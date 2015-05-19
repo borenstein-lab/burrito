@@ -1,0 +1,158 @@
+some based on http://bl.ocks.org/ianyfchang/8119685
+
+define beginning variables:
+  total_heatmap_height
+  total_heatmap_width
+
+  # initial dimensions of heatmap cells
+  rect_height = total_heatmap_height / num_rows
+  rect_width = total_heatmap_width / num_cols
+
+  # otu label height will be same as rect_height
+  otu_label_width
+
+  # ko label width will be same as rect_width
+  ko_label_height
+
+  color_min = rgb_of_min_color
+  color_max = rgb_of_max_color
+
+define cell object:
+  x_pos
+  y_pos
+  height
+  width
+  otu_owner
+  ko_owner
+  color
+
+define label object:
+  x_pos
+  y_pos
+  height
+  width
+  text
+  owner
+
+create_heatmap(otus, kos, cells, otu_labels, ko_labels):
+  for otu in otus:
+    for ko in kos:
+      create cell object
+      set cell otu and ko
+      set color of cell corresponding to otu and ko
+      set height and width of cell
+      set x pos and y pos of cell corresponding to otu and ko
+      add cell to cells
+  
+  otu_labels = list of labels for otus
+  for otu in otus:
+    create label object
+    set x pos and y pos
+    set height and width
+    set text
+    add to otu_labels
+
+  ko_labels = list of labels kos
+  for ko in kos:
+    create label object
+    set x pos and y pos
+    set height and width
+    set text
+    add to ko_labels
+
+draw_heatmap(cells, otu_labels, ko_labels):
+  draw cells and labels
+
+increase_otu_sat(otu, cells):
+  for cell in cells:
+    if cell.otu_owner == otu:
+      increase color saturation
+
+decrease_otu_sat(otu, cells):
+  for cell in cells:
+    if cell.otu_owner == otu:
+      decrease color saturation
+
+increase_ko_sat(ko, cells):
+  for cell in cells:
+    if cell.ko_owner == ko:
+      increase color saturation
+
+decrease_ko_sat(ko, cells):
+  for cell in cells:
+    if cell.ko_owner == ko:
+      decrease color saturation
+
+# if we are just highlighting on mouseover
+on_label_mouseover:
+  increase saturation of cells in row/col
+  redraw heatmap
+  draw black outlines?
+
+on_end_label_mouseover:
+  decrease saturation of cells in row/col
+  draw heatmap  
+
+on_label_mouseclick:
+  add otu/ko to list of clicked otus/kos if not already in list or remove otu/ko from list of clicked otus/kos if already in list
+  if added to list:
+    increase saturation of cells in row/col
+  if removed from list:
+    decrease saturation of cells in row/col
+  draw heatmap
+  if added to list:
+    draw black outlines?
+
+# on changing taxonomic or function level from drop down?
+change_otu/ko_level:
+  change list of otus/kos based on lookup
+  create heatmap with new otus/kos
+  draw heatmap
+
+update_row_pos(otu, new_y, cells, otu_labels):
+  for cell in cells:
+    if cell.otu_owner == otu:
+      cell.y_pos = new_y
+  for label in otu_labels:
+    if otu_labels == otu:
+      label.y_pos = new_y
+
+update_col_pos(ko, new_x, cells, ko_labels):
+  for cell in cells:
+    if cell.ko_owner == ko:
+      cell.x_pos = new_x
+  for label in ko_labels:
+    if ko_labels == ko:
+      label.x_pos = new_x
+
+# on changing otu/ko sort order from drop down
+change_otu/ko_sort:
+  # depends on sorting method, but should look something like this
+  for i in number of iterations for animation to take place:
+    for otu/ko in otus/kos:
+      look up new y/x position given new sort
+      update_row/col_pos(otu/ko, new_y/x, cells, otu/ko_labels)
+    draw heatmap
+
+# if we are drilling down on moused-over selection
+on_label_mouseover:
+  look up children of moused-over label
+  remove cells belonging to moused-over label
+  add cells belonging to children, all at same x/y position (depends on whether row/column)
+  add labels belonging to children, all at same x/y position (depends on whether row/column)
+  over animation time:
+    shrink all cell widths/heights appropriately
+    spread out children cells with update_row/col_pos
+    shift parent label away from heatmap, do not update height/width
+    spread out children labels
+
+on_end_label_mouseover:
+  reverse on mouseover
+  at end remove cells belonging to children
+  at end add cells for parent
+
+on_mouseclick:
+  if on label just expanded by mouseover:
+    ignore on_end_label_mouseover
+  if on expanded label not just expanded:
+    perform on_end_label_mouseover
