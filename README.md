@@ -11,25 +11,39 @@
  
 ###Will: 
 -Specialize in realizing our visualization in Canvas to increase performance
+
 -Exploring options on how to integrate Canvas and d3 to quickly render the large number of data points and edges that our visualization will include.
+
 -Port visualization prototypes to Canvas
+
 -Project management, to ensure that the project is broken down into manageable chunks.
+
 -Coordinating visual design of separate components of the visualization.
+
 -Gathering user feedback and using it to modify project goals.
 
 ###Colin:
 -Initial implementation of bipartite graph visualization.
+
 -Initial implementation of bipartite graph interaction, including mouseover highlighting and using it to highlight sections of the stacked bar plots.
+
 -Aid in implementation of data structures.
+
 -Creating animations when changing what data is being displayed.
+
 
 ###Alex:
 -Initial implementation of hierarchical tree structures visualization.
+
 -Initial implementation of hierarchical tree interaction:using them to increase or reduce the level of detail on the stacked bar plots and the bipartite graph, including transitions between levels when the user clicks on a taxon or function to subset
+
 -Implementation of data structures
+
 
 ###Cecilia:
 -Format the data for input
+
 -Initial code for stacked bar plots visualization.
+
 -Implementation of stacked bar plot interactions including mouseover details, click to subset, and sample sorting and reordering, followed by implementation of joint subsetting of both bar plots.
 
