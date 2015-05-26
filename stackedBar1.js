@@ -28,7 +28,7 @@
 
 
   d3.tsv("mice_samplemap.txt", function(error2, data2){
-    //console.log(data2)});
+    console.log(data2)});
 
 
   d3.tsv("metagenome_predictions_transpose.txt", function(error, data) {
