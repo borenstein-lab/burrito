@@ -4,8 +4,8 @@ var margin = {
     bottom: 20,
     left: 120
 },
-width = 1960 - margin.right - margin.left,
-    height = 1800 - margin.top - margin.bottom;
+width = window.innerWidth - margin.left - margin.right - 50,
+height = window.innerHeight - margin.top - margin.bottom - 50;
 
 var i = 0,
     duration = 750,
@@ -13,8 +13,8 @@ var i = 0,
 
 var tree = d3.layout.tree()
     .children(function (d) {
-    if (d.values != null) return d.values;
-    else if (d.children != null) return d.children;
+    if (d.hasOwnProperty('values')) return d.values;
+    else if (d.hasOwnProperty('children')) return d.children;
 })
     .size([height, width]);
 
@@ -40,13 +40,21 @@ d3.tsv("taxa_mapping.txt", function(error, data){
         .key(function(d) { return d.Genus; })
         .key(function(d) { return d.Species; })
         .entries(data);    
+
+    function fixNames(d){
+        d.name = d.key;
+        if(d.hasOwnProperty('values')){
+            d.children = d.values;
+            d.values.forEach(fixNames);
+        }
+    }
     newData = {
-        "name": "data",
+        "name": "All Taxa",
         "children": nested_data,
     }
 
+
     root = newData;
-    console.log(root);
     root.x0 = height/2;
     root.y0 = 0;
 
@@ -79,8 +87,9 @@ d3.tsv("taxa_mapping.txt", function(error, data){
             links = tree.links(nodes);
 
         // Normalize for fixed-depth.
+        console.log(nodes.toSource());
         nodes.forEach(function (d) {
-            d.y = d.depth * 180;
+            d.y = d.depth * 140;
         });
 
         // Update the nodes…
@@ -106,6 +115,7 @@ d3.tsv("taxa_mapping.txt", function(error, data){
         nodeEnter.append("text")
             .attr("x", function (d) {
             return d.children || d._children || d.values || d._values ? -10 : 10;
+            //return d.children || d.values ? -10 : 10;
         })
             .attr("dy", ".35em")
             .attr("text-anchor", function (d) {
@@ -186,11 +196,12 @@ d3.tsv("taxa_mapping.txt", function(error, data){
                 source: o,
                 target: o
             });
-        })
-            .remove();
+        }).remove();
 
         // Stash the old positions for transition.
         nodes.forEach(function (d) {
+            console.log(d.x);
+            console.log(d.y);
             d.x0 = d.x;
             d.y0 = d.y;
         });
