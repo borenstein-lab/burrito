@@ -1,0 +1,151 @@
+Kingdom	Phylum	Class	Order	Family	Genus	Species	OTU_ID
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			258522
+Bacteria	Firmicutes	Clostridia	Clostridiales				330296
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			190114
+Bacteria	Firmicutes	Clostridia	Clostridiales				271162
+Bacteria	Firmicutes	Clostridia	Clostridiales				180800
+Bacteria	Firmicutes	Clostridia	Clostridiales				175613
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			230933
+Bacteria	Firmicutes	Clostridia	Clostridiales				311174
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			1111580
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		272834
+Bacteria	Firmicutes	Clostridia	Clostridiales				4464787
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		271689
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			3265889
+Bacteria	Firmicutes	Clostridia	Clostridiales				4365109
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			189840
+Bacteria	Firmicutes	Clostridia	Clostridiales				174260
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			199307
+Bacteria	Firmicutes	Clostridia	Clostridiales				258747
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			192283
+Bacteria	Firmicutes	Clostridia	Clostridiales				190971
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		192557
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Bacteroidaceae	Bacteroides		260410
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			170248
+Bacteria	Firmicutes	Clostridia	Clostridiales				184966
+Bacteria	Firmicutes	Clostridia	Clostridiales				217139
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			197600
+Bacteria	Firmicutes	Clostridia	Clostridiales				268220
+Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Moraxellaceae			219151
+Bacteria	Firmicutes	Clostridia	Clostridiales				275987
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			210950
+Bacteria	Firmicutes	Clostridia	Clostridiales				272905
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			4481359
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			207288
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			198904
+Bacteria	Firmicutes	Clostridia	Clostridiales				732285
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			185723
+Bacteria	Firmicutes	Clostridia	Clostridiales				356353
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Coprococcus		274455
+Bacteria	Firmicutes	Clostridia	Clostridiales				262917
+Bacteria	Firmicutes	Clostridia	Clostridiales				353593
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			4440624
+Bacteria	Firmicutes	Clostridia	Clostridiales				267373
+Bacteria	Firmicutes	Clostridia	Clostridiales				346595
+Bacteria	Firmicutes	Clostridia	Clostridiales				172464
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			196165
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			743911
+Bacteria	Firmicutes	Clostridia	Clostridiales				174853
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			182595
+Bacteria	Firmicutes	Clostridia	Clostridiales				460611
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			214835
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			266223
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		272004
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	[Ruminococcus]	gnavus	270758
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		263337
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			1902400
+Bacteria	Firmicutes	Clostridia	Clostridiales				164308
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			196349
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Ruminococcus		171079
+Bacteria	Firmicutes	Clostridia	Clostridiales				339718
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Ruminococcus		189147
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			330772
+Bacteria	Firmicutes	Clostridia	Clostridiales	Peptococcaceae	rc4-4		263895
+Bacteria	Firmicutes	Clostridia	Clostridiales				187359
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			173892
+Bacteria	Firmicutes	Clostridia	Clostridiales				1510067
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			346267
+Bacteria	Firmicutes	Clostridia	Clostridiales				779847
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		180879
+Bacteria	Firmicutes	Clostridia	Clostridiales				1571092
+Bacteria	Firmicutes	Clostridia	Clostridiales				266061
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			195402
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			215214
+Bacteria	Firmicutes	Clostridia	Clostridiales				321952
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Rikenellaceae			194490
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			189778
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Ruminococcus		178480
+Bacteria	Firmicutes	Clostridia	Clostridiales				265063
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			173852
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			211494
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		179547
+Bacteria	Firmicutes	Clostridia	Clostridiales				266697
+Bacteria	Firmicutes	Clostridia	Clostridiales				197875
+Bacteria	Firmicutes	Clostridia	Clostridiales				312476
+Bacteria	Firmicutes	Clostridia	Clostridiales				175114
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	[Ruminococcus]	gnavus	383971
+Bacteria	Tenericutes	Mollicutes	RF39				4432841
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			263933
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			205134
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		317633
+Bacteria	Firmicutes	Clostridia	Clostridiales				250270
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			180405
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			165241
+Bacteria	Firmicutes	Clostridia	Clostridiales				310751
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			183362
+Bacteria	Firmicutes	Clostridia	Clostridiales				186940
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			183893
+Bacteria	Firmicutes	Clostridia	Clostridiales				182323
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			790663
+Bacteria	Firmicutes	Bacilli	Lactobacillales	Lactobacillaceae	Lactobacillus		269125
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			322585
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		182033
+Bacteria	Firmicutes	Clostridia	Clostridiales				179059
+Bacteria	Firmicutes	Clostridia	Clostridiales				266203
+Bacteria	Firmicutes	Clostridia	Clostridiales				355097
+Bacteria	Firmicutes	Clostridia	Clostridiales				305553
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Ruminococcus		2978254
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			343140
+Bacteria	Tenericutes	Mollicutes	Anaeroplasmatales	Anaeroplasmataceae	Anaeroplasma		4390755
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			331043
+Bacteria	Firmicutes	Bacilli	Turicibacterales	Turicibacteraceae	Turicibacter		214919
+Bacteria	Firmicutes	Clostridia	Clostridiales				186707
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			174056
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			196533
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			289984
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	[Ruminococcus]	gnavus	2897332
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			320123
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Coprococcus		653533
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			183478
+Bacteria	Firmicutes	Clostridia	Clostridiales				2120779
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			273737
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Ruminococcus		268971
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			334328
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			258559
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			1051764
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			232380
+Bacteria	Firmicutes	Clostridia	Clostridiales				199532
+Bacteria	Firmicutes	Clostridia	Clostridiales				175573
+Bacteria	Firmicutes	Clostridia	Clostridiales				262247
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Ruminococcus		177271
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			185587
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			187078
+Bacteria	Firmicutes	Clostridia	Clostridiales				177291
+Bacteria	Firmicutes	Clostridia	Clostridiales				262410
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			198964
+Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas		1566691
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			355822
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			259557
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			209030
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae			259275
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			389282
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		176118
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			833390
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae			213896
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		272595
+Bacteria	Firmicutes	Clostridia	Clostridiales				307416
+Bacteria	Firmicutes	Bacilli	Lactobacillales	Lactobacillaceae	Lactobacillus		135956
+Bacteria	Firmicutes	Clostridia	Clostridiales				335183
+Bacteria	Firmicutes	Clostridia	Clostridiales	Ruminococcaceae	Oscillospira		838685
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	S24-7			203713
+Bacteria	Firmicutes	Clostridia	Clostridiales				174320
