@@ -26,8 +26,19 @@
     .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+
+  d3.tsv("mice_samplemap.txt", function(error2, data2){
+    console.log(data2)});
+
+
   d3.tsv("metagenome_predictions_transpose.txt", function(error, data) {
-    color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Sample"; }));
+    color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Sample"; }))
+    //console.log(data);
+
+
+
+
+
 
     var normalized = true;
 

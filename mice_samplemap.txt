@@ -1,4 +1,4 @@
-SampleID	Treatment	Day
+Sample	Treatment	Day
 Cef2dayrec21	Antibiotic	2
 Cef2dayrec22	Antibiotic	2
 Cef2dayrec23	Antibiotic	2
