@@ -16,7 +16,15 @@ var tree = d3.layout.tree()
     if (d.hasOwnProperty('values')) return d.values;
     else if (d.hasOwnProperty('children')) return d.children;
 })
-    .size([height, width]);
+    .size([height, width/2]);
+
+var tree2 = d3.layout.tree()
+    .children(function (d) {
+    if (d.hasOwnProperty('values')) return d.values;
+    else if (d.hasOwnProperty('children')) return d.children;
+})
+    .size([height, width/2]);
+
 
 var diagonal = d3.svg.diagonal()
     .projection(function (d) {
@@ -29,32 +37,25 @@ var svg = d3.select("body").append("svg")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.tsv("taxa_mapping.txt", function(error, data){
+d3.tsv("taxa_mapping.txt", function(error, data1){
+    d3.tsv("functional_mapping.txt", function(error, data2){
 
-    var nested_data = d3.nest()
-        .key(function(d) {return d.Kingdom; })
+        var taxa_data = d3.nest()
+        .key(function(d) { return d.Kingdom; })
         .key(function(d) { return d.Phylum; })
         .key(function(d) { return d.Class; })
         .key(function(d) { return d.Order; })
         .key(function(d) { return d.Family; })
         .key(function(d) { return d.Genus; })
         .key(function(d) { return d.Species; })
-        .entries(data);    
+        .entries(data1);    
 
-    function fixNames(d){
-        d.name = d.key;
-        if(d.hasOwnProperty('values')){
-            d.children = d.values;
-            d.values.forEach(fixNames);
-        }
-    }
-    newData = {
+    newTaxaData = {
         "name": "All Taxa",
-        "children": nested_data,
+        "children": taxa_data,
     }
 
-
-    root = newData;
+    root = newTaxaData;
     root.x0 = height/2;
     root.y0 = 0;
 
@@ -80,6 +81,29 @@ d3.tsv("taxa_mapping.txt", function(error, data){
 
     d3.select(self.frameElement).style("height", "800px");
 
+    var function_data = d3.nest()
+        .key(function(d) { return d.Category; })
+        .key(function(d) { return d.SuperPathway; })
+        .key(function(d) { return d.SubPathway; })
+        .key(function(d) { return d.KO; })
+        .entries(data2);    
+
+    newFunctionData = {
+        "name": "All Functions",
+        "children": function_data,
+    }
+
+    root2 = newFunctionData;
+    root2.x0 = height/2;
+    root2.y0 = 0;
+
+    root2.children.forEach(collapse);
+
+    update(root2);
+
+    d3.select(self.frameElement).style("height", "800px");
+
+
     function update(source) {
 
         // Compute the new tree layout.
@@ -87,9 +111,8 @@ d3.tsv("taxa_mapping.txt", function(error, data){
             links = tree.links(nodes);
 
         // Normalize for fixed-depth.
-        console.log(nodes.toSource());
         nodes.forEach(function (d) {
-            d.y = d.depth * 140;
+            d.y = d.depth * 100;
         });
 
         // Update the nodes…
@@ -115,7 +138,6 @@ d3.tsv("taxa_mapping.txt", function(error, data){
         nodeEnter.append("text")
             .attr("x", function (d) {
             return d.children || d._children || d.values || d._values ? -10 : 10;
-            //return d.children || d.values ? -10 : 10;
         })
             .attr("dy", ".35em")
             .attr("text-anchor", function (d) {
@@ -200,8 +222,8 @@ d3.tsv("taxa_mapping.txt", function(error, data){
 
         // Stash the old positions for transition.
         nodes.forEach(function (d) {
-            console.log(d.x);
-            console.log(d.y);
+            //console.log(d.x);
+            //console.log(d.y);
             d.x0 = d.x;
             d.y0 = d.y;
         });
@@ -228,4 +250,5 @@ d3.tsv("taxa_mapping.txt", function(error, data){
         }
         update(d);
     }
+})
 });
