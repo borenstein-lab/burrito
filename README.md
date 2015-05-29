@@ -51,3 +51,40 @@ http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/
 
 -Implementation of stacked bar plot interactions including mouseover details, click to subset, and sample sorting and reordering, followed by implementation of joint subsetting of both bar plots.
 
+
+##To Do 5/27/25
+#Overall
+-Get multiple graphs on same page
+#Stacked Bar Plots
+-make one with otu data(on it's own, not involved in data cube)
+-highlight all bars from species(write a function to do so)
+-collapsing or expanding bars
+-need to rewrite KO stacked bar w/ data cube
+#Data
+-load all data at once w/ nested loads
+-Create data cube
+#Trees
+-Create trees with edges from nodes
+-Leaves at same x-coordinate, maybe using dummy nodes. 
+-Permanent labels on leaves
+-interior labels on mouseover
+-branch coloring or shading scheme for heirarchy level
+
+
+##Tasks
+
+#Colin
+Work on the tree structure
+
+#Alex
+Data Structure
+Simple Highlighting on stacked bar
+
+#Cecilia
+Start on Bipartite
+
+#Will
+Create OTU Stacked Bar Graph
+Get everything on the same page
+
+
