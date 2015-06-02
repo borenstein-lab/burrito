@@ -166,7 +166,40 @@
 			.data(data.edges).enter().append("polygon").attr("class","edge")
 			.attr("points", edgePolygon)
 			.style("fill",function(d){ return colors[d.key1];})
-			.style("opacity",0.2).each(function(d) { this._current = d; });
+			.style("opacity",0.2).each(function(d) { this._current = d; })
+			.on("mouseover", function(d,i){ 
+				d3.select(this).style("opacity",1);
+				//console.log(this._current.key1);
+				var current_data = this._current;
+				[0,1].forEach(function(m){
+					var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
+						.selectAll(".mainbar").filter(function(d,i){ 
+							return (i==current_data["key"+(m+1)]);});
+					selectedBar.select(".barlabel").style('font-weight','bold');
+
+					var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
+						.selectAll(".subbar")
+						.filter(function(d,i){ 
+							return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
+					selSubBar.style("opacity", 1);
+
+				});
+			})
+			.on("mouseout", function(d,i){ 
+				d3.select(this).style("opacity",0.2);
+				var current_data = this._current;
+				[0,1].forEach(function(m){
+					var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
+						.selectAll(".mainbar").filter(function(d,i){ 
+							return (i==current_data["key"+(m+1)]);});
+					selectedBar.select(".barlabel").style('font-weight','normal');
+					var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
+						.selectAll(".subbar")
+						.filter(function(d,i){ 
+							return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
+					selSubBar.style("opacity", 0.2);
+				});
+			});
 	}	
 	
 
@@ -241,7 +274,7 @@
 
 			var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
-			console.log(selectedEdges.toSource());
+			//console.log(selectedEdges.toSource());
 
 			selectedEdges.style("opacity", 1);
 			//selectedEdges.select("_current").style("stroke-opacity", 1);
@@ -261,16 +294,15 @@
 		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
 		selectedBar.select(".barlabel").style('font-weight','normal');
 
-			var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
-				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
-			console.log(selectedEdges.toSource());
+		var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
+			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
+		//console.log(selectedEdges.toSource());
 
-			selectedEdges.style("opacity", 0.2);
+		selectedEdges.style("opacity", 0.2);
 
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');
 	}
-
 
 		// function transitionPart(data, id, p){
 	// 	var mainbar = d3.select("#"+id).select(".part"+p).select(".mainbars")
