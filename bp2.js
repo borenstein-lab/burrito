@@ -1,15 +1,16 @@
 !function(){
 	var bP={};	
-	var b=30, bb=150, height=600, buffMargin=1, minHeight=14;
-	var c1=[-50, 50], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
+	var b=20, bb=150, height=600, buffMargin=1, minHeight=14;
+	var c1=[-60, 35], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
 	var colors =d3.scale.category20().range();
 	
 	bP.partData = function(data){
 		var sData={};
 		
+		var cat1 = Object.keys(data[0])[0], cat2 = Object.keys(data[0])[1];
 		sData.keys=[
-			d3.set(data.map(function(d){ return d['OTU'];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
-			d3.set(data.map(function(d){ return d['Gene'];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
+			d3.set(data.map(function(d){ return d[cat1];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
+			d3.set(data.map(function(d){ return d[cat2];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
 		];
 
 		//console.log(sData.keys[1].toSource());
@@ -19,8 +20,8 @@
 		];
 
 		data.forEach(function(d){ 
-			sData.data[0][sData.keys[0].indexOf(d['OTU'])][sData.keys[1].indexOf(d['Gene'])]=1;
-			sData.data[1][sData.keys[1].indexOf(d['Gene'])][sData.keys[0].indexOf(d['OTU'])]=1; 
+			sData.data[0][sData.keys[0].indexOf(d[cat1])][sData.keys[1].indexOf(d[cat2])]=1;
+			sData.data[1][sData.keys[1].indexOf(d[cat2])][sData.keys[0].indexOf(d[cat1])]=1; 
 		});
 				
 		return sData;
@@ -39,7 +40,6 @@
 					v.percent = d; //(total == 0 ? 0 : d/total); //d is 1 or 0 only
 					v.value=d;
 					v.height=1; //Math.max(v.percent*(e-s-2*b*a.length), m); 
-					console.log(v.height);
 					(v.height==m ? leftoverHeight-=m : neededHeight+=v.height );
 					ret.push(v);
 				}
@@ -50,7 +50,7 @@
 			ret.forEach(
 				function(d){ 
 					d.percent = scaleFact*d.percent; 
-					d.height=1*scaleFact; //(d.height==m? m : d.height*scaleFact);
+					d.height= scaleFact; //(d.height==m? m : d.height*scaleFact);
 					d.middle=sum+b+d.height/2;
 					d.y=s + d.middle; //- d.percent*(e-s-2*b*a.length)/2;
 					d.h= 1; //d.percent*(e-s-2*b*a.length);
@@ -83,6 +83,8 @@
 				return (a.key1 < b.key1 ? -1 : a.key1 > b.key1 ? 
 						1 : a.key2 < b.key2 ? -1 : a.key2 > b.key2 ? 1: 0 )});
 		});
+
+		//console.log(vis.subBars[0].toSource());
 		
 		vis.edges = vis.subBars[0].map(function(p,i){
 			return {
@@ -109,6 +111,7 @@
 	function drawPart(data, id, p){
 		d3.select("#"+id).append("g").attr("class","part"+p)
 			.attr("transform","translate("+( p*(bb+b))+",0)");
+
 		d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
 		d3.select("#"+id).select(".part"+p).append("g").attr("class","mainbars");
 		
@@ -146,7 +149,8 @@
 			.attr("y",function(d){ return d.y})
 			.attr("width",b)
 			.attr("height",function(d){ return d.h})
-			.style("fill",function(d){ return colors[d.key1];});
+			.style("fill",function(d){ return colors[d.key1];})
+			.style("opacity",0.1);
 	}
 	
 	function drawEdges(data, id){
@@ -162,7 +166,7 @@
 			.data(data.edges).enter().append("polygon").attr("class","edge")
 			.attr("points", edgePolygon)
 			.style("fill",function(d){ return colors[d.key1];})
-			.style("opacity",0.15).each(function(d) { this._current = d; });
+			.style("opacity",0.2).each(function(d) { this._current = d; });
 	}	
 	
 
@@ -176,7 +180,6 @@
 			
 			h.append("text").text(header[d]).attr("x", (c1[d]-3))
 				.attr("y", -5).style("fill","black").style("font-size", "16");
-			
 			//h.append("text").text("Count").attr("x", (c2[d]-10))
 			//	.attr("y", -5).style("fill","grey");
 			// h.append("line").attr("x1",c1[d]-10).attr("y1", -2)
@@ -227,22 +230,43 @@
 			
 			//selectedBar.select(".mainrect").style("stroke-opacity",1);			
 			selectedBar.select(".barlabel").style('font-weight','bold');
-			var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge");
+
+			var selSubBar =  d3.select("#"+k.id).select(".part"+m).select(".subbars")
+				.selectAll(".subbar")
+				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
+			//console.log(selSubBar.toSource());
+			//console.log(selectedBar.toSource());
+
+			selSubBar.style("opacity", 1);
+
+			var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
+				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 			console.log(selectedEdges.toSource());
 
-			selectedEdges.select("_current").style("stroke-opacity", 1);
+			selectedEdges.style("opacity", 1);
+			//selectedEdges.select("_current").style("stroke-opacity", 1);
 			//selectedBar.select(".barvalue").style('font-weight','bold');
 			//selectedBar.select(".barpercent").style('font-weight','bold');
 	}	
 	
 	bP.deSelectSegment = function(k, m, s){
 		//transition(visualize(k.data), k.id);
-			
 		var selectedBar = d3.select("#"+k.id).select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ return (i==s);});
-			
-		selectedBar.select(".mainrect").style("stroke-opacity",0);			
+
+			var selSubBar = d3.select("#"+k.id).select(".part"+m).select(".subbars").selectAll(".subbar")
+			.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
+			selSubBar.style("opacity", 0.1);
+
+		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
 		selectedBar.select(".barlabel").style('font-weight','normal');
+
+			var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
+				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
+			console.log(selectedEdges.toSource());
+
+			selectedEdges.style("opacity", 0.2);
+
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');
 	}
