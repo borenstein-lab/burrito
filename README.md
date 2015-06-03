@@ -55,7 +55,7 @@ http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/
 ##To Do 5/27/25
 ###Overall
 -Get multiple graphs on same page
-#Stacked Bar Plots
+###Stacked Bar Plots
 -make one with otu data(on it's own, not involved in data cube)
 -highlight all bars from species(write a function to do so)
 -collapsing or expanding bars
