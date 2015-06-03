@@ -1,4 +1,4 @@
-(function(){
+
   var margin = {top: 20, right: 20, bottom: 80, left: 40},
       width = window.innerWidth - margin.left - margin.right - 250,
       height = window.innerHeight - margin.top - margin.bottom - 50;
@@ -34,7 +34,6 @@
   d3.tsv("metagenome_predictions_transpose.txt", function(error, data) {
     color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Sample"; }))
     //console.log(data);
-
 
 
 
@@ -196,5 +195,5 @@
         .style("position", "absolute")
         .style("z-index", "10")
         .text("Raw Counts");
+
   });
-})();
