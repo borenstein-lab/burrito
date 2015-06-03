@@ -218,7 +218,7 @@
 
         /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
-
+        // Create a cube of the currently displayed contribution data
         var displayed_contribution_cube = {};
         for (var i = 0; i < samples.length; i++){
           var sample = samples[i];
