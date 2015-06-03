@@ -1,8 +1,8 @@
 !function(){
 	var bP={};	
-	var b=20, bb=150, height=600, buffMargin=1, minHeight=14;
+	var b=20, bb=150, height=500, buffMargin=1, minHeight=14;
 	var c1=[-60, 35], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
-	var colors =d3.scale.category20().range();
+	var colors = d3.scale.category20().range();
 	
 	bP.partData = function(data){
 		var sData={};
@@ -12,6 +12,7 @@
 			d3.set(data.map(function(d){ return d[cat1];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
 			d3.set(data.map(function(d){ return d[cat2];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
 		];
+		// need to get to match in tree order
 
 		//console.log(sData.keys[1].toSource());
 		
@@ -30,7 +31,14 @@
 	function visualize(data){
 		var vis ={};
 		function calculatePosition(a, s, e, b, m){
-			var total=d3.sum(a);
+			console.log("a"+a);
+			console.log("s"+s);
+			console.log("e"+e);
+			console.log("b"+b);
+			console.log("m"+m);
+
+			var total=a.length;
+
 			var sum=0, neededHeight=0, leftoverHeight= e-s-2*b*a.length;
 			var ret =[];
 			
@@ -50,10 +58,10 @@
 			ret.forEach(
 				function(d){ 
 					d.percent = scaleFact*d.percent; 
-					d.height= scaleFact; //(d.height==m? m : d.height*scaleFact);
+					d.height= scaleFact; //*d.value; //(d.height==m? m : d.height*scaleFact);
 					d.middle=sum+b+d.height/2;
 					d.y=s + d.middle; //- d.percent*(e-s-2*b*a.length)/2;
-					d.h= 1; //d.percent*(e-s-2*b*a.length);
+					d.h= 1; //scaleFact; //d.value; //d.percent*(e-s-2*b*a.length);
 					d.percent = (total == 0 ? 0 : d.value/total);
 					sum+=2*b+d.height;
 				}
@@ -63,19 +71,23 @@
 
 		//making the main 2 bars
 		vis.mainBars = [ 
-			calculatePosition( data.data[0].map(function(d){ return d3.sum(d);}), 0, height, buffMargin, minHeight), 
-			calculatePosition( data.data[1].map(function(d){ return d3.sum(d);}), 0, height, buffMargin, minHeight)
+			calculatePosition( data.data[0].map(function(d){ return d.length;}), 0, height, buffMargin, minHeight), //d3.sum(d) 
+			calculatePosition( data.data[1].map(function(d){ return d.length;}), 0, height, buffMargin, minHeight)
 		];
 		
 		//making the bars for each node
 		vis.subBars = [[],[]];
 		vis.mainBars.forEach(function(pos,p){
 			pos.forEach(function(bar, i){	
-				calculatePosition(data.data[p][i], bar.y, bar.y+bar.h, 0, 0).forEach(function(sBar,j){ 
-					sBar.key1=(p==0 ? i : j); 
-					sBar.key2=(p==0 ? j : i); 
-					vis.subBars[p].push(sBar); 
-				});
+				//console.log(bar.toSource());
+				if(bar.value !== 0){
+					console.log(data.data[p][i]);
+					calculatePosition(data.data[p][i], bar.y, bar.y, 0, 0).forEach(function(sBar,j){ //+bar.h
+						sBar.key1=(p==0 ? i : j); 
+						sBar.key2=(p==0 ? j : i); 
+						vis.subBars[p].push(sBar); 
+					});
+				}
 			});
 		});
 		vis.subBars.forEach(function(sBar){
@@ -93,9 +105,15 @@
 				y1:p.y,
 				y2:vis.subBars[1][i].y,
 				h1:p.h,
-				h2:vis.subBars[1][i].h
+				h2:vis.subBars[1][i].h,
+				val:p.value
 			};
 		});
+		console.log(vis.edges.length);
+		console.log(vis.edges[0].val);
+		vis.edges = vis.edges.filter(function(d){ return d.val!==0});
+		console.log(vis.edges[0].toSource());
+		console.log(vis.edges.length);
 		vis.keys=data.keys;
 		return vis;
 	}
@@ -130,7 +148,8 @@
 			.attr("x", c1[p])
 			.attr("y",function(d){ return d.middle+5;})
 			.text(function(d,i){ return data.keys[p][i];})
-			.attr("text-anchor","start" );
+			.attr("text-anchor","start" )
+			.style("visibility", "hidden");
 			
 //		mainbar.append("text").attr("class","barvalue")
 //			.attr("x", c2[p]).attr("y",function(d){ return d.middle+5;});
@@ -169,36 +188,13 @@
 			.style("opacity",0.2).each(function(d) { this._current = d; })
 			.on("mouseover", function(d,i){ 
 				d3.select(this).style("opacity",1);
-				//console.log(this._current.key1);
 				var current_data = this._current;
-				[0,1].forEach(function(m){
-					var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
-						.selectAll(".mainbar").filter(function(d,i){ 
-							return (i==current_data["key"+(m+1)]);});
-					selectedBar.select(".barlabel").style('font-weight','bold');
-
-					var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
-						.selectAll(".subbar")
-						.filter(function(d,i){ 
-							return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
-					selSubBar.style("opacity", 1);
-
-				});
+				bP.selectEdge(id, i, current_data);
 			})
 			.on("mouseout", function(d,i){ 
 				d3.select(this).style("opacity",0.2);
 				var current_data = this._current;
-				[0,1].forEach(function(m){
-					var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
-						.selectAll(".mainbar").filter(function(d,i){ 
-							return (i==current_data["key"+(m+1)]);});
-					selectedBar.select(".barlabel").style('font-weight','normal');
-					var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
-						.selectAll(".subbar")
-						.filter(function(d,i){ 
-							return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
-					selSubBar.style("opacity", 0.2);
-				});
+				bP.deselectEdge(id, i, current_data);
 			});
 	}	
 	
@@ -262,7 +258,8 @@
 				.selectAll(".mainbar").filter(function(d,i){ return (i==s);}); //return sth element of main bar only
 			
 			//selectedBar.select(".mainrect").style("stroke-opacity",1);			
-			selectedBar.select(".barlabel").style('font-weight','bold');
+			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
+;
 
 			var selSubBar =  d3.select("#"+k.id).select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
@@ -292,7 +289,7 @@
 			selSubBar.style("opacity", 0.1);
 
 		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
-		selectedBar.select(".barlabel").style('font-weight','normal');
+		selectedBar.select(".barlabel").style('font-weight','normal').style("visibility", "hidden");
 
 		var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
@@ -302,6 +299,36 @@
 
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');
+	}
+
+	bP.selectEdge = function(id, i, current_data){
+		[0,1].forEach(function(m){
+		var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
+			.selectAll(".mainbar").filter(function(d,i){ 
+				return (i==current_data["key"+(m+1)]);});
+			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
+
+			var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
+				.selectAll(".subbar")
+				.filter(function(d,i){ 
+					return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
+			selSubBar.style("opacity", 1);
+		});
+	}
+
+	bP.deselectEdge = function(id, i, current_data){
+		[0,1].forEach(function(m){
+		var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
+			.selectAll(".mainbar").filter(function(d,i){ 
+				return (i==current_data["key"+(m+1)]);});
+		selectedBar.select(".barlabel").style('font-weight','normal').style("visibility", "hidden");
+		var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
+			.selectAll(".subbar")
+			.filter(function(d,i){ 
+				return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
+		selSubBar.style("opacity", 0.2);
+		});
+
 	}
 
 		// function transitionPart(data, id, p){
