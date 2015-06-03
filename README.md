@@ -53,17 +53,17 @@ http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/
 
 
 ##To Do 5/27/25
-#Overall
+###Overall
 -Get multiple graphs on same page
 #Stacked Bar Plots
 -make one with otu data(on it's own, not involved in data cube)
 -highlight all bars from species(write a function to do so)
 -collapsing or expanding bars
 -need to rewrite KO stacked bar w/ data cube
-#Data
+###Data
 -load all data at once w/ nested loads
 -Create data cube
-#Trees
+###Trees
 -Create trees with edges from nodes
 -Leaves at same x-coordinate, maybe using dummy nodes. 
 -Permanent labels on leaves
@@ -73,17 +73,17 @@ http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/
 
 ##Tasks
 
-#Colin
+###Colin
 Work on the tree structure
 
-#Alex
+###Alex
 Data Structure
 Simple Highlighting on stacked bar
 
-#Cecilia
+###Cecilia
 Start on Bipartite
 
-#Will
+###Will
 Create OTU Stacked Bar Graph
 Get everything on the same page
 
