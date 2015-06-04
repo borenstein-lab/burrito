@@ -43,8 +43,8 @@
           // Checks whether a node in a tree is a leaf node
           function is_leaf(node){
             if (node.hasOwnProperty('values')){
-              for (var value in node.values){
-                if (value.hasOwnProperty('values')){
+              for (var i = 0; i < node.values.length; i++){
+                if (node.values[i].hasOwnProperty('values')){
                   return false;
                 }
               }
@@ -103,10 +103,17 @@
           // For each row in the original TSV, make an entry in the original_contribution_cube
           // Accessed by original_contribution_cube[sample][taxon][func], returns the contribution of the given taxon to the given func relative to the total functional abundance in the given sample
           contribution_data.forEach(function(d) {
-            var ko = d.Gene;
-            var otu = d.OTU;
+            var ko = d.SubPathway;
+            var otu = d.Genus;
             var sample = d.Sample;
-            var contribution = d.ContributionPercentOfSample;
+            var contribution = parseFloat(d.ContributionPercentOfSample);
+            var contribution_fraction = 0;
+            for (var i = 0; i < func_rel_abundance_data.length; i++){
+              if (sample == func_rel_abundance_data[i].Sample){
+                contribution_fraction = parseFloat(func_rel_abundance_data[i][ko]);
+              }
+            }
+            contribution *= contribution_fraction
 
             // If there's already an entry for the sample, move on to check for the otu entry, otherwise add an entry for the sample
             if (sample in original_contribution_cube){
@@ -166,11 +173,17 @@
             // Sum the relative contributions to each leaf ko by each leaf otu
             var total = 0;
             for (var i = 0; i < contribution_data.length; i++){
-              var curr_otu = contribution_data[i].OTU;
-              var curr_ko = contribution_data[i].Gene;
+              var curr_otu = contribution_data[i].Genus;
+              var curr_ko = contribution_data[i].SubPathway;
               var curr_sample = contribution_data[i].Sample;
               if (leaf_taxa.indexOf(curr_otu) != -1 && leaf_funcs.indexOf(curr_ko) != -1 && sample == curr_sample){
-                total += parseFloat(contribution_data[i].ContributionPercentOfSample);
+                var contribution_fraction = 0;
+                for (var j = 0; j < func_rel_abundance_data.length; j++){
+                  if (sample == func_rel_abundance_data[j].Sample){
+                    contribution_fraction = parseFloat(func_rel_abundance_data[j][curr_ko]);
+                  }
+                }
+                total += parseFloat(contribution_data[i].ContributionPercentOfSample) * contribution_fraction;
               }
             }
 
@@ -222,8 +235,13 @@
               if (original_contribution_cube[sample].hasOwnProperty(leaf_taxon)){
                 for (var j=0; j < leaf_funcs.length; j++){
                   var leaf_func = leaf_funcs[j];
+                  if (i == 0 && j == 0){
+                    console.log(leaf_taxon);
+                    console.log(leaf_func);
+                    console.log(sample);
+                  }
                   if (original_contribution_cube[sample][leaf_taxon].hasOwnProperty(leaf_func)){
-                    total += parseFloat(original_contribution_cube[sample][leaf_taxon][leaf_func]);
+                    total += original_contribution_cube[sample][leaf_taxon][leaf_func];
                   }
                 }
               }
@@ -244,7 +262,7 @@
               displayed_contribution_cube[sample][taxon] = {};
               for (var k = 0; k < func_tree.length; k++){
                 var func = func_tree[k].key;
-                displayed_contribution_cube[sample][taxon][func] = no_cube_calculate_new_contribution(sample, taxon, func);
+                displayed_contribution_cube[sample][taxon][func] = calculate_new_contribution(sample, taxon, func);
               }
             }
           }
@@ -574,16 +592,24 @@
 
           /////////////////////////////////////////////////////////////////////// Performance Testing /////////////////////////////////////////////////////////////////////////////////////////////
 
+          console.log(original_contribution_cube);
+          console.log(displayed_contribution_cube);
+
           console.log("Taxa Count".concat(" ", displayed_taxa.length));
           console.log(displayed_taxa);
 
           console.log("Function Count".concat(" ", displayed_funcs.length));
           console.log(displayed_funcs);
 
-          var sample = samples[0];
-          var taxon = displayed_taxa[0];
-          var func = displayed_funcs[0];
-          console.log(sample.concat(" ", taxon, " ", func, " ", get_contribution(sample, taxon, func)));
+          var sum = 0;
+          for (var i = 0; i < displayed_funcs.length; i++){
+            var sample = samples[0];
+            var taxon = displayed_taxa[0];
+            var func = displayed_funcs[i];
+            sum += get_contribution(sample, taxon, func);
+            console.log(sample.concat(" ", taxon, " ", func, " ", get_contribution(sample, taxon, func)));
+          }
+          console.log(sum);
         });
       });
     });
