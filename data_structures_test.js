@@ -223,7 +223,7 @@
                 for (var j=0; j < leaf_funcs.length; j++){
                   var leaf_func = leaf_funcs[j];
                   if (original_contribution_cube[sample][leaf_taxon].hasOwnProperty(leaf_func)){
-                    total += parseFloat(original_contribution_cube[sample][leaf_taxon[leaf_func);
+                    total += parseFloat(original_contribution_cube[sample][leaf_taxon][leaf_func]);
                   }
                 }
               }
