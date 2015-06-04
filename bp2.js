@@ -7,7 +7,7 @@
 	bP.partData = function(data){
 		var sData={};
 		
-		var cat1 = Object.keys(data[0])[0], cat2 = Object.keys(data[0])[1];
+		var cat1 = Object.keys(data[0])[0], cat2 = Object.keys(data[0])[1], num3 = Object.keys(data[0])[2];
 		sData.keys=[
 			d3.set(data.map(function(d){ return d[cat1];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
 			d3.set(data.map(function(d){ return d[cat2];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
@@ -21,8 +21,8 @@
 		];
 
 		data.forEach(function(d){ 
-			sData.data[0][sData.keys[0].indexOf(d[cat1])][sData.keys[1].indexOf(d[cat2])]=1;
-			sData.data[1][sData.keys[1].indexOf(d[cat2])][sData.keys[0].indexOf(d[cat1])]=1; 
+			sData.data[0][sData.keys[0].indexOf(d[cat1])][sData.keys[1].indexOf(d[cat2])]=1*d[num3];
+			sData.data[1][sData.keys[1].indexOf(d[cat2])][sData.keys[0].indexOf(d[cat1])]=1*d[num3]; 
 		});
 				
 		return sData;
@@ -31,11 +31,11 @@
 	function visualize(data){
 		var vis ={};
 		function calculatePosition(a, s, e, b, m){
-			console.log("a"+a);
-			console.log("s"+s);
-			console.log("e"+e);
-			console.log("b"+b);
-			console.log("m"+m);
+			// console.log("a"+a);
+			// console.log("s"+s);
+			// console.log("e"+e);
+			// console.log("b"+b);
+			// console.log("m"+m);
 
 			var total=a.length;
 
@@ -54,7 +54,6 @@
 			);
 			
 			var scaleFact=leftoverHeight/Math.max(neededHeight,1), sum=0;
-			
 			ret.forEach(
 				function(d){ 
 					d.percent = scaleFact*d.percent; 
@@ -64,6 +63,8 @@
 					d.h= 1; //scaleFact; //d.value; //d.percent*(e-s-2*b*a.length);
 					d.percent = (total == 0 ? 0 : d.value/total);
 					sum+=2*b+d.height;
+					d.wid=d.value;
+					//console.log(d.wid);
 				}
 			);
 			return ret;
@@ -79,9 +80,7 @@
 		vis.subBars = [[],[]];
 		vis.mainBars.forEach(function(pos,p){
 			pos.forEach(function(bar, i){	
-				//console.log(bar.toSource());
 				if(bar.value !== 0){
-					console.log(data.data[p][i]);
 					calculatePosition(data.data[p][i], bar.y, bar.y, 0, 0).forEach(function(sBar,j){ //+bar.h
 						sBar.key1=(p==0 ? i : j); 
 						sBar.key2=(p==0 ? j : i); 
@@ -106,14 +105,15 @@
 				y2:vis.subBars[1][i].y,
 				h1:p.h,
 				h2:vis.subBars[1][i].h,
-				val:p.value
+				val:p.value,
+				wid:p.wid
 			};
 		});
-		console.log(vis.edges.length);
-		console.log(vis.edges[0].val);
+		//console.log(vis.edges.length);
+		//console.log(vis.edges[0].val);
 		vis.edges = vis.edges.filter(function(d){ return d.val!==0});
-		console.log(vis.edges[0].toSource());
-		console.log(vis.edges.length);
+		//console.log(vis.edges[0].toSource());
+		//console.log(vis.edges.length);
 		vis.keys=data.keys;
 		return vis;
 	}
@@ -187,12 +187,12 @@
 			.style("fill",function(d){ return colors[d.key1];})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
 			.on("mouseover", function(d,i){ 
-				d3.select(this).style("opacity",1);
+				d3.select(this).attr("points", edgePolygon2).style("opacity",1);
 				var current_data = this._current;
 				bP.selectEdge(id, i, current_data);
 			})
 			.on("mouseout", function(d,i){ 
-				d3.select(this).style("opacity",0.2);
+				d3.select(this).attr("points", edgePolygon).style("opacity",0.2);
 				var current_data = this._current;
 				bP.deselectEdge(id, i, current_data);
 			});
@@ -219,6 +219,10 @@
 	
 	function edgePolygon(d){
 		return [0, d.y1, bb, d.y2, bb, d.y2+d.h2, 0, d.y1+d.h1].join(" ");
+	}	
+
+	function edgePolygon2(d){
+		return [0, d.y1-Math.sqrt(d.wid)/2, bb, d.y2-Math.sqrt(d.wid)/2, bb, d.y2+Math.sqrt(d.wid)/2, 0, d.y1+Math.sqrt(d.wid)].join(" ");
 	}	
 	
 	bP.draw = function(bip, svg){
@@ -273,7 +277,7 @@
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 			//console.log(selectedEdges.toSource());
 
-			selectedEdges.style("opacity", 1);
+			selectedEdges.attr("points", edgePolygon2).style("opacity", 1);
 			//selectedEdges.select("_current").style("stroke-opacity", 1);
 			//selectedBar.select(".barvalue").style('font-weight','bold');
 			//selectedBar.select(".barpercent").style('font-weight','bold');
@@ -295,13 +299,14 @@
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
 
-		selectedEdges.style("opacity", 0.2);
+		selectedEdges.attr("points", edgePolygon).style("opacity", 0.2);
 
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');
 	}
 
 	bP.selectEdge = function(id, i, current_data){
+		//bold associated names
 		[0,1].forEach(function(m){
 		var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ 
@@ -327,7 +332,7 @@
 			.filter(function(d,i){ 
 				return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
 		selSubBar.style("opacity", 0.2);
-		});
+		});		
 
 	}
 
