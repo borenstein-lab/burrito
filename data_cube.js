@@ -521,7 +521,6 @@
           }
         }
       }
-
       /////////////////////////////////////////////////////////////////////// original_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
       // For each row in the original TSV, make an entry in the original_contribution_cube
@@ -538,7 +537,6 @@
           }
         }
         contribution *= contribution_fraction
-
         // If there's already an entry for the sample, move on to check for the otu entry, otherwise add an entry for the sample
         if (sample in this.original_contribution_cube){
 
@@ -554,7 +552,7 @@
           this.original_contribution_cube[sample][otu] = {};
           this.original_contribution_cube[sample][otu][ko] = contribution;
         };
-      });
+      }, this);
 
       /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
