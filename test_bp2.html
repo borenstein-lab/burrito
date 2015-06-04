@@ -14,22 +14,34 @@ rect{
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="data_structures_test.js"></script>
+<script src="data_cube.js"></script>
 <script src="bp2.js"></script>
 <script>
 
 
 var width = 1100, height = 610, margin ={b:0, t:40, l:170, r:50};
 
-d3.tsv("reduced_genus_pathway_links.txt", function(error, linkData){
+  d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
+    d3.tsv("taxa_mapping.txt", function(error, taxa_tree_data){
+      d3.tsv("functional_mapping.txt", function(error, func_tree_data){
+        d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+			d3.tsv("reduced_genus_pathway_links.txt", function(error, linkData){
+				var data_cube = data_cube_wrapper.make_cube();
+				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
+				console.log(data_cube.toSource());
+				console.log(data_cube.get_contribution("NoAbx32","Bacteroides","None"));
 
-	var svg = d3.select("body")
-		.append("svg").attr('width',width).attr('height',(height+margin.b+margin.t))
-		.append("g").attr("transform","translate("+ margin.l+","+margin.t+")");
 
-	var data = {data:bP.partData(linkData), id:'Genomes', header:["Genus","Pathway", "Genomes"]};
+				var svg = d3.select("body")
+					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.t))
+					.append("g").attr("transform","translate("+ margin.l+","+margin.t+")");
 
-	bP.draw(data, svg);
+				var data = {data:bP.partData(linkData), id:'Genomes', header:["Genus","Pathway", "Genomes"]};
+				bP.draw(data, svg);
+			});
+		});
+    });
+  });
 });
 
 </script>
