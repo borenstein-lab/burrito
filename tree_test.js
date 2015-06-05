@@ -66,7 +66,6 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
         .key(function(d) { return d.Order; })
         .key(function(d) { return d.Family; })
         .key(function(d) { return d.Genus; })
-        .key(function(d) { return d.Species; })
         .entries(data1);    
 
     newTaxaData = {
@@ -109,7 +108,6 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
         .key(function(d) { return d.Category; })
         .key(function(d) { return d.SuperPathway; })
         .key(function(d) { return d.SubPathway; })
-        .key(function(d) { return d.KO; })
         .entries(data2);    
 
     newFunctionData = {
