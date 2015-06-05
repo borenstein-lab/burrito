@@ -335,14 +335,24 @@
 
       // Only try to expand if the function has children
       if (!this.is_leaf(curr_func)){
+        var child_funcs = [];
+
+        // Get each child of the func to be expanded
+        for (var i = 0; i < curr_func.values.length; i++){
+          child_funcs.push(curr_func.values[i].key)
+        }
+
+        // Sort the array of children alphabetically
+        child_funcs.sort();
+
+        // Insert each child function into the array of displayed functions
+        var curr_func_index = this.displayed_funcs.indexOf(curr_func.key);
+        for (var i = 0; i < child_funcs.length; i++){
+          this.displayed_funcs.splice(curr_func_index + i, 0, child_funcs[i]);
+        }       
 
         // Remove the function being expanded
         this.displayed_funcs.splice(this.displayed_funcs.indexOf(curr_func.key), 1);
-
-        // For each child of the expanded function, add that child to the displayed_funcs
-        for (var i = 0; i < curr_func.values.length; i++){
-          this.displayed_funcs.push(curr_func.values[i].key)
-        }
       }
     }
 
@@ -357,18 +367,19 @@
 
         // Use a BFS to find descendents
         var func_children = [];
+        var displayed_children = [];
         for (var i = 0; i < curr_func.values.length; i++){
           func_children.push(curr_func.values[i])
           for (; func_children.length > 0;){
             var curr_child = func_children.shift();
+            var name = curr_child.key;
 
             // If the descendent has its own children, check whether it is displayed 
             if (!this.is_leaf(curr_child)){
-              var name = curr_child.key;
 
-              // If the descendent is displayed, remove it from the list
+              // If the descendent is displayed, remember
               if (this.displayed_funcs.indexOf(name) != -1){
-                this.displayed_funcs.splice(this.displayed_funcs.indexOf(name), 1);
+                displayed_children.push(name);
 
               // Otherwise remember its children to check later
               } else {
@@ -377,13 +388,23 @@
                 }
               }
 
-            // Otherwise, it must be displayed, so remove it
+            // Otherwise, it must be displayed
             } else {
-              this.displayed_funcs.splice(this.displayed_funcs.indexOf(curr_child.key), 1);
+              displayed_children.push(name);
             }
           }
         }
-        this.displayed_funcs.push(curr_func.key);
+        var earliest_spot = this.displayed_funcs.length;
+        for (var i = 0; i < displayed_children.length; i++){
+          var curr_spot = this.displayed_funcs.indexOf(displayed_children[i]);
+          if (curr_spot < earliest_spot){
+            earliest_spot = curr_spot;
+          }
+        }
+        this.displayed_funcs.splice(earliest_spot, 0, curr_func.key);
+        for (var i = 0; i < displayed_children.length; i++){
+          this.displayed_funcs.splice(this.displayed_funcs.indexOf(displayed_children[i]), 1);
+        }
       }
     }
 
@@ -395,14 +416,24 @@
 
       // Only try to expand the taxon if it has children
       if (!this.is_leaf(curr_taxon)){
+        var child_taxa = [];
 
-        // Remove the taxon from the displayed_taxa
-        this.displayed_taxa.splice(this.displayed_taxa.indexOf(curr_taxon.key), 1);
-
-        // Add each child taxon to the displayed_taxa
+        // Get each child of the taxon to be expanded
         for (var i = 0; i < curr_taxon.values.length; i++){
-          this.displayed_taxa.push(curr_taxon.values[i].key);
+          child_taxa.push(curr_taxon.values[i].key)
         }
+
+        // Sort the array of children alphabetically
+        child_taxa.sort();
+
+        // Insert each child taxon into the array of displayed taxa
+        var curr_taxon_index = this.displayed_taxa.indexOf(curr_taxon.key);
+        for (var i = 0; i < child_taxa.length; i++){
+          this.displayed_taxa.splice(curr_taxon_index + i, 0, child_taxa[i]);
+        }       
+
+        // Remove the function being expanded
+        this.displayed_taxa.splice(this.displayed_taxa.indexOf(curr_taxon.key), 1);
       }
     }
 
@@ -417,18 +448,19 @@
 
         // Use a BFS to find descendents
         var taxon_children = [];
+        var displayed_children = [];
         for (var i = 0; i < curr_taxon.values.length; i++){
           taxon_children.push(curr_taxon.values[i])
           for (; taxon_children.length > 0;){
             var curr_child = taxon_children.shift();
+            var name = curr_child.key;
 
             // If the descendent has its own children, check whether it is displayed
             if (!this.is_leaf(curr_child)){
-              var name = curr_child.key;
 
-              // If the descendent is displayed, remove it from the list
+              // If the descendent is displayed, remember
               if (this.displayed_taxa.indexOf(name) != -1){
-                this.displayed_taxa.splice(this.displayed_taxa.indexOf(name), 1);
+                displayed_children.push(name);
 
               // Otherwise, remember its children to check later
               } else {
@@ -439,11 +471,21 @@
 
             // Otherwise, it must be displayed, so remove it
             } else {
-              this.displayed_taxa.splice(this.displayed_taxa.indexOf(curr_child.key), 1);
+              displayed_children.push(name)
             }
           }
         }
-        this.displayed_taxa.push(curr_taxon.key);
+        var earliest_spot = this.displayed_taxa.length;
+        for (var i = 0; i < displayed_children.length; i++){
+          var curr_spot = this.displayed_taxa.indexOf(displayed_children[i]);
+          if (curr_spot < earliest_spot){
+            earliest_spot = curr_spot;
+          }
+        }
+        this.displayed_taxa.splice(earliest_spot, 0, curr_taxon.key);
+        for (var i = 0; i < displayed_children.length; i++){
+          this.displayed_taxa.splice(this.displayed_taxa.indexOf(displayed_children[i]), 1);
+        }
       }
     }
 
