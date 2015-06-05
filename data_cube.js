@@ -163,7 +163,7 @@
 
             //  Find the immediate children of the function and add their entries to the cube
             for (var i = 0; i < curr_func.values.length; i++){
-              this.displayed_contribution_cube[sample][taxon][new_func_name] = this.calculate_new_contribution(sample, taxon, curr_func.values[i].key);
+              this.displayed_contribution_cube[sample][taxon][curr_func.values[i].key] = this.calculate_new_contribution(sample, taxon, curr_func.values[i].key);
             }
           }
         }
@@ -246,8 +246,8 @@
             this.displayed_contribution_cube[sample][curr_taxon.values[i].key] = {}
 
             // For each function currently displayed, add an entry for that function
-            for (var j = 0; j < displayed_funcs.length; j++){
-              this.displayed_contribution_cube[sample][new_taxon_name][displayed_funcs[j]] = calculate_new_contribution(sample, new_taxon_name, displayed_funcs[j]);
+            for (var j = 0; j < this.displayed_funcs.length; j++){
+              this.displayed_contribution_cube[sample][curr_taxon.values[i].key][this.displayed_funcs[j]] = this.calculate_new_contribution(sample, curr_taxon.values[i].key, this.displayed_funcs[j]);
             }
           }
         }
@@ -259,7 +259,7 @@
     // Collapse the chosen taxon in the displayed_contribution_cube to replace the entries of the currently displayed descendents of the taxon with the new taxon entry
 
     data_cube.collapse_taxon_displayed_contribution_cube = function(taxon){
-      var curr_taxon = this.taxon_lookup[taxon];
+      var curr_taxon = this.taxa_lookup[taxon];
 
       // Only try to collapse if the taxon has children
       if (!this.is_leaf(curr_taxon)){
@@ -268,10 +268,9 @@
         var taxon_children = [];
         var taxon_present_children = [];
         for (var i = 0; i < curr_taxon.values.length; i++){
-          taxon_children.push(curr_taxon.values[i])
+          taxon_children.push(curr_taxon.values[i]);
           for (; taxon_children.length > 0;){
             var curr_child = taxon_children.shift();
-
             // If the descendent taxon we are looking at has children, check whether this descendent taxon is currently displayed, or if we need to check its children
             if (!this.is_leaf(curr_child)){
               var name = curr_child.key;
@@ -296,20 +295,24 @@
 
         // For each descendent taxon that is currently displayed, remove its entry from the displayed_contribution_cube
         for (var sample in this.displayed_contribution_cube){
+          var contributions = {};
           for (var i = 0; i < taxon_present_children.length; i++){
             var child_taxon_name = taxon_present_children[i];
 
-            // Sum the contributions of the displayed descendents to speed up adding the new taxon's entry to the cube
-            var contributions = {};
-            for (func in this.displayed_contribution_cube[sample][child_taxon_name]){
-              var contribution = this.displayed_contribution_cube[sample][child_taxon_name][func];
-              if (contributions.hasOwnProperty(func)){
-                contributions[func] += contribution;
-              } else {
-                contributions[func] = contribution;
+            // Only need to account for contributions and remove child taxa if they are present in this sample
+            if (this.displayed_contribution_cube[sample].hasOwnProperty(child_taxon_name)){
+
+              // Sum the contributions of the displayed descendents to speed up adding the new taxon's entry to the cube
+              for (func in this.displayed_contribution_cube[sample][child_taxon_name]){
+                var contribution = this.displayed_contribution_cube[sample][child_taxon_name][func];
+                if (contributions.hasOwnProperty(func)){
+                  contributions[func] += contribution;
+                } else {
+                  contributions[func] = contribution;
+                }
               }
+              delete this.displayed_contribution_cube[sample][child_taxon_name];
             }
-            delete this.displayed_contribution_cube[sample][child_taxon_name];
           }
 
           // Add in the new taxon, along with its function contributions
@@ -328,7 +331,7 @@
 
     // Expand the chosen function in the displayed_funcs to replace the original function entry with its children function entries        
     data_cube.expand_func_displayed_funcs = function(func){
-      var curr_func = func_lookup[func];
+      var curr_func = this.func_lookup[func];
 
       // Only try to expand if the function has children
       if (!this.is_leaf(curr_func)){
@@ -442,6 +445,38 @@
         }
         this.displayed_taxa.push(curr_taxon.key);
       }
+    }
+
+    /////////////////////////////////////////////////////////////////////// expand_func /////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Wrapper to expand both the displayed funcs and the displayed contribution cube
+    data_cube.expand_func = function(func){
+      this.expand_func_displayed_contribution_cube(func);
+      this.expand_func_displayed_funcs(func);
+    }
+
+    /////////////////////////////////////////////////////////////////////// collapse_func /////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Wrapper to collapse both the displayed funcs and the displayed contribution cube
+    data_cube.collapse_func = function(func){
+      this.collapse_func_displayed_contribution_cube(func);
+      this.collapse_func_displayed_funcs(func);
+    }
+
+    /////////////////////////////////////////////////////////////////////// expand_taxon /////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Wrapper to expand both the displayed taxa and the displayed contribution cube
+    data_cube.expand_taxon = function(taxon){
+      this.expand_taxon_displayed_contribution_cube(taxon);
+      this.expand_taxon_displayed_taxa(taxon);
+    }
+
+    /////////////////////////////////////////////////////////////////////// collapse_taxon /////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Wrapper to collapse both the displayed taxa and the displayed contribution cube
+    data_cube.collapse_taxon = function(taxon){
+      this.collapse_taxon_displayed_contribution_cube(taxon);
+      this.collapse_taxon_displayed_taxa(taxon);
     }
 
     /////////////////////////////////////////////////////////////////////// initialize_cube /////////////////////////////////////////////////////////////////////////////////////////////
