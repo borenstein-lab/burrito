@@ -129,9 +129,11 @@ SVGs["func"] = FuncTreeSVG;
 						(data_cube.displayed_taxa).map(function(t,i){
 							if(all_taxa_links.map(function(d){return d.Taxa;}).indexOf(t)===-1){
 							if((data_cube.displayed_contribution_cube[d]).hasOwnProperty(t)){
-								for(j=0; j<d3.keys(data_cube.displayed_contribution_cube[d][t]).length; j++){
-									all_taxa_links.push({Taxa:t, Functions:d3.keys(data_cube.displayed_contribution_cube[d][t])[j],
+								for(j=0; j<data_cube.displayed_funcs.length; j++){
+									if(data_cube.displayed_contribution_cube[d][t].hasOwnProperty(data_cube.displayed_funcs[j])){
+										all_taxa_links.push({Taxa:t, Functions:data_cube.displayed_funcs[j],
 										numKO:1});
+									}
 								}
 									//all_taxa_links.Functions.push(d3.keys(data_cube.displayed_contribution_cube[d][t])[j]);
 							}
