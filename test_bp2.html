@@ -6,11 +6,19 @@ body{
 	margin:100px auto;
 }
 svg text{
-	font-size:10px;
+	font-size:8pt;
 }
 rect{
 	shape-rendering:crispEdges;
 }
+
+.brush .extent {
+  fill-opacity: .1;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+
+
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -25,29 +33,13 @@ var width = 1100, height = 610, margin ={b:0, t:40, l:170, r:50};
     d3.tsv("taxa_mapping.txt", function(error, taxa_tree_data){
       d3.tsv("functional_mapping.txt", function(error, func_tree_data){
         d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
-			d3.tsv("reduced_genus_pathway_links.txt", function(error, linkData){
 				//initialize display cube
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
-				console.log(data_cube.displayed_taxa);
-				console.log(data_cube.displayed_funcs);
-				console.log(data_cube.get_contribution("NoAbx32","Bacteria","Cellular Processes"));
 				data_cube.expand_taxon('Bacteria');
-				console.log(data_cube.displayed_taxa);
-				console.log(data_cube.displayed_funcs);
-				console.log(data_cube.get_contribution("NoAbx32", "Bacteroidetes", "Cellular Processes"));
 				data_cube.expand_func("Cellular Processes");
-				console.log(data_cube.displayed_taxa);
-				console.log(data_cube.displayed_funcs);
-				console.log(data_cube.get_contribution("NoAbx32", "Bacteroidetes", "Organismal Systems"));
 				data_cube.collapse_taxon("Bacteria");
-				console.log(data_cube.displayed_taxa);
-				console.log(data_cube.displayed_funcs);
-				console.log(data_cube.get_contribution("NoAbx32", "Bacteria", "Organismal Systems"));
 				data_cube.collapse_func("Cellular Processes");
-				console.log(data_cube.displayed_taxa);
-				console.log(data_cube.displayed_funcs);
-				console.log(data_cube.get_contribution("NoAbx32", "Bacteria", "Cellular Processes"));
 
 				var svg = d3.select("body")
 					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.t))
@@ -76,16 +68,17 @@ var width = 1100, height = 610, margin ={b:0, t:40, l:170, r:50};
 
 				//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
 				var taxLevels = d3.keys(taxa_tree_data[0]);
-				console.log(taxLevels);
-				var startTaxLevel = "Phylum";
-				var startFuncLevel = "SuperPathway";
 
 				var bpData = getLinkData();
-				console.log(bpData.toSource());
 
 				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 				bP.draw(data, svg);
-			});
+				data_cube.expand_taxon("Bacteria");
+				data_cube.expand_func("Metabolism");
+				var bpData = getLinkData();
+				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+				//bP.updateGraph(data, svg);
+
 		});
     });
   });

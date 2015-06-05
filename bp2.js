@@ -1,4 +1,4 @@
-!function(){
+(function(){
 	var bP={};	
 	var b=20, bb=150, height=500, buffMargin=1, minHeight=14;
 	var c1=[-60, 35], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
@@ -10,8 +10,8 @@
 		sData.keys=[
 			// d3.set(d3.keys(data)).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
 			// d3.set(d3.keys(data).map(function(d){ return data[d].values})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})
-			d3.set(data.map(function(d){ return d[cat1];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
-			d3.set(data.map(function(d){ return d[cat2];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
+			d3.set(data.map(function(d){ return d[cat1];})).values(),//.sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
+			d3.set(data.map(function(d){ return d[cat2];})).values() //.sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
 		];
 		// need to get to match in tree order so may want another way to get unique values
 		
@@ -59,7 +59,7 @@
 					d.height= scaleFact; //*d.value; //(d.height==m? m : d.height*scaleFact);
 					d.middle=sum+b+d.height/2;
 					d.y=s + d.middle; //- d.percent*(e-s-2*b*a.length)/2;
-					d.h= 1; //scaleFact; //d.value; //d.percent*(e-s-2*b*a.length);
+					d.h= 2; //scaleFact; //d.value; //d.percent*(e-s-2*b*a.length);
 					d.percent = (total == 0 ? 0 : d.value/total);
 					sum+=2*b+d.height;
 					d.wid=d.value;
@@ -170,6 +170,15 @@
 			.style("fill",function(d){ return colors[d.key1];})
 			.style("opacity",0.1);
 	}
+
+	function updatePart(data, id, p){
+		d3.select("#"+id).select(".part"+p).select(".mainbars").selectAll(".mainbar")
+			.data(data.mainBars[p]).transition();
+
+		d3.select("#"+id).select(".part"+p).select(".subbars").selectAll(".subbar")
+			.data(data.subBars[p]).transition();
+
+	}
 	
 	function drawEdges(data, id){
 		d3.select("#"+id).append("g").attr("class","edges").attr("transform","translate("+ b+",0)");
@@ -195,19 +204,20 @@
 				var current_data = this._current;
 				bP.deselectEdge(id, i, current_data);
 			});
+			//brush would go here
 	}	
 	
 
 	function drawHeader(header, id){
-		d3.select("#"+id).append("g").attr("class","header").append("text").text(header[2])
-			.style("font-size","20").attr("x",108).attr("y",-20).style("text-anchor","middle")
-			.style("font-weight","bold");
+		//d3.select("#"+id).append("g").attr("class","header").append("text").text(header[2])
+		//	.style("font-size","20").attr("x",108).attr("y",-20).style("text-anchor","middle")
+		//	.style("font-weight","bold");
 		
 		[0,1].forEach(function(d){
 			var h = d3.select("#"+id).select(".part"+d).append("g").attr("class","header");
 			
 			h.append("text").text(header[d]).attr("x", (c1[d]-3))
-				.attr("y", -5).style("fill","black").style("font-size", "16");
+				.attr("y", -5).style("fill","black").style("font-size", "14pt");
 			//h.append("text").text("Count").attr("x", (c2[d]-10))
 			//	.attr("y", -5).style("fill","grey");
 			// h.append("line").attr("x1",c1[d]-10).attr("y1", -2)
@@ -221,12 +231,44 @@
 	}	
 
 	function edgePolygon2(d){
-		return [0, d.y1-Math.sqrt(d.wid)/2, bb, d.y2-Math.sqrt(d.wid)/2, bb, d.y2+Math.sqrt(d.wid)/2, 0, d.y1+Math.sqrt(d.wid)].join(" ");
+		if(d.wid===1){ //don't change
+			return [0, d.y1, bb, d.y2, bb, d.y2+d.h2, 0, d.y1+d.h1].join(" ");
+		} else{
+			return [0, d.y1-Math.sqrt(d.wid)/2, bb, d.y2-Math.sqrt(d.wid)/2, bb, d.y2+Math.sqrt(d.wid)/2, 0, d.y1+Math.sqrt(d.wid)].join(" ");
+		}
+		//
 	}	
 	
 	bP.draw = function(bip, svg){
 		svg.append("g")
 			.attr("id", bip.id);
+
+		// var brush = svg.append("g")
+  //     		.datum(function() { return {selected: false, previouslySelected: false}; })
+  //     		.attr("class", "brush")
+  //     		.call(d3.svg.brush()
+	 //       		.x(d3.scale.identity().domain([0, width]))
+  //   	    	.y(d3.scale.identity().domain([0, height]))
+		// 		.on("brush", function(){
+		// 			var extent = brush.extent();
+  // 					edges.classed("selected", function(d) {
+  // 						selectEdge(id, i, current_data);
+  // 						console.log(d.toSource());
+  //   					is_brushed = extent[0] <= d.index && d.index <= extent[1];
+  //   					return is_brushed;
+  // 					});
+		// 		})
+		// 		.on("brushend", function(){
+
+		// 		}));
+
+		// svg.append("g")
+		// 	.attr("class", "brush")
+		// 	.call(brush)
+		// 	.selectAll('rect')
+		// 	.attr('height', height);
+
+
 				//.attr("transform","translate("+ (550*s)+",0)");
 		//console.log(bip.data.data.toSource());		
 		var visData = visualize(bip.data);
@@ -243,8 +285,47 @@
 				.on("mouseover",function(d, i){ return bP.selectSegment(bip, p, i); })
 				.on("mouseout",function(d, i){ return bP.deSelectSegment(bip, p, i); });	
 		});
+
 	}
 	
+	bP.updateGraph = function(bip, svg){ //bip id has to be the same
+
+		//svg.select("#"+bip.id).transition();
+		svg.select("#"+bip.id).remove(); //.transition();
+		svg.append("g")
+			.attr("id", bip.id);
+
+
+// var svg = d3.select('#barChart')
+//        .append('svg')
+//        .attr('width', width + margins.left + margins.right)
+//        .attr('height', height + margins.top + margins.bottom)
+//        .append('g')
+//        .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
+
+// 		d3.select(#+bip.id).select("svg").remove();
+// 		svg.select(#+bip.id).transition();
+// 		//or .remove()?
+
+		var visData = visualize(bip.data);
+		//updatePart(visData, bip.id, 0);
+		//updatePart(visData, bip.id, 1);
+		drawPart(visData, bip.id, 0);
+		drawPart(visData, bip.id, 1); 
+		drawEdges(visData, bip.id);
+		drawHeader(bip.header, bip.id);
+			
+		[0,1].forEach(function(p){			
+			d3.select("#"+bip.id)
+				.select(".part"+p)
+				.select(".mainbars")
+				.selectAll(".mainbar")
+				.on("mouseover",function(d, i){ return bP.selectSegment(bip, p, i); })
+				.on("mouseout",function(d, i){ return bP.deSelectSegment(bip, p, i); });	
+		});
+
+	} 
+
 	bP.selectSegment = function(k, m, s){ //s # of node, m which side of nodes
 			// var newdata =  {keys:[], data:[]};	
 				
@@ -377,4 +458,4 @@
 	
 
 	this.bP = bP;
-}();
+})();
