@@ -4,38 +4,57 @@ var margin = {
     bottom: 20,
     left: 120
 },
-width = window.innerWidth - margin.left - margin.right - 50,
-height = window.innerHeight - margin.top - margin.bottom - 50;
+//width = window.innerWidth - margin.left - margin.right - 50,
+//height = window.innerHeight - margin.top - margin.bottom - 50;
+width = 600 - margin.left - margin.right - 50;
+height = 600 - margin.left - margin.right - 50;
 
 var i = 0,
     duration = 750,
-    root;
+    taxaroot,
+	funcroot,
+	roots = {};
 
-var tree = d3.layout.tree()
+
+
+var TaxaTree = d3.layout.tree()
     .children(function (d) {
     if (d.hasOwnProperty('values')) return d.values;
     else if (d.hasOwnProperty('children')) return d.children;
 })
     .size([height, width/2]);
 
-var tree2 = d3.layout.tree()
+var FuncTree = d3.layout.tree()
     .children(function (d) {
     if (d.hasOwnProperty('values')) return d.values;
     else if (d.hasOwnProperty('children')) return d.children;
 })
     .size([height, width/2]);
 
+var trees = [];
+trees["taxa"] = TaxaTree;
+trees["func"] = FuncTree;
 
 var diagonal = d3.svg.diagonal()
     .projection(function (d) {
     return [d.y, d.x];
 });
 
-var svg = d3.select("body").append("svg")
+var TaxaTreeSVG = d3.select("body").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var FuncTreeSVG = d3.select("body").append("svg")
+    .attr("width", width + margin.right + margin.left)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var SVGs = {};
+SVGs["taxa"] = TaxaTreeSVG;
+SVGs["func"] = FuncTreeSVG;
 
 d3.tsv("taxa_mapping.txt", function(error, data1){
     d3.tsv("functional_mapping.txt", function(error, data2){
@@ -55,11 +74,12 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
         "children": taxa_data,
     }
 
-    root = newTaxaData;
-    root.x0 = height/2;
-    root.y0 = 0;
-
+    taxaroot = newTaxaData;
+    taxaroot.x0 = height/2;
+    taxaroot.y0 = 0;
+	
     function collapse(d) {
+		d.type = settype;
         if (d.hasOwnProperty('name')) {
             if (d.children) {
                 d._children = d.children;
@@ -74,10 +94,14 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
             }
         }
     }
+	
+	var settype = 'taxa';
+    taxaroot.children.forEach(collapse);
+	taxaroot.type = 'taxa';
 
-    root.children.forEach(collapse);
-
-    update(root);
+	roots["taxa"] = taxaroot;
+	
+    update(taxaroot);
 
     d3.select(self.frameElement).style("height", "800px");
 
@@ -93,13 +117,15 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
         "children": function_data,
     }
 
-    root2 = newFunctionData;
-    root2.x0 = height/2;
-    root2.y0 = 0;
-
-    root2.children.forEach(collapse);
-
-    update(root2);
+    funcroot = newFunctionData;
+    funcroot.x0 = height/2;
+    funcroot.y0 = 0;
+	settype = 'func';
+    funcroot.children.forEach(collapse);
+	funcroot.type = settype;
+	roots["func"] = funcroot;
+	
+    update(funcroot);
 
     d3.select(self.frameElement).style("height", "800px");
 
@@ -107,16 +133,36 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
     function update(source) {
 
         // Compute the new tree layout.
-        var nodes = tree.nodes(root).reverse(),
-            links = tree.links(nodes);
-
+		
+        var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
+            links = trees[source.type].links(nodes);
+		
+		var nleaf = 0;
+		nodes.forEach(function (d) {
+			nleaf = nleaf + (d.children || d.values ? 0 : 1);
+		})
+		
+		var leafC = 1;
+		nodes.forEach(function (d) {
+			if (!(d.children || d.values)) {
+				d.x = (nleaf - leafC)/nleaf * height;
+				leafC = leafC + 1;
+			} else {
+				var sumpos = 0;
+				d.children.forEach(function (dc) {
+					sumpos = sumpos + dc.x;
+				})
+				d.x = sumpos / d.children.length;
+			}
+		})
         // Normalize for fixed-depth.
+		var maxDepth = getDepth(roots[source.type]);
         nodes.forEach(function (d) {
-            d.y = d.depth * 100;
+        //    d.y = (d.depth / maxDepth) * width ;
         });
 
         // Update the nodes…
-        var node = svg.selectAll("g.node")
+        var node = SVGs[source.type].selectAll("g.node")
             .data(nodes, function (d) {
             return d.id || (d.id = ++i);
         });
@@ -137,11 +183,11 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
 
         nodeEnter.append("text")
             .attr("x", function (d) {
-            return d.children || d._children || d.values || d._values ? -10 : 10;
+            return 10;
         })
             .attr("dy", ".35em")
             .attr("text-anchor", function (d) {
-            return d.children || d._children || d.values || d._values ? "end" : "start";
+            return "start";
         })
             .text(function (d) {
                if(d.name != null)
@@ -165,7 +211,19 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
         });
 
         nodeUpdate.select("text")
-            .style("fill-opacity", 1);
+            .style("fill-opacity", function(d) {
+				return d.children || d.values ? 0 : 1;
+			})
+			.text(function (d) {
+				if(d.children || d.values) {
+					return "";
+				} else {
+					if(d.name != null)
+                   return d.name;
+               else if(d.key != null)
+                   return d.key;
+				}
+			});
 
         // Transition exiting nodes to the parent's new position.
         var nodeExit = node.exit().transition()
@@ -182,7 +240,7 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
             .style("fill-opacity", 1e-6);
 
         // Update the links…
-        var link = svg.selectAll("path.link")
+        var link = SVGs[source.type].selectAll("path.link")
             .data(links, function (d) {
             return d.target.id;
         });
@@ -250,5 +308,26 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
         }
         update(d);
     }
+	
+	function getDepth(rootnode) {
+		var depth = 0;
+		if (rootnode.children) {
+			rootnode.children.forEach(function(d) {
+				var tmpDepth = getDepth(d);
+				if (tmpDepth > depth) {
+					depth = tmpDepth;
+				}
+			})
+		}
+		return 1+depth;
+	}
 })
 });
+
+
+
+
+
+
+
+
