@@ -158,7 +158,12 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
         // Normalize for fixed-depth.
 		var maxDepth = getDepth(roots[source.type]);
         nodes.forEach(function (d) {
-        //    d.y = (d.depth / maxDepth) * width ;
+			if (source.type == 'taxa') {
+				d.y = (d.depth / maxDepth) * width ;
+			} else {
+				d.y = width - (d.depth / maxDepth) * width;
+			}
+            
         });
 
         // Update the nodes…
@@ -183,11 +188,11 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
 
         nodeEnter.append("text")
             .attr("x", function (d) {
-            return 10;
+            return source.type == 'taxa' ? 10 : -10;
         })
             .attr("dy", ".35em")
             .attr("text-anchor", function (d) {
-            return "start";
+            return source.type == 'taxa' ? "start" : "end";
         })
             .text(function (d) {
                if(d.name != null)
@@ -293,17 +298,21 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
+				// collapseNode(d.name);
             } else {
                 d.children = d._children;
                 d._children = null;
+				// expandNode(d.name);
             }
         } else if (d.hasOwnProperty('key')) {
             if (d.values) {
                 d._values = d.values;
                 d.values = null;
+				// collapseNode(d.key);
             } else {
                 d.values = d._values;
                 d._values = null;
+				// expandNodes(d.key);
             }
         }
         update(d);
@@ -321,13 +330,10 @@ d3.tsv("taxa_mapping.txt", function(error, data1){
 		}
 		return 1+depth;
 	}
+	
+	function showInfo(d) {
+		
+	}
 })
 });
-
-
-
-
-
-
-
 
