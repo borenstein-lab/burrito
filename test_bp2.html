@@ -149,11 +149,11 @@ SVGs["func"] = FuncTreeSVG;
 
 				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 				bP.draw(data, svg);
-				data_cube.expand_taxon("Bacteria");
-				data_cube.expand_func("Metabolism");
+				//data_cube.expand_taxon("Bacteria");
+				//data_cube.expand_func("Metabolism");
 				var bpData = getLinkData();
 				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-				//bP.updateGraph(data, svg);
+				bP.updateGraph(data, svg);
 
 				var taxa_data = d3.nest()
 			        .key(function(d) { return d.Kingdom; })
@@ -385,27 +385,38 @@ SVGs["func"] = FuncTreeSVG;
         });
     }
 
+	// Update the bipartite graph after changes to data_cube
+	function updateBPgraph() {
+		var bpData = getLinkData();
+		var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+		bP.updateGraph(data, svg);
+	}
+	
     // Toggle children on click.
     function click(d) {
         if (d.hasOwnProperty('name')) {
             if (d.children) {
                 d._children = d.children;
                 d.children = null;
-				// collapseNode(d.name);
+				d.type == 'taxa' ? data_cube.collapse_taxon(d.name) : data_cube.collapse_func(d.name);
+				updateBPgraph();
             } else {
                 d.children = d._children;
                 d._children = null;
-				// expandNode(d.name);
+				d.type == 'taxa' ? data_cube.expand_taxon(d.name) : data_cube.expand_func(d.name);
+				updateBPgraph();
             }
         } else if (d.hasOwnProperty('key')) {
             if (d.values) {
                 d._values = d.values;
                 d.values = null;
-				// collapseNode(d.key);
+				d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
+				updateBPgraph();
             } else {
                 d.values = d._values;
                 d._values = null;
-				// expandNodes(d.key);
+				d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
+				updateBPgraph();
             }
         }
         update(d);
