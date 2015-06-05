@@ -6,15 +6,14 @@
 	
 	bP.partData = function(data){
 		var sData={};
-		
-		var cat1 = Object.keys(data[0])[0], cat2 = Object.keys(data[0])[1], num3 = Object.keys(data[0])[2];
+		var cat1 = d3.keys(data[0])[0], cat2 = d3.keys(data[0])[1], num3 = d3.keys(data[0])[2];
 		sData.keys=[
+			// d3.set(d3.keys(data)).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
+			// d3.set(d3.keys(data).map(function(d){ return data[d].values})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})
 			d3.set(data.map(function(d){ return d[cat1];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
 			d3.set(data.map(function(d){ return d[cat2];})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
 		];
-		// need to get to match in tree order
-
-		//console.log(sData.keys[1].toSource());
+		// need to get to match in tree order so may want another way to get unique values
 		
 		sData.data = [	sData.keys[0].map( function(d){ return sData.keys[1].map( function(v){ return 0; }); }),
 						sData.keys[1].map( function(d){ return sData.keys[0].map( function(v){ return 0; }); }) 
