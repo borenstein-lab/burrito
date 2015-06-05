@@ -148,7 +148,7 @@
 			.attr("y",function(d){ return d.middle+5;})
 			.text(function(d,i){ return data.keys[p][i];})
 			.attr("text-anchor","start" )
-			.style("visibility", "hidden");
+			//.style("visibility", "hidden");
 			
 //		mainbar.append("text").attr("class","barvalue")
 //			.attr("x", c2[p]).attr("y",function(d){ return d.middle+5;});
@@ -323,7 +323,8 @@
 				.on("mouseover",function(d, i){ return bP.selectSegment(bip, p, i); })
 				.on("mouseout",function(d, i){ return bP.deSelectSegment(bip, p, i); });	
 		});
-
+		
+		return visData;
 	} 
 
 	bP.selectSegment = function(k, m, s){ //s # of node, m which side of nodes

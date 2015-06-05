@@ -58,7 +58,7 @@ path.link {
 <script>
 
 
-var width = 400, height = 610, margin ={b:0, t:40, left:30, right:30, top:10, bottom:10};
+var width = 400, height = 610, margin ={b:10, top:40, l:80, left:30, right:30, bottom:10};
 
 var i = 0,
     duration = 750,
@@ -101,6 +101,8 @@ var FuncTreeSVG = d3.select("#funcTree").append("svg")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var bpvisdata;
+
 var SVGs = {};
 SVGs["taxa"] = TaxaTreeSVG;
 SVGs["func"] = FuncTreeSVG;
@@ -112,14 +114,14 @@ SVGs["func"] = FuncTreeSVG;
 				//initialize display cube
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
-				// data_cube.expand_taxon('Bacteria');
-				// data_cube.expand_func("Cellular Processes");
-				// data_cube.collapse_taxon("Bacteria");
-				// data_cube.collapse_func("Cellular Processes");
+				data_cube.expand_taxon('Bacteria');
+				data_cube.expand_func("Cellular Processes");
+				data_cube.collapse_taxon("Bacteria");
+				data_cube.collapse_func("Cellular Processes");
 
 				var svg = d3.select("#bpGraph")
-					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.t))
-					.append("g").attr("transform","translate("+ margin.l+","+margin.t+")");
+					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.top))
+					.append("g").attr("transform","translate("+ margin.l+","+margin.top+")");
 
 				getLinkData = function(){
 					//get unique linked functions for each taxon
@@ -129,12 +131,9 @@ SVGs["func"] = FuncTreeSVG;
 						(data_cube.displayed_taxa).map(function(t,i){
 							if(all_taxa_links.map(function(d){return d.Taxa;}).indexOf(t)===-1){
 							if((data_cube.displayed_contribution_cube[d]).hasOwnProperty(t)){
-								for(j=0; j<data_cube.displayed_funcs.length; j++){
-									console.log(data_cube.displayed_contribution_cube[d][t].toSource());
-									if(data_cube.displayed_contribution_cube[d][t][data_cube.displayed_funcs[j]]!==0){
-										all_taxa_links.push({Taxa:t, Functions:data_cube.displayed_funcs[j],
+								for(j=0; j<d3.keys(data_cube.displayed_contribution_cube[d][t]).length; j++){
+									all_taxa_links.push({Taxa:t, Functions:d3.keys(data_cube.displayed_contribution_cube[d][t])[j],
 										numKO:1});
-									}
 								}
 									//all_taxa_links.Functions.push(d3.keys(data_cube.displayed_contribution_cube[d][t])[j]);
 							}
@@ -166,7 +165,7 @@ SVGs["func"] = FuncTreeSVG;
 				//data_cube.expand_func("Metabolism");
 				var bpData = getLinkData();
 				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-				bP.updateGraph(data, svg);
+				bpvisdata = bP.updateGraph(data, svg);
 
 				var taxa_data = d3.nest()
 			        .key(function(d) { return d.Kingdom; })
@@ -279,7 +278,14 @@ SVGs["func"] = FuncTreeSVG;
 		var leafC = 1;
 		nodes.forEach(function (d) {
 			if (!(d.children || d.values)) {
-				d.x = (nleaf - leafC)/nleaf * height;
+				var dattype = d.type == "taxa" ? 0 : 1;
+				var thedat = -1;
+				for (i = 0; i < bpvisdata.keys[dattype].length ; i++) {
+					if (d.key == bpvisdata.keys[dattype][i])
+						thedat = i;
+				}
+				d.x = bpvisdata.mainBars[dattype][thedat].y;
+				//d.x = (nleaf - leafC)/nleaf * height;
 				leafC = leafC + 1;
 			} else {
 				var sumpos = 0;
@@ -430,7 +436,8 @@ SVGs["func"] = FuncTreeSVG;
 	function updateBPgraph() {
 		var bpData = getLinkData();
 		var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-		bP.updateGraph(data, svg);
+		var visdata = bP.updateGraph(data, svg);
+		return visdata;
 	}
 	
     // Toggle children on click.
@@ -440,24 +447,24 @@ SVGs["func"] = FuncTreeSVG;
                 d._children = d.children;
                 d.children = null;
 				d.type == 'taxa' ? data_cube.collapse_taxon(d.name) : data_cube.collapse_func(d.name);
-				updateBPgraph();
+				bpvisdata = updateBPgraph();
             } else {
                 d.children = d._children;
                 d._children = null;
 				d.type == 'taxa' ? data_cube.expand_taxon(d.name) : data_cube.expand_func(d.name);
-				updateBPgraph();
+				bpvisdata = updateBPgraph();
             }
         } else if (d.hasOwnProperty('key')) {
             if (d.values) {
                 d._values = d.values;
                 d.values = null;
 				d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
-				updateBPgraph();
+				bpvisdata = updateBPgraph();
             } else {
                 d.values = d._values;
                 d._values = null;
 				d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
-				updateBPgraph();
+				bpvisdata = updateBPgraph();
             }
         }
         update(d);
