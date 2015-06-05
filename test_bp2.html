@@ -112,10 +112,10 @@ SVGs["func"] = FuncTreeSVG;
 				//initialize display cube
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
-				data_cube.expand_taxon('Bacteria');
-				data_cube.expand_func("Cellular Processes");
-				data_cube.collapse_taxon("Bacteria");
-				data_cube.collapse_func("Cellular Processes");
+				// data_cube.expand_taxon('Bacteria');
+				// data_cube.expand_func("Cellular Processes");
+				// data_cube.collapse_taxon("Bacteria");
+				// data_cube.collapse_func("Cellular Processes");
 
 				var svg = d3.select("#bpGraph")
 					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.t))
@@ -130,7 +130,8 @@ SVGs["func"] = FuncTreeSVG;
 							if(all_taxa_links.map(function(d){return d.Taxa;}).indexOf(t)===-1){
 							if((data_cube.displayed_contribution_cube[d]).hasOwnProperty(t)){
 								for(j=0; j<data_cube.displayed_funcs.length; j++){
-									if(data_cube.displayed_contribution_cube[d][t].hasOwnProperty(data_cube.displayed_funcs[j])){
+									console.log(data_cube.displayed_contribution_cube[d][t].toSource());
+									if(data_cube.displayed_contribution_cube[d][t][data_cube.displayed_funcs[j]]!==0){
 										all_taxa_links.push({Taxa:t, Functions:data_cube.displayed_funcs[j],
 										numKO:1});
 									}
