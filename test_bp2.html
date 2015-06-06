@@ -67,17 +67,11 @@ var i = 0,
 	roots = {};
 
 var TaxaTree = d3.layout.tree()
-    .children(function (d) {
-    if (d.hasOwnProperty('values')) return d.values;
-    else if (d.hasOwnProperty('children')) return d.children;
-})
+    .children(function (d) { return d.values; })
     .size([height, width/2]);
 
 var FuncTree = d3.layout.tree()
-    .children(function (d) {
-    if (d.hasOwnProperty('values')) return d.values;
-    else if (d.hasOwnProperty('children')) return d.children;
-})
+    .children(function (d) { return d.values;})
     .size([height, width/2]);
 
 var trees = [];
@@ -187,8 +181,8 @@ SVGs["func"] = FuncTreeSVG;
 			    }
 
 			    newTaxaData = {
-			        "name": "All Taxa",
-			        "children": taxa_data,
+			        "key": "All Taxa",
+			        "values": taxa_data,
 			    }
 
 			    taxaroot = newTaxaData;
@@ -197,23 +191,16 @@ SVGs["func"] = FuncTreeSVG;
 				
 			    function collapse(d) {
 					d.type = settype;
-			        if (d.hasOwnProperty('name')) {
-			            if (d.children) {
-			                d._children = d.children;
-			                d._children.forEach(collapse);
-			                d.children = null;
-			            }
-			        } else if (d.hasOwnProperty('key')) {
 			            if (d.values) {
 			                d._values = d.values;
 			                d._values.forEach(collapse);
 			                d.values = null;
 			            }
-			        }
+			        
 			    }
 				
 				var settype = 'taxa';
-			    taxaroot.children.forEach(collapse);
+			    taxaroot.values.forEach(collapse);
 				taxaroot.type = 'taxa';
 
 				roots["taxa"] = taxaroot;
@@ -243,15 +230,15 @@ SVGs["func"] = FuncTreeSVG;
 			    }  
 
 			    newFunctionData = {
-			        "name": "All Functions",
-			        "children": function_data,
+			        "key": "All Functions",
+			        "values": function_data,
 			    }
 
 			    funcroot = newFunctionData;
 			    funcroot.x0 = height/2;
 			    funcroot.y0 = 0;
 				settype = 'func';
-			    funcroot.children.forEach(collapse);
+			    funcroot.values.forEach(collapse);
 				funcroot.type = settype;
 				roots["func"] = funcroot;
 				
@@ -268,27 +255,30 @@ SVGs["func"] = FuncTreeSVG;
 		
 		var nleaf = 0;
 		nodes.forEach(function (d) {
-			nleaf = nleaf + (d.children || d.values ? 0 : 1);
+			nleaf = nleaf + (d.values ? 0 : 1);
 		})
 		
 		var leafC = 1;
 		nodes.forEach(function (d) {
-			if (!(d.children || d.values)) {
+			if (!(d.values)) {
 				var dattype = d.type == "taxa" ? 0 : 1;
 				var thedat = -1;
 				for (i = 0; i < bpvisdata.keys[dattype].length ; i++) {
 					if (d.key == bpvisdata.keys[dattype][i])
 						thedat = i;
 				}
-				d.x = bpvisdata.mainBars[dattype][thedat].y;
+				if (thedat >= 0) {
+					d.x = bpvisdata.mainBars[dattype][thedat].y;	
+				} else { d.x = 0; }
+				
 				//d.x = (nleaf - leafC)/nleaf * height;
 				leafC = leafC + 1;
 			} else {
 				var sumpos = 0;
-				d.children.forEach(function (dc) {
+				d.values.forEach(function (dc) {
 					sumpos = sumpos + dc.x;
 				})
-				d.x = sumpos / d.children.length;
+				d.x = sumpos / d.values.length;
 			}
 		})
         // Normalize for fixed-depth.
@@ -319,7 +309,7 @@ SVGs["func"] = FuncTreeSVG;
         nodeEnter.append("circle")
             .attr("r", 1e-6)
             .style("fill", function (d) {
-            return d._children || d._values ? "lightsteelblue" : "#fff";
+            return d._values ? "lightsteelblue" : "#fff";
         });
 
         nodeEnter.append("text")
@@ -331,9 +321,7 @@ SVGs["func"] = FuncTreeSVG;
             return source.type == 'taxa' ? "start" : "end";
         })
             .text(function (d) {
-               if(d.name != null)
-                   return d.name;
-               else if(d.key != null)
+               if(d.key != null)
                    return d.key;
         })
             .style("fill-opacity", 1e-6);
@@ -348,20 +336,18 @@ SVGs["func"] = FuncTreeSVG;
         nodeUpdate.select("circle")
             .attr("r", 4.5)
             .style("fill", function (d) {
-            return d._children || d._values ? "lightsteelblue" : "#fff";
+            return d._values ? "lightsteelblue" : "#fff";
         });
 
         nodeUpdate.select("text")
             .style("fill-opacity", function(d) {
-				return d.children || d.values ? 0 : 1;
+				return d.values ? 0 : 1;
 			})
 			.text(function (d) {
-				if(d.children || d.values) {
+				if( d.values) {
 					return "";
 				} else {
-					if(d.name != null)
-                   return d.name;
-               else if(d.key != null)
+					if(d.key != null)
                    return d.key;
 				}
 			});
@@ -438,38 +424,33 @@ SVGs["func"] = FuncTreeSVG;
 	
     // Toggle children on click.
     function click(d) {
-        if (d.hasOwnProperty('name')) {
-            if (d.children) {
-                d._children = d.children;
-                d.children = null;
-				d.type == 'taxa' ? data_cube.collapse_taxon(d.name) : data_cube.collapse_func(d.name);
-				bpvisdata = updateBPgraph();
-            } else {
-                d.children = d._children;
-                d._children = null;
-				d.type == 'taxa' ? data_cube.expand_taxon(d.name) : data_cube.expand_func(d.name);
-				bpvisdata = updateBPgraph();
-            }
-        } else if (d.hasOwnProperty('key')) {
             if (d.values) {
-                d._values = d.values;
-                d.values = null;
-				d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
-				bpvisdata = updateBPgraph();
+				collapseTree(d);
+                bpvisdata = updateBPgraph();
             } else {
                 d.values = d._values;
                 d._values = null;
 				d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
 				bpvisdata = updateBPgraph();
-            }
-        }
+           } 
         update(d);
     }
 	
+	// collapse all children of the collapsing node recursively
+	function collapseTree(d) {
+		if (d.values) {
+			d._values = d.values;
+			d.values = null;
+			d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
+			d._values.forEach(collapseTree);
+		}
+	}
+	
+	// get the total depth of the tree to the deepest leaf
 	function getDepth(rootnode) {
 		var depth = 0;
-		if (rootnode.children) {
-			rootnode.children.forEach(function(d) {
+		if (rootnode.values) {
+			rootnode.values.forEach(function(d) {
 				var tmpDepth = getDepth(d);
 				if (tmpDepth > depth) {
 					depth = tmpDepth;
