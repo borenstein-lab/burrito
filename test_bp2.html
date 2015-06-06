@@ -127,21 +127,17 @@ SVGs["func"] = FuncTreeSVG;
 					//get unique linked functions for each taxon
 					allSamples = d3.keys(data_cube.displayed_contribution_cube);
 					var all_taxa_links = []; //{Taxa:[], Functions:[]};
-					allSamples.map(function(d){
-						(data_cube.displayed_taxa).map(function(t,i){
-							if(all_taxa_links.map(function(d){return d.Taxa;}).indexOf(t)===-1){
-							if((data_cube.displayed_contribution_cube[d]).hasOwnProperty(t)){
-								for(j=0; j<d3.keys(data_cube.displayed_contribution_cube[d][t]).length; j++){
-									all_taxa_links.push({Taxa:t, Functions:d3.keys(data_cube.displayed_contribution_cube[d][t])[j],
-										numKO:1});
-								}
-									//all_taxa_links.Functions.push(d3.keys(data_cube.displayed_contribution_cube[d][t])[j]);
+					data_cube.displayed_taxa.map(function(t,i){
+						data_cube.displayed_funcs.map(function(f,i){
+							var foo = allSamples.map(function(d){
+								return data_cube.get_contribution(d,t,f);
+							})
+							if(d3.sum(foo)!==0){
+								all_taxa_links.push({Taxa:t, Functions:f, numKO:1});
 							}
-							}
-						});
+						})
 					});
 					return all_taxa_links;
-					//a.filter(function(item, i, ar){ return ar.indexOf(item) === i; });
 				}
 
 				function sort_nest(x, y){
