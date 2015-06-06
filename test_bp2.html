@@ -61,7 +61,7 @@ path.link {
 var width = 400, height = 610, margin ={b:10, top:40, l:80, left:30, right:30, bottom:10};
 
 var i = 0,
-    duration = 750,
+    duration = 300,
     taxaroot,
 	funcroot,
 	roots = {};
@@ -108,10 +108,6 @@ SVGs["func"] = FuncTreeSVG;
 				//initialize display cube
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
-				data_cube.expand_taxon('Bacteria');
-				data_cube.expand_func("Cellular Processes");
-				data_cube.collapse_taxon("Bacteria");
-				data_cube.collapse_func("Cellular Processes");
 
 				var svg = d3.select("#bpGraph")
 					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.top))
@@ -246,7 +242,7 @@ SVGs["func"] = FuncTreeSVG;
 
 			    d3.select(self.frameElement).style("height", "800px");
 
-			        function update(source) {
+		function update(source) {
 
         // Compute the new tree layout.
 		
@@ -257,6 +253,8 @@ SVGs["func"] = FuncTreeSVG;
 		nodes.forEach(function (d) {
 			nleaf = nleaf + (d.values ? 0 : 1);
 		})
+
+		console.log(nleaf);
 		
 		var leafC = 1;
 		nodes.forEach(function (d) {
@@ -392,7 +390,8 @@ SVGs["func"] = FuncTreeSVG;
             .attr("d", diagonal);
 
         // Transition exiting nodes to the parent's new position.
-        link.exit().transition()
+        link.exit()
+        	.transition()
             .duration(duration)
             .attr("d", function (d) {
             var o = {
@@ -424,10 +423,10 @@ SVGs["func"] = FuncTreeSVG;
 	
     // Toggle children on click.
     function click(d) {
-            if (d.values) {
+            if (d.values) { //collapse
 				collapseTree(d);
                 bpvisdata = updateBPgraph();
-            } else {
+            } else { //expand
                 d.values = d._values;
                 d._values = null;
 				d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
