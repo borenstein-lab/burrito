@@ -126,7 +126,7 @@
 	}
 	
 	function drawPart(data, id, p){
-		d3.select("#"+id).append("g").attr("class","part"+p)
+		d3.select("#"+id).append("g").attr("class","part"+p).transition().duration(300)
 			.attr("transform","translate("+( p*(bb+b))+",0)");
 
 		d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
@@ -141,24 +141,16 @@
 			.attr("width",b).attr("height",function(d){ return d.height; })
 			.style("shape-rendering","auto")
 			.style("fill-opacity",0).style("stroke-width","0.5")
-			.style("stroke","black").style("stroke-opacity",0);
+			.style("stroke","black").style("stroke-opacity",0)
+			.transition().duration(300);
 			
 		mainbar.append("text").attr("class","barlabel")
 			.attr("x", c1[p])
 			.attr("y",function(d){ return d.middle+5;})
 			.text(function(d,i){ return data.keys[p][i];})
 			.attr("text-anchor","start" )
-			//.style("visibility", "hidden");
-			
-//		mainbar.append("text").attr("class","barvalue")
-//			.attr("x", c2[p]).attr("y",function(d){ return d.middle+5;});
-			//.text(function(d,i){ return d.value ;})
-			//.attr("text-anchor","end");
-			
-//		mainbar.append("text").attr("class","barpercent")
-//			.attr("x", c3[p]).attr("y",function(d){ return d.middle+5;});
-			//.text(function(d,i){ return "( "+Math.round(100*d.percent)+"%)" ;})
-			//.attr("text-anchor","end").style("fill","grey");
+			.transition().duration(300);
+
 			
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
@@ -168,29 +160,25 @@
 			.attr("width",b)
 			.attr("height",function(d){ return d.h})
 			.style("fill",function(d){ return colors[d.key1];})
-			.style("opacity",0.1);
+			.style("opacity",0.1)
+			.transition().duration(300);
 	}
 
-	function updatePart(data, id, p){
-		d3.select("#"+id).select(".part"+p).select(".mainbars").selectAll(".mainbar")
-			.data(data.mainBars[p]).transition();
+	// function updatePart(data, id, p){
+	// 	d3.select("#"+id).select(".part"+p).select(".mainbars").selectAll(".mainbar")
+	// 		.data(data.mainBars[p]).transition();
 
-		d3.select("#"+id).select(".part"+p).select(".subbars").selectAll(".subbar")
-			.data(data.subBars[p]).transition();
+	// 	d3.select("#"+id).select(".part"+p).select(".subbars").selectAll(".subbar")
+	// 		.data(data.subBars[p]).transition();
 
-	}
+	// }
 	
 	function drawEdges(data, id){
-		d3.select("#"+id).append("g").attr("class","edges").attr("transform","translate("+ b+",0)");
-
-		// var bundle = d3.layout.bundle();
-
-		// var line = d3.svg.line.radial()
-  //   		.interpolate("bundle")
-  //   		.tension(.85);
+		d3.select("#"+id).append("g").attr("class","edges").transition().duration(300).attr("transform","translate("+ b+",0)");
 
 		d3.select("#"+id).select(".edges").selectAll(".edge")
-			.data(data.edges).enter().append("polygon").attr("class","edge")
+			.data(data.edges).enter().append("polygon")
+			.attr("class","edge")
 			.attr("points", edgePolygon)
 			.style("fill",function(d){ return colors[d.key1];})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
@@ -203,7 +191,8 @@
 				d3.select(this).attr("points", edgePolygon).style("opacity",0.2);
 				var current_data = this._current;
 				bP.deselectEdge(id, i, current_data);
-			});
+			})
+			.transition().duration(300);
 			//brush would go here
 	}	
 	
@@ -275,7 +264,7 @@
 		drawPart(visData, bip.id, 0);
 		drawPart(visData, bip.id, 1); 
 		drawEdges(visData, bip.id);
-		drawHeader(bip.header, bip.id);
+//		drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
 			d3.select("#"+bip.id)
@@ -313,7 +302,7 @@
 		drawPart(visData, bip.id, 0);
 		drawPart(visData, bip.id, 1); 
 		drawEdges(visData, bip.id);
-		drawHeader(bip.header, bip.id);
+		//drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
 			d3.select("#"+bip.id)
