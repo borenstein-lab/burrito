@@ -114,10 +114,6 @@ SVGs["func"] = FuncTreeSVG;
 				//initialize display cube
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
-				data_cube.expand_taxon('Bacteria');
-				data_cube.expand_func("Cellular Processes");
-				data_cube.collapse_taxon("Bacteria");
-				data_cube.collapse_func("Cellular Processes");
 
 				var svg = d3.select("#bpGraph")
 					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.top))
