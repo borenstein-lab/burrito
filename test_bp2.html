@@ -236,7 +236,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						function update_func_bar(){
 								var func_data = getFuncBarData();
 								fB.Draw(func_data, samplemap);
-								console.log(func_data);
+								//console.log(func_data);
 						}
 
 						//data_cube.expand_taxon("Bacteria");
@@ -484,7 +484,46 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								.attr("transform", function (d) {
 									return "translate(" + source.y0 + "," + source.x0 + ")";
 								})
-								.on("click", click);
+								.on("click", click)
+								.on("mouseover", function (d) {
+								
+									var thisnode = d;
+									var thisNparents = [];
+									thisNparents.push(thisnode);
+									while (thisnode.parent) {
+										thisnode = thisnode.parent;
+										thisNparents.push(thisnode);
+									}
+										
+									d.thisandparents = node.filter(function (d2) { 
+										var good = false;
+										thisNparents.forEach( function (d4) {
+											if (d2.id == d4.id) {
+												good = true;} 
+												});
+										return good;
+									})
+									
+									d.thisandparents.select("circle")
+										.style("stroke-width", "5")
+										.style("stroke", "green");
+										
+									d.thisandparents.append("text")
+											.text(function (d5) {
+											return d5.key })
+											.attr("text-anchor", "middle")
+											.attr("dy", function (d5, isz) {
+												return "-" + (1* d3.select(this.parentNode).select("circle").attr("r") + 6) +  "";
+											});
+								})
+								.on("mouseout", function(d) { 
+								
+									d.thisandparents.select("circle")
+										.style("stroke-width", "1")
+										.style("stroke", "steelblue");
+
+									d.thisandparents.select("text").remove(); 
+									});
 
 							nodeEnter.append("circle")
 								.attr("r", 1e-6)
@@ -630,7 +669,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 										collapseTree(d);
 										d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
 										bpvisdata = updateBPgraph();
-										console.log(bpvisdata.toSource());
+										//console.log(bpvisdata.toSource());
 									}
 								} else { //expand
 									if (d._values[0].hasOwnProperty('key')) {
@@ -670,10 +709,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							}
 							return 1+depth;
 						}
-						
-						function showInfo(d) {
-							
-						}
+
 					});
 				});
 			});
