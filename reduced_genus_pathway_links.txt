@@ -1,1478 +1,1478 @@
-Genus	SubPathway
-7	00010 Glycolysis / Gluconeogenesis
-Pseudomonas	00010 Glycolysis / Gluconeogenesis
-5	00010 Glycolysis / Gluconeogenesis
-Ruminococcus	00010 Glycolysis / Gluconeogenesis
-8	00010 Glycolysis / Gluconeogenesis
-6	00010 Glycolysis / Gluconeogenesis
-[Ruminococcus]	00010 Glycolysis / Gluconeogenesis
-7	00260 Glycine, serine and threonine metabolism
-Lactobacillus	00260 Glycine, serine and threonine metabolism
-5	00260 Glycine, serine and threonine metabolism
-Pseudomonas	00260 Glycine, serine and threonine metabolism
-6	00260 Glycine, serine and threonine metabolism
-Ruminococcus	00260 Glycine, serine and threonine metabolism
-Oscillospira	00260 Glycine, serine and threonine metabolism
-3	00260 Glycine, serine and threonine metabolism
-8	00260 Glycine, serine and threonine metabolism
-rc4-4	00260 Glycine, serine and threonine metabolism
-[Ruminococcus]	00260 Glycine, serine and threonine metabolism
-Coprococcus	00260 Glycine, serine and threonine metabolism
-8	00650 Butanoate metabolism
-5	00640 Propanoate metabolism
-6	00640 Propanoate metabolism
-Ruminococcus	00640 Propanoate metabolism
-Oscillospira	00640 Propanoate metabolism
-7	00640 Propanoate metabolism
-[Ruminococcus]	00640 Propanoate metabolism
-Coprococcus	00640 Propanoate metabolism
-7	00040 Pentose and glucuronate interconversions
-5	00040 Pentose and glucuronate interconversions
-6	00040 Pentose and glucuronate interconversions
-Ruminococcus	00040 Pentose and glucuronate interconversions
-Oscillospira	00040 Pentose and glucuronate interconversions
-[Ruminococcus]	00040 Pentose and glucuronate interconversions
-Coprococcus	00040 Pentose and glucuronate interconversions
-7	00051 Fructose and mannose metabolism
-Turicibacter	00051 Fructose and mannose metabolism
-6	00051 Fructose and mannose metabolism
-Coprococcus	00051 Fructose and mannose metabolism
-Pseudomonas	00562 Inositol phosphate metabolism
-5	00562 Inositol phosphate metabolism
-Ruminococcus	00562 Inositol phosphate metabolism
-7	00562 Inositol phosphate metabolism
-6	00562 Inositol phosphate metabolism
-Coprococcus	00562 Inositol phosphate metabolism
-4	00040 Pentose and glucuronate interconversions
-Pseudomonas	00040 Pentose and glucuronate interconversions
-3	00040 Pentose and glucuronate interconversions
-Turicibacter	00040 Pentose and glucuronate interconversions
-8	00040 Pentose and glucuronate interconversions
-Bacteroides	00040 Pentose and glucuronate interconversions
-4	00340 Histidine metabolism
-7	00340 Histidine metabolism
-5	00340 Histidine metabolism
-Pseudomonas	00340 Histidine metabolism
-6	00340 Histidine metabolism
-Ruminococcus	00340 Histidine metabolism
-Oscillospira	00340 Histidine metabolism
-3	00340 Histidine metabolism
-Turicibacter	00340 Histidine metabolism
-8	00340 Histidine metabolism
-Bacteroides	00340 Histidine metabolism
-rc4-4	00340 Histidine metabolism
-[Ruminococcus]	00340 Histidine metabolism
-Coprococcus	00340 Histidine metabolism
-4	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-7	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-5	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-Pseudomonas	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-6	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-Ruminococcus	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-Oscillospira	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-3	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-Turicibacter	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-8	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-Bacteroides	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-rc4-4	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-[Ruminococcus]	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-Coprococcus	00400 Phenylalanine, tyrosine and tryptophan biosynthesis
-Lactobacillus	00010 Glycolysis / Gluconeogenesis
-Oscillospira	00010 Glycolysis / Gluconeogenesis
-Turicibacter	00010 Glycolysis / Gluconeogenesis
-rc4-4	00010 Glycolysis / Gluconeogenesis
-Coprococcus	00010 Glycolysis / Gluconeogenesis
-Anaeroplasma	00010 Glycolysis / Gluconeogenesis
-9	00010 Glycolysis / Gluconeogenesis
-4	00630 Glyoxylate and dicarboxylate metabolism
-7	00630 Glyoxylate and dicarboxylate metabolism
-5	00630 Glyoxylate and dicarboxylate metabolism
-Pseudomonas	00630 Glyoxylate and dicarboxylate metabolism
-6	00630 Glyoxylate and dicarboxylate metabolism
-Ruminococcus	00630 Glyoxylate and dicarboxylate metabolism
-Oscillospira	00630 Glyoxylate and dicarboxylate metabolism
-3	00630 Glyoxylate and dicarboxylate metabolism
-Turicibacter	00630 Glyoxylate and dicarboxylate metabolism
-8	00630 Glyoxylate and dicarboxylate metabolism
-Bacteroides	00630 Glyoxylate and dicarboxylate metabolism
-[Ruminococcus]	00630 Glyoxylate and dicarboxylate metabolism
-Coprococcus	00630 Glyoxylate and dicarboxylate metabolism
-Pseudomonas	00650 Butanoate metabolism
-Pseudomonas	00280 Valine, leucine and isoleucine degradation
-7	00280 Valine, leucine and isoleucine degradation
-Turicibacter	00280 Valine, leucine and isoleucine degradation
-8	00280 Valine, leucine and isoleucine degradation
-4	00020 Citrate cycle (TCA cycle)
-3	00020 Citrate cycle (TCA cycle)
-7	00020 Citrate cycle (TCA cycle)
-Turicibacter	00020 Citrate cycle (TCA cycle)
-8	00020 Citrate cycle (TCA cycle)
-Bacteroides	00020 Citrate cycle (TCA cycle)
-7	00620 Pyruvate metabolism
-Lactobacillus	00620 Pyruvate metabolism
-5	00620 Pyruvate metabolism
-6	00620 Pyruvate metabolism
-Ruminococcus	00620 Pyruvate metabolism
-Oscillospira	00620 Pyruvate metabolism
-Turicibacter	00620 Pyruvate metabolism
-8	00620 Pyruvate metabolism
-rc4-4	00620 Pyruvate metabolism
-[Ruminococcus]	00620 Pyruvate metabolism
-Coprococcus	00620 Pyruvate metabolism
-Pseudomonas	00620 Pyruvate metabolism
-Bacteroides	00620 Pyruvate metabolism
-6	00020 Citrate cycle (TCA cycle)
-5	00020 Citrate cycle (TCA cycle)
-Pseudomonas	00020 Citrate cycle (TCA cycle)
-Ruminococcus	00020 Citrate cycle (TCA cycle)
-Oscillospira	00020 Citrate cycle (TCA cycle)
-rc4-4	00020 Citrate cycle (TCA cycle)
-[Ruminococcus]	00020 Citrate cycle (TCA cycle)
-Coprococcus	00020 Citrate cycle (TCA cycle)
-Pseudomonas	00030 Pentose phosphate pathway
-Lactobacillus	00030 Pentose phosphate pathway
-5	00030 Pentose phosphate pathway
-6	00030 Pentose phosphate pathway
-Turicibacter	00030 Pentose phosphate pathway
-Bacteroides	00030 Pentose phosphate pathway
-7	00030 Pentose phosphate pathway
-Coprococcus	00650 Butanoate metabolism
-Pseudomonas	00051 Fructose and mannose metabolism
-4	None
-5	None
-Pseudomonas	None
-6	None
-Ruminococcus	None
-7	None
-3	None
-Bacteroides	None
-[Ruminococcus]	None
-Coprococcus	None
-4	00660 C5-Branched dibasic acid metabolism
-7	00660 C5-Branched dibasic acid metabolism
-5	00660 C5-Branched dibasic acid metabolism
-Pseudomonas	00660 C5-Branched dibasic acid metabolism
-6	00660 C5-Branched dibasic acid metabolism
-Ruminococcus	00660 C5-Branched dibasic acid metabolism
-Oscillospira	00660 C5-Branched dibasic acid metabolism
-3	00660 C5-Branched dibasic acid metabolism
-8	00660 C5-Branched dibasic acid metabolism
-Bacteroides	00660 C5-Branched dibasic acid metabolism
-rc4-4	00660 C5-Branched dibasic acid metabolism
-[Ruminococcus]	00660 C5-Branched dibasic acid metabolism
-Coprococcus	00660 C5-Branched dibasic acid metabolism
-4	00290 Valine, leucine and isoleucine biosynthesis
-5	00290 Valine, leucine and isoleucine biosynthesis
-Pseudomonas	00290 Valine, leucine and isoleucine biosynthesis
-6	00290 Valine, leucine and isoleucine biosynthesis
-Ruminococcus	00290 Valine, leucine and isoleucine biosynthesis
-Oscillospira	00290 Valine, leucine and isoleucine biosynthesis
-7	00290 Valine, leucine and isoleucine biosynthesis
-8	00290 Valine, leucine and isoleucine biosynthesis
-Bacteroides	00290 Valine, leucine and isoleucine biosynthesis
-rc4-4	00290 Valine, leucine and isoleucine biosynthesis
-[Ruminococcus]	00290 Valine, leucine and isoleucine biosynthesis
-Coprococcus	00290 Valine, leucine and isoleucine biosynthesis
-Lactobacillus	00900 Terpenoid backbone biosynthesis
-4	00564 Glycerophospholipid metabolism
-7	00564 Glycerophospholipid metabolism
-Lactobacillus	00564 Glycerophospholipid metabolism
-5	00564 Glycerophospholipid metabolism
-Pseudomonas	00564 Glycerophospholipid metabolism
-6	00564 Glycerophospholipid metabolism
-Ruminococcus	00564 Glycerophospholipid metabolism
-Oscillospira	00564 Glycerophospholipid metabolism
-3	00564 Glycerophospholipid metabolism
-Turicibacter	00564 Glycerophospholipid metabolism
-8	00564 Glycerophospholipid metabolism
-Bacteroides	00564 Glycerophospholipid metabolism
-rc4-4	00564 Glycerophospholipid metabolism
-[Ruminococcus]	00564 Glycerophospholipid metabolism
-Coprococcus	00564 Glycerophospholipid metabolism
-Anaeroplasma	00564 Glycerophospholipid metabolism
-9	00564 Glycerophospholipid metabolism
-4	00680 Methane metabolism
-7	00680 Methane metabolism
-Lactobacillus	00680 Methane metabolism
-5	00680 Methane metabolism
-Pseudomonas	00680 Methane metabolism
-6	00680 Methane metabolism
-Ruminococcus	00680 Methane metabolism
-Oscillospira	00680 Methane metabolism
-3	00680 Methane metabolism
-8	00680 Methane metabolism
-Bacteroides	00680 Methane metabolism
-rc4-4	00680 Methane metabolism
-[Ruminococcus]	00680 Methane metabolism
-Coprococcus	00680 Methane metabolism
-4	00061 Fatty acid biosynthesis
-7	00061 Fatty acid biosynthesis
-Lactobacillus	00061 Fatty acid biosynthesis
-5	00061 Fatty acid biosynthesis
-Pseudomonas	00061 Fatty acid biosynthesis
-6	00061 Fatty acid biosynthesis
-Ruminococcus	00061 Fatty acid biosynthesis
-Oscillospira	00061 Fatty acid biosynthesis
-3	00061 Fatty acid biosynthesis
-Turicibacter	00061 Fatty acid biosynthesis
-8	00061 Fatty acid biosynthesis
-Bacteroides	00061 Fatty acid biosynthesis
-rc4-4	00061 Fatty acid biosynthesis
-[Ruminococcus]	00061 Fatty acid biosynthesis
-Coprococcus	00061 Fatty acid biosynthesis
-Turicibacter	00260 Glycine, serine and threonine metabolism
-4	00523 Polyketide sugar unit biosynthesis
-7	00523 Polyketide sugar unit biosynthesis
-5	00523 Polyketide sugar unit biosynthesis
-Pseudomonas	00523 Polyketide sugar unit biosynthesis
-6	00523 Polyketide sugar unit biosynthesis
-Ruminococcus	00523 Polyketide sugar unit biosynthesis
-3	00523 Polyketide sugar unit biosynthesis
-Turicibacter	00523 Polyketide sugar unit biosynthesis
-8	00523 Polyketide sugar unit biosynthesis
-Bacteroides	00523 Polyketide sugar unit biosynthesis
-[Ruminococcus]	00523 Polyketide sugar unit biosynthesis
-Coprococcus	00523 Polyketide sugar unit biosynthesis
-Ruminococcus	00051 Fructose and mannose metabolism
-7	00650 Butanoate metabolism
-5	00650 Butanoate metabolism
-6	00650 Butanoate metabolism
-Oscillospira	00650 Butanoate metabolism
-Turicibacter	00650 Butanoate metabolism
-4	00520 Amino sugar and nucleotide sugar metabolism
-7	00520 Amino sugar and nucleotide sugar metabolism
-Lactobacillus	00520 Amino sugar and nucleotide sugar metabolism
-5	00520 Amino sugar and nucleotide sugar metabolism
-Pseudomonas	00520 Amino sugar and nucleotide sugar metabolism
-6	00520 Amino sugar and nucleotide sugar metabolism
-Ruminococcus	00520 Amino sugar and nucleotide sugar metabolism
-Oscillospira	00520 Amino sugar and nucleotide sugar metabolism
-3	00520 Amino sugar and nucleotide sugar metabolism
-Turicibacter	00520 Amino sugar and nucleotide sugar metabolism
-8	00520 Amino sugar and nucleotide sugar metabolism
-Bacteroides	00520 Amino sugar and nucleotide sugar metabolism
-rc4-4	00520 Amino sugar and nucleotide sugar metabolism
-[Ruminococcus]	00520 Amino sugar and nucleotide sugar metabolism
-Coprococcus	00520 Amino sugar and nucleotide sugar metabolism
-4	00770 Pantothenate and CoA biosynthesis
-7	00770 Pantothenate and CoA biosynthesis
-5	00770 Pantothenate and CoA biosynthesis
-Pseudomonas	00770 Pantothenate and CoA biosynthesis
-6	00770 Pantothenate and CoA biosynthesis
-Oscillospira	00770 Pantothenate and CoA biosynthesis
-Bacteroides	00770 Pantothenate and CoA biosynthesis
-Coprococcus	00770 Pantothenate and CoA biosynthesis
-3	00740 Riboflavin metabolism
-rc4-4	00640 Propanoate metabolism
-5	00230 Purine metabolism
-6	00230 Purine metabolism
-Oscillospira	00230 Purine metabolism
-7	00230 Purine metabolism
-[Ruminococcus]	00230 Purine metabolism
-Coprococcus	00230 Purine metabolism
-4	00230 Purine metabolism
-Lactobacillus	00230 Purine metabolism
-Pseudomonas	00230 Purine metabolism
-Ruminococcus	00230 Purine metabolism
-3	00230 Purine metabolism
-Turicibacter	00230 Purine metabolism
-8	00230 Purine metabolism
-Bacteroides	00230 Purine metabolism
-rc4-4	00230 Purine metabolism
-[Ruminococcus]	00052 Galactose metabolism
-4	00750 Vitamin B6 metabolism
-5	00750 Vitamin B6 metabolism
-Pseudomonas	00750 Vitamin B6 metabolism
-6	00750 Vitamin B6 metabolism
-Oscillospira	00750 Vitamin B6 metabolism
-3	00750 Vitamin B6 metabolism
-7	00750 Vitamin B6 metabolism
-8	00750 Vitamin B6 metabolism
-Bacteroides	00750 Vitamin B6 metabolism
-Coprococcus	00750 Vitamin B6 metabolism
-4	00900 Terpenoid backbone biosynthesis
-7	00900 Terpenoid backbone biosynthesis
-5	00900 Terpenoid backbone biosynthesis
-Pseudomonas	00900 Terpenoid backbone biosynthesis
-6	00900 Terpenoid backbone biosynthesis
-Ruminococcus	00900 Terpenoid backbone biosynthesis
-Oscillospira	00900 Terpenoid backbone biosynthesis
-3	00900 Terpenoid backbone biosynthesis
-Turicibacter	00900 Terpenoid backbone biosynthesis
-8	00900 Terpenoid backbone biosynthesis
-Bacteroides	00900 Terpenoid backbone biosynthesis
-rc4-4	00900 Terpenoid backbone biosynthesis
-[Ruminococcus]	00900 Terpenoid backbone biosynthesis
-Coprococcus	00900 Terpenoid backbone biosynthesis
-4	00051 Fructose and mannose metabolism
-Lactobacillus	00051 Fructose and mannose metabolism
-5	00051 Fructose and mannose metabolism
-Oscillospira	00051 Fructose and mannose metabolism
-8	00051 Fructose and mannose metabolism
-Bacteroides	00051 Fructose and mannose metabolism
-[Ruminococcus]	00051 Fructose and mannose metabolism
-rc4-4	00630 Glyoxylate and dicarboxylate metabolism
-8	00030 Pentose phosphate pathway
-4	00010 Glycolysis / Gluconeogenesis
-4	00260 Glycine, serine and threonine metabolism
-Bacteroides	00260 Glycine, serine and threonine metabolism
-3	00010 Glycolysis / Gluconeogenesis
-Bacteroides	00010 Glycolysis / Gluconeogenesis
-Lactobacillus	00650 Butanoate metabolism
-rc4-4	00650 Butanoate metabolism
-Pseudomonas	00330 Arginine and proline metabolism
-Pseudomonas	00640 Propanoate metabolism
-8	00640 Propanoate metabolism
-4	00330 Arginine and proline metabolism
-7	00330 Arginine and proline metabolism
-5	00330 Arginine and proline metabolism
-6	00330 Arginine and proline metabolism
-Ruminococcus	00330 Arginine and proline metabolism
-Oscillospira	00330 Arginine and proline metabolism
-3	00330 Arginine and proline metabolism
-8	00330 Arginine and proline metabolism
-Bacteroides	00330 Arginine and proline metabolism
-rc4-4	00330 Arginine and proline metabolism
-[Ruminococcus]	00330 Arginine and proline metabolism
-Coprococcus	00330 Arginine and proline metabolism
-Pseudomonas	00360 Phenylalanine metabolism
-Lactobacillus	00330 Arginine and proline metabolism
-Pseudomonas	00350 Tyrosine metabolism
-8	None
-4	00620 Pyruvate metabolism
-Oscillospira	None
-rc4-4	None
-7	00720 Carbon fixation pathways in prokaryotes
-5	00720 Carbon fixation pathways in prokaryotes
-6	00720 Carbon fixation pathways in prokaryotes
-rc4-4	00720 Carbon fixation pathways in prokaryotes
-[Ruminococcus]	00720 Carbon fixation pathways in prokaryotes
-4	00300 Lysine biosynthesis
-7	00300 Lysine biosynthesis
-Lactobacillus	00300 Lysine biosynthesis
-5	00300 Lysine biosynthesis
-Pseudomonas	00300 Lysine biosynthesis
-6	00300 Lysine biosynthesis
-Ruminococcus	00300 Lysine biosynthesis
-Oscillospira	00300 Lysine biosynthesis
-3	00300 Lysine biosynthesis
-Turicibacter	00300 Lysine biosynthesis
-8	00300 Lysine biosynthesis
-Bacteroides	00300 Lysine biosynthesis
-rc4-4	00300 Lysine biosynthesis
-[Ruminococcus]	00300 Lysine biosynthesis
-Coprococcus	00300 Lysine biosynthesis
-4	00240 Pyrimidine metabolism
-7	00240 Pyrimidine metabolism
-Lactobacillus	00240 Pyrimidine metabolism
-5	00240 Pyrimidine metabolism
-Pseudomonas	00240 Pyrimidine metabolism
-6	00240 Pyrimidine metabolism
-Ruminococcus	00240 Pyrimidine metabolism
-Oscillospira	00240 Pyrimidine metabolism
-3	00240 Pyrimidine metabolism
-8	00240 Pyrimidine metabolism
-Bacteroides	00240 Pyrimidine metabolism
-rc4-4	00240 Pyrimidine metabolism
-[Ruminococcus]	00240 Pyrimidine metabolism
-Coprococcus	00240 Pyrimidine metabolism
-Pseudomonas	00860 Porphyrin and chlorophyll metabolism
-8	00860 Porphyrin and chlorophyll metabolism
-7	00860 Porphyrin and chlorophyll metabolism
-Turicibacter	00860 Porphyrin and chlorophyll metabolism
-Lactobacillus	None
-Turicibacter	None
-Lactobacillus	00020 Citrate cycle (TCA cycle)
-Pseudomonas	00071 Fatty acid degradation
-8	00071 Fatty acid degradation
-4	00281 Geraniol degradation
-Pseudomonas	00281 Geraniol degradation
-7	00281 Geraniol degradation
-3	00281 Geraniol degradation
-8	00281 Geraniol degradation
-Bacteroides	00281 Geraniol degradation
-3	00250 Alanine, aspartate and glutamate metabolism
-Turicibacter	00250 Alanine, aspartate and glutamate metabolism
-Bacteroides	00250 Alanine, aspartate and glutamate metabolism
-rc4-4	00250 Alanine, aspartate and glutamate metabolism
-Coprococcus	00250 Alanine, aspartate and glutamate metabolism
-Pseudomonas	00910 Nitrogen metabolism
-6	00910 Nitrogen metabolism
-8	00910 Nitrogen metabolism
-rc4-4	00910 Nitrogen metabolism
-4	00910 Nitrogen metabolism
-7	00910 Nitrogen metabolism
-Lactobacillus	00910 Nitrogen metabolism
-5	00910 Nitrogen metabolism
-Ruminococcus	00910 Nitrogen metabolism
-Oscillospira	00910 Nitrogen metabolism
-3	00910 Nitrogen metabolism
-Bacteroides	00910 Nitrogen metabolism
-[Ruminococcus]	00910 Nitrogen metabolism
-Coprococcus	00910 Nitrogen metabolism
-Turicibacter	00910 Nitrogen metabolism
-4	00250 Alanine, aspartate and glutamate metabolism
-7	00250 Alanine, aspartate and glutamate metabolism
-5	00250 Alanine, aspartate and glutamate metabolism
-Pseudomonas	00250 Alanine, aspartate and glutamate metabolism
-6	00250 Alanine, aspartate and glutamate metabolism
-Ruminococcus	00250 Alanine, aspartate and glutamate metabolism
-8	00250 Alanine, aspartate and glutamate metabolism
-[Ruminococcus]	00250 Alanine, aspartate and glutamate metabolism
-8	00360 Phenylalanine metabolism
-Turicibacter	00330 Arginine and proline metabolism
-4	00790 Folate biosynthesis
-7	00790 Folate biosynthesis
-Lactobacillus	00790 Folate biosynthesis
-5	00790 Folate biosynthesis
-Pseudomonas	00790 Folate biosynthesis
-6	00790 Folate biosynthesis
-Oscillospira	00790 Folate biosynthesis
-Ruminococcus	00790 Folate biosynthesis
-3	00790 Folate biosynthesis
-Turicibacter	00790 Folate biosynthesis
-8	00790 Folate biosynthesis
-Bacteroides	00790 Folate biosynthesis
-[Ruminococcus]	00790 Folate biosynthesis
-Coprococcus	00790 Folate biosynthesis
-Anaeroplasma	00790 Folate biosynthesis
-9	00790 Folate biosynthesis
-4	00720 Carbon fixation pathways in prokaryotes
-Pseudomonas	00720 Carbon fixation pathways in prokaryotes
-Ruminococcus	00720 Carbon fixation pathways in prokaryotes
-Oscillospira	00720 Carbon fixation pathways in prokaryotes
-3	00720 Carbon fixation pathways in prokaryotes
-8	00720 Carbon fixation pathways in prokaryotes
-Bacteroides	00720 Carbon fixation pathways in prokaryotes
-Coprococcus	00720 Carbon fixation pathways in prokaryotes
-Pseudomonas	00920 Sulfur metabolism
-Pseudomonas	00760 Nicotinate and nicotinamide metabolism
-8	00760 Nicotinate and nicotinamide metabolism
-4	00190 Oxidative phosphorylation
-Pseudomonas	00190 Oxidative phosphorylation
-3	00190 Oxidative phosphorylation
-8	00190 Oxidative phosphorylation
-Bacteroides	00190 Oxidative phosphorylation
-rc4-4	00190 Oxidative phosphorylation
-7	00190 Oxidative phosphorylation
-5	00190 Oxidative phosphorylation
-6	00190 Oxidative phosphorylation
-Ruminococcus	00190 Oxidative phosphorylation
-Oscillospira	00190 Oxidative phosphorylation
-Turicibacter	00190 Oxidative phosphorylation
-[Ruminococcus]	00190 Oxidative phosphorylation
-Coprococcus	00190 Oxidative phosphorylation
-Pseudomonas	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-Anaeroplasma	None
-9	None
-8	00920 Sulfur metabolism
-Pseudomonas	00480 Glutathione metabolism
-8	00480 Glutathione metabolism
-Turicibacter	00240 Pyrimidine metabolism
-Anaeroplasma	00240 Pyrimidine metabolism
-9	00240 Pyrimidine metabolism
-6	00920 Sulfur metabolism
-5	00920 Sulfur metabolism
-Oscillospira	00920 Sulfur metabolism
-rc4-4	00920 Sulfur metabolism
-Coprococcus	00920 Sulfur metabolism
-Ruminococcus	00920 Sulfur metabolism
-Lactobacillus	00190 Oxidative phosphorylation
-Pseudomonas	00590 Arachidonic acid metabolism
-5	00590 Arachidonic acid metabolism
-7	00590 Arachidonic acid metabolism
-Turicibacter	00590 Arachidonic acid metabolism
-8	00590 Arachidonic acid metabolism
-Bacteroides	00590 Arachidonic acid metabolism
-Coprococcus	00590 Arachidonic acid metabolism
-Pseudomonas	00362 Benzoate degradation
-Coprococcus	00350 Tyrosine metabolism
-Pseudomonas	00380 Tryptophan metabolism
-8	00350 Tyrosine metabolism
-Pseudomonas	00310 Lysine degradation
-Pseudomonas	00621 Dioxin degradation
-6	00350 Tyrosine metabolism
-8	02020 Two-component system
-8	01040 Biosynthesis of unsaturated fatty acids
-8	00591 Linoleic acid metabolism
-Anaeroplasma	00230 Purine metabolism
-9	00230 Purine metabolism
-Lactobacillus	00270 Cysteine and methionine metabolism
-7	00270 Cysteine and methionine metabolism
-6	00270 Cysteine and methionine metabolism
-4	00270 Cysteine and methionine metabolism
-5	00270 Cysteine and methionine metabolism
-Pseudomonas	00270 Cysteine and methionine metabolism
-Ruminococcus	00270 Cysteine and methionine metabolism
-Oscillospira	00270 Cysteine and methionine metabolism
-3	00270 Cysteine and methionine metabolism
-8	00270 Cysteine and methionine metabolism
-Bacteroides	00270 Cysteine and methionine metabolism
-rc4-4	00270 Cysteine and methionine metabolism
-[Ruminococcus]	00270 Cysteine and methionine metabolism
-Coprococcus	00270 Cysteine and methionine metabolism
-Turicibacter	00270 Cysteine and methionine metabolism
-Anaeroplasma	00270 Cysteine and methionine metabolism
-9	00270 Cysteine and methionine metabolism
-4	04122 Sulfur relay system
-7	04122 Sulfur relay system
-Lactobacillus	04122 Sulfur relay system
-5	04122 Sulfur relay system
-Pseudomonas	04122 Sulfur relay system
-6	04122 Sulfur relay system
-Ruminococcus	04122 Sulfur relay system
-Oscillospira	04122 Sulfur relay system
-3	04122 Sulfur relay system
-Turicibacter	04122 Sulfur relay system
-8	04122 Sulfur relay system
-Bacteroides	04122 Sulfur relay system
-rc4-4	04122 Sulfur relay system
-[Ruminococcus]	04122 Sulfur relay system
-Coprococcus	04122 Sulfur relay system
-Anaeroplasma	04122 Sulfur relay system
-9	04122 Sulfur relay system
-8	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-Pseudomonas	00983 Drug metabolism - other enzymes
-8	00983 Drug metabolism - other enzymes
-5	02020 Two-component system
-Pseudomonas	02020 Two-component system
-6	02020 Two-component system
-Oscillospira	02020 Two-component system
-Ruminococcus	02020 Two-component system
-7	02020 Two-component system
-Coprococcus	02020 Two-component system
-3	00360 Phenylalanine metabolism
-5	00860 Porphyrin and chlorophyll metabolism
-6	00860 Porphyrin and chlorophyll metabolism
-Oscillospira	00860 Porphyrin and chlorophyll metabolism
-[Ruminococcus]	00860 Porphyrin and chlorophyll metabolism
-Coprococcus	00860 Porphyrin and chlorophyll metabolism
-Lactobacillus	00630 Glyoxylate and dicarboxylate metabolism
-Anaeroplasma	00630 Glyoxylate and dicarboxylate metabolism
-9	00630 Glyoxylate and dicarboxylate metabolism
-4	00670 One carbon pool by folate
-7	00670 One carbon pool by folate
-Lactobacillus	00670 One carbon pool by folate
-5	00670 One carbon pool by folate
-Pseudomonas	00670 One carbon pool by folate
-6	00670 One carbon pool by folate
-Ruminococcus	00670 One carbon pool by folate
-Oscillospira	00670 One carbon pool by folate
-3	00670 One carbon pool by folate
-Turicibacter	00670 One carbon pool by folate
-8	00670 One carbon pool by folate
-Bacteroides	00670 One carbon pool by folate
-rc4-4	00670 One carbon pool by folate
-[Ruminococcus]	00670 One carbon pool by folate
-Coprococcus	00670 One carbon pool by folate
-Anaeroplasma	00670 One carbon pool by folate
-9	00670 One carbon pool by folate
-3	00770 Pantothenate and CoA biosynthesis
-8	00770 Pantothenate and CoA biosynthesis
-rc4-4	00770 Pantothenate and CoA biosynthesis
-4	00030 Pentose phosphate pathway
-Ruminococcus	00030 Pentose phosphate pathway
-Oscillospira	00030 Pentose phosphate pathway
-3	00030 Pentose phosphate pathway
-rc4-4	00030 Pentose phosphate pathway
-[Ruminococcus]	00030 Pentose phosphate pathway
-Coprococcus	00030 Pentose phosphate pathway
-Anaeroplasma	00030 Pentose phosphate pathway
-9	00030 Pentose phosphate pathway
-Anaeroplasma	00620 Pyruvate metabolism
-9	00620 Pyruvate metabolism
-Pseudomonas	00561 Glycerolipid metabolism
-8	00561 Glycerolipid metabolism
-6	00071 Fatty acid degradation
-Oscillospira	00071 Fatty acid degradation
-4	00650 Butanoate metabolism
-3	00650 Butanoate metabolism
-Bacteroides	00650 Butanoate metabolism
-4	00920 Sulfur metabolism
-7	00920 Sulfur metabolism
-Turicibacter	00920 Sulfur metabolism
-Bacteroides	00920 Sulfur metabolism
-[Ruminococcus]	00920 Sulfur metabolism
-Lactobacillus	00920 Sulfur metabolism
-4	00780 Biotin metabolism
-Pseudomonas	00780 Biotin metabolism
-8	00780 Biotin metabolism
-Bacteroides	00780 Biotin metabolism
-4	00561 Glycerolipid metabolism
-7	00561 Glycerolipid metabolism
-Lactobacillus	00561 Glycerolipid metabolism
-5	00561 Glycerolipid metabolism
-6	00561 Glycerolipid metabolism
-Ruminococcus	00561 Glycerolipid metabolism
-Oscillospira	00561 Glycerolipid metabolism
-3	00561 Glycerolipid metabolism
-Turicibacter	00561 Glycerolipid metabolism
-Bacteroides	00561 Glycerolipid metabolism
-rc4-4	00561 Glycerolipid metabolism
-[Ruminococcus]	00561 Glycerolipid metabolism
-Coprococcus	00561 Glycerolipid metabolism
-Anaeroplasma	00561 Glycerolipid metabolism
-9	00561 Glycerolipid metabolism
-3	00620 Pyruvate metabolism
-4	00540 Lipopolysaccharide biosynthesis
-Pseudomonas	00540 Lipopolysaccharide biosynthesis
-3	00540 Lipopolysaccharide biosynthesis
-8	00540 Lipopolysaccharide biosynthesis
-Bacteroides	00540 Lipopolysaccharide biosynthesis
-4	00350 Tyrosine metabolism
-7	00350 Tyrosine metabolism
-Lactobacillus	00350 Tyrosine metabolism
-5	00350 Tyrosine metabolism
-Ruminococcus	00350 Tyrosine metabolism
-Oscillospira	00350 Tyrosine metabolism
-3	00350 Tyrosine metabolism
-Turicibacter	00350 Tyrosine metabolism
-Bacteroides	00350 Tyrosine metabolism
-Pseudomonas	00430 Taurine and hypotaurine metabolism
-6	00430 Taurine and hypotaurine metabolism
-Oscillospira	00430 Taurine and hypotaurine metabolism
-7	00430 Taurine and hypotaurine metabolism
-Turicibacter	00430 Taurine and hypotaurine metabolism
-8	00430 Taurine and hypotaurine metabolism
-5	00430 Taurine and hypotaurine metabolism
-4	00500 Starch and sucrose metabolism
-7	00500 Starch and sucrose metabolism
-Lactobacillus	00500 Starch and sucrose metabolism
-5	00500 Starch and sucrose metabolism
-Pseudomonas	00500 Starch and sucrose metabolism
-6	00500 Starch and sucrose metabolism
-Ruminococcus	00500 Starch and sucrose metabolism
-Oscillospira	00500 Starch and sucrose metabolism
-3	00500 Starch and sucrose metabolism
-Turicibacter	00500 Starch and sucrose metabolism
-Bacteroides	00500 Starch and sucrose metabolism
-rc4-4	00500 Starch and sucrose metabolism
-[Ruminococcus]	00500 Starch and sucrose metabolism
-Coprococcus	00500 Starch and sucrose metabolism
-4	00510 N-Glycan biosynthesis
-5	00510 N-Glycan biosynthesis
-6	00510 N-Glycan biosynthesis
-7	00510 N-Glycan biosynthesis
-3	00510 N-Glycan biosynthesis
-Bacteroides	00510 N-Glycan biosynthesis
-rc4-4	00510 N-Glycan biosynthesis
-Coprococcus	00510 N-Glycan biosynthesis
-7	00760 Nicotinate and nicotinamide metabolism
-Lactobacillus	00760 Nicotinate and nicotinamide metabolism
-5	00760 Nicotinate and nicotinamide metabolism
-6	00760 Nicotinate and nicotinamide metabolism
-Ruminococcus	00760 Nicotinate and nicotinamide metabolism
-Oscillospira	00760 Nicotinate and nicotinamide metabolism
-Turicibacter	00760 Nicotinate and nicotinamide metabolism
-Bacteroides	00760 Nicotinate and nicotinamide metabolism
-rc4-4	00760 Nicotinate and nicotinamide metabolism
-[Ruminococcus]	00760 Nicotinate and nicotinamide metabolism
-Coprococcus	00760 Nicotinate and nicotinamide metabolism
-Anaeroplasma	00760 Nicotinate and nicotinamide metabolism
-9	00760 Nicotinate and nicotinamide metabolism
-4	00760 Nicotinate and nicotinamide metabolism
-3	00760 Nicotinate and nicotinamide metabolism
-rc4-4	00860 Porphyrin and chlorophyll metabolism
-4	03013 RNA transport
-Lactobacillus	03013 RNA transport
-5	03013 RNA transport
-6	03013 RNA transport
-7	03013 RNA transport
-3	03013 RNA transport
-Turicibacter	03013 RNA transport
-8	03013 RNA transport
-Bacteroides	03013 RNA transport
-rc4-4	03013 RNA transport
-[Ruminococcus]	03013 RNA transport
-Coprococcus	03013 RNA transport
-4	00730 Thiamine metabolism
-7	00730 Thiamine metabolism
-5	00730 Thiamine metabolism
-6	00730 Thiamine metabolism
-Oscillospira	00730 Thiamine metabolism
-Ruminococcus	00730 Thiamine metabolism
-3	00730 Thiamine metabolism
-Turicibacter	00730 Thiamine metabolism
-8	00730 Thiamine metabolism
-Bacteroides	00730 Thiamine metabolism
-rc4-4	00730 Thiamine metabolism
-[Ruminococcus]	00730 Thiamine metabolism
-Coprococcus	00730 Thiamine metabolism
-4	00908 Zeatin biosynthesis
-7	00908 Zeatin biosynthesis
-Lactobacillus	00908 Zeatin biosynthesis
-5	00908 Zeatin biosynthesis
-Pseudomonas	00908 Zeatin biosynthesis
-6	00908 Zeatin biosynthesis
-Ruminococcus	00908 Zeatin biosynthesis
-Oscillospira	00908 Zeatin biosynthesis
-3	00908 Zeatin biosynthesis
-Turicibacter	00908 Zeatin biosynthesis
-8	00908 Zeatin biosynthesis
-Bacteroides	00908 Zeatin biosynthesis
-rc4-4	00908 Zeatin biosynthesis
-[Ruminococcus]	00908 Zeatin biosynthesis
-Coprococcus	00908 Zeatin biosynthesis
-4	00740 Riboflavin metabolism
-5	00740 Riboflavin metabolism
-Pseudomonas	00740 Riboflavin metabolism
-6	00740 Riboflavin metabolism
-Oscillospira	00740 Riboflavin metabolism
-7	00740 Riboflavin metabolism
-Turicibacter	00740 Riboflavin metabolism
-8	00740 Riboflavin metabolism
-Bacteroides	00740 Riboflavin metabolism
-rc4-4	00740 Riboflavin metabolism
-Coprococcus	00740 Riboflavin metabolism
-rc4-4	00790 Folate biosynthesis
-Ruminococcus	00860 Porphyrin and chlorophyll metabolism
-3	00860 Porphyrin and chlorophyll metabolism
-6	00565 Ether lipid metabolism
-5	00565 Ether lipid metabolism
-Oscillospira	00250 Alanine, aspartate and glutamate metabolism
-Lactobacillus	00340 Histidine metabolism
-Lactobacillus	00640 Propanoate metabolism
-5	00310 Lysine degradation
-6	00310 Lysine degradation
-4	00280 Valine, leucine and isoleucine degradation
-Lactobacillus	00280 Valine, leucine and isoleucine degradation
-5	00280 Valine, leucine and isoleucine degradation
-6	00280 Valine, leucine and isoleucine degradation
-Ruminococcus	00280 Valine, leucine and isoleucine degradation
-Oscillospira	00280 Valine, leucine and isoleucine degradation
-3	00280 Valine, leucine and isoleucine degradation
-Bacteroides	00280 Valine, leucine and isoleucine degradation
-rc4-4	00280 Valine, leucine and isoleucine degradation
-[Ruminococcus]	00280 Valine, leucine and isoleucine degradation
-Coprococcus	00280 Valine, leucine and isoleucine degradation
-3	00051 Fructose and mannose metabolism
-4	00052 Galactose metabolism
-Lactobacillus	00052 Galactose metabolism
-5	00052 Galactose metabolism
-6	00052 Galactose metabolism
-Ruminococcus	00052 Galactose metabolism
-Oscillospira	00052 Galactose metabolism
-7	00052 Galactose metabolism
-3	00052 Galactose metabolism
-Turicibacter	00052 Galactose metabolism
-Bacteroides	00052 Galactose metabolism
-Coprococcus	00052 Galactose metabolism
-Lactobacillus	00770 Pantothenate and CoA biosynthesis
-Ruminococcus	00770 Pantothenate and CoA biosynthesis
-Turicibacter	00770 Pantothenate and CoA biosynthesis
-[Ruminococcus]	00770 Pantothenate and CoA biosynthesis
-Lactobacillus	00750 Vitamin B6 metabolism
-Ruminococcus	00750 Vitamin B6 metabolism
-rc4-4	00750 Vitamin B6 metabolism
-[Ruminococcus]	00750 Vitamin B6 metabolism
-Pseudomonas	00052 Galactose metabolism
-Lactobacillus	00730 Thiamine metabolism
-Pseudomonas	00730 Thiamine metabolism
-Anaeroplasma	00770 Pantothenate and CoA biosynthesis
-9	00770 Pantothenate and CoA biosynthesis
-Lactobacillus	00040 Pentose and glucuronate interconversions
-rc4-4	00051 Fructose and mannose metabolism
-4	03018 RNA degradation
-Pseudomonas	03018 RNA degradation
-3	03018 RNA degradation
-8	03018 RNA degradation
-Bacteroides	03018 RNA degradation
-rc4-4	00523 Polyketide sugar unit biosynthesis
-Pseudomonas	03013 RNA transport
-Ruminococcus	03013 RNA transport
-Oscillospira	03013 RNA transport
-Anaeroplasma	03013 RNA transport
-9	03013 RNA transport
-Ruminococcus	00540 Lipopolysaccharide biosynthesis
-4	00550 Peptidoglycan biosynthesis
-7	00550 Peptidoglycan biosynthesis
-Lactobacillus	00550 Peptidoglycan biosynthesis
-5	00550 Peptidoglycan biosynthesis
-Pseudomonas	00550 Peptidoglycan biosynthesis
-6	00550 Peptidoglycan biosynthesis
-Ruminococcus	00550 Peptidoglycan biosynthesis
-Oscillospira	00550 Peptidoglycan biosynthesis
-3	00550 Peptidoglycan biosynthesis
-Turicibacter	00550 Peptidoglycan biosynthesis
-8	00550 Peptidoglycan biosynthesis
-Bacteroides	00550 Peptidoglycan biosynthesis
-rc4-4	00550 Peptidoglycan biosynthesis
-[Ruminococcus]	00550 Peptidoglycan biosynthesis
-Coprococcus	00550 Peptidoglycan biosynthesis
-5	00450 Selenocompound metabolism
-Pseudomonas	00450 Selenocompound metabolism
-6	00450 Selenocompound metabolism
-Oscillospira	00450 Selenocompound metabolism
-7	00450 Selenocompound metabolism
-Turicibacter	00450 Selenocompound metabolism
-[Ruminococcus]	00450 Selenocompound metabolism
-Coprococcus	00450 Selenocompound metabolism
-7	00780 Biotin metabolism
-5	00780 Biotin metabolism
-6	00780 Biotin metabolism
-Ruminococcus	00780 Biotin metabolism
-Oscillospira	00780 Biotin metabolism
-rc4-4	00780 Biotin metabolism
-[Ruminococcus]	00780 Biotin metabolism
-Coprococcus	00780 Biotin metabolism
-8	00362 Benzoate degradation
-Turicibacter	00640 Propanoate metabolism
-7	00311 Penicillin and cephalosporin biosynthesis
-Pseudomonas	00364 Fluorobenzoate degradation
-4	00562 Inositol phosphate metabolism
-Lactobacillus	00562 Inositol phosphate metabolism
-Oscillospira	00562 Inositol phosphate metabolism
-3	00562 Inositol phosphate metabolism
-8	00562 Inositol phosphate metabolism
-Bacteroides	00562 Inositol phosphate metabolism
-Lactobacillus	00627 Aminobenzoate degradation
-5	00627 Aminobenzoate degradation
-6	00627 Aminobenzoate degradation
-Turicibacter	00627 Aminobenzoate degradation
-Coprococcus	00627 Aminobenzoate degradation
-Pseudomonas	00140 Steroid hormone biosynthesis
-5	00140 Steroid hormone biosynthesis
-Bacteroides	00140 Steroid hormone biosynthesis
-5	00600 Sphingolipid metabolism
-Pseudomonas	03430 Mismatch repair
-7	03410 Base excision repair
-Lactobacillus	03410 Base excision repair
-5	03410 Base excision repair
-Pseudomonas	03410 Base excision repair
-6	03410 Base excision repair
-Ruminococcus	03410 Base excision repair
-Oscillospira	03410 Base excision repair
-Turicibacter	03410 Base excision repair
-8	03410 Base excision repair
-Bacteroides	03410 Base excision repair
-rc4-4	03410 Base excision repair
-[Ruminococcus]	03410 Base excision repair
-Coprococcus	03410 Base excision repair
-4	03410 Base excision repair
-3	03410 Base excision repair
-Anaeroplasma	03410 Base excision repair
-9	03410 Base excision repair
-4	03440 Homologous recombination
-7	03440 Homologous recombination
-Pseudomonas	03440 Homologous recombination
-5	03440 Homologous recombination
-Ruminococcus	03440 Homologous recombination
-Oscillospira	03440 Homologous recombination
-3	03440 Homologous recombination
-8	03440 Homologous recombination
-Bacteroides	03440 Homologous recombination
-rc4-4	03440 Homologous recombination
-Lactobacillus	04210 Apoptosis
-3	04210 Apoptosis
-8	04210 Apoptosis
-4	00600 Sphingolipid metabolism
-Bacteroides	00600 Sphingolipid metabolism
-[Ruminococcus]	00600 Sphingolipid metabolism
-Anaeroplasma	00500 Starch and sucrose metabolism
-9	00500 Starch and sucrose metabolism
-5	00511 Other glycan degradation
-6	00511 Other glycan degradation
-Ruminococcus	00511 Other glycan degradation
-7	00511 Other glycan degradation
-Turicibacter	00511 Other glycan degradation
-Bacteroides	00511 Other glycan degradation
-4	00511 Other glycan degradation
-3	00511 Other glycan degradation
-5	00531 Glycosaminoglycan degradation
-Turicibacter	00531 Glycosaminoglycan degradation
-Bacteroides	00531 Glycosaminoglycan degradation
-Ruminococcus	00600 Sphingolipid metabolism
-Turicibacter	00600 Sphingolipid metabolism
-Coprococcus	00600 Sphingolipid metabolism
-4	00531 Glycosaminoglycan degradation
-[Ruminococcus]	00511 Other glycan degradation
-Coprococcus	00511 Other glycan degradation
-Pseudomonas	01053 Biosynthesis of siderophore group nonribosomal peptides
-5	00480 Glutathione metabolism
-Turicibacter	00480 Glutathione metabolism
-[Ruminococcus]	00480 Glutathione metabolism
-Anaeroplasma	00480 Glutathione metabolism
-9	00480 Glutathione metabolism
-Lactobacillus	00480 Glutathione metabolism
-4	00480 Glutathione metabolism
-6	00480 Glutathione metabolism
-Oscillospira	00480 Glutathione metabolism
-7	00480 Glutathione metabolism
-3	00480 Glutathione metabolism
-Bacteroides	00480 Glutathione metabolism
-Coprococcus	00480 Glutathione metabolism
-4	04974 Protein digestion and absorption
-3	04974 Protein digestion and absorption
-Bacteroides	04974 Protein digestion and absorption
-4	04112 Cell cycle - Caulobacter
-7	04112 Cell cycle - Caulobacter
-5	04112 Cell cycle - Caulobacter
-Pseudomonas	04112 Cell cycle - Caulobacter
-6	04112 Cell cycle - Caulobacter
-Ruminococcus	04112 Cell cycle - Caulobacter
-Oscillospira	04112 Cell cycle - Caulobacter
-3	04112 Cell cycle - Caulobacter
-Turicibacter	04112 Cell cycle - Caulobacter
-8	04112 Cell cycle - Caulobacter
-Bacteroides	04112 Cell cycle - Caulobacter
-rc4-4	04112 Cell cycle - Caulobacter
-[Ruminococcus]	04112 Cell cycle - Caulobacter
-Coprococcus	04112 Cell cycle - Caulobacter
-Anaeroplasma	04112 Cell cycle - Caulobacter
-9	04112 Cell cycle - Caulobacter
-Pseudomonas	05142 Chagas disease (American trypanosomiasis)
-Lactobacillus	04112 Cell cycle - Caulobacter
-Pseudomonas	01503 Cationic antimicrobial peptide (CAMP) resistance
-Lactobacillus	00250 Alanine, aspartate and glutamate metabolism
-Pseudomonas	00311 Penicillin and cephalosporin biosynthesis
-4	00120 Primary bile acid biosynthesis
-Lactobacillus	00120 Primary bile acid biosynthesis
-5	00120 Primary bile acid biosynthesis
-6	00120 Primary bile acid biosynthesis
-Ruminococcus	00120 Primary bile acid biosynthesis
-7	00120 Primary bile acid biosynthesis
-3	00120 Primary bile acid biosynthesis
-Turicibacter	00120 Primary bile acid biosynthesis
-Bacteroides	00120 Primary bile acid biosynthesis
-rc4-4	00120 Primary bile acid biosynthesis
-[Ruminococcus]	00120 Primary bile acid biosynthesis
-Coprococcus	00120 Primary bile acid biosynthesis
-4	01503 Cationic antimicrobial peptide (CAMP) resistance
-7	01503 Cationic antimicrobial peptide (CAMP) resistance
-Lactobacillus	01503 Cationic antimicrobial peptide (CAMP) resistance
-5	01503 Cationic antimicrobial peptide (CAMP) resistance
-6	01503 Cationic antimicrobial peptide (CAMP) resistance
-Ruminococcus	01503 Cationic antimicrobial peptide (CAMP) resistance
-Oscillospira	01503 Cationic antimicrobial peptide (CAMP) resistance
-3	01503 Cationic antimicrobial peptide (CAMP) resistance
-Turicibacter	01503 Cationic antimicrobial peptide (CAMP) resistance
-Bacteroides	01503 Cationic antimicrobial peptide (CAMP) resistance
-rc4-4	01503 Cationic antimicrobial peptide (CAMP) resistance
-[Ruminococcus]	01503 Cationic antimicrobial peptide (CAMP) resistance
-Coprococcus	01503 Cationic antimicrobial peptide (CAMP) resistance
-5	00360 Phenylalanine metabolism
-Oscillospira	00360 Phenylalanine metabolism
-6	00360 Phenylalanine metabolism
-7	00360 Phenylalanine metabolism
-Turicibacter	00360 Phenylalanine metabolism
-4	02020 Two-component system
-Lactobacillus	02020 Two-component system
-3	02020 Two-component system
-Bacteroides	02020 Two-component system
-Lactobacillus	00720 Carbon fixation pathways in prokaryotes
-Turicibacter	00720 Carbon fixation pathways in prokaryotes
-Anaeroplasma	00720 Carbon fixation pathways in prokaryotes
-9	00720 Carbon fixation pathways in prokaryotes
-Anaeroplasma	00190 Oxidative phosphorylation
-9	00190 Oxidative phosphorylation
-[Ruminococcus]	02020 Two-component system
-Lactobacillus	00625 Chloroalkane and chloroalkene degradation
-Pseudomonas	00625 Chloroalkane and chloroalkene degradation
-5	00625 Chloroalkane and chloroalkene degradation
-6	00625 Chloroalkane and chloroalkene degradation
-Oscillospira	00625 Chloroalkane and chloroalkene degradation
-7	00625 Chloroalkane and chloroalkene degradation
-Coprococcus	00625 Chloroalkane and chloroalkene degradation
-Pseudomonas	00627 Aminobenzoate degradation
-4	00410 beta-Alanine metabolism
-Pseudomonas	00410 beta-Alanine metabolism
-6	00410 beta-Alanine metabolism
-7	00410 beta-Alanine metabolism
-3	00410 beta-Alanine metabolism
-8	00410 beta-Alanine metabolism
-Bacteroides	00410 beta-Alanine metabolism
-rc4-4	00410 beta-Alanine metabolism
-Coprococcus	00410 beta-Alanine metabolism
-7	00310 Lysine degradation
-Ruminococcus	00310 Lysine degradation
-Oscillospira	00310 Lysine degradation
-Turicibacter	00310 Lysine degradation
-rc4-4	00310 Lysine degradation
-Coprococcus	00310 Lysine degradation
-4	00860 Porphyrin and chlorophyll metabolism
-Bacteroides	00860 Porphyrin and chlorophyll metabolism
-4	00362 Benzoate degradation
-7	00362 Benzoate degradation
-Lactobacillus	00362 Benzoate degradation
-5	00362 Benzoate degradation
-6	00362 Benzoate degradation
-Oscillospira	00362 Benzoate degradation
-Ruminococcus	00362 Benzoate degradation
-Bacteroides	00362 Benzoate degradation
-Coprococcus	00362 Benzoate degradation
-Ruminococcus	00650 Butanoate metabolism
-7	00053 Ascorbate and aldarate metabolism
-Turicibacter	02020 Two-component system
-[Ruminococcus]	00650 Butanoate metabolism
-Bacteroides	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-rc4-4	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-Ruminococcus	00360 Phenylalanine metabolism
-4	00380 Tryptophan metabolism
-7	00380 Tryptophan metabolism
-6	00380 Tryptophan metabolism
-3	00380 Tryptophan metabolism
-Turicibacter	00380 Tryptophan metabolism
-Bacteroides	00380 Tryptophan metabolism
-3	00290 Valine, leucine and isoleucine biosynthesis
-Pseudomonas	00053 Ascorbate and aldarate metabolism
-6	00053 Ascorbate and aldarate metabolism
-Lactobacillus	00523 Polyketide sugar unit biosynthesis
-3	00640 Propanoate metabolism
-Bacteroides	00640 Propanoate metabolism
-Lactobacillus	00860 Porphyrin and chlorophyll metabolism
-4	00473 D-Alanine metabolism
-7	00473 D-Alanine metabolism
-Lactobacillus	00473 D-Alanine metabolism
-5	00473 D-Alanine metabolism
-Pseudomonas	00473 D-Alanine metabolism
-6	00473 D-Alanine metabolism
-Ruminococcus	00473 D-Alanine metabolism
-Oscillospira	00473 D-Alanine metabolism
-3	00473 D-Alanine metabolism
-Turicibacter	00473 D-Alanine metabolism
-8	00473 D-Alanine metabolism
-rc4-4	00473 D-Alanine metabolism
-[Ruminococcus]	00473 D-Alanine metabolism
-Coprococcus	00473 D-Alanine metabolism
-4	00471 D-Glutamine and D-glutamate metabolism
-Lactobacillus	00471 D-Glutamine and D-glutamate metabolism
-5	00471 D-Glutamine and D-glutamate metabolism
-Pseudomonas	00471 D-Glutamine and D-glutamate metabolism
-6	00471 D-Glutamine and D-glutamate metabolism
-Ruminococcus	00471 D-Glutamine and D-glutamate metabolism
-Oscillospira	00471 D-Glutamine and D-glutamate metabolism
-7	00471 D-Glutamine and D-glutamate metabolism
-3	00471 D-Glutamine and D-glutamate metabolism
-Turicibacter	00471 D-Glutamine and D-glutamate metabolism
-8	00471 D-Glutamine and D-glutamate metabolism
-Bacteroides	00471 D-Glutamine and D-glutamate metabolism
-rc4-4	00471 D-Glutamine and D-glutamate metabolism
-[Ruminococcus]	00471 D-Glutamine and D-glutamate metabolism
-Coprococcus	00471 D-Glutamine and D-glutamate metabolism
-8	00052 Galactose metabolism
-rc4-4	00052 Galactose metabolism
-Pseudomonas	00120 Primary bile acid biosynthesis
-8	00120 Primary bile acid biosynthesis
-rc4-4	00362 Benzoate degradation
-Anaeroplasma	00051 Fructose and mannose metabolism
-9	00051 Fructose and mannose metabolism
-Ruminococcus	00440 Phosphonate and phosphinate metabolism
-3	00310 Lysine degradation
-8	00310 Lysine degradation
-Bacteroides	00310 Lysine degradation
-4	00970 Aminoacyl-tRNA biosynthesis
-7	00970 Aminoacyl-tRNA biosynthesis
-Lactobacillus	00970 Aminoacyl-tRNA biosynthesis
-5	00970 Aminoacyl-tRNA biosynthesis
-Pseudomonas	00970 Aminoacyl-tRNA biosynthesis
-6	00970 Aminoacyl-tRNA biosynthesis
-Ruminococcus	00970 Aminoacyl-tRNA biosynthesis
-Oscillospira	00970 Aminoacyl-tRNA biosynthesis
-3	00970 Aminoacyl-tRNA biosynthesis
-Turicibacter	00970 Aminoacyl-tRNA biosynthesis
-8	00970 Aminoacyl-tRNA biosynthesis
-Bacteroides	00970 Aminoacyl-tRNA biosynthesis
-rc4-4	00970 Aminoacyl-tRNA biosynthesis
-[Ruminococcus]	00970 Aminoacyl-tRNA biosynthesis
-Coprococcus	00970 Aminoacyl-tRNA biosynthesis
-Anaeroplasma	00970 Aminoacyl-tRNA biosynthesis
-9	00970 Aminoacyl-tRNA biosynthesis
-4	00450 Selenocompound metabolism
-Lactobacillus	00450 Selenocompound metabolism
-Ruminococcus	00450 Selenocompound metabolism
-3	00450 Selenocompound metabolism
-8	00450 Selenocompound metabolism
-Bacteroides	00450 Selenocompound metabolism
-rc4-4	00450 Selenocompound metabolism
-Anaeroplasma	00450 Selenocompound metabolism
-9	00450 Selenocompound metabolism
-Anaeroplasma	00860 Porphyrin and chlorophyll metabolism
-9	00860 Porphyrin and chlorophyll metabolism
-6	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-4	00360 Phenylalanine metabolism
-Bacteroides	00360 Phenylalanine metabolism
-rc4-4	00360 Phenylalanine metabolism
-[Ruminococcus]	00360 Phenylalanine metabolism
-Coprococcus	00360 Phenylalanine metabolism
-5	00410 beta-Alanine metabolism
-Bacteroides	00473 D-Alanine metabolism
-Pseudomonas	03450 Non-homologous end-joining
-6	03450 Non-homologous end-joining
-Ruminococcus	03450 Non-homologous end-joining
-7	03450 Non-homologous end-joining
-Turicibacter	03450 Non-homologous end-joining
-rc4-4	03450 Non-homologous end-joining
-4	03030 DNA replication
-7	03030 DNA replication
-Lactobacillus	03030 DNA replication
-5	03030 DNA replication
-Pseudomonas	03030 DNA replication
-6	03030 DNA replication
-Ruminococcus	03030 DNA replication
-Oscillospira	03030 DNA replication
-3	03030 DNA replication
-Turicibacter	03030 DNA replication
-8	03030 DNA replication
-Bacteroides	03030 DNA replication
-rc4-4	03030 DNA replication
-[Ruminococcus]	03030 DNA replication
-Coprococcus	03030 DNA replication
-Anaeroplasma	03030 DNA replication
-9	03030 DNA replication
-7	02010 ABC transporters
-5	02010 ABC transporters
-Pseudomonas	02010 ABC transporters
-6	02010 ABC transporters
-Oscillospira	02010 ABC transporters
-Ruminococcus	02010 ABC transporters
-Turicibacter	02010 ABC transporters
-8	02010 ABC transporters
-rc4-4	02010 ABC transporters
-Coprococcus	02010 ABC transporters
-Lactobacillus	02010 ABC transporters
-Bacteroides	02010 ABC transporters
-[Ruminococcus]	02010 ABC transporters
-Anaeroplasma	02010 ABC transporters
-9	02010 ABC transporters
-4	02010 ABC transporters
-3	02010 ABC transporters
-rc4-4	02020 Two-component system
-Anaeroplasma	02020 Two-component system
-9	02020 Two-component system
-Pseudomonas	02040 Flagellar assembly
-5	02040 Flagellar assembly
-6	02040 Flagellar assembly
-Oscillospira	02040 Flagellar assembly
-Ruminococcus	02040 Flagellar assembly
-7	02040 Flagellar assembly
-rc4-4	02040 Flagellar assembly
-Coprococcus	02040 Flagellar assembly
-Pseudomonas	02030 Bacterial chemotaxis
-5	02030 Bacterial chemotaxis
-6	02030 Bacterial chemotaxis
-Oscillospira	02030 Bacterial chemotaxis
-Ruminococcus	02030 Bacterial chemotaxis
-7	02030 Bacterial chemotaxis
-rc4-4	02030 Bacterial chemotaxis
-Pseudomonas	03070 Bacterial secretion system
-8	03070 Bacterial secretion system
-5	03070 Bacterial secretion system
-rc4-4	03070 Bacterial secretion system
-6	01501 beta-Lactam resistance
-[Ruminococcus]	01501 beta-Lactam resistance
-Coprococcus	01501 beta-Lactam resistance
-4	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-Lactobacillus	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-3	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-Coprococcus	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-4	02030 Bacterial chemotaxis
-Bacteroides	02030 Bacterial chemotaxis
-5	02060 Phosphotransferase system (PTS)
-6	02060 Phosphotransferase system (PTS)
-7	02060 Phosphotransferase system (PTS)
-[Ruminococcus]	02060 Phosphotransferase system (PTS)
-Coprococcus	02060 Phosphotransferase system (PTS)
-Lactobacillus	02060 Phosphotransferase system (PTS)
-Oscillospira	02060 Phosphotransferase system (PTS)
-Pseudomonas	02060 Phosphotransferase system (PTS)
-5	00053 Ascorbate and aldarate metabolism
-[Ruminococcus]	00053 Ascorbate and aldarate metabolism
-Coprococcus	00053 Ascorbate and aldarate metabolism
-Lactobacillus	00540 Lipopolysaccharide biosynthesis
-4	03010 Ribosome
-7	03010 Ribosome
-Lactobacillus	03010 Ribosome
-5	03010 Ribosome
-Pseudomonas	03010 Ribosome
-6	03010 Ribosome
-Ruminococcus	03010 Ribosome
-Oscillospira	03010 Ribosome
-3	03010 Ribosome
-Turicibacter	03010 Ribosome
-8	03010 Ribosome
-Bacteroides	03010 Ribosome
-rc4-4	03010 Ribosome
-[Ruminococcus]	03010 Ribosome
-Coprococcus	03010 Ribosome
-Anaeroplasma	03010 Ribosome
-9	03010 Ribosome
-4	03060 Protein export
-7	03060 Protein export
-Lactobacillus	03060 Protein export
-5	03060 Protein export
-Pseudomonas	03060 Protein export
-6	03060 Protein export
-Ruminococcus	03060 Protein export
-Oscillospira	03060 Protein export
-3	03060 Protein export
-Turicibacter	03060 Protein export
-8	03060 Protein export
-Bacteroides	03060 Protein export
-rc4-4	03060 Protein export
-[Ruminococcus]	03060 Protein export
-Coprococcus	03060 Protein export
-Anaeroplasma	03060 Protein export
-9	03060 Protein export
-Bacteroides	00053 Ascorbate and aldarate metabolism
-Ruminococcus	00053 Ascorbate and aldarate metabolism
-Pseudomonas	05111 Vibrio cholerae pathogenic cycle
-Anaeroplasma	00730 Thiamine metabolism
-9	00730 Thiamine metabolism
-5	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-7	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-[Ruminococcus]	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-7	03070 Bacterial secretion system
-6	03070 Bacterial secretion system
-Ruminococcus	03070 Bacterial secretion system
-Oscillospira	03070 Bacterial secretion system
-[Ruminococcus]	03070 Bacterial secretion system
-Coprococcus	03070 Bacterial secretion system
-5	00540 Lipopolysaccharide biosynthesis
-6	00540 Lipopolysaccharide biosynthesis
-7	00540 Lipopolysaccharide biosynthesis
-Pseudomonas	00930 Caprolactam degradation
-8	00930 Caprolactam degradation
-Pseudomonas	00791 Atrazine degradation
-6	00791 Atrazine degradation
-Oscillospira	00791 Atrazine degradation
-7	00791 Atrazine degradation
-Pseudomonas	00440 Phosphonate and phosphinate metabolism
-5	00440 Phosphonate and phosphinate metabolism
-Oscillospira	00440 Phosphonate and phosphinate metabolism
-7	00440 Phosphonate and phosphinate metabolism
-Bacteroides	00440 Phosphonate and phosphinate metabolism
-Coprococcus	00440 Phosphonate and phosphinate metabolism
-Lactobacillus	00780 Biotin metabolism
-3	00780 Biotin metabolism
-Turicibacter	00780 Biotin metabolism
-Lactobacillus	03440 Homologous recombination
-6	03440 Homologous recombination
-Turicibacter	03440 Homologous recombination
-Coprococcus	03440 Homologous recombination
-Anaeroplasma	03440 Homologous recombination
-9	03440 Homologous recombination
-[Ruminococcus]	03440 Homologous recombination
-4	03430 Mismatch repair
-7	03430 Mismatch repair
-Lactobacillus	03430 Mismatch repair
-5	03430 Mismatch repair
-6	03430 Mismatch repair
-Ruminococcus	03430 Mismatch repair
-Oscillospira	03430 Mismatch repair
-3	03430 Mismatch repair
-Turicibacter	03430 Mismatch repair
-8	03430 Mismatch repair
-Bacteroides	03430 Mismatch repair
-rc4-4	03430 Mismatch repair
-[Ruminococcus]	03430 Mismatch repair
-Coprococcus	03430 Mismatch repair
-4	01501 beta-Lactam resistance
-Pseudomonas	01501 beta-Lactam resistance
-3	01501 beta-Lactam resistance
-8	01501 beta-Lactam resistance
-Bacteroides	01501 beta-Lactam resistance
-4	05134 Legionellosis
-7	05134 Legionellosis
-Lactobacillus	05134 Legionellosis
-5	05134 Legionellosis
-Pseudomonas	05134 Legionellosis
-6	05134 Legionellosis
-Ruminococcus	05134 Legionellosis
-Oscillospira	05134 Legionellosis
-3	05134 Legionellosis
-Turicibacter	05134 Legionellosis
-8	05134 Legionellosis
-Bacteroides	05134 Legionellosis
-rc4-4	05134 Legionellosis
-[Ruminococcus]	05134 Legionellosis
-Coprococcus	05134 Legionellosis
-Anaeroplasma	05134 Legionellosis
-9	05134 Legionellosis
-Lactobacillus	03018 RNA degradation
-5	03018 RNA degradation
-6	03018 RNA degradation
-7	03018 RNA degradation
-rc4-4	03018 RNA degradation
-[Ruminococcus]	03018 RNA degradation
-Coprococcus	03018 RNA degradation
-4	00785 Lipoic acid metabolism
-Pseudomonas	00785 Lipoic acid metabolism
-3	00785 Lipoic acid metabolism
-8	00785 Lipoic acid metabolism
-Bacteroides	00785 Lipoic acid metabolism
-Turicibacter	03018 RNA degradation
-4	03420 Nucleotide excision repair
-7	03420 Nucleotide excision repair
-Lactobacillus	03420 Nucleotide excision repair
-5	03420 Nucleotide excision repair
-Pseudomonas	03420 Nucleotide excision repair
-6	03420 Nucleotide excision repair
-Ruminococcus	03420 Nucleotide excision repair
-Oscillospira	03420 Nucleotide excision repair
-3	03420 Nucleotide excision repair
-Turicibacter	03420 Nucleotide excision repair
-8	03420 Nucleotide excision repair
-Bacteroides	03420 Nucleotide excision repair
-rc4-4	03420 Nucleotide excision repair
-[Ruminococcus]	03420 Nucleotide excision repair
-Coprococcus	03420 Nucleotide excision repair
-Anaeroplasma	03420 Nucleotide excision repair
-9	03420 Nucleotide excision repair
-Oscillospira	03018 RNA degradation
-Ruminococcus	03018 RNA degradation
-8	01503 Cationic antimicrobial peptide (CAMP) resistance
-4	03008 Ribosome biogenesis in eukaryotes
-7	03008 Ribosome biogenesis in eukaryotes
-Lactobacillus	03008 Ribosome biogenesis in eukaryotes
-5	03008 Ribosome biogenesis in eukaryotes
-Pseudomonas	03008 Ribosome biogenesis in eukaryotes
-6	03008 Ribosome biogenesis in eukaryotes
-Ruminococcus	03008 Ribosome biogenesis in eukaryotes
-Oscillospira	03008 Ribosome biogenesis in eukaryotes
-3	03008 Ribosome biogenesis in eukaryotes
-Turicibacter	03008 Ribosome biogenesis in eukaryotes
-8	03008 Ribosome biogenesis in eukaryotes
-Bacteroides	03008 Ribosome biogenesis in eukaryotes
-rc4-4	03008 Ribosome biogenesis in eukaryotes
-[Ruminococcus]	03008 Ribosome biogenesis in eukaryotes
-Coprococcus	03008 Ribosome biogenesis in eukaryotes
-Anaeroplasma	03008 Ribosome biogenesis in eukaryotes
-9	03008 Ribosome biogenesis in eukaryotes
-Lactobacillus	00785 Lipoic acid metabolism
-5	00785 Lipoic acid metabolism
-6	00785 Lipoic acid metabolism
-Ruminococcus	00785 Lipoic acid metabolism
-Oscillospira	00785 Lipoic acid metabolism
-Turicibacter	00785 Lipoic acid metabolism
-rc4-4	00785 Lipoic acid metabolism
-Anaeroplasma	00785 Lipoic acid metabolism
-9	00785 Lipoic acid metabolism
-Coprococcus	00785 Lipoic acid metabolism
-4	00440 Phosphonate and phosphinate metabolism
-Lactobacillus	00440 Phosphonate and phosphinate metabolism
-6	00440 Phosphonate and phosphinate metabolism
-8	00440 Phosphonate and phosphinate metabolism
-[Ruminococcus]	00440 Phosphonate and phosphinate metabolism
-rc4-4	00430 Taurine and hypotaurine metabolism
-8	00627 Aminobenzoate degradation
-5	00983 Drug metabolism - other enzymes
-7	00983 Drug metabolism - other enzymes
-Anaeroplasma	03018 RNA degradation
-9	03018 RNA degradation
-4	04141 Protein processing in endoplasmic reticulum
-7	04141 Protein processing in endoplasmic reticulum
-5	04141 Protein processing in endoplasmic reticulum
-Pseudomonas	04141 Protein processing in endoplasmic reticulum
-6	04141 Protein processing in endoplasmic reticulum
-Ruminococcus	04141 Protein processing in endoplasmic reticulum
-Oscillospira	04141 Protein processing in endoplasmic reticulum
-3	04141 Protein processing in endoplasmic reticulum
-Turicibacter	04141 Protein processing in endoplasmic reticulum
-8	04141 Protein processing in endoplasmic reticulum
-Bacteroides	04141 Protein processing in endoplasmic reticulum
-rc4-4	04141 Protein processing in endoplasmic reticulum
-[Ruminococcus]	04141 Protein processing in endoplasmic reticulum
-Coprococcus	04141 Protein processing in endoplasmic reticulum
-Pseudomonas	00521 Streptomycin biosynthesis
-4	04068 FoxO signaling pathway
-Pseudomonas	04068 FoxO signaling pathway
-6	04068 FoxO signaling pathway
-5	04068 FoxO signaling pathway
-Oscillospira	04068 FoxO signaling pathway
-3	04068 FoxO signaling pathway
-7	04068 FoxO signaling pathway
-Turicibacter	04068 FoxO signaling pathway
-8	04068 FoxO signaling pathway
-Bacteroides	04068 FoxO signaling pathway
-rc4-4	04068 FoxO signaling pathway
-Anaeroplasma	04068 FoxO signaling pathway
-9	04068 FoxO signaling pathway
-Coprococcus	04068 FoxO signaling pathway
-5	04146 Peroxisome
-6	04146 Peroxisome
-7	04146 Peroxisome
-Turicibacter	04146 Peroxisome
-8	04146 Peroxisome
-[Ruminococcus]	04146 Peroxisome
-7	01053 Biosynthesis of siderophore group nonribosomal peptides
-Pseudomonas	00261 Monobactam biosynthesis
-Pseudomonas	00363 Bisphenol degradation
-Pseudomonas	05132 Salmonella infection
-8	05132 Salmonella infection
-3	00440 Phosphonate and phosphinate metabolism
-rc4-4	00440 Phosphonate and phosphinate metabolism
-Turicibacter	00750 Vitamin B6 metabolism
-Anaeroplasma	03430 Mismatch repair
-9	03430 Mismatch repair
-rc4-4	00633 Nitrotoluene degradation
-8	00500 Starch and sucrose metabolism
-7	04910 Insulin signaling pathway
-6	04910 Insulin signaling pathway
-Ruminococcus	04910 Insulin signaling pathway
-Oscillospira	04910 Insulin signaling pathway
-Turicibacter	04910 Insulin signaling pathway
-Bacteroides	04910 Insulin signaling pathway
-[Ruminococcus]	04910 Insulin signaling pathway
-Coprococcus	04910 Insulin signaling pathway
-Pseudomonas	04978 Mineral absorption
-6	04978 Mineral absorption
-7	04978 Mineral absorption
-8	04978 Mineral absorption
-rc4-4	04978 Mineral absorption
-Pseudomonas	05133 Pertussis
-8	05133 Pertussis
-4	05120 Epithelial cell signaling in Helicobacter pylori infection
-7	05120 Epithelial cell signaling in Helicobacter pylori infection
-5	05120 Epithelial cell signaling in Helicobacter pylori infection
-Pseudomonas	05120 Epithelial cell signaling in Helicobacter pylori infection
-6	05120 Epithelial cell signaling in Helicobacter pylori infection
-Ruminococcus	05120 Epithelial cell signaling in Helicobacter pylori infection
-Oscillospira	05120 Epithelial cell signaling in Helicobacter pylori infection
-3	05120 Epithelial cell signaling in Helicobacter pylori infection
-Turicibacter	05120 Epithelial cell signaling in Helicobacter pylori infection
-8	05120 Epithelial cell signaling in Helicobacter pylori infection
-Bacteroides	05120 Epithelial cell signaling in Helicobacter pylori infection
-rc4-4	05120 Epithelial cell signaling in Helicobacter pylori infection
-[Ruminococcus]	05120 Epithelial cell signaling in Helicobacter pylori infection
-Coprococcus	05120 Epithelial cell signaling in Helicobacter pylori infection
-Ruminococcus	02060 Phosphotransferase system (PTS)
-Turicibacter	02060 Phosphotransferase system (PTS)
-Anaeroplasma	02060 Phosphotransferase system (PTS)
-9	02060 Phosphotransferase system (PTS)
-Turicibacter	00130 Ubiquinone and other terpenoid-quinone biosynthesis
-Pseudomonas	00830 Retinol metabolism
-Pseudomonas	00906 Carotenoid biosynthesis
-Ruminococcus	00906 Carotenoid biosynthesis
-Pseudomonas	01040 Biosynthesis of unsaturated fatty acids
-Turicibacter	01040 Biosynthesis of unsaturated fatty acids
-8	00633 Nitrotoluene degradation
-Pseudomonas	00633 Nitrotoluene degradation
-Pseudomonas	00460 Cyanoamino acid metabolism
-6	00311 Penicillin and cephalosporin biosynthesis
-6	05150 Staphylococcus aureus infection
-Coprococcus	05150 Staphylococcus aureus infection
-Pseudomonas	05322 Systemic lupus erythematosus
-5	00710 Carbon fixation in photosynthetic organisms
-Lactobacillus	00740 Riboflavin metabolism
-Ruminococcus	00740 Riboflavin metabolism
-[Ruminococcus]	00740 Riboflavin metabolism
-Anaeroplasma	00740 Riboflavin metabolism
-9	00740 Riboflavin metabolism
-3	00920 Sulfur metabolism
-4	03070 Bacterial secretion system
-3	03070 Bacterial secretion system
-Bacteroides	03070 Bacterial secretion system
-3	00140 Steroid hormone biosynthesis
-Pseudomonas	04626 Plant-pathogen interaction
-7	00071 Fatty acid degradation
-Anaeroplasma	00900 Terpenoid backbone biosynthesis
-9	00900 Terpenoid backbone biosynthesis
-7	05146 Amoebiasis
-5	05146 Amoebiasis
-6	05146 Amoebiasis
-Oscillospira	05146 Amoebiasis
-Coprococcus	05146 Amoebiasis
-Lactobacillus	04141 Protein processing in endoplasmic reticulum
-Pseudomonas	01057 Biosynthesis of type II polyketide products
-Pseudomonas	05143 African trypanosomiasis
-7	05143 African trypanosomiasis
+Genus	SubPathway	numKO
+7	Glycolysis___Gluconeogenesis	32
+Pseudomonas	Glycolysis___Gluconeogenesis	26
+5	Glycolysis___Gluconeogenesis	28
+Ruminococcus	Glycolysis___Gluconeogenesis	22
+8	Glycolysis___Gluconeogenesis	17
+6	Glycolysis___Gluconeogenesis	28
+[Ruminococcus]	Glycolysis___Gluconeogenesis	19
+7	Glycine_serine_and_threonine_metabolism	15
+Lactobacillus	Glycine_serine_and_threonine_metabolism	6
+5	Glycine_serine_and_threonine_metabolism	14
+Pseudomonas	Glycine_serine_and_threonine_metabolism	20
+6	Glycine_serine_and_threonine_metabolism	12
+Ruminococcus	Glycine_serine_and_threonine_metabolism	9
+Oscillospira	Glycine_serine_and_threonine_metabolism	10
+3	Glycine_serine_and_threonine_metabolism	7
+8	Glycine_serine_and_threonine_metabolism	14
+rc4-4	Glycine_serine_and_threonine_metabolism	10
+[Ruminococcus]	Glycine_serine_and_threonine_metabolism	8
+Coprococcus	Glycine_serine_and_threonine_metabolism	11
+8	Butanoate_metabolism	9
+5	Propanoate_metabolism	5
+6	Propanoate_metabolism	6
+Ruminococcus	Propanoate_metabolism	2
+Oscillospira	Propanoate_metabolism	5
+7	Propanoate_metabolism	7
+[Ruminococcus]	Propanoate_metabolism	5
+Coprococcus	Propanoate_metabolism	3
+7	Pentose_and_glucuronate_interconversions	14
+5	Pentose_and_glucuronate_interconversions	18
+6	Pentose_and_glucuronate_interconversions	21
+Ruminococcus	Pentose_and_glucuronate_interconversions	10
+Oscillospira	Pentose_and_glucuronate_interconversions	7
+[Ruminococcus]	Pentose_and_glucuronate_interconversions	12
+Coprococcus	Pentose_and_glucuronate_interconversions	11
+7	Fructose_and_mannose_metabolism	23
+Turicibacter	Fructose_and_mannose_metabolism	9
+6	Fructose_and_mannose_metabolism	26
+Coprococcus	Fructose_and_mannose_metabolism	22
+Pseudomonas	Inositol_phosphate_metabolism	8
+5	Inositol_phosphate_metabolism	6
+Ruminococcus	Inositol_phosphate_metabolism	2
+7	Inositol_phosphate_metabolism	3
+6	Inositol_phosphate_metabolism	4
+Coprococcus	Inositol_phosphate_metabolism	6
+4	Pentose_and_glucuronate_interconversions	4
+Pseudomonas	Pentose_and_glucuronate_interconversions	3
+3	Pentose_and_glucuronate_interconversions	2
+Turicibacter	Pentose_and_glucuronate_interconversions	3
+8	Pentose_and_glucuronate_interconversions	2
+Bacteroides	Pentose_and_glucuronate_interconversions	14
+4	Histidine_metabolism	9
+7	Histidine_metabolism	13
+5	Histidine_metabolism	10
+Pseudomonas	Histidine_metabolism	17
+6	Histidine_metabolism	13
+Ruminococcus	Histidine_metabolism	11
+Oscillospira	Histidine_metabolism	15
+3	Histidine_metabolism	11
+Turicibacter	Histidine_metabolism	14
+8	Histidine_metabolism	15
+Bacteroides	Histidine_metabolism	13
+rc4-4	Histidine_metabolism	7
+[Ruminococcus]	Histidine_metabolism	10
+Coprococcus	Histidine_metabolism	10
+4	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	14
+7	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	20
+5	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	18
+Pseudomonas	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	15
+6	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	17
+Ruminococcus	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	16
+Oscillospira	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	13
+3	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	9
+Turicibacter	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	9
+8	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	13
+Bacteroides	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	14
+rc4-4	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	15
+[Ruminococcus]	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	15
+Coprococcus	Phenylalanine_tyrosine_and_tryptophan_biosynthesis	18
+Lactobacillus	Glycolysis___Gluconeogenesis	23
+Oscillospira	Glycolysis___Gluconeogenesis	24
+Turicibacter	Glycolysis___Gluconeogenesis	21
+rc4-4	Glycolysis___Gluconeogenesis	18
+Coprococcus	Glycolysis___Gluconeogenesis	24
+Anaeroplasma	Glycolysis___Gluconeogenesis	16
+9	Glycolysis___Gluconeogenesis	16
+4	Glyoxylate_and_dicarboxylate_metabolism	9
+7	Glyoxylate_and_dicarboxylate_metabolism	15
+5	Glyoxylate_and_dicarboxylate_metabolism	18
+Pseudomonas	Glyoxylate_and_dicarboxylate_metabolism	26
+6	Glyoxylate_and_dicarboxylate_metabolism	18
+Ruminococcus	Glyoxylate_and_dicarboxylate_metabolism	7
+Oscillospira	Glyoxylate_and_dicarboxylate_metabolism	13
+3	Glyoxylate_and_dicarboxylate_metabolism	9
+Turicibacter	Glyoxylate_and_dicarboxylate_metabolism	13
+8	Glyoxylate_and_dicarboxylate_metabolism	14
+Bacteroides	Glyoxylate_and_dicarboxylate_metabolism	13
+[Ruminococcus]	Glyoxylate_and_dicarboxylate_metabolism	7
+Coprococcus	Glyoxylate_and_dicarboxylate_metabolism	10
+Pseudomonas	Butanoate_metabolism	16
+Pseudomonas	Valine_leucine_and_isoleucine_degradation	10
+7	Valine_leucine_and_isoleucine_degradation	2
+Turicibacter	Valine_leucine_and_isoleucine_degradation	2
+8	Valine_leucine_and_isoleucine_degradation	6
+4	Citrate_cycle_TCA_cycle	13
+3	Citrate_cycle_TCA_cycle	10
+7	Citrate_cycle_TCA_cycle	16
+Turicibacter	Citrate_cycle_TCA_cycle	8
+8	Citrate_cycle_TCA_cycle	15
+Bacteroides	Citrate_cycle_TCA_cycle	16
+7	Pyruvate_metabolism	22
+Lactobacillus	Pyruvate_metabolism	11
+5	Pyruvate_metabolism	21
+6	Pyruvate_metabolism	23
+Ruminococcus	Pyruvate_metabolism	14
+Oscillospira	Pyruvate_metabolism	19
+Turicibacter	Pyruvate_metabolism	11
+8	Pyruvate_metabolism	18
+rc4-4	Pyruvate_metabolism	15
+[Ruminococcus]	Pyruvate_metabolism	15
+Coprococcus	Pyruvate_metabolism	18
+Pseudomonas	Pyruvate_metabolism	16
+Bacteroides	Pyruvate_metabolism	13
+6	Citrate_cycle_TCA_cycle	13
+5	Citrate_cycle_TCA_cycle	12
+Pseudomonas	Citrate_cycle_TCA_cycle	16
+Ruminococcus	Citrate_cycle_TCA_cycle	9
+Oscillospira	Citrate_cycle_TCA_cycle	13
+rc4-4	Citrate_cycle_TCA_cycle	15
+[Ruminococcus]	Citrate_cycle_TCA_cycle	7
+Coprococcus	Citrate_cycle_TCA_cycle	7
+Pseudomonas	Pentose_phosphate_pathway	22
+Lactobacillus	Pentose_phosphate_pathway	11
+5	Pentose_phosphate_pathway	15
+6	Pentose_phosphate_pathway	16
+Turicibacter	Pentose_phosphate_pathway	11
+Bacteroides	Pentose_phosphate_pathway	13
+7	Pentose_phosphate_pathway	13
+Coprococcus	Butanoate_metabolism	9
+Pseudomonas	Fructose_and_mannose_metabolism	14
+4	None	319
+5	None	693
+Pseudomonas	None	964
+6	None	661
+Ruminococcus	None	458
+7	None	718
+3	None	316
+Bacteroides	None	407
+[Ruminococcus]	None	435
+Coprococcus	None	532
+4	C5-Branched_dibasic_acid_metabolism	4
+7	C5-Branched_dibasic_acid_metabolism	3
+5	C5-Branched_dibasic_acid_metabolism	3
+Pseudomonas	C5-Branched_dibasic_acid_metabolism	3
+6	C5-Branched_dibasic_acid_metabolism	3
+Ruminococcus	C5-Branched_dibasic_acid_metabolism	3
+Oscillospira	C5-Branched_dibasic_acid_metabolism	3
+3	C5-Branched_dibasic_acid_metabolism	4
+8	C5-Branched_dibasic_acid_metabolism	3
+Bacteroides	C5-Branched_dibasic_acid_metabolism	4
+rc4-4	C5-Branched_dibasic_acid_metabolism	3
+[Ruminococcus]	C5-Branched_dibasic_acid_metabolism	3
+Coprococcus	C5-Branched_dibasic_acid_metabolism	3
+4	Valine_leucine_and_isoleucine_biosynthesis	2
+5	Valine_leucine_and_isoleucine_biosynthesis	2
+Pseudomonas	Valine_leucine_and_isoleucine_biosynthesis	2
+6	Valine_leucine_and_isoleucine_biosynthesis	2
+Ruminococcus	Valine_leucine_and_isoleucine_biosynthesis	2
+Oscillospira	Valine_leucine_and_isoleucine_biosynthesis	2
+7	Valine_leucine_and_isoleucine_biosynthesis	2
+8	Valine_leucine_and_isoleucine_biosynthesis	3
+Bacteroides	Valine_leucine_and_isoleucine_biosynthesis	2
+rc4-4	Valine_leucine_and_isoleucine_biosynthesis	2
+[Ruminococcus]	Valine_leucine_and_isoleucine_biosynthesis	2
+Coprococcus	Valine_leucine_and_isoleucine_biosynthesis	2
+Lactobacillus	Terpenoid_backbone_biosynthesis	10
+4	Glycerophospholipid_metabolism	7
+7	Glycerophospholipid_metabolism	11
+Lactobacillus	Glycerophospholipid_metabolism	7
+5	Glycerophospholipid_metabolism	10
+Pseudomonas	Glycerophospholipid_metabolism	13
+6	Glycerophospholipid_metabolism	11
+Ruminococcus	Glycerophospholipid_metabolism	6
+Oscillospira	Glycerophospholipid_metabolism	8
+3	Glycerophospholipid_metabolism	8
+Turicibacter	Glycerophospholipid_metabolism	9
+8	Glycerophospholipid_metabolism	12
+Bacteroides	Glycerophospholipid_metabolism	8
+rc4-4	Glycerophospholipid_metabolism	7
+[Ruminococcus]	Glycerophospholipid_metabolism	8
+Coprococcus	Glycerophospholipid_metabolism	11
+Anaeroplasma	Glycerophospholipid_metabolism	5
+9	Glycerophospholipid_metabolism	5
+4	Methane_metabolism	5
+7	Methane_metabolism	6
+Lactobacillus	Methane_metabolism	3
+5	Methane_metabolism	4
+Pseudomonas	Methane_metabolism	6
+6	Methane_metabolism	4
+Ruminococcus	Methane_metabolism	4
+Oscillospira	Methane_metabolism	6
+3	Methane_metabolism	6
+8	Methane_metabolism	5
+Bacteroides	Methane_metabolism	3
+rc4-4	Methane_metabolism	11
+[Ruminococcus]	Methane_metabolism	2
+Coprococcus	Methane_metabolism	3
+4	Fatty_acid_biosynthesis	7
+7	Fatty_acid_biosynthesis	7
+Lactobacillus	Fatty_acid_biosynthesis	7
+5	Fatty_acid_biosynthesis	7
+Pseudomonas	Fatty_acid_biosynthesis	9
+6	Fatty_acid_biosynthesis	7
+Ruminococcus	Fatty_acid_biosynthesis	7
+Oscillospira	Fatty_acid_biosynthesis	6
+3	Fatty_acid_biosynthesis	6
+Turicibacter	Fatty_acid_biosynthesis	6
+8	Fatty_acid_biosynthesis	8
+Bacteroides	Fatty_acid_biosynthesis	7
+rc4-4	Fatty_acid_biosynthesis	6
+[Ruminococcus]	Fatty_acid_biosynthesis	6
+Coprococcus	Fatty_acid_biosynthesis	6
+Turicibacter	Glycine_serine_and_threonine_metabolism	8
+4	Polyketide_sugar_unit_biosynthesis	4
+7	Polyketide_sugar_unit_biosynthesis	4
+5	Polyketide_sugar_unit_biosynthesis	4
+Pseudomonas	Polyketide_sugar_unit_biosynthesis	3
+6	Polyketide_sugar_unit_biosynthesis	4
+Ruminococcus	Polyketide_sugar_unit_biosynthesis	4
+3	Polyketide_sugar_unit_biosynthesis	4
+Turicibacter	Polyketide_sugar_unit_biosynthesis	4
+8	Polyketide_sugar_unit_biosynthesis	4
+Bacteroides	Polyketide_sugar_unit_biosynthesis	4
+[Ruminococcus]	Polyketide_sugar_unit_biosynthesis	4
+Coprococcus	Polyketide_sugar_unit_biosynthesis	4
+Ruminococcus	Fructose_and_mannose_metabolism	13
+7	Butanoate_metabolism	12
+5	Butanoate_metabolism	9
+6	Butanoate_metabolism	13
+Oscillospira	Butanoate_metabolism	13
+Turicibacter	Butanoate_metabolism	6
+4	Amino_sugar_and_nucleotide_sugar_metabolism	8
+7	Amino_sugar_and_nucleotide_sugar_metabolism	19
+Lactobacillus	Amino_sugar_and_nucleotide_sugar_metabolism	12
+5	Amino_sugar_and_nucleotide_sugar_metabolism	20
+Pseudomonas	Amino_sugar_and_nucleotide_sugar_metabolism	17
+6	Amino_sugar_and_nucleotide_sugar_metabolism	22
+Ruminococcus	Amino_sugar_and_nucleotide_sugar_metabolism	8
+Oscillospira	Amino_sugar_and_nucleotide_sugar_metabolism	12
+3	Amino_sugar_and_nucleotide_sugar_metabolism	8
+Turicibacter	Amino_sugar_and_nucleotide_sugar_metabolism	13
+8	Amino_sugar_and_nucleotide_sugar_metabolism	7
+Bacteroides	Amino_sugar_and_nucleotide_sugar_metabolism	12
+rc4-4	Amino_sugar_and_nucleotide_sugar_metabolism	6
+[Ruminococcus]	Amino_sugar_and_nucleotide_sugar_metabolism	12
+Coprococcus	Amino_sugar_and_nucleotide_sugar_metabolism	14
+4	Pantothenate_and_CoA_biosynthesis	6
+7	Pantothenate_and_CoA_biosynthesis	9
+5	Pantothenate_and_CoA_biosynthesis	8
+Pseudomonas	Pantothenate_and_CoA_biosynthesis	6
+6	Pantothenate_and_CoA_biosynthesis	8
+Oscillospira	Pantothenate_and_CoA_biosynthesis	7
+Bacteroides	Pantothenate_and_CoA_biosynthesis	6
+Coprococcus	Pantothenate_and_CoA_biosynthesis	8
+3	Riboflavin_metabolism	5
+rc4-4	Propanoate_metabolism	2
+5	Purine_metabolism	50
+6	Purine_metabolism	50
+Oscillospira	Purine_metabolism	41
+7	Purine_metabolism	51
+[Ruminococcus]	Purine_metabolism	42
+Coprococcus	Purine_metabolism	46
+4	Purine_metabolism	36
+Lactobacillus	Purine_metabolism	42
+Pseudomonas	Purine_metabolism	61
+Ruminococcus	Purine_metabolism	40
+3	Purine_metabolism	34
+Turicibacter	Purine_metabolism	32
+8	Purine_metabolism	50
+Bacteroides	Purine_metabolism	43
+rc4-4	Purine_metabolism	34
+[Ruminococcus]	Galactose_metabolism	17
+4	Vitamin_B6_metabolism	3
+5	Vitamin_B6_metabolism	4
+Pseudomonas	Vitamin_B6_metabolism	5
+6	Vitamin_B6_metabolism	4
+Oscillospira	Vitamin_B6_metabolism	2
+3	Vitamin_B6_metabolism	3
+7	Vitamin_B6_metabolism	4
+8	Vitamin_B6_metabolism	4
+Bacteroides	Vitamin_B6_metabolism	5
+Coprococcus	Vitamin_B6_metabolism	4
+4	Terpenoid_backbone_biosynthesis	9
+7	Terpenoid_backbone_biosynthesis	11
+5	Terpenoid_backbone_biosynthesis	11
+Pseudomonas	Terpenoid_backbone_biosynthesis	9
+6	Terpenoid_backbone_biosynthesis	9
+Ruminococcus	Terpenoid_backbone_biosynthesis	10
+Oscillospira	Terpenoid_backbone_biosynthesis	9
+3	Terpenoid_backbone_biosynthesis	8
+Turicibacter	Terpenoid_backbone_biosynthesis	9
+8	Terpenoid_backbone_biosynthesis	9
+Bacteroides	Terpenoid_backbone_biosynthesis	9
+rc4-4	Terpenoid_backbone_biosynthesis	10
+[Ruminococcus]	Terpenoid_backbone_biosynthesis	8
+Coprococcus	Terpenoid_backbone_biosynthesis	9
+4	Fructose_and_mannose_metabolism	8
+Lactobacillus	Fructose_and_mannose_metabolism	12
+5	Fructose_and_mannose_metabolism	21
+Oscillospira	Fructose_and_mannose_metabolism	6
+8	Fructose_and_mannose_metabolism	3
+Bacteroides	Fructose_and_mannose_metabolism	13
+[Ruminococcus]	Fructose_and_mannose_metabolism	13
+rc4-4	Glyoxylate_and_dicarboxylate_metabolism	12
+8	Pentose_phosphate_pathway	7
+4	Glycolysis___Gluconeogenesis	14
+4	Glycine_serine_and_threonine_metabolism	10
+Bacteroides	Glycine_serine_and_threonine_metabolism	10
+3	Glycolysis___Gluconeogenesis	15
+Bacteroides	Glycolysis___Gluconeogenesis	17
+Lactobacillus	Butanoate_metabolism	5
+rc4-4	Butanoate_metabolism	3
+Pseudomonas	Arginine_and_proline_metabolism	35
+Pseudomonas	Propanoate_metabolism	12
+8	Propanoate_metabolism	9
+4	Arginine_and_proline_metabolism	11
+7	Arginine_and_proline_metabolism	15
+5	Arginine_and_proline_metabolism	15
+6	Arginine_and_proline_metabolism	21
+Ruminococcus	Arginine_and_proline_metabolism	11
+Oscillospira	Arginine_and_proline_metabolism	12
+3	Arginine_and_proline_metabolism	11
+8	Arginine_and_proline_metabolism	13
+Bacteroides	Arginine_and_proline_metabolism	13
+rc4-4	Arginine_and_proline_metabolism	10
+[Ruminococcus]	Arginine_and_proline_metabolism	7
+Coprococcus	Arginine_and_proline_metabolism	10
+Pseudomonas	Phenylalanine_metabolism	14
+Lactobacillus	Arginine_and_proline_metabolism	4
+Pseudomonas	Tyrosine_metabolism	13
+8	None	566
+4	Pyruvate_metabolism	11
+Oscillospira	None	491
+rc4-4	None	491
+7	Carbon_fixation_pathways_in_prokaryotes	7
+5	Carbon_fixation_pathways_in_prokaryotes	6
+6	Carbon_fixation_pathways_in_prokaryotes	7
+rc4-4	Carbon_fixation_pathways_in_prokaryotes	4
+[Ruminococcus]	Carbon_fixation_pathways_in_prokaryotes	5
+4	Lysine_biosynthesis	9
+7	Lysine_biosynthesis	11
+Lactobacillus	Lysine_biosynthesis	10
+5	Lysine_biosynthesis	12
+Pseudomonas	Lysine_biosynthesis	11
+6	Lysine_biosynthesis	11
+Ruminococcus	Lysine_biosynthesis	9
+Oscillospira	Lysine_biosynthesis	10
+3	Lysine_biosynthesis	8
+Turicibacter	Lysine_biosynthesis	9
+8	Lysine_biosynthesis	9
+Bacteroides	Lysine_biosynthesis	9
+rc4-4	Lysine_biosynthesis	9
+[Ruminococcus]	Lysine_biosynthesis	10
+Coprococcus	Lysine_biosynthesis	10
+4	Pyrimidine_metabolism	21
+7	Pyrimidine_metabolism	29
+Lactobacillus	Pyrimidine_metabolism	20
+5	Pyrimidine_metabolism	28
+Pseudomonas	Pyrimidine_metabolism	19
+6	Pyrimidine_metabolism	26
+Ruminococcus	Pyrimidine_metabolism	24
+Oscillospira	Pyrimidine_metabolism	22
+3	Pyrimidine_metabolism	20
+8	Pyrimidine_metabolism	18
+Bacteroides	Pyrimidine_metabolism	21
+rc4-4	Pyrimidine_metabolism	20
+[Ruminococcus]	Pyrimidine_metabolism	22
+Coprococcus	Pyrimidine_metabolism	23
+Pseudomonas	Porphyrin_and_chlorophyll_metabolism	35
+8	Porphyrin_and_chlorophyll_metabolism	16
+7	Porphyrin_and_chlorophyll_metabolism	29
+Turicibacter	Porphyrin_and_chlorophyll_metabolism	4
+Lactobacillus	None	385
+Turicibacter	None	432
+Lactobacillus	Citrate_cycle_TCA_cycle	2
+Pseudomonas	Fatty_acid_degradation	5
+8	Fatty_acid_degradation	6
+4	Geraniol_degradation	1
+Pseudomonas	Geraniol_degradation	8
+7	Geraniol_degradation	1
+3	Geraniol_degradation	1
+8	Geraniol_degradation	1
+Bacteroides	Geraniol_degradation	2
+3	Alanine_aspartate_and_glutamate_metabolism	8
+Turicibacter	Alanine_aspartate_and_glutamate_metabolism	7
+Bacteroides	Alanine_aspartate_and_glutamate_metabolism	13
+rc4-4	Alanine_aspartate_and_glutamate_metabolism	7
+Coprococcus	Alanine_aspartate_and_glutamate_metabolism	8
+Pseudomonas	Nitrogen_metabolism	20
+6	Nitrogen_metabolism	7
+8	Nitrogen_metabolism	14
+rc4-4	Nitrogen_metabolism	4
+4	Nitrogen_metabolism	3
+7	Nitrogen_metabolism	7
+Lactobacillus	Nitrogen_metabolism	1
+5	Nitrogen_metabolism	8
+Ruminococcus	Nitrogen_metabolism	2
+Oscillospira	Nitrogen_metabolism	4
+3	Nitrogen_metabolism	2
+Bacteroides	Nitrogen_metabolism	5
+[Ruminococcus]	Nitrogen_metabolism	4
+Coprococcus	Nitrogen_metabolism	5
+Turicibacter	Nitrogen_metabolism	2
+4	Alanine_aspartate_and_glutamate_metabolism	8
+7	Alanine_aspartate_and_glutamate_metabolism	11
+5	Alanine_aspartate_and_glutamate_metabolism	11
+Pseudomonas	Alanine_aspartate_and_glutamate_metabolism	11
+6	Alanine_aspartate_and_glutamate_metabolism	10
+Ruminococcus	Alanine_aspartate_and_glutamate_metabolism	6
+8	Alanine_aspartate_and_glutamate_metabolism	7
+[Ruminococcus]	Alanine_aspartate_and_glutamate_metabolism	6
+8	Phenylalanine_metabolism	1
+Turicibacter	Arginine_and_proline_metabolism	6
+4	Folate_biosynthesis	10
+7	Folate_biosynthesis	12
+Lactobacillus	Folate_biosynthesis	3
+5	Folate_biosynthesis	9
+Pseudomonas	Folate_biosynthesis	18
+6	Folate_biosynthesis	11
+Oscillospira	Folate_biosynthesis	3
+Ruminococcus	Folate_biosynthesis	5
+3	Folate_biosynthesis	8
+Turicibacter	Folate_biosynthesis	3
+8	Folate_biosynthesis	16
+Bacteroides	Folate_biosynthesis	12
+[Ruminococcus]	Folate_biosynthesis	4
+Coprococcus	Folate_biosynthesis	12
+Anaeroplasma	Folate_biosynthesis	2
+9	Folate_biosynthesis	2
+4	Carbon_fixation_pathways_in_prokaryotes	3
+Pseudomonas	Carbon_fixation_pathways_in_prokaryotes	2
+Ruminococcus	Carbon_fixation_pathways_in_prokaryotes	3
+Oscillospira	Carbon_fixation_pathways_in_prokaryotes	4
+3	Carbon_fixation_pathways_in_prokaryotes	2
+8	Carbon_fixation_pathways_in_prokaryotes	2
+Bacteroides	Carbon_fixation_pathways_in_prokaryotes	3
+Coprococcus	Carbon_fixation_pathways_in_prokaryotes	4
+Pseudomonas	Sulfur_metabolism	20
+Pseudomonas	Nicotinate_and_nicotinamide_metabolism	12
+8	Nicotinate_and_nicotinamide_metabolism	13
+4	Oxidative_phosphorylation	29
+Pseudomonas	Oxidative_phosphorylation	44
+3	Oxidative_phosphorylation	19
+8	Oxidative_phosphorylation	32
+Bacteroides	Oxidative_phosphorylation	32
+rc4-4	Oxidative_phosphorylation	25
+7	Oxidative_phosphorylation	22
+5	Oxidative_phosphorylation	21
+6	Oxidative_phosphorylation	21
+Ruminococcus	Oxidative_phosphorylation	21
+Oscillospira	Oxidative_phosphorylation	20
+Turicibacter	Oxidative_phosphorylation	13
+[Ruminococcus]	Oxidative_phosphorylation	21
+Coprococcus	Oxidative_phosphorylation	21
+Pseudomonas	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	11
+Anaeroplasma	None	149
+9	None	149
+8	Sulfur_metabolism	14
+Pseudomonas	Glutathione_metabolism	7
+8	Glutathione_metabolism	8
+Turicibacter	Pyrimidine_metabolism	14
+Anaeroplasma	Pyrimidine_metabolism	12
+9	Pyrimidine_metabolism	12
+6	Sulfur_metabolism	14
+5	Sulfur_metabolism	8
+Oscillospira	Sulfur_metabolism	4
+rc4-4	Sulfur_metabolism	6
+Coprococcus	Sulfur_metabolism	5
+Ruminococcus	Sulfur_metabolism	4
+Lactobacillus	Oxidative_phosphorylation	12
+Pseudomonas	Arachidonic_acid_metabolism	1
+5	Arachidonic_acid_metabolism	1
+7	Arachidonic_acid_metabolism	1
+Turicibacter	Arachidonic_acid_metabolism	1
+8	Arachidonic_acid_metabolism	1
+Bacteroides	Arachidonic_acid_metabolism	1
+Coprococcus	Arachidonic_acid_metabolism	1
+Pseudomonas	Benzoate_degradation	15
+Coprococcus	Tyrosine_metabolism	2
+Pseudomonas	Tryptophan_metabolism	3
+8	Tyrosine_metabolism	6
+Pseudomonas	Lysine_degradation	1
+Pseudomonas	Dioxin_degradation	1
+6	Tyrosine_metabolism	4
+8	Two-component_system	37
+8	Biosynthesis_of_unsaturated_fatty_acids	3
+8	Linoleic_acid_metabolism	1
+Anaeroplasma	Purine_metabolism	22
+9	Purine_metabolism	22
+Lactobacillus	Cysteine_and_methionine_metabolism	6
+7	Cysteine_and_methionine_metabolism	16
+6	Cysteine_and_methionine_metabolism	16
+4	Cysteine_and_methionine_metabolism	8
+5	Cysteine_and_methionine_metabolism	14
+Pseudomonas	Cysteine_and_methionine_metabolism	12
+Ruminococcus	Cysteine_and_methionine_metabolism	9
+Oscillospira	Cysteine_and_methionine_metabolism	10
+3	Cysteine_and_methionine_metabolism	7
+8	Cysteine_and_methionine_metabolism	10
+Bacteroides	Cysteine_and_methionine_metabolism	7
+rc4-4	Cysteine_and_methionine_metabolism	10
+[Ruminococcus]	Cysteine_and_methionine_metabolism	8
+Coprococcus	Cysteine_and_methionine_metabolism	9
+Turicibacter	Cysteine_and_methionine_metabolism	9
+Anaeroplasma	Cysteine_and_methionine_metabolism	3
+9	Cysteine_and_methionine_metabolism	3
+4	Sulfur_relay_system	1
+7	Sulfur_relay_system	2
+Lactobacillus	Sulfur_relay_system	1
+5	Sulfur_relay_system	2
+Pseudomonas	Sulfur_relay_system	8
+6	Sulfur_relay_system	2
+Ruminococcus	Sulfur_relay_system	1
+Oscillospira	Sulfur_relay_system	1
+3	Sulfur_relay_system	1
+Turicibacter	Sulfur_relay_system	1
+8	Sulfur_relay_system	7
+Bacteroides	Sulfur_relay_system	3
+rc4-4	Sulfur_relay_system	3
+[Ruminococcus]	Sulfur_relay_system	1
+Coprococcus	Sulfur_relay_system	2
+Anaeroplasma	Sulfur_relay_system	1
+9	Sulfur_relay_system	1
+8	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	7
+Pseudomonas	Drug_metabolism_-_other_enzymes	2
+8	Drug_metabolism_-_other_enzymes	2
+5	Two-component_system	35
+Pseudomonas	Two-component_system	85
+6	Two-component_system	45
+Oscillospira	Two-component_system	37
+Ruminococcus	Two-component_system	21
+7	Two-component_system	45
+Coprococcus	Two-component_system	27
+3	Phenylalanine_metabolism	1
+5	Porphyrin_and_chlorophyll_metabolism	29
+6	Porphyrin_and_chlorophyll_metabolism	28
+Oscillospira	Porphyrin_and_chlorophyll_metabolism	28
+[Ruminococcus]	Porphyrin_and_chlorophyll_metabolism	24
+Coprococcus	Porphyrin_and_chlorophyll_metabolism	27
+Lactobacillus	Glyoxylate_and_dicarboxylate_metabolism	4
+Anaeroplasma	Glyoxylate_and_dicarboxylate_metabolism	1
+9	Glyoxylate_and_dicarboxylate_metabolism	1
+4	One_carbon_pool_by_folate	1
+7	One_carbon_pool_by_folate	2
+Lactobacillus	One_carbon_pool_by_folate	2
+5	One_carbon_pool_by_folate	2
+Pseudomonas	One_carbon_pool_by_folate	2
+6	One_carbon_pool_by_folate	3
+Ruminococcus	One_carbon_pool_by_folate	2
+Oscillospira	One_carbon_pool_by_folate	3
+3	One_carbon_pool_by_folate	2
+Turicibacter	One_carbon_pool_by_folate	3
+8	One_carbon_pool_by_folate	2
+Bacteroides	One_carbon_pool_by_folate	2
+rc4-4	One_carbon_pool_by_folate	2
+[Ruminococcus]	One_carbon_pool_by_folate	2
+Coprococcus	One_carbon_pool_by_folate	2
+Anaeroplasma	One_carbon_pool_by_folate	2
+9	One_carbon_pool_by_folate	2
+3	Pantothenate_and_CoA_biosynthesis	5
+8	Pantothenate_and_CoA_biosynthesis	6
+rc4-4	Pantothenate_and_CoA_biosynthesis	6
+4	Pentose_phosphate_pathway	7
+Ruminococcus	Pentose_phosphate_pathway	11
+Oscillospira	Pentose_phosphate_pathway	9
+3	Pentose_phosphate_pathway	7
+rc4-4	Pentose_phosphate_pathway	8
+[Ruminococcus]	Pentose_phosphate_pathway	10
+Coprococcus	Pentose_phosphate_pathway	13
+Anaeroplasma	Pentose_phosphate_pathway	6
+9	Pentose_phosphate_pathway	6
+Anaeroplasma	Pyruvate_metabolism	2
+9	Pyruvate_metabolism	2
+Pseudomonas	Glycerolipid_metabolism	10
+8	Glycerolipid_metabolism	6
+6	Fatty_acid_degradation	1
+Oscillospira	Fatty_acid_degradation	1
+4	Butanoate_metabolism	5
+3	Butanoate_metabolism	5
+Bacteroides	Butanoate_metabolism	5
+4	Sulfur_metabolism	2
+7	Sulfur_metabolism	5
+Turicibacter	Sulfur_metabolism	3
+Bacteroides	Sulfur_metabolism	6
+[Ruminococcus]	Sulfur_metabolism	4
+Lactobacillus	Sulfur_metabolism	2
+4	Biotin_metabolism	7
+Pseudomonas	Biotin_metabolism	6
+8	Biotin_metabolism	6
+Bacteroides	Biotin_metabolism	7
+4	Glycerolipid_metabolism	4
+7	Glycerolipid_metabolism	9
+Lactobacillus	Glycerolipid_metabolism	9
+5	Glycerolipid_metabolism	9
+6	Glycerolipid_metabolism	9
+Ruminococcus	Glycerolipid_metabolism	9
+Oscillospira	Glycerolipid_metabolism	6
+3	Glycerolipid_metabolism	4
+Turicibacter	Glycerolipid_metabolism	7
+Bacteroides	Glycerolipid_metabolism	2
+rc4-4	Glycerolipid_metabolism	7
+[Ruminococcus]	Glycerolipid_metabolism	6
+Coprococcus	Glycerolipid_metabolism	7
+Anaeroplasma	Glycerolipid_metabolism	3
+9	Glycerolipid_metabolism	3
+3	Pyruvate_metabolism	7
+4	Lipopolysaccharide_biosynthesis	11
+Pseudomonas	Lipopolysaccharide_biosynthesis	18
+3	Lipopolysaccharide_biosynthesis	11
+8	Lipopolysaccharide_biosynthesis	11
+Bacteroides	Lipopolysaccharide_biosynthesis	11
+4	Tyrosine_metabolism	1
+7	Tyrosine_metabolism	2
+Lactobacillus	Tyrosine_metabolism	1
+5	Tyrosine_metabolism	1
+Ruminococcus	Tyrosine_metabolism	1
+Oscillospira	Tyrosine_metabolism	2
+3	Tyrosine_metabolism	1
+Turicibacter	Tyrosine_metabolism	1
+Bacteroides	Tyrosine_metabolism	1
+Pseudomonas	Taurine_and_hypotaurine_metabolism	1
+6	Taurine_and_hypotaurine_metabolism	1
+Oscillospira	Taurine_and_hypotaurine_metabolism	1
+7	Taurine_and_hypotaurine_metabolism	1
+Turicibacter	Taurine_and_hypotaurine_metabolism	1
+8	Taurine_and_hypotaurine_metabolism	1
+5	Taurine_and_hypotaurine_metabolism	1
+4	Starch_and_sucrose_metabolism	8
+7	Starch_and_sucrose_metabolism	19
+Lactobacillus	Starch_and_sucrose_metabolism	11
+5	Starch_and_sucrose_metabolism	20
+Pseudomonas	Starch_and_sucrose_metabolism	15
+6	Starch_and_sucrose_metabolism	21
+Ruminococcus	Starch_and_sucrose_metabolism	15
+Oscillospira	Starch_and_sucrose_metabolism	7
+3	Starch_and_sucrose_metabolism	6
+Turicibacter	Starch_and_sucrose_metabolism	10
+Bacteroides	Starch_and_sucrose_metabolism	12
+rc4-4	Starch_and_sucrose_metabolism	6
+[Ruminococcus]	Starch_and_sucrose_metabolism	8
+Coprococcus	Starch_and_sucrose_metabolism	13
+4	N-Glycan_biosynthesis	1
+5	N-Glycan_biosynthesis	2
+6	N-Glycan_biosynthesis	1
+7	N-Glycan_biosynthesis	1
+3	N-Glycan_biosynthesis	1
+Bacteroides	N-Glycan_biosynthesis	1
+rc4-4	N-Glycan_biosynthesis	1
+Coprococcus	N-Glycan_biosynthesis	1
+7	Nicotinate_and_nicotinamide_metabolism	9
+Lactobacillus	Nicotinate_and_nicotinamide_metabolism	4
+5	Nicotinate_and_nicotinamide_metabolism	9
+6	Nicotinate_and_nicotinamide_metabolism	9
+Ruminococcus	Nicotinate_and_nicotinamide_metabolism	9
+Oscillospira	Nicotinate_and_nicotinamide_metabolism	6
+Turicibacter	Nicotinate_and_nicotinamide_metabolism	8
+Bacteroides	Nicotinate_and_nicotinamide_metabolism	8
+rc4-4	Nicotinate_and_nicotinamide_metabolism	7
+[Ruminococcus]	Nicotinate_and_nicotinamide_metabolism	8
+Coprococcus	Nicotinate_and_nicotinamide_metabolism	8
+Anaeroplasma	Nicotinate_and_nicotinamide_metabolism	4
+9	Nicotinate_and_nicotinamide_metabolism	4
+4	Nicotinate_and_nicotinamide_metabolism	7
+3	Nicotinate_and_nicotinamide_metabolism	5
+rc4-4	Porphyrin_and_chlorophyll_metabolism	15
+4	RNA_transport	2
+Lactobacillus	RNA_transport	2
+5	RNA_transport	2
+6	RNA_transport	2
+7	RNA_transport	3
+3	RNA_transport	2
+Turicibacter	RNA_transport	2
+8	RNA_transport	2
+Bacteroides	RNA_transport	2
+rc4-4	RNA_transport	2
+[Ruminococcus]	RNA_transport	2
+Coprococcus	RNA_transport	2
+4	Thiamine_metabolism	6
+7	Thiamine_metabolism	12
+5	Thiamine_metabolism	11
+6	Thiamine_metabolism	10
+Oscillospira	Thiamine_metabolism	8
+Ruminococcus	Thiamine_metabolism	8
+3	Thiamine_metabolism	5
+Turicibacter	Thiamine_metabolism	7
+8	Thiamine_metabolism	8
+Bacteroides	Thiamine_metabolism	8
+rc4-4	Thiamine_metabolism	13
+[Ruminococcus]	Thiamine_metabolism	9
+Coprococcus	Thiamine_metabolism	11
+4	Zeatin_biosynthesis	1
+7	Zeatin_biosynthesis	1
+Lactobacillus	Zeatin_biosynthesis	1
+5	Zeatin_biosynthesis	1
+Pseudomonas	Zeatin_biosynthesis	1
+6	Zeatin_biosynthesis	1
+Ruminococcus	Zeatin_biosynthesis	1
+Oscillospira	Zeatin_biosynthesis	1
+3	Zeatin_biosynthesis	1
+Turicibacter	Zeatin_biosynthesis	1
+8	Zeatin_biosynthesis	1
+Bacteroides	Zeatin_biosynthesis	1
+rc4-4	Zeatin_biosynthesis	1
+[Ruminococcus]	Zeatin_biosynthesis	1
+Coprococcus	Zeatin_biosynthesis	1
+4	Riboflavin_metabolism	5
+5	Riboflavin_metabolism	5
+Pseudomonas	Riboflavin_metabolism	7
+6	Riboflavin_metabolism	5
+Oscillospira	Riboflavin_metabolism	5
+7	Riboflavin_metabolism	5
+Turicibacter	Riboflavin_metabolism	5
+8	Riboflavin_metabolism	7
+Bacteroides	Riboflavin_metabolism	5
+rc4-4	Riboflavin_metabolism	5
+Coprococcus	Riboflavin_metabolism	5
+rc4-4	Folate_biosynthesis	8
+Ruminococcus	Porphyrin_and_chlorophyll_metabolism	6
+3	Porphyrin_and_chlorophyll_metabolism	5
+6	Ether_lipid_metabolism	1
+5	Ether_lipid_metabolism	1
+Oscillospira	Alanine_aspartate_and_glutamate_metabolism	9
+Lactobacillus	Histidine_metabolism	1
+Lactobacillus	Propanoate_metabolism	1
+5	Lysine_degradation	2
+6	Lysine_degradation	3
+4	Valine_leucine_and_isoleucine_degradation	1
+Lactobacillus	Valine_leucine_and_isoleucine_degradation	1
+5	Valine_leucine_and_isoleucine_degradation	1
+6	Valine_leucine_and_isoleucine_degradation	1
+Ruminococcus	Valine_leucine_and_isoleucine_degradation	1
+Oscillospira	Valine_leucine_and_isoleucine_degradation	1
+3	Valine_leucine_and_isoleucine_degradation	1
+Bacteroides	Valine_leucine_and_isoleucine_degradation	2
+rc4-4	Valine_leucine_and_isoleucine_degradation	1
+[Ruminococcus]	Valine_leucine_and_isoleucine_degradation	1
+Coprococcus	Valine_leucine_and_isoleucine_degradation	1
+3	Fructose_and_mannose_metabolism	4
+4	Galactose_metabolism	7
+Lactobacillus	Galactose_metabolism	10
+5	Galactose_metabolism	17
+6	Galactose_metabolism	22
+Ruminococcus	Galactose_metabolism	13
+Oscillospira	Galactose_metabolism	6
+7	Galactose_metabolism	17
+3	Galactose_metabolism	5
+Turicibacter	Galactose_metabolism	8
+Bacteroides	Galactose_metabolism	8
+Coprococcus	Galactose_metabolism	16
+Lactobacillus	Pantothenate_and_CoA_biosynthesis	5
+Ruminococcus	Pantothenate_and_CoA_biosynthesis	5
+Turicibacter	Pantothenate_and_CoA_biosynthesis	4
+[Ruminococcus]	Pantothenate_and_CoA_biosynthesis	5
+Lactobacillus	Vitamin_B6_metabolism	1
+Ruminococcus	Vitamin_B6_metabolism	3
+rc4-4	Vitamin_B6_metabolism	3
+[Ruminococcus]	Vitamin_B6_metabolism	3
+Pseudomonas	Galactose_metabolism	4
+Lactobacillus	Thiamine_metabolism	4
+Pseudomonas	Thiamine_metabolism	8
+Anaeroplasma	Pantothenate_and_CoA_biosynthesis	2
+9	Pantothenate_and_CoA_biosynthesis	2
+Lactobacillus	Pentose_and_glucuronate_interconversions	1
+rc4-4	Fructose_and_mannose_metabolism	3
+4	RNA_degradation	7
+Pseudomonas	RNA_degradation	12
+3	RNA_degradation	8
+8	RNA_degradation	9
+Bacteroides	RNA_degradation	8
+rc4-4	Polyketide_sugar_unit_biosynthesis	2
+Pseudomonas	RNA_transport	2
+Ruminococcus	RNA_transport	1
+Oscillospira	RNA_transport	1
+Anaeroplasma	RNA_transport	1
+9	RNA_transport	1
+Ruminococcus	Lipopolysaccharide_biosynthesis	2
+4	Peptidoglycan_biosynthesis	7
+7	Peptidoglycan_biosynthesis	9
+Lactobacillus	Peptidoglycan_biosynthesis	7
+5	Peptidoglycan_biosynthesis	9
+Pseudomonas	Peptidoglycan_biosynthesis	12
+6	Peptidoglycan_biosynthesis	8
+Ruminococcus	Peptidoglycan_biosynthesis	8
+Oscillospira	Peptidoglycan_biosynthesis	8
+3	Peptidoglycan_biosynthesis	7
+Turicibacter	Peptidoglycan_biosynthesis	7
+8	Peptidoglycan_biosynthesis	11
+Bacteroides	Peptidoglycan_biosynthesis	9
+rc4-4	Peptidoglycan_biosynthesis	7
+[Ruminococcus]	Peptidoglycan_biosynthesis	8
+Coprococcus	Peptidoglycan_biosynthesis	8
+5	Selenocompound_metabolism	4
+Pseudomonas	Selenocompound_metabolism	2
+6	Selenocompound_metabolism	5
+Oscillospira	Selenocompound_metabolism	4
+7	Selenocompound_metabolism	5
+Turicibacter	Selenocompound_metabolism	4
+[Ruminococcus]	Selenocompound_metabolism	3
+Coprococcus	Selenocompound_metabolism	4
+7	Biotin_metabolism	2
+5	Biotin_metabolism	2
+6	Biotin_metabolism	2
+Ruminococcus	Biotin_metabolism	2
+Oscillospira	Biotin_metabolism	2
+rc4-4	Biotin_metabolism	2
+[Ruminococcus]	Biotin_metabolism	2
+Coprococcus	Biotin_metabolism	2
+8	Benzoate_degradation	10
+Turicibacter	Propanoate_metabolism	3
+7	Penicillin_and_cephalosporin_biosynthesis	1
+Pseudomonas	Fluorobenzoate_degradation	1
+4	Inositol_phosphate_metabolism	1
+Lactobacillus	Inositol_phosphate_metabolism	1
+Oscillospira	Inositol_phosphate_metabolism	1
+3	Inositol_phosphate_metabolism	1
+8	Inositol_phosphate_metabolism	1
+Bacteroides	Inositol_phosphate_metabolism	2
+Lactobacillus	Aminobenzoate_degradation	1
+5	Aminobenzoate_degradation	1
+6	Aminobenzoate_degradation	1
+Turicibacter	Aminobenzoate_degradation	1
+Coprococcus	Aminobenzoate_degradation	1
+Pseudomonas	Steroid_hormone_biosynthesis	1
+5	Steroid_hormone_biosynthesis	1
+Bacteroides	Steroid_hormone_biosynthesis	2
+5	Sphingolipid_metabolism	3
+Pseudomonas	Mismatch_repair	6
+7	Base_excision_repair	11
+Lactobacillus	Base_excision_repair	7
+5	Base_excision_repair	10
+Pseudomonas	Base_excision_repair	9
+6	Base_excision_repair	10
+Ruminococcus	Base_excision_repair	7
+Oscillospira	Base_excision_repair	9
+Turicibacter	Base_excision_repair	11
+8	Base_excision_repair	7
+Bacteroides	Base_excision_repair	8
+rc4-4	Base_excision_repair	5
+[Ruminococcus]	Base_excision_repair	5
+Coprococcus	Base_excision_repair	10
+4	Base_excision_repair	6
+3	Base_excision_repair	6
+Anaeroplasma	Base_excision_repair	3
+9	Base_excision_repair	3
+4	Homologous_recombination	9
+7	Homologous_recombination	10
+Pseudomonas	Homologous_recombination	12
+5	Homologous_recombination	10
+Ruminococcus	Homologous_recombination	10
+Oscillospira	Homologous_recombination	10
+3	Homologous_recombination	9
+8	Homologous_recombination	12
+Bacteroides	Homologous_recombination	9
+rc4-4	Homologous_recombination	9
+Lactobacillus	Apoptosis	1
+3	Apoptosis	1
+8	Apoptosis	1
+4	Sphingolipid_metabolism	1
+Bacteroides	Sphingolipid_metabolism	2
+[Ruminococcus]	Sphingolipid_metabolism	1
+Anaeroplasma	Starch_and_sucrose_metabolism	1
+9	Starch_and_sucrose_metabolism	1
+5	Other_glycan_degradation	3
+6	Other_glycan_degradation	4
+Ruminococcus	Other_glycan_degradation	2
+7	Other_glycan_degradation	3
+Turicibacter	Other_glycan_degradation	2
+Bacteroides	Other_glycan_degradation	3
+4	Other_glycan_degradation	2
+3	Other_glycan_degradation	2
+5	Glycosaminoglycan_degradation	1
+Turicibacter	Glycosaminoglycan_degradation	1
+Bacteroides	Glycosaminoglycan_degradation	2
+Ruminococcus	Sphingolipid_metabolism	1
+Turicibacter	Sphingolipid_metabolism	1
+Coprococcus	Sphingolipid_metabolism	1
+4	Glycosaminoglycan_degradation	1
+[Ruminococcus]	Other_glycan_degradation	1
+Coprococcus	Other_glycan_degradation	1
+Pseudomonas	Biosynthesis_of_siderophore_group_nonribosomal_peptides	2
+5	Glutathione_metabolism	2
+Turicibacter	Glutathione_metabolism	3
+[Ruminococcus]	Glutathione_metabolism	2
+Anaeroplasma	Glutathione_metabolism	1
+9	Glutathione_metabolism	1
+Lactobacillus	Glutathione_metabolism	2
+4	Glutathione_metabolism	1
+6	Glutathione_metabolism	1
+Oscillospira	Glutathione_metabolism	1
+7	Glutathione_metabolism	2
+3	Glutathione_metabolism	1
+Bacteroides	Glutathione_metabolism	1
+Coprococcus	Glutathione_metabolism	1
+4	Protein_digestion_and_absorption	1
+3	Protein_digestion_and_absorption	1
+Bacteroides	Protein_digestion_and_absorption	1
+4	Cell_cycle_-_Caulobacter	8
+7	Cell_cycle_-_Caulobacter	8
+5	Cell_cycle_-_Caulobacter	7
+Pseudomonas	Cell_cycle_-_Caulobacter	11
+6	Cell_cycle_-_Caulobacter	7
+Ruminococcus	Cell_cycle_-_Caulobacter	6
+Oscillospira	Cell_cycle_-_Caulobacter	7
+3	Cell_cycle_-_Caulobacter	7
+Turicibacter	Cell_cycle_-_Caulobacter	7
+8	Cell_cycle_-_Caulobacter	8
+Bacteroides	Cell_cycle_-_Caulobacter	8
+rc4-4	Cell_cycle_-_Caulobacter	7
+[Ruminococcus]	Cell_cycle_-_Caulobacter	7
+Coprococcus	Cell_cycle_-_Caulobacter	7
+Anaeroplasma	Cell_cycle_-_Caulobacter	2
+9	Cell_cycle_-_Caulobacter	2
+Pseudomonas	Chagas_disease_American_trypanosomiasis	1
+Lactobacillus	Cell_cycle_-_Caulobacter	7
+Pseudomonas	Cationic_antimicrobial_peptide_CAMP_resistance	8
+Lactobacillus	Alanine_aspartate_and_glutamate_metabolism	6
+Pseudomonas	Penicillin_and_cephalosporin_biosynthesis	1
+4	Primary_bile_acid_biosynthesis	1
+Lactobacillus	Primary_bile_acid_biosynthesis	1
+5	Primary_bile_acid_biosynthesis	1
+6	Primary_bile_acid_biosynthesis	2
+Ruminococcus	Primary_bile_acid_biosynthesis	1
+7	Primary_bile_acid_biosynthesis	1
+3	Primary_bile_acid_biosynthesis	1
+Turicibacter	Primary_bile_acid_biosynthesis	1
+Bacteroides	Primary_bile_acid_biosynthesis	1
+rc4-4	Primary_bile_acid_biosynthesis	1
+[Ruminococcus]	Primary_bile_acid_biosynthesis	1
+Coprococcus	Primary_bile_acid_biosynthesis	1
+4	Cationic_antimicrobial_peptide_CAMP_resistance	1
+7	Cationic_antimicrobial_peptide_CAMP_resistance	1
+Lactobacillus	Cationic_antimicrobial_peptide_CAMP_resistance	1
+5	Cationic_antimicrobial_peptide_CAMP_resistance	1
+6	Cationic_antimicrobial_peptide_CAMP_resistance	1
+Ruminococcus	Cationic_antimicrobial_peptide_CAMP_resistance	1
+Oscillospira	Cationic_antimicrobial_peptide_CAMP_resistance	1
+3	Cationic_antimicrobial_peptide_CAMP_resistance	1
+Turicibacter	Cationic_antimicrobial_peptide_CAMP_resistance	1
+Bacteroides	Cationic_antimicrobial_peptide_CAMP_resistance	1
+rc4-4	Cationic_antimicrobial_peptide_CAMP_resistance	1
+[Ruminococcus]	Cationic_antimicrobial_peptide_CAMP_resistance	1
+Coprococcus	Cationic_antimicrobial_peptide_CAMP_resistance	1
+5	Phenylalanine_metabolism	4
+Oscillospira	Phenylalanine_metabolism	4
+6	Phenylalanine_metabolism	5
+7	Phenylalanine_metabolism	3
+Turicibacter	Phenylalanine_metabolism	1
+4	Two-component_system	9
+Lactobacillus	Two-component_system	12
+3	Two-component_system	7
+Bacteroides	Two-component_system	13
+Lactobacillus	Carbon_fixation_pathways_in_prokaryotes	2
+Turicibacter	Carbon_fixation_pathways_in_prokaryotes	2
+Anaeroplasma	Carbon_fixation_pathways_in_prokaryotes	1
+9	Carbon_fixation_pathways_in_prokaryotes	1
+Anaeroplasma	Oxidative_phosphorylation	9
+9	Oxidative_phosphorylation	9
+[Ruminococcus]	Two-component_system	15
+Lactobacillus	Chloroalkane_and_chloroalkene_degradation	1
+Pseudomonas	Chloroalkane_and_chloroalkene_degradation	1
+5	Chloroalkane_and_chloroalkene_degradation	1
+6	Chloroalkane_and_chloroalkene_degradation	1
+Oscillospira	Chloroalkane_and_chloroalkene_degradation	1
+7	Chloroalkane_and_chloroalkene_degradation	1
+Coprococcus	Chloroalkane_and_chloroalkene_degradation	1
+Pseudomonas	Aminobenzoate_degradation	8
+4	beta-Alanine_metabolism	2
+Pseudomonas	beta-Alanine_metabolism	2
+6	beta-Alanine_metabolism	2
+7	beta-Alanine_metabolism	2
+3	beta-Alanine_metabolism	2
+8	beta-Alanine_metabolism	2
+Bacteroides	beta-Alanine_metabolism	2
+rc4-4	beta-Alanine_metabolism	2
+Coprococcus	beta-Alanine_metabolism	2
+7	Lysine_degradation	1
+Ruminococcus	Lysine_degradation	1
+Oscillospira	Lysine_degradation	3
+Turicibacter	Lysine_degradation	3
+rc4-4	Lysine_degradation	1
+Coprococcus	Lysine_degradation	1
+4	Porphyrin_and_chlorophyll_metabolism	5
+Bacteroides	Porphyrin_and_chlorophyll_metabolism	6
+4	Benzoate_degradation	1
+7	Benzoate_degradation	1
+Lactobacillus	Benzoate_degradation	2
+5	Benzoate_degradation	1
+6	Benzoate_degradation	2
+Oscillospira	Benzoate_degradation	1
+Ruminococcus	Benzoate_degradation	1
+Bacteroides	Benzoate_degradation	1
+Coprococcus	Benzoate_degradation	1
+Ruminococcus	Butanoate_metabolism	3
+7	Ascorbate_and_aldarate_metabolism	3
+Turicibacter	Two-component_system	11
+[Ruminococcus]	Butanoate_metabolism	2
+Bacteroides	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	6
+rc4-4	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	8
+Ruminococcus	Phenylalanine_metabolism	3
+4	Tryptophan_metabolism	1
+7	Tryptophan_metabolism	1
+6	Tryptophan_metabolism	1
+3	Tryptophan_metabolism	1
+Turicibacter	Tryptophan_metabolism	1
+Bacteroides	Tryptophan_metabolism	1
+3	Valine_leucine_and_isoleucine_biosynthesis	1
+Pseudomonas	Ascorbate_and_aldarate_metabolism	3
+6	Ascorbate_and_aldarate_metabolism	6
+Lactobacillus	Polyketide_sugar_unit_biosynthesis	1
+3	Propanoate_metabolism	2
+Bacteroides	Propanoate_metabolism	2
+Lactobacillus	Porphyrin_and_chlorophyll_metabolism	1
+4	D-Alanine_metabolism	2
+7	D-Alanine_metabolism	2
+Lactobacillus	D-Alanine_metabolism	4
+5	D-Alanine_metabolism	2
+Pseudomonas	D-Alanine_metabolism	2
+6	D-Alanine_metabolism	2
+Ruminococcus	D-Alanine_metabolism	2
+Oscillospira	D-Alanine_metabolism	2
+3	D-Alanine_metabolism	2
+Turicibacter	D-Alanine_metabolism	2
+8	D-Alanine_metabolism	2
+rc4-4	D-Alanine_metabolism	1
+[Ruminococcus]	D-Alanine_metabolism	2
+Coprococcus	D-Alanine_metabolism	2
+4	D-Glutamine_and_D-glutamate_metabolism	3
+Lactobacillus	D-Glutamine_and_D-glutamate_metabolism	3
+5	D-Glutamine_and_D-glutamate_metabolism	3
+Pseudomonas	D-Glutamine_and_D-glutamate_metabolism	3
+6	D-Glutamine_and_D-glutamate_metabolism	3
+Ruminococcus	D-Glutamine_and_D-glutamate_metabolism	3
+Oscillospira	D-Glutamine_and_D-glutamate_metabolism	3
+7	D-Glutamine_and_D-glutamate_metabolism	3
+3	D-Glutamine_and_D-glutamate_metabolism	3
+Turicibacter	D-Glutamine_and_D-glutamate_metabolism	3
+8	D-Glutamine_and_D-glutamate_metabolism	3
+Bacteroides	D-Glutamine_and_D-glutamate_metabolism	3
+rc4-4	D-Glutamine_and_D-glutamate_metabolism	3
+[Ruminococcus]	D-Glutamine_and_D-glutamate_metabolism	3
+Coprococcus	D-Glutamine_and_D-glutamate_metabolism	3
+8	Galactose_metabolism	1
+rc4-4	Galactose_metabolism	1
+Pseudomonas	Primary_bile_acid_biosynthesis	1
+8	Primary_bile_acid_biosynthesis	1
+rc4-4	Benzoate_degradation	1
+Anaeroplasma	Fructose_and_mannose_metabolism	2
+9	Fructose_and_mannose_metabolism	2
+Ruminococcus	Phosphonate_and_phosphinate_metabolism	3
+3	Lysine_degradation	2
+8	Lysine_degradation	1
+Bacteroides	Lysine_degradation	1
+4	Aminoacyl-tRNA_biosynthesis	19
+7	Aminoacyl-tRNA_biosynthesis	23
+Lactobacillus	Aminoacyl-tRNA_biosynthesis	23
+5	Aminoacyl-tRNA_biosynthesis	24
+Pseudomonas	Aminoacyl-tRNA_biosynthesis	21
+6	Aminoacyl-tRNA_biosynthesis	23
+Ruminococcus	Aminoacyl-tRNA_biosynthesis	22
+Oscillospira	Aminoacyl-tRNA_biosynthesis	23
+3	Aminoacyl-tRNA_biosynthesis	19
+Turicibacter	Aminoacyl-tRNA_biosynthesis	20
+8	Aminoacyl-tRNA_biosynthesis	23
+Bacteroides	Aminoacyl-tRNA_biosynthesis	19
+rc4-4	Aminoacyl-tRNA_biosynthesis	23
+[Ruminococcus]	Aminoacyl-tRNA_biosynthesis	21
+Coprococcus	Aminoacyl-tRNA_biosynthesis	23
+Anaeroplasma	Aminoacyl-tRNA_biosynthesis	21
+9	Aminoacyl-tRNA_biosynthesis	21
+4	Selenocompound_metabolism	2
+Lactobacillus	Selenocompound_metabolism	2
+Ruminococcus	Selenocompound_metabolism	2
+3	Selenocompound_metabolism	2
+8	Selenocompound_metabolism	1
+Bacteroides	Selenocompound_metabolism	2
+rc4-4	Selenocompound_metabolism	1
+Anaeroplasma	Selenocompound_metabolism	2
+9	Selenocompound_metabolism	2
+Anaeroplasma	Porphyrin_and_chlorophyll_metabolism	1
+9	Porphyrin_and_chlorophyll_metabolism	1
+6	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	5
+4	Phenylalanine_metabolism	1
+Bacteroides	Phenylalanine_metabolism	2
+rc4-4	Phenylalanine_metabolism	3
+[Ruminococcus]	Phenylalanine_metabolism	2
+Coprococcus	Phenylalanine_metabolism	1
+5	beta-Alanine_metabolism	1
+Bacteroides	D-Alanine_metabolism	1
+Pseudomonas	Non-homologous_end-joining	2
+6	Non-homologous_end-joining	2
+Ruminococcus	Non-homologous_end-joining	2
+7	Non-homologous_end-joining	1
+Turicibacter	Non-homologous_end-joining	2
+rc4-4	Non-homologous_end-joining	1
+4	DNA_replication	6
+7	DNA_replication	6
+Lactobacillus	DNA_replication	6
+5	DNA_replication	6
+Pseudomonas	DNA_replication	6
+6	DNA_replication	6
+Ruminococcus	DNA_replication	5
+Oscillospira	DNA_replication	6
+3	DNA_replication	6
+Turicibacter	DNA_replication	7
+8	DNA_replication	5
+Bacteroides	DNA_replication	6
+rc4-4	DNA_replication	6
+[Ruminococcus]	DNA_replication	6
+Coprococcus	DNA_replication	6
+Anaeroplasma	DNA_replication	6
+9	DNA_replication	6
+7	ABC_transporters	83
+5	ABC_transporters	65
+Pseudomonas	ABC_transporters	101
+6	ABC_transporters	90
+Oscillospira	ABC_transporters	50
+Ruminococcus	ABC_transporters	39
+Turicibacter	ABC_transporters	50
+8	ABC_transporters	43
+rc4-4	ABC_transporters	36
+Coprococcus	ABC_transporters	61
+Lactobacillus	ABC_transporters	25
+Bacteroides	ABC_transporters	21
+[Ruminococcus]	ABC_transporters	46
+Anaeroplasma	ABC_transporters	10
+9	ABC_transporters	10
+4	ABC_transporters	19
+3	ABC_transporters	14
+rc4-4	Two-component_system	22
+Anaeroplasma	Two-component_system	1
+9	Two-component_system	1
+Pseudomonas	Flagellar_assembly	28
+5	Flagellar_assembly	20
+6	Flagellar_assembly	23
+Oscillospira	Flagellar_assembly	16
+Ruminococcus	Flagellar_assembly	12
+7	Flagellar_assembly	22
+rc4-4	Flagellar_assembly	21
+Coprococcus	Flagellar_assembly	3
+Pseudomonas	Bacterial_chemotaxis	5
+5	Bacterial_chemotaxis	7
+6	Bacterial_chemotaxis	7
+Oscillospira	Bacterial_chemotaxis	6
+Ruminococcus	Bacterial_chemotaxis	5
+7	Bacterial_chemotaxis	7
+rc4-4	Bacterial_chemotaxis	7
+Pseudomonas	Bacterial_secretion_system	24
+8	Bacterial_secretion_system	9
+5	Bacterial_secretion_system	2
+rc4-4	Bacterial_secretion_system	1
+6	beta-Lactam_resistance	1
+[Ruminococcus]	beta-Lactam_resistance	1
+Coprococcus	beta-Lactam_resistance	1
+4	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	6
+Lactobacillus	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	1
+3	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	5
+Coprococcus	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	2
+4	Bacterial_chemotaxis	1
+Bacteroides	Bacterial_chemotaxis	1
+5	Phosphotransferase_system_PTS	5
+6	Phosphotransferase_system_PTS	5
+7	Phosphotransferase_system_PTS	6
+[Ruminococcus]	Phosphotransferase_system_PTS	2
+Coprococcus	Phosphotransferase_system_PTS	6
+Lactobacillus	Phosphotransferase_system_PTS	4
+Oscillospira	Phosphotransferase_system_PTS	2
+Pseudomonas	Phosphotransferase_system_PTS	3
+5	Ascorbate_and_aldarate_metabolism	3
+[Ruminococcus]	Ascorbate_and_aldarate_metabolism	5
+Coprococcus	Ascorbate_and_aldarate_metabolism	4
+Lactobacillus	Lipopolysaccharide_biosynthesis	1
+4	Ribosome	54
+7	Ribosome	54
+Lactobacillus	Ribosome	53
+5	Ribosome	54
+Pseudomonas	Ribosome	50
+6	Ribosome	54
+Ruminococcus	Ribosome	52
+Oscillospira	Ribosome	53
+3	Ribosome	54
+Turicibacter	Ribosome	52
+8	Ribosome	54
+Bacteroides	Ribosome	53
+rc4-4	Ribosome	54
+[Ruminococcus]	Ribosome	52
+Coprococcus	Ribosome	52
+Anaeroplasma	Ribosome	51
+9	Ribosome	51
+4	Protein_export	13
+7	Protein_export	15
+Lactobacillus	Protein_export	10
+5	Protein_export	14
+Pseudomonas	Protein_export	14
+6	Protein_export	12
+Ruminococcus	Protein_export	13
+Oscillospira	Protein_export	10
+3	Protein_export	13
+Turicibacter	Protein_export	10
+8	Protein_export	16
+Bacteroides	Protein_export	13
+rc4-4	Protein_export	12
+[Ruminococcus]	Protein_export	11
+Coprococcus	Protein_export	12
+Anaeroplasma	Protein_export	8
+9	Protein_export	8
+Bacteroides	Ascorbate_and_aldarate_metabolism	1
+Ruminococcus	Ascorbate_and_aldarate_metabolism	1
+Pseudomonas	Vibrio_cholerae_pathogenic_cycle	1
+Anaeroplasma	Thiamine_metabolism	1
+9	Thiamine_metabolism	1
+5	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	2
+7	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	2
+[Ruminococcus]	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	1
+7	Bacterial_secretion_system	1
+6	Bacterial_secretion_system	1
+Ruminococcus	Bacterial_secretion_system	1
+Oscillospira	Bacterial_secretion_system	1
+[Ruminococcus]	Bacterial_secretion_system	1
+Coprococcus	Bacterial_secretion_system	1
+5	Lipopolysaccharide_biosynthesis	4
+6	Lipopolysaccharide_biosynthesis	3
+7	Lipopolysaccharide_biosynthesis	1
+Pseudomonas	Caprolactam_degradation	2
+8	Caprolactam_degradation	1
+Pseudomonas	Atrazine_degradation	1
+6	Atrazine_degradation	1
+Oscillospira	Atrazine_degradation	1
+7	Atrazine_degradation	1
+Pseudomonas	Phosphonate_and_phosphinate_metabolism	4
+5	Phosphonate_and_phosphinate_metabolism	3
+Oscillospira	Phosphonate_and_phosphinate_metabolism	2
+7	Phosphonate_and_phosphinate_metabolism	2
+Bacteroides	Phosphonate_and_phosphinate_metabolism	3
+Coprococcus	Phosphonate_and_phosphinate_metabolism	3
+Lactobacillus	Biotin_metabolism	1
+3	Biotin_metabolism	1
+Turicibacter	Biotin_metabolism	1
+Lactobacillus	Homologous_recombination	9
+6	Homologous_recombination	9
+Turicibacter	Homologous_recombination	9
+Coprococcus	Homologous_recombination	9
+Anaeroplasma	Homologous_recombination	6
+9	Homologous_recombination	6
+[Ruminococcus]	Homologous_recombination	8
+4	Mismatch_repair	5
+7	Mismatch_repair	6
+Lactobacillus	Mismatch_repair	5
+5	Mismatch_repair	6
+6	Mismatch_repair	6
+Ruminococcus	Mismatch_repair	6
+Oscillospira	Mismatch_repair	6
+3	Mismatch_repair	5
+Turicibacter	Mismatch_repair	5
+8	Mismatch_repair	4
+Bacteroides	Mismatch_repair	6
+rc4-4	Mismatch_repair	5
+[Ruminococcus]	Mismatch_repair	6
+Coprococcus	Mismatch_repair	6
+4	beta-Lactam_resistance	2
+Pseudomonas	beta-Lactam_resistance	2
+3	beta-Lactam_resistance	2
+8	beta-Lactam_resistance	2
+Bacteroides	beta-Lactam_resistance	2
+4	Legionellosis	1
+7	Legionellosis	1
+Lactobacillus	Legionellosis	1
+5	Legionellosis	1
+Pseudomonas	Legionellosis	1
+6	Legionellosis	1
+Ruminococcus	Legionellosis	1
+Oscillospira	Legionellosis	1
+3	Legionellosis	1
+Turicibacter	Legionellosis	1
+8	Legionellosis	1
+Bacteroides	Legionellosis	1
+rc4-4	Legionellosis	1
+[Ruminococcus]	Legionellosis	1
+Coprococcus	Legionellosis	1
+Anaeroplasma	Legionellosis	1
+9	Legionellosis	1
+Lactobacillus	RNA_degradation	7
+5	RNA_degradation	8
+6	RNA_degradation	8
+7	RNA_degradation	9
+rc4-4	RNA_degradation	8
+[Ruminococcus]	RNA_degradation	7
+Coprococcus	RNA_degradation	7
+4	Lipoic_acid_metabolism	2
+Pseudomonas	Lipoic_acid_metabolism	2
+3	Lipoic_acid_metabolism	2
+8	Lipoic_acid_metabolism	2
+Bacteroides	Lipoic_acid_metabolism	3
+Turicibacter	RNA_degradation	6
+4	Nucleotide_excision_repair	5
+7	Nucleotide_excision_repair	5
+Lactobacillus	Nucleotide_excision_repair	4
+5	Nucleotide_excision_repair	5
+Pseudomonas	Nucleotide_excision_repair	5
+6	Nucleotide_excision_repair	5
+Ruminococcus	Nucleotide_excision_repair	5
+Oscillospira	Nucleotide_excision_repair	5
+3	Nucleotide_excision_repair	5
+Turicibacter	Nucleotide_excision_repair	5
+8	Nucleotide_excision_repair	5
+Bacteroides	Nucleotide_excision_repair	5
+rc4-4	Nucleotide_excision_repair	5
+[Ruminococcus]	Nucleotide_excision_repair	4
+Coprococcus	Nucleotide_excision_repair	5
+Anaeroplasma	Nucleotide_excision_repair	4
+9	Nucleotide_excision_repair	4
+Oscillospira	RNA_degradation	6
+Ruminococcus	RNA_degradation	5
+8	Cationic_antimicrobial_peptide_CAMP_resistance	2
+4	Ribosome_biogenesis_in_eukaryotes	1
+7	Ribosome_biogenesis_in_eukaryotes	1
+Lactobacillus	Ribosome_biogenesis_in_eukaryotes	1
+5	Ribosome_biogenesis_in_eukaryotes	1
+Pseudomonas	Ribosome_biogenesis_in_eukaryotes	3
+6	Ribosome_biogenesis_in_eukaryotes	1
+Ruminococcus	Ribosome_biogenesis_in_eukaryotes	1
+Oscillospira	Ribosome_biogenesis_in_eukaryotes	1
+3	Ribosome_biogenesis_in_eukaryotes	1
+Turicibacter	Ribosome_biogenesis_in_eukaryotes	1
+8	Ribosome_biogenesis_in_eukaryotes	2
+Bacteroides	Ribosome_biogenesis_in_eukaryotes	1
+rc4-4	Ribosome_biogenesis_in_eukaryotes	1
+[Ruminococcus]	Ribosome_biogenesis_in_eukaryotes	1
+Coprococcus	Ribosome_biogenesis_in_eukaryotes	1
+Anaeroplasma	Ribosome_biogenesis_in_eukaryotes	1
+9	Ribosome_biogenesis_in_eukaryotes	1
+Lactobacillus	Lipoic_acid_metabolism	1
+5	Lipoic_acid_metabolism	1
+6	Lipoic_acid_metabolism	1
+Ruminococcus	Lipoic_acid_metabolism	1
+Oscillospira	Lipoic_acid_metabolism	1
+Turicibacter	Lipoic_acid_metabolism	1
+rc4-4	Lipoic_acid_metabolism	1
+Anaeroplasma	Lipoic_acid_metabolism	1
+9	Lipoic_acid_metabolism	1
+Coprococcus	Lipoic_acid_metabolism	1
+4	Phosphonate_and_phosphinate_metabolism	2
+Lactobacillus	Phosphonate_and_phosphinate_metabolism	1
+6	Phosphonate_and_phosphinate_metabolism	2
+8	Phosphonate_and_phosphinate_metabolism	2
+[Ruminococcus]	Phosphonate_and_phosphinate_metabolism	1
+rc4-4	Taurine_and_hypotaurine_metabolism	2
+8	Aminobenzoate_degradation	1
+5	Drug_metabolism_-_other_enzymes	1
+7	Drug_metabolism_-_other_enzymes	1
+Anaeroplasma	RNA_degradation	4
+9	RNA_degradation	4
+4	Protein_processing_in_endoplasmic_reticulum	2
+7	Protein_processing_in_endoplasmic_reticulum	2
+5	Protein_processing_in_endoplasmic_reticulum	2
+Pseudomonas	Protein_processing_in_endoplasmic_reticulum	2
+6	Protein_processing_in_endoplasmic_reticulum	1
+Ruminococcus	Protein_processing_in_endoplasmic_reticulum	2
+Oscillospira	Protein_processing_in_endoplasmic_reticulum	2
+3	Protein_processing_in_endoplasmic_reticulum	2
+Turicibacter	Protein_processing_in_endoplasmic_reticulum	2
+8	Protein_processing_in_endoplasmic_reticulum	1
+Bacteroides	Protein_processing_in_endoplasmic_reticulum	2
+rc4-4	Protein_processing_in_endoplasmic_reticulum	2
+[Ruminococcus]	Protein_processing_in_endoplasmic_reticulum	1
+Coprococcus	Protein_processing_in_endoplasmic_reticulum	1
+Pseudomonas	Streptomycin_biosynthesis	1
+4	FoxO_signaling_pathway	1
+Pseudomonas	FoxO_signaling_pathway	1
+6	FoxO_signaling_pathway	1
+5	FoxO_signaling_pathway	1
+Oscillospira	FoxO_signaling_pathway	1
+3	FoxO_signaling_pathway	1
+7	FoxO_signaling_pathway	1
+Turicibacter	FoxO_signaling_pathway	1
+8	FoxO_signaling_pathway	1
+Bacteroides	FoxO_signaling_pathway	1
+rc4-4	FoxO_signaling_pathway	1
+Anaeroplasma	FoxO_signaling_pathway	1
+9	FoxO_signaling_pathway	1
+Coprococcus	FoxO_signaling_pathway	1
+5	Peroxisome	1
+6	Peroxisome	1
+7	Peroxisome	1
+Turicibacter	Peroxisome	1
+8	Peroxisome	1
+[Ruminococcus]	Peroxisome	1
+7	Biosynthesis_of_siderophore_group_nonribosomal_peptides	1
+Pseudomonas	Monobactam_biosynthesis	1
+Pseudomonas	Bisphenol_degradation	1
+Pseudomonas	Salmonella_infection	2
+8	Salmonella_infection	2
+3	Phosphonate_and_phosphinate_metabolism	1
+rc4-4	Phosphonate_and_phosphinate_metabolism	1
+Turicibacter	Vitamin_B6_metabolism	2
+Anaeroplasma	Mismatch_repair	1
+9	Mismatch_repair	1
+rc4-4	Nitrotoluene_degradation	2
+8	Starch_and_sucrose_metabolism	1
+7	Insulin_signaling_pathway	1
+6	Insulin_signaling_pathway	1
+Ruminococcus	Insulin_signaling_pathway	1
+Oscillospira	Insulin_signaling_pathway	1
+Turicibacter	Insulin_signaling_pathway	1
+Bacteroides	Insulin_signaling_pathway	1
+[Ruminococcus]	Insulin_signaling_pathway	1
+Coprococcus	Insulin_signaling_pathway	1
+Pseudomonas	Mineral_absorption	1
+6	Mineral_absorption	1
+7	Mineral_absorption	1
+8	Mineral_absorption	1
+rc4-4	Mineral_absorption	1
+Pseudomonas	Pertussis	3
+8	Pertussis	2
+4	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+7	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+5	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+Pseudomonas	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+6	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+Ruminococcus	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+Oscillospira	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+3	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+Turicibacter	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+8	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+Bacteroides	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+rc4-4	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+[Ruminococcus]	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+Coprococcus	Epithelial_cell_signaling_in_Helicobacter_pylori_infection	1
+Ruminococcus	Phosphotransferase_system_PTS	1
+Turicibacter	Phosphotransferase_system_PTS	1
+Anaeroplasma	Phosphotransferase_system_PTS	1
+9	Phosphotransferase_system_PTS	1
+Turicibacter	Ubiquinone_and_other_terpenoid-quinone_biosynthesis	1
+Pseudomonas	Retinol_metabolism	1
+Pseudomonas	Carotenoid_biosynthesis	1
+Ruminococcus	Carotenoid_biosynthesis	1
+Pseudomonas	Biosynthesis_of_unsaturated_fatty_acids	4
+Turicibacter	Biosynthesis_of_unsaturated_fatty_acids	1
+8	Nitrotoluene_degradation	2
+Pseudomonas	Nitrotoluene_degradation	1
+Pseudomonas	Cyanoamino_acid_metabolism	3
+6	Penicillin_and_cephalosporin_biosynthesis	1
+6	Staphylococcus_aureus_infection	1
+Coprococcus	Staphylococcus_aureus_infection	1
+Pseudomonas	Systemic_lupus_erythematosus	1
+5	Carbon_fixation_in_photosynthetic_organisms	1
+Lactobacillus	Riboflavin_metabolism	1
+Ruminococcus	Riboflavin_metabolism	1
+[Ruminococcus]	Riboflavin_metabolism	1
+Anaeroplasma	Riboflavin_metabolism	1
+9	Riboflavin_metabolism	1
+3	Sulfur_metabolism	1
+4	Bacterial_secretion_system	1
+3	Bacterial_secretion_system	1
+Bacteroides	Bacterial_secretion_system	1
+3	Steroid_hormone_biosynthesis	1
+Pseudomonas	Plant-pathogen_interaction	1
+7	Fatty_acid_degradation	1
+Anaeroplasma	Terpenoid_backbone_biosynthesis	1
+9	Terpenoid_backbone_biosynthesis	1
+7	Amoebiasis	1
+5	Amoebiasis	1
+6	Amoebiasis	1
+Oscillospira	Amoebiasis	1
+Coprococcus	Amoebiasis	1
+Lactobacillus	Protein_processing_in_endoplasmic_reticulum	1
+Pseudomonas	Biosynthesis_of_type_II_polyketide_products	1
+Pseudomonas	African_trypanosomiasis	1
+7	African_trypanosomiasis	1
