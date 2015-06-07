@@ -9,8 +9,6 @@
 
   var y = d3.scale.linear()
       .rangeRound([height, 0]);
-
-  var color = d3.scale.category20();
   
   var xAxis = d3.svg.axis()
       .scale(x)
@@ -103,7 +101,7 @@ fB.vizData = function(data){
 
 
 
-fB.Draw = function(stackdata, sampledata){
+fB.Draw = function(stackdata, sampledata, colors){
   var viz = fB.vizData(stackdata);
     //get the x axis set
     svg.append("g")
@@ -157,7 +155,7 @@ fB.Draw = function(stackdata, sampledata){
         .attr("width", x.rangeBand())
         .attr("y", function(d) {return y(d.y1); })
         .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
-        .style("fill", function(d) { return color(d.func); })
+        .style("fill", function(d) { return colors(d.func); })
         .on("mouseover", function(d){
           current_rectangle_data = d3.select(this).datum();
           tempcolor = this.style.fill
