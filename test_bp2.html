@@ -64,7 +64,7 @@ body{
 <script>
 
 
-var width = 1200, height = 600, margin ={b:0, top:20, l:0, left:30, right:30, bottom:20};
+var width = 1200, height = 600, margin ={left:40, right:40, top:20, bottom:20};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -107,6 +107,13 @@ var bpvisdata;
 var SVGs = {};
 SVGs["taxa"] = TaxaTreeG;
 SVGs["func"] = FuncTreeG;
+
+var levelNames = {};
+var curlevelNames = {};
+levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Family", "Order", "Genus"];
+levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+curlevelNames['taxa'] = levelNames['taxa'];
+curlevelNames['func'] = levelNames['func'];
 
 d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
     d3.tsv("taxa_mapping2.txt", function(error, taxa_tree_data){
@@ -220,6 +227,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 			        .key(function(d) { return d.Genus; })
 			        .entries(taxa_tree_data);    
 
+					
 			    var curr_taxa = [];
 			    for (var i = 0; i < taxa_data.length; i++){
 				    curr_taxa.push(taxa_data[i]);
@@ -257,9 +265,29 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 			    taxaroot.values.forEach(collapse);
 				taxaroot.type = 'taxa';
 
-				roots["taxa"] = taxaroot;
+				function countchildren(rootnode) {
+					var totchildren = 0;
+					var addone = 1;
+					if (rootnode.values) {
+						rootnode.values.forEach( function(d) {
+							totchildren = totchildren + countchildren(d);
+						})
+						addone = 0;
+					} 
+					if (rootnode._values) {
+						rootnode._values.forEach( function(d) {
+							totchildren = totchildren + countchildren(d);
+						})
+						addone = 0;
+					}
+					rootnode.Ndescendents = totchildren;
+					return (totchildren + addone);
+				}
 				
-			    update(taxaroot);
+				
+				roots["taxa"] = taxaroot;
+				countchildren(roots["taxa"]);
+			    update(roots["taxa"]);
 
 			    d3.select(self.frameElement).style("height", "800px");
 
@@ -291,19 +319,24 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 			    funcroot = newFunctionData;
 			    funcroot.x0 = height/2;
 			    funcroot.y0 = 0;
+				
 				settype = 'func';
 			    funcroot.values.forEach(collapse);
 				funcroot.type = settype;
-				roots["func"] = funcroot;
 				
-			    update(funcroot);
+				roots["func"] = funcroot;
+				countchildren(roots["func"]);
+			    update(roots['func']);
 
 			    d3.select(self.frameElement).style("height", "800px");
 
+				
+				
+				
+				
 				// Update the tree graphs
 				// Expands or collapses the source node, depending on whether it is currently open or closed
 				function update(source) {
-
 					// Compute the new tree layout.
 					var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
 						links = trees[source.type].links(nodes);
@@ -347,16 +380,67 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 					
 					// Normalize for fixed-depth.
 					var maxDepth = getDepth(roots[source.type]);
+					
+					var depthpos = {};
+					depthpos['taxa'] = [];
+					depthpos['func'] = [];
 					nodes.forEach(function (d) {
 						if (source.type == 'taxa') {
 							//d.y = (d.depth / maxDepth) * treewidth ;
 							if (d.depth == maxDepth) {
 								//d.y = treewidth;
-						}} else {
+							}
+							depthpos['taxa'][d.depth] = d.y;
+
+						} else {
 							//d.y = treewidth - (d.depth / maxDepth) * treewidth;
 							d.y = treewidth - d.y;
+							depthpos['func'][d.depth] = d.y;
 						}
 					}); 
+
+					// figure out which depth levels exist
+					curlevelNames[source.type] = [];
+					for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
+						curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
+					}
+					console.log(curlevelNames[source.type][source.type]);
+					
+					// Update the tree depth labels
+					var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+						.data(curlevelNames[source.type])
+						
+					var newdepthlabels = depthlabels.enter().append("g")
+						.attr("class","depthlabel")
+						.attr("transform", function(d) {
+							return "translate(" + depthpos[source.type][d.depth+1] + "," + 50 + ")";
+						});
+						
+					newdepthlabels.append("text")
+						.text(function (d) {
+							return d.name;
+							})
+						.attr("text-anchor","middle")
+						.attr("visibility", "hidden");
+						
+					var upddepthlabels = depthlabels.transition()
+						.duration(duration)
+						.attr("transform", function(d) {
+							return "translate(" + depthpos[source.type][d.depth+1] + "," + 50 + ")";
+						});
+						
+					upddepthlabels.select("text")
+						.attr("visibility", "visible");
+					
+					var labelexit = depthlabels.exit().transition()
+						.duration(duration)
+						.remove();
+						
+					labelexit.select("text")
+						.attr("visibility","hidden");
+						
+					
+						
 					
 					// Update the nodes…
 					var node = SVGs[source.type].selectAll("g.node")
@@ -402,10 +486,20 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 					}); 
 
 					nodeUpdate.select("circle")
-						.attr("r", 4.5)
+						.attr("r", function (d) {
+							return (4 * Math.sqrt(d.Ndescendents))
+						})
 						.style("fill", function (d) {
-						return d._values ? "lightsteelblue" : "#fff";
-					});
+							if (d.values) {
+							return "#fff";
+							} else {  // has d._values
+								if (d._values[0].hasOwnProperty("key")) {
+									return "lightsteelblue";
+								} else {
+									return "#000"
+								}
+							}
+						});
 
 					/*
 					nodeUpdate.select("text")
@@ -497,8 +591,10 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				// Toggle children on click.
 				function click(d) {
 						if (d.values) { //collapse
-							collapseTree(d);
-							bpvisdata = updateBPgraph();
+							if (d.depth > 0) {//don't collapse the root
+								collapseTree(d);
+								bpvisdata = updateBPgraph();
+							}
 						} else { //expand
 							if (d._values[0].hasOwnProperty('key')) {
 								d.values = d._values;
