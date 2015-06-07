@@ -628,6 +628,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								if (d.values) { //collapse
 									if (d.depth > 0) {//don't collapse the root
 										collapseTree(d);
+										d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
 										bpvisdata = updateBPgraph();
 										console.log(bpvisdata.toSource());
 									}
@@ -652,7 +653,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							if (d.values) {
 								d._values = d.values;
 								d.values = null;
-								d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
 								d._values.forEach(collapseTree);
 							}
 						}
