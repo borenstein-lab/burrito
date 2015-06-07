@@ -1,6 +1,34 @@
 (function(){
   var otu_bar = {};
 
+  var margin = {top: 20, right: 20, bottom: 80, left: 40},
+      width = window.innerWidth - margin.left - margin.right - 250,
+      height = window.innerHeight - margin.top - margin.bottom - 50;
+
+  var x = d3.scale.ordinal()
+      .rangeRoundBands([0, width], .3);
+
+  var y = d3.scale.linear()
+      .rangeRound([height, 0]);
+
+  var color = d3.scale.category20();
+  
+  var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left")
+      .tickFormat(d3.format(".2s"));
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right+250)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
   function get_taxon_abundance(taxon, row, data_cube){
     var leaves = data_cube.get_leaves(taxon, data_cube.taxa_lookup);
     total = 0;
@@ -25,7 +53,7 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(colors, bar_data, width, height, svg){
+  otu_bar.draw = function(colors, bar_data){
 
     var x = d3.scale.ordinal()
       .rangeRoundBands([0, width], .3);
