@@ -131,4 +131,4 @@ Metabolism	Metabolism of other amino acids	Cyanoamino_acid_metabolism
 Human Diseases	Infectious diseases	Amoebiasis
 Human Diseases	Immune diseases	Systemic_lupus_erythematosus
 Human Diseases	Infectious diseases	African_trypanosomiasis
-None	None	None
+Unknown function	Unknown function	Unknown function
