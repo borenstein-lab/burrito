@@ -97,7 +97,7 @@ var diagonal = d3.svg.diagonal()
 
 var NavSVG = d3.select("#navgraph").append("svg")
 	.attr('width',(margin.left + width + margin.right))
-	.attr('height',(margin.bottom + height + margin.top))
+	.attr('height',(margin.bottom + height + margin.top));
 
 var TaxaTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -107,6 +107,16 @@ var bpG = NavSVG.append("g")
 
 var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
+
+var BarSVG = d3.select("#funcbars").append("svg")
+	.attr("width", (margin.left + width+margin.right))
+	.attr("height", (margin.bottom + height + margin.top));
+
+var TaxaBar = BarSVG.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var FunctionBar = BarSVG.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var bpvisdata;
 
@@ -216,7 +226,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 
-						bP.draw(data, bpG);
+						bP.draw(data, bpG, taxa_colors, func_colors);
 
 						//draw the stacked bar
 
@@ -247,7 +257,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						//data_cube.expand_func("Metabolism");
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-						bpvisdata = bP.updateGraph(data, bpG);
+						bpvisdata = bP.updateGraph(data, bpG, taxa_colors, func_colors);
 
 						var taxa_data = d3.nest()
 					        .key(function(d) { return d.Kingdom; })
