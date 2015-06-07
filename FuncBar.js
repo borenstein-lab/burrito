@@ -1,6 +1,6 @@
 !function(){
   var fB = {};
-  var margin = {top: 20, right: 20, bottom: 80, left: 40},
+  var margin = {top: 20, right: 20, bottom: 80, left: 60},
       width = window.innerWidth - margin.left - margin.right - 250,
       height = window.innerHeight - margin.top - margin.bottom - 50;
 
@@ -155,6 +155,7 @@ fB.Draw = function(stackdata, sampledata){
         .on("mouseover", function(d){
           current_rectangle_data = d3.select(this).datum();
           tempcolor = this.style.fill
+          console.log(d3.select(this).style());
           d3.select(this).style("opacity", "0.6");
 
           tooltip.text(" " + current_rectangle_data.func + " ");
