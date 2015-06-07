@@ -171,10 +171,14 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							allSamples.map(function(d){	
 								samples.push({sample:d});
 							});
-							(data_cube.displayed_funcs).map(function(z){
+							var my_displayed_funcs = data_cube.displayed_funcs.slice(0);
+							my_displayed_funcs.reverse();
+							(my_displayed_funcs).map(function(z){
 								funcs.push(z);
 							});
-							(data_cube.displayed_taxa).map(function(t,i){
+							var my_displayed_taxa = data_cube.displayed_taxa.slice(0);
+							my_displayed_taxa.reverse();
+							(my_displayed_taxa).map(function(t,i){
 								taxa.push(t)
 							});
 							//then loop through sequentially to populate an array of all the samples
