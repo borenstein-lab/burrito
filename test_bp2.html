@@ -54,6 +54,11 @@ body{
 	float:top;
 	}
 </style>
+<head>
+<p>Visualizing metagenomic data</p>
+<p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker, </p>
+<p> data from ________ reference </p>
+</head>
 <body>
 <div id="navgraph">   </div>
 <div id="funcbars">   </div>
@@ -65,7 +70,7 @@ body{
 <script>
 
 
-var width = 1200, height = 600, margin ={left:40, right:40, top:20, bottom:20};
+var width = 1200, height = 600, margin ={left:40, right:40, top:50, bottom:20};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -436,7 +441,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var newdepthlabels = depthlabels.enter().append("g")
 								.attr("class","depthlabel")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 5 + ")";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + 5 + ") rotate(-45)";
 								});
 								
 							newdepthlabels.append("text")
@@ -449,7 +454,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var upddepthlabels = depthlabels.transition()
 								.duration(duration)
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 5 + ")";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + 5 + ") rotate(-45)";
 								});
 								
 							upddepthlabels.select("text")
