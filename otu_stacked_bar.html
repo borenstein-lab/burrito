@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+text {
+  font-size: 17px;
+}
+
+form {
+  font-size: 17px;
+}
+
+.x.axis path {
+  display: none;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="data_cube.js"></script>
+<script src="otu_stacked_bar.js"></script>
+<script>
+	var margin = {top: 20, right: 20, bottom: 80, left: 40},
+      width = window.innerWidth - margin.left - margin.right - 250,
+      height = window.innerHeight - margin.top - margin.bottom - 50;
+
+	var svg = d3.select("body").append("svg")
+		.attr("width", width + margin.left + margin.right+250)
+    	.attr("height", height + margin.top + margin.bottom)
+   		.append("g")
+     	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
+    	d3.tsv("taxa_mapping2.txt", function(error, taxa_tree_data){
+    		d3.tsv("function_mapping2.txt", function(error, func_tree_data){
+        		d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+					d3.tsv("reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
+						var data_cube = data_cube_wrapper.make_cube();
+						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
+						var colors = d3.scale.category20();
+						colors.domain(data_cube.displayed_taxa);
+						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+						otu_bar.draw(colors, otu_bar_data, width, height, svg);
+						data_cube.expand_taxon("Bacteria");
+						otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+						otu_bar.draw(colors, otu_bar_data, width, height, svg);
+						data_cube.expand_taxon("Firmicutes");
+						otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+						colors.domain(data_cube.displayed_taxa);
+						otu_bar.draw(colors, otu_bar_data, width, height, svg);
+					});
+				});
+			});
+		});
+	});
+
+</script>
