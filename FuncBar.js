@@ -66,7 +66,6 @@ fB.vizData = function(data){
     })  });
     x.domain(h);
     y.domain([0, 100]);
-    console.log(x.domain);
 
 
    return data;
@@ -74,6 +73,7 @@ fB.vizData = function(data){
 
 
   getSampleGroup = function(samp, sampledata){
+    console.log(sampledata);
     treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
     day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
     if(treatment==="Antibiotic"){
@@ -86,6 +86,8 @@ fB.vizData = function(data){
 
   }
 
+  
+
   var sampleColor = d3.scale.ordinal();
   sampleColor["1"] = "red";
   sampleColor["2"] = "darkred";
@@ -95,7 +97,6 @@ fB.vizData = function(data){
 fB.Draw = function(stackdata, sampledata){
   var viz = fB.vizData(stackdata);
 
-    
     //get the x axis set
     svg.append("g")
         .attr("class", "x axis")
@@ -110,7 +111,7 @@ fB.Draw = function(stackdata, sampledata){
                   });
 
     svg.selectAll("text").style("fill",function(m){
-      return sampleColor[getSampleGroup(m, sampledata)];
+     return sampleColor[getSampleGroup(m, sampledata)];
     });
       //init the tooltip as invisible
     var tooltip = d3.select("body")
