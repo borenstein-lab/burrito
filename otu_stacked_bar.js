@@ -44,7 +44,9 @@
       var bar = {};
       bar.Sample = d.Sample;
       var y0 = 0;
-      bar.taxa = data_cube.displayed_taxa.map(function(name){
+      var my_displayed_taxa = data_cube.displayed_taxa.slice(0);
+      my_displayed_taxa.reverse()
+      bar.taxa = my_displayed_taxa.map(function(name){
         return { name: name, y0: y0, y1: y0 += get_taxon_abundance(name, d, data_cube)};
       });
       bar.total = bar.taxa[bar.taxa.length - 1].y1;
