@@ -32,6 +32,26 @@
       }
     }
 
+    data_cube.get_leaves = function(parent, lookup){
+      var leaves = [];
+
+      // Use a BFS to find the leaves
+      var curr_nodes = [];
+      curr_nodes.push(lookup[parent]);
+      for (; curr_nodes.length > 0;){
+        curr_node = curr_nodes.shift();
+        if (this.is_leaf(curr_node)){
+          leaves.push(curr_node.key);
+        } else {
+          for (var i = 0; i < curr_node.values.length; i++){
+            curr_nodes.push(curr_node.values[i]);
+          }
+        }
+      }
+
+      return leaves;
+    }
+
     // /////////////////////////////////////////////////////////////////////// no_cube_calculate_new_contribution /////////////////////////////////////////////////////////////////////////////////////////////
 
     // // Returns the contribution of the given taxon to the given function relative to the total functional abundance in the given sample
@@ -97,36 +117,8 @@
     data_cube.calculate_new_contribution = function(sample, taxon, func){
 
       // Get the leaf nodes under the give taxon and func
-      var leaf_taxa = [];
-      var leaf_funcs = [];
-
-      // Use a BFS to find the leaf otus
-      var curr_taxa = [];
-      curr_taxa.push(this.taxa_lookup[taxon]);
-      for (; curr_taxa.length > 0;){
-        curr_taxon = curr_taxa.shift();
-        if (this.is_leaf(curr_taxon)){
-          leaf_taxa.push(curr_taxon.key);
-        } else {
-          for (var i = 0; i < curr_taxon.values.length; i++){
-            curr_taxa.push(curr_taxon.values[i]);
-          }
-        }
-      }
-
-      // Use a BFS to find the leaf kos
-      var curr_funcs = [];
-      curr_funcs.push(this.func_lookup[func]);
-      for (; curr_funcs.length > 0;){
-        curr_func = curr_funcs.shift();
-        if (this.is_leaf(curr_func)){
-          leaf_funcs.push(curr_func.key);
-        } else {
-          for (var i = 0; i < curr_func.values.length; i++){
-            curr_funcs.push(curr_func.values[i]);
-          }
-        }
-      }
+      var leaf_taxa = this.get_leaves(taxon, this.taxa_lookup);
+      var leaf_funcs = this.get_leaves(func, this.func_lookup);
 
       // Now sum all the contributions across those leaf otus and leaf kos for the given sample
       var total = 0;
