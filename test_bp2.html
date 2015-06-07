@@ -493,11 +493,15 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							collapseTree(d);
 							bpvisdata = updateBPgraph();
 						} else { //expand
-							d.values = d._values;
-							d._values = null;
-							d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
-							bpvisdata = updateBPgraph();
-					   } 
+							if (d._values[0].hasOwnProperty('key')) {
+								d.values = d._values;
+								d._values = null;
+								d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
+								bpvisdata = updateBPgraph();
+							} else {
+							}
+							
+					   }
 					update(d);
 				}
 
