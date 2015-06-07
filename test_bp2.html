@@ -146,7 +146,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
 
 						
-
 						getLinkData = function(){
 							//get unique linked functions for each taxon
 							allSamples = d3.keys(data_cube.displayed_contribution_cube);
