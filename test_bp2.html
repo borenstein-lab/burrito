@@ -481,7 +481,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 				// Update the bipartite graph after changes to data_cube
 				function updateBPgraph() {
-					console.log(data_cube.displayed_funcs);
 					var bpData = getLinkData();
 					var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 					var visdata = bP.updateGraph(data, bpG);

@@ -16,8 +16,6 @@
 		// 	d3.set(data.map(function(d){ return d[cat2];})).values() //.sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
 		// ];
 		// need to get to match in tree order so may want another way to get unique values
-		console.log(sData.keys[0]);
-		console.log(sData.keys[1]);
 		
 		sData.data = [	sData.keys[0].map( function(d){ return sData.keys[1].map( function(v){ return 0; }); }),
 						sData.keys[1].map( function(d){ return sData.keys[0].map( function(v){ return 0; }); }) 
