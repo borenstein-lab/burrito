@@ -32,6 +32,12 @@ path.link {
    stroke: #ccc;
    stroke-width: 1.5px;
 }
+
+body{
+    font-family: "Verdana", Verdana, sans-serif;
+    font-size:12px;
+}
+
 #csvdata {
    display: none;
 }
@@ -106,6 +112,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
     d3.tsv("taxa_mapping2.txt", function(error, taxa_tree_data){
 		d3.tsv("function_mapping2.txt", function(error, func_tree_data){
 			d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+				d3.tsv("mice_samplemap.txt", function(error, samplemap){
 				//initialize display cube
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
@@ -141,7 +148,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 					var count = 0;
 					var tcount = 0;
 
-					allSamples = d3.keys(data_cube.displayed_contribution_cube);
+					allSamples = d3.keys(data_cube.displayed_contribution_cube).sort();
 					var all_taxa_links = []; //{Taxa:[], Functions:[]};
 					//loop through all the functions
 					//this keeps all functions together
@@ -197,7 +204,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 				var stackData = getFuncBarData();
 
-				fB.Draw(stackData);
+				fB.Draw(stackData, samplemap);
 				//data_cube.expand_taxon("Bacteria");
 				//data_cube.expand_func("Metabolism");
 				var bpData = getLinkData();
@@ -533,7 +540,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				function showInfo(d) {
 					
 				}
-
+				});
 
 			});
 		});
