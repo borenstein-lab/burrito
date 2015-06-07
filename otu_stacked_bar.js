@@ -13,6 +13,12 @@
 
   var color = d3.scale.category20();
   
+  var sampleColor = d3.scale.ordinal();
+  sampleColor["1"] = "red";
+  sampleColor["2"] = "darkred";
+  sampleColor["3"] = "steelblue";
+  sampleColor["4"] = "darkblue";
+
   var xAxis = d3.svg.axis()
       .scale(x)
       .orient("bottom");
@@ -27,6 +33,19 @@
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  getSampleGroup = function(samp, sampledata){
+    treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
+    day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
+    if(treatment==="Antibiotic"){
+      if(day==="2") return "1";
+      else return "2";
+    } else{
+      if(day==="2") return "3";
+      else return "4";
+    }
+
+  }
 
 
   function get_taxon_abundance(taxon, row, data_cube){
@@ -55,7 +74,7 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(colors, bar_data){
+  otu_bar.draw = function(colors, bar_data, sampledata){
 
     var x = d3.scale.ordinal()
       .rangeRoundBands([0, width], .3);
@@ -102,6 +121,10 @@
         return "rotate(-35)"
       });
 
+    svg.selectAll("text").style("fill",function(m){
+      return sampleColor[getSampleGroup(m, sampledata)];
+    });
+
     var Sample = svg.selectAll(".Sample")
       .data(bar_data)
       .enter().append("g")
@@ -147,65 +170,65 @@
       .style("text-anchor", "end")
       .attr("class", "y_label");
 
-    var normalizebox = svg.append("foreignObject")
-      .attr("width", 100)
-      .attr("height", 100)
-      .attr("x", width + 50)
-      .attr("y", height/2)
-      .attr("text", "Raw Repo Counts")
-      .html("<form><input type=checkbox><span>Raw Counts</span></form>")
-      .on("click", function(){
-        if (!normalized) {
-          y.domain([0, 100]);
-          d3.select(".y_label").text("Relative abundance");
-          bar_data.forEach(function(d) {
-            d.taxa.forEach(function(e){
-              e.y0 = Math.round(e.y0/d.total*100*100)/100;
-              e.y1 = Math.round(e.y1/d.total*100*100)/100;
-            })
-          })
-        } else {
-          y.domain([0, d3.max(bar_data, function(d) { 
-            return d.total; 
-          })]);
-          d3.select(".y_label").text("Count");
-          bar_data.forEach(function(d) {
-            d.taxa.forEach(function(e){
-              e.y0 = e.y0*d.total/100;
-              e.y1 = e.y1*d.total/100;
-            })
-          })
-        }
+    // var normalizebox = svg.append("foreignObject")
+    //   .attr("width", 100)
+    //   .attr("height", 100)
+    //   .attr("x", width + 50)
+    //   .attr("y", height/2)
+    //   .attr("text", "Raw Repo Counts")
+    //   .html("<form><input type=checkbox><span>Raw Counts</span></form>")
+    //   .on("click", function(){
+    //     if (!normalized) {
+    //       y.domain([0, 100]);
+    //       d3.select(".y_label").text("Relative abundance");
+    //       bar_data.forEach(function(d) {
+    //         d.taxa.forEach(function(e){
+    //           e.y0 = Math.round(e.y0/d.total*100*100)/100;
+    //           e.y1 = Math.round(e.y1/d.total*100*100)/100;
+    //         })
+    //       })
+    //     } else {
+    //       y.domain([0, d3.max(bar_data, function(d) { 
+    //         return d.total; 
+    //       })]);
+    //       d3.select(".y_label").text("Count");
+    //       bar_data.forEach(function(d) {
+    //         d.taxa.forEach(function(e){
+    //           e.y0 = e.y0*d.total/100;
+    //           e.y1 = e.y1*d.total/100;
+    //         })
+    //       })
+    //     }
 
-        normalized = !normalized;
-        var transition = svg.transition().duration(750);
+    //     normalized = !normalized;
+    //     var transition = svg.transition().duration(750);
 
-        transition.select('.y.axis')
-          .call(yAxis);
+    //     transition.select('.y.axis')
+    //       .call(yAxis);
 
-        svg.selectAll(".Sample").data(bar_data);
+    //     svg.selectAll(".Sample").data(bar_data);
 
-        Sample.selectAll("rect")
-          .data(function(d) { 
-            return d.taxa; 
-          })
-          .transition().duration(750)
-          .attr("width", x.rangeBand())
-          .attr("y", function(d) { 
-            return y(d.y1); 
-          })
-          .attr("height", function(d) { 
-            return y(d.y0) - y(d.y1); 
-          })
-          .style("fill", function(d) { 
-            return colors(d.name); 
-          });
-      });
+    //     Sample.selectAll("rect")
+    //       .data(function(d) { 
+    //         return d.taxa; 
+    //       })
+    //       .transition().duration(750)
+    //       .attr("width", x.rangeBand())
+    //       .attr("y", function(d) { 
+    //         return y(d.y1); 
+    //       })
+    //       .attr("height", function(d) { 
+    //         return y(d.y0) - y(d.y1); 
+    //       })
+    //       .style("fill", function(d) { 
+    //         return colors(d.name); 
+    //       });
+    //   });
 
-    normalizebox.append("div")
-      .style("position", "absolute")
-      .style("z-index", "10")
-      .text("Raw Counts");
+    // normalizebox.append("div")
+    //   .style("position", "absolute")
+    //   .style("z-index", "10")
+    //   .text("Raw Counts");
   };
 
   this.otu_bar = otu_bar;

@@ -218,7 +218,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						var otu_colors = d3.scale.category20();
 						otu_colors.domain(data_cube.displayed_taxa);
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_colors, otu_bar_data);
+						otu_bar.draw(otu_colors, otu_bar_data, samplemap);
 
 
 						function update_otu_bar(){
@@ -376,6 +376,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 											thedat = idxz;
 									}
 									
+									console.log(thedat);
 									if (thedat >= 0) {
 										d.x = bpvisdata.mainBars[dattype][thedat].y;	
 									} else { d.x = 0; 
@@ -428,7 +429,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var newdepthlabels = depthlabels.enter().append("g")
 								.attr("class","depthlabel")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 50 + ")";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + 5 + ")";
 								});
 								
 							newdepthlabels.append("text")
@@ -441,7 +442,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var upddepthlabels = depthlabels.transition()
 								.duration(duration)
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 50 + ")";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + 5 + ")";
 								});
 								
 							upddepthlabels.select("text")
@@ -502,7 +503,11 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 							nodeUpdate.select("circle")
 								.attr("r", function (d) {
-									return (4 * Math.sqrt(d.Ndescendents))
+									if(d._values){
+										return (4 * Math.sqrt(d.Ndescendents))
+									}else{
+										return 4;
+									}
 								})
 								.style("fill", function (d) {
 									if (d.values) {
@@ -609,6 +614,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 									if (d.depth > 0) {//don't collapse the root
 										collapseTree(d);
 										bpvisdata = updateBPgraph();
+										console.log(bpvisdata.toSource());
 									}
 								} else { //expand
 									if (d._values[0].hasOwnProperty('key')) {
