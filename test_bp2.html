@@ -91,7 +91,7 @@ var TaxaTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 var bpG = NavSVG.append("g")
-	.attr("transform","translate("+ (margin.left + treewidth) +","+ margin.top +")");
+	.attr("transform","translate("+ (margin.left + treewidth + 40) +","+ margin.top +")");
 
 var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
@@ -371,6 +371,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						return d._values ? "lightsteelblue" : "#fff";
 					});
 
+					/*
 					nodeEnter.append("text")
 						.attr("x", function (d) {
 						return source.type == 'taxa' ? 10 : -10;
@@ -384,7 +385,8 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							   return d.key;
 					})
 						.style("fill-opacity", 1e-6);
-
+					*/
+					
 					// Transition nodes to their new position.
 					var nodeUpdate = node.transition()
 						.duration(duration)
@@ -398,6 +400,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						return d._values ? "lightsteelblue" : "#fff";
 					});
 
+					/*
 					nodeUpdate.select("text")
 						.style("fill-opacity", function(d) {
 							return d.values ? 0 : 1;
@@ -409,7 +412,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								if(d.key != null)
 							   return d.key;
 							}
-						});
+						}); */
 						
 						
 
@@ -424,8 +427,8 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 					nodeExit.select("circle")
 						.attr("r", 1e-6);
 
-					nodeExit.select("text")
-						.style("fill-opacity", 1e-6);
+				/*	nodeExit.select("text")
+						.style("fill-opacity", 1e-6); */
 
 					
 					// Update the links…

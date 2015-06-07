@@ -1,7 +1,7 @@
 (function(){
 	var bP={};	
 	var b=20, bb=150, height=500, buffMargin=1, minHeight=14;
-	var c1=[-60, 35], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
+	var c1=[-15, 35], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
 	var colors = d3.scale.category20().range();
 	
 	bP.partData = function(data){
@@ -148,7 +148,7 @@
 			.attr("x", c1[p])
 			.attr("y",function(d){ return d.middle+5;})
 			.text(function(d,i){ return data.keys[p][i];})
-			.attr("text-anchor","start" )
+			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.transition().duration(300);
 
 			
@@ -363,7 +363,7 @@
 			selSubBar.style("opacity", 0.1);
 
 		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
-		selectedBar.select(".barlabel").style('font-weight','normal').style("visibility", "hidden");
+		selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
 
 		var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
@@ -396,7 +396,7 @@
 		var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
-		selectedBar.select(".barlabel").style('font-weight','normal').style("visibility", "hidden");
+		selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
 		var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 			.selectAll(".subbar")
 			.filter(function(d,i){ 
