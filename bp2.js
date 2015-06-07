@@ -155,7 +155,7 @@
 			.transition().duration(300);
 
 		data_id = mainbar.map(function(d,i){ return data.keys[p][i]})[0];
-
+		console.log(colors);
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
 			.append("rect").attr("class","subbar")
@@ -163,7 +163,7 @@
 			.attr("y",function(d){ return d.y})
 			.attr("width",b)
 			.attr("height",function(d){ return d.h})
-			.style("fill",function(d){ return colors[data_id];})
+			.style("fill",function(d){ return colors(data_id);})
 			.style("opacity",0.1)
 			.transition().duration(300);
 	}

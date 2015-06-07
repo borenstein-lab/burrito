@@ -229,7 +229,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 
-						bP.draw(data, bpG, taxa_colors, func_colors);
 
 						//draw the stacked bar
 
@@ -239,6 +238,9 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 						otu_bar.draw(otu_bar_data, samplemap, taxa_colors);
+
+
+						bP.draw(data, bpG, taxa_colors, func_colors);
 
 
 						function update_otu_bar(){
@@ -632,7 +634,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						function updateBPgraph() {
 							var bpData = getLinkData();
 							var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-							var visdata = bP.updateGraph(data, bpG);
+							var visdata = bP.updateGraph(data, bpG, taxa_colors, func_colors);
 							return visdata;
 						}
 
