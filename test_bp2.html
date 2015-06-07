@@ -101,10 +101,10 @@ var SVGs = {};
 SVGs["taxa"] = TaxaTreeSVG;
 SVGs["func"] = FuncTreeSVG;
 
-  d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
+d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
     d3.tsv("taxa_mapping2.txt", function(error, taxa_tree_data){
-      d3.tsv("function_mapping2.txt", function(error, func_tree_data){
-        d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+		d3.tsv("function_mapping2.txt", function(error, func_tree_data){
+			d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
 				//initialize display cube
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
@@ -242,231 +242,239 @@ SVGs["func"] = FuncTreeSVG;
 
 			    d3.select(self.frameElement).style("height", "800px");
 
-		function update(source) {
+				function update(source) {
 
-        // Compute the new tree layout.
-		
-        var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
-            links = trees[source.type].links(nodes);
-		
-		var nleaf = 0;
-		nodes.forEach(function (d) {
-			nleaf = nleaf + (d.values ? 0 : 1);
-		})
+					// Compute the new tree layout.
+					
+					var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
+						links = trees[source.type].links(nodes);
+						
+					var nleaf = 0;
+					nodes.forEach(function (d) {
+						nleaf = nleaf + (d.values ? 0 : 1);
+					})
 
-		console.log(nleaf);
-		
-		var leafC = 1;
-		nodes.forEach(function (d) {
-			if (!(d.values)) {
-				var dattype = d.type == "taxa" ? 0 : 1;
-				var thedat = -1;
-				for (i = 0; i < bpvisdata.keys[dattype].length ; i++) {
-					if (d.key == bpvisdata.keys[dattype][i])
-						thedat = i;
+					//console.log(nleaf);
+					
+					var leafC = 1;
+					nodes.forEach(function (d) {
+						if (!(d.values)) { 
+							var dattype = d.type == "taxa" ? 0 : 1;
+							var thedat = -1;
+
+							for (var idxz = 0; idxz < bpvisdata.keys[dattype].length ; idxz++) {
+								if (d.key == bpvisdata.keys[dattype][idxz])
+									thedat = idxz;
+							}
+							
+							if (thedat >= 0) {
+								d.x = bpvisdata.mainBars[dattype][thedat].y;	
+							} else { d.x = 0; 
+							}
+							
+							//d.x = (nleaf - leafC)/nleaf * height;
+							leafC = leafC + 1;
+						} else { 
+							var sumpos = 0;
+							d.values.forEach(function (dc) {
+								sumpos = sumpos + dc.x;
+							})
+							d.x = sumpos / d.values.length; 
+						}
+					})
+					
+					// Normalize for fixed-depth.
+					var maxDepth = getDepth(roots[source.type]);
+					nodes.forEach(function (d) {
+						if (source.type == 'taxa') {
+							d.y = (d.depth / maxDepth) * width ;
+						} else {
+							d.y = width - (d.depth / maxDepth) * width;
+						}
+						
+					});
+					
+					// Update the nodes…
+					var node = SVGs[source.type].selectAll("g.node")
+						.data(nodes, function (d) {
+						return d.id || (d.id = ++i);
+					});
+
+					// Enter any new nodes at the parent's previous position.
+					var nodeEnter = node.enter().append("g")
+						.attr("class", "node")
+						.attr("transform", function (d) {
+							return "translate(" + source.y0 + "," + source.x0 + ")";
+						})
+						.on("click", click);
+
+					nodeEnter.append("circle")
+						.attr("r", 1e-6)
+						.style("fill", function (d) {
+						return d._values ? "lightsteelblue" : "#fff";
+					});
+
+					nodeEnter.append("text")
+						.attr("x", function (d) {
+						return source.type == 'taxa' ? 10 : -10;
+					})
+						.attr("dy", ".35em")
+						.attr("text-anchor", function (d) {
+						return source.type == 'taxa' ? "start" : "end";
+					})
+						.text(function (d) {
+						   if(d.key != null)
+							   return d.key;
+					})
+						.style("fill-opacity", 1e-6);
+
+					// Transition nodes to their new position.
+					
+					var nodeUpdate = node.transition()
+						.duration(duration)
+						.attr("transform", function (d) {
+						return "translate(" + d.y + "," + d.x + ")";
+					}); 
+
+					nodeUpdate.select("circle")
+						.attr("r", 4.5)
+						.style("fill", function (d) {
+						return d._values ? "lightsteelblue" : "#fff";
+					});
+
+					nodeUpdate.select("text")
+						.style("fill-opacity", function(d) {
+							return d.values ? 0 : 1;
+						})
+						.text(function (d) {
+							if( d.values) {
+								return "";
+							} else {
+								if(d.key != null)
+							   return d.key;
+							}
+						});
+						
+						
+
+					// Transition exiting nodes to the parent's new position.
+					
+					var nodeExit = node.exit().transition()
+						.duration(duration)
+						.attr("transform", function (d) {
+						return "translate(" + source.y + "," + source.x + ")";
+					})
+						.remove();
+
+					nodeExit.select("circle")
+						.attr("r", 1e-6);
+
+					nodeExit.select("text")
+						.style("fill-opacity", 1e-6);
+
+					
+					// Update the links…
+					var link = SVGs[source.type].selectAll("path.link")
+						.data(links, function (d) {
+						return d.target.id;
+					});
+
+					// Enter any new links at the parent's previous position.
+					link.enter().insert("path", "g")
+						.attr("class", "link")
+						.attr("d", function (d) {
+						var o = {
+							x: source.x0,
+							y: source.y0
+						};
+						return diagonal({
+							source: o,
+							target: o
+						});
+					});
+
+					// Transition links to their new position.
+					link.transition()
+						.duration(duration)
+						.attr("d", diagonal);
+
+					// Transition exiting nodes to the parent's new position.
+					link.exit().transition()
+						.duration(duration)
+						.attr("d", function (d) {
+						var o = {
+							x: source.x,
+							y: source.y
+						};
+						return diagonal({
+							source: o,
+							target: o
+						});
+					}).remove();
+
+					// Stash the old positions for transition.
+					nodes.forEach(function (d) {
+						//console.log(d.x);
+						//console.log(d.y);
+						d.x0 = d.x;
+						d.y0 = d.y;
+					});
 				}
-				if (thedat >= 0) {
-					d.x = bpvisdata.mainBars[dattype][thedat].y;	
-				} else { d.x = 0; }
+
+				// Update the bipartite graph after changes to data_cube
+				function updateBPgraph() {
+					var bpData = getLinkData();
+					var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+					var visdata = bP.updateGraph(data, svg);
+					return visdata;
+				}
 				
-				//d.x = (nleaf - leafC)/nleaf * height;
-				leafC = leafC + 1;
-			} else {
-				var sumpos = 0;
-				d.values.forEach(function (dc) {
-					sumpos = sumpos + dc.x;
-				})
-				d.x = sumpos / d.values.length;
-			}
-		})
-        // Normalize for fixed-depth.
-		var maxDepth = getDepth(roots[source.type]);
-        nodes.forEach(function (d) {
-			if (source.type == 'taxa') {
-				d.y = (d.depth / maxDepth) * width ;
-			} else {
-				d.y = width - (d.depth / maxDepth) * width;
-			}
-            
-        });
-
-        // Update the nodes…
-        var node = SVGs[source.type].selectAll("g.node")
-            .data(nodes, function (d) {
-            return d.id || (d.id = ++i);
-        });
-
-        // Enter any new nodes at the parent's previous position.
-        var nodeEnter = node.enter().append("g")
-            .attr("class", "node")
-            .attr("transform", function (d) {
-            return "translate(" + source.y0 + "," + source.x0 + ")";
-        })
-            .on("click", click);
-
-        nodeEnter.append("circle")
-            .attr("r", 1e-6)
-            .style("fill", function (d) {
-            return d._values ? "lightsteelblue" : "#fff";
-        });
-
-        nodeEnter.append("text")
-            .attr("x", function (d) {
-            return source.type == 'taxa' ? 10 : -10;
-        })
-            .attr("dy", ".35em")
-            .attr("text-anchor", function (d) {
-            return source.type == 'taxa' ? "start" : "end";
-        })
-            .text(function (d) {
-               if(d.key != null)
-                   return d.key;
-        })
-            .style("fill-opacity", 1e-6);
-
-        // Transition nodes to their new position.
-        var nodeUpdate = node.transition()
-            .duration(duration)
-            .attr("transform", function (d) {
-            return "translate(" + d.y + "," + d.x + ")";
-        });
-
-        nodeUpdate.select("circle")
-            .attr("r", 4.5)
-            .style("fill", function (d) {
-            return d._values ? "lightsteelblue" : "#fff";
-        });
-
-        nodeUpdate.select("text")
-            .style("fill-opacity", function(d) {
-				return d.values ? 0 : 1;
-			})
-			.text(function (d) {
-				if( d.values) {
-					return "";
-				} else {
-					if(d.key != null)
-                   return d.key;
+				// Toggle children on click.
+				function click(d) {
+						if (d.values) { //collapse
+							collapseTree(d);
+							bpvisdata = updateBPgraph();
+						} else { //expand
+							d.values = d._values;
+							d._values = null;
+							d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
+							bpvisdata = updateBPgraph();
+					   } 
+					update(d);
 				}
+				
+				// collapse all children of the collapsing node recursively
+				function collapseTree(d) {
+					if (d.values) {
+						d._values = d.values;
+						d.values = null;
+						d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
+						d._values.forEach(collapseTree);
+					}
+				}
+				
+				// get the total depth of the tree to the deepest leaf
+				function getDepth(rootnode) {
+					var depth = 0;
+					if (rootnode.values) {
+						rootnode.values.forEach(function(d) {
+							var tmpDepth = getDepth(d);
+							if (tmpDepth > depth) {
+								depth = tmpDepth;
+							}
+						})
+					}
+					return 1+depth;
+				}
+				
+				function showInfo(d) {
+					
+				}
+
+
 			});
-
-        // Transition exiting nodes to the parent's new position.
-        var nodeExit = node.exit().transition()
-            .duration(duration)
-            .attr("transform", function (d) {
-            return "translate(" + source.y + "," + source.x + ")";
-        })
-            .remove();
-
-        nodeExit.select("circle")
-            .attr("r", 1e-6);
-
-        nodeExit.select("text")
-            .style("fill-opacity", 1e-6);
-
-        // Update the links…
-        var link = SVGs[source.type].selectAll("path.link")
-            .data(links, function (d) {
-            return d.target.id;
-        });
-
-        // Enter any new links at the parent's previous position.
-        link.enter().insert("path", "g")
-            .attr("class", "link")
-            .attr("d", function (d) {
-            var o = {
-                x: source.x0,
-                y: source.y0
-            };
-            return diagonal({
-                source: o,
-                target: o
-            });
-        });
-
-        // Transition links to their new position.
-        link.transition()
-            .duration(duration)
-            .attr("d", diagonal);
-
-        // Transition exiting nodes to the parent's new position.
-        link.exit()
-        	.transition()
-            .duration(duration)
-            .attr("d", function (d) {
-            var o = {
-                x: source.x,
-                y: source.y
-            };
-            return diagonal({
-                source: o,
-                target: o
-            });
-        }).remove();
-
-        // Stash the old positions for transition.
-        nodes.forEach(function (d) {
-            //console.log(d.x);
-            //console.log(d.y);
-            d.x0 = d.x;
-            d.y0 = d.y;
-        });
-    }
-
-	// Update the bipartite graph after changes to data_cube
-	function updateBPgraph() {
-		var bpData = getLinkData();
-		var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-		var visdata = bP.updateGraph(data, svg);
-		return visdata;
-	}
-	
-    // Toggle children on click.
-    function click(d) {
-            if (d.values) { //collapse
-				collapseTree(d);
-                bpvisdata = updateBPgraph();
-            } else { //expand
-                d.values = d._values;
-                d._values = null;
-				d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
-				bpvisdata = updateBPgraph();
-           } 
-        update(d);
-    }
-	
-	// collapse all children of the collapsing node recursively
-	function collapseTree(d) {
-		if (d.values) {
-			d._values = d.values;
-			d.values = null;
-			d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
-			d._values.forEach(collapseTree);
-		}
-	}
-	
-	// get the total depth of the tree to the deepest leaf
-	function getDepth(rootnode) {
-		var depth = 0;
-		if (rootnode.values) {
-			rootnode.values.forEach(function(d) {
-				var tmpDepth = getDepth(d);
-				if (tmpDepth > depth) {
-					depth = tmpDepth;
-				}
-			})
-		}
-		return 1+depth;
-	}
-	
-	function showInfo(d) {
-		
-	}
-
-
 		});
-    });
-  });
+	});
 });
 
 </script>
