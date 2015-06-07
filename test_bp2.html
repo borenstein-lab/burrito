@@ -189,8 +189,8 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				var taxLevels = d3.keys(taxa_tree_data[0]);
 
 				var bpData = getLinkData();
+				var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 
-				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 				bP.draw(data, bpG);
 
 				//draw the stacked bar
@@ -201,7 +201,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				//data_cube.expand_taxon("Bacteria");
 				//data_cube.expand_func("Metabolism");
 				var bpData = getLinkData();
-				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+				var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 				bpvisdata = bP.updateGraph(data, bpG);
 
 				var taxa_data = d3.nest()
@@ -481,8 +481,9 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 				// Update the bipartite graph after changes to data_cube
 				function updateBPgraph() {
+					console.log(data_cube.displayed_funcs);
 					var bpData = getLinkData();
-					var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+					var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 					var visdata = bP.updateGraph(data, bpG);
 					return visdata;
 				}
