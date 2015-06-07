@@ -122,7 +122,9 @@
       });
 
     svg.selectAll("text").style("fill",function(m){
-      return sampleColor[getSampleGroup(m, sampledata)];
+      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
+        return sampleColor[getSampleGroup(m, sampledata)];        
+      }
     });
 
     var Sample = svg.selectAll(".Sample")

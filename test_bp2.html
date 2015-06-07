@@ -224,7 +224,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						function update_otu_bar(){
 							otu_colors.domain(data_cube.displayed_taxa);
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-							otu_bar.draw(otu_colors, otu_bar_data);
+							otu_bar.draw(otu_colors, otu_bar_data, samplemap);
 						}
 
 						//data_cube.expand_taxon("Bacteria");
