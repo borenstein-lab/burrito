@@ -36,19 +36,16 @@ var color = d3.scale.category20();
 
 fB.vizData = function(data){
 
-    //color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Sample"; }))
     var alldata = [];
     var y0 = 0;
     var y1 = 0;
 
-
     data.forEach(function(d) {
-      //var y1 = data.Contribution;
-      //alldata.push({Sample:d.Sample, Func:d.Func, cont:d.Contribution});
       var y0 = 0;
       var y1 = 0;
       var h = d.length-1;
 
+      //assign values for size of bars
       d.data.forEach(function(e){
 
         e.y0 = y0*100;
@@ -75,12 +72,7 @@ fB.vizData = function(data){
   }
 
 
-////THIS IS WHERE I LEFT OFF
 
-//Now I just need to find a way to actually draw this new data
-
-//New data is an array of objects(203).  Each object contains values and keys inside).
-//Want to map the height to d.y1 - d.y0 and color somehow to the function
 
 fB.Draw = function(stackdata){
   var viz = fB.vizData(stackdata);
@@ -99,7 +91,7 @@ fB.Draw = function(stackdata){
               .attr("transform", function(d) {
                   return "rotate(-35)"
                   });
-
+      //init the tooltip as invisible
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")
@@ -108,7 +100,7 @@ fB.Draw = function(stackdata){
         .text("a simple tooltip");
 
 
-
+        //create a Sample object, creates 28 groups(one for each sample)
     var Sample = svg.selectAll(".Sample")
         .data(viz)
         .enter().append("g")
@@ -116,8 +108,7 @@ fB.Draw = function(stackdata){
         .attr("transform", function(d) {return "translate(" + x(d.Sample) + ",0)"; });
 
 
-
-    console.log(Sample);
+        //create rects for each value, transpose based on sample
     Sample.selectAll("rect")
       .data(function(d) { 
 
@@ -140,14 +131,9 @@ fB.Draw = function(stackdata){
         .on("mouseout", function(){
           return tooltip.style("visibility", "hidden");
 
-           
-
-
-
-
 
         });
-
+//init y-axis
         svg.append("g")
         .attr("class", "y axis")
         .call(yAxis)
@@ -161,18 +147,7 @@ fB.Draw = function(stackdata){
 
 
 
-
-
-
-
 }
-
-//actual graphing
-
-
-
-
-
 
 
 this.fB = fB;
