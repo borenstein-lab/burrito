@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style> /*
+body{ 
+	width:1200px;
+	margin:100px auto;
+}
+svg text{
+	font-size:8pt;
+}
+rect{
+	shape-rendering:crispEdges;
+}
+
+.brush .extent {
+  fill-opacity: .1;
+  stroke: #fff;
+  shape-rendering: crispEdges;
+}
+*/
+.node circle {
+   cursor: pointer;
+   fill: #fff;
+   stroke: steelblue;
+   stroke-width: 1.5px;
+}
+.node text {
+   font-size: 11px;
+}
+path.link {
+   fill: none;
+   stroke: #ccc;
+   stroke-width: 1.5px;
+}
+
+body{
+    font-family: "Verdana", Verdana, sans-serif;
+    font-size:12px;
+}
+
+#csvdata {
+   display: none;
+}
+#taxTree{
+	float:left;
+}
+#bpGraph{
+	float:left;
+}
+#funcTree{
+	float:left;
+}
+#navgraph{
+	float:top;
+	}
+</style>
+<body>
+<div id="navgraph">   </div>
+<div id="funcbars">   </div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="data_cube.js"></script>
+<script src="bp2.js"></script>
+<script src="FuncBar.js"></script>
+<script src="otu_stacked_bar.js"></script>
+<script>
+
+
+var width = 1200, height = 600, margin ={left:40, right:40, top:20, bottom:20};
+var treewidth = width / 3;
+var i = 0,
+    duration = 300,
+    taxaroot,
+	funcroot,
+	roots = {};
+
+var TaxaTree = d3.layout.tree()
+    .children(function (d) { return d.values; })
+    .size([height, treewidth*2/3]);
+
+var FuncTree = d3.layout.tree()
+    .children(function (d) { return d.values;})
+    .size([height, treewidth*2/3]);
+
+var trees = [];
+trees["taxa"] = TaxaTree;
+trees["func"] = FuncTree;
+
+var diagonal = d3.svg.diagonal()
+    .projection(function (d) {
+    return [d.y, d.x];
+});
+
+var NavSVG = d3.select("#navgraph").append("svg")
+	.attr('width',(margin.left + width + margin.right))
+	.attr('height',(margin.bottom + height + margin.top))
+
+var TaxaTreeG = NavSVG.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+var bpG = NavSVG.append("g")
+	.attr("transform","translate("+ (margin.left + treewidth + 40) +","+ margin.top +")");
+
+var FuncTreeG = NavSVG.append("g")
+    .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
+
+var bpvisdata;
+
+var SVGs = {};
+SVGs["taxa"] = TaxaTreeG;
+SVGs["func"] = FuncTreeG;
+
+var levelNames = {};
+var curlevelNames = {};
+levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Family", "Order", "Genus"];
+levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+curlevelNames['taxa'] = levelNames['taxa'];
+curlevelNames['func'] = levelNames['func'];
+
+d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
+    d3.tsv("taxa_mapping2.txt", function(error, taxa_tree_data){
+		d3.tsv("function_mapping2.txt", function(error, func_tree_data){
+			d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+				d3.tsv("mice_samplemap.txt", function(error, samplemap){
+					d3.tsv("reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
+						//initialize display cube
+						var data_cube = data_cube_wrapper.make_cube();
+						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
+
+						
+
+						getLinkData = function(){
+							//get unique linked functions for each taxon
+							allSamples = d3.keys(data_cube.displayed_contribution_cube);
+							var all_taxa_links = []; //{Taxa:[], Functions:[]};
+							data_cube.displayed_taxa.map(function(t,i){
+								data_cube.displayed_funcs.map(function(f,i){
+									var foo = allSamples.map(function(d){
+										return data_cube.get_contribution(d,t,f);
+									})
+									if(d3.sum(foo)!==0){
+										all_taxa_links.push({Taxa:t, Functions:f, numKO:1});
+									}
+								})
+							});
+							return all_taxa_links;
+						}
+
+						//this gets the data for the functional bar chart
+
+						getFuncBarData = function(){
+							var contributions = [];
+							var samples = [];
+							var funcs = [];
+							var taxa = [];
+
+							var all_func_data = [];
+							var count = 0;
+							var tcount = 0;
+
+							allSamples = d3.keys(data_cube.displayed_contribution_cube).sort();
+							var all_taxa_links = []; //{Taxa:[], Functions:[]};
+							//loop through all the functions
+							//this keeps all functions together
+
+							//loop through Samples, funcs and taxa and create arrays of the data
+							allSamples.map(function(d){	
+								samples.push({sample:d});
+							});
+							(data_cube.displayed_funcs).map(function(z){
+								funcs.push(z);
+							});
+							(data_cube.displayed_taxa).map(function(t,i){
+								taxa.push(t)
+							});
+							//then loop through sequentially to populate an array of all the samples
+							samples.map(function(n){
+								funcs.map(function(m){
+
+									taxa.map(function(tt){	
+										contributions.push({func:m, Taxa:tt, Sample:n.sample, contributions:data_cube.get_contribution([n.sample],[tt],[m])});})
+								})
+							var temp = [];
+							contributions.map(function(q){
+								if (q.Sample == n.sample) {
+									temp.push({func:q.func, Taxa:q.Taxa, Sample:q.Sample, contributions:q.contributions});}
+							})
+
+							all_func_data.push({data:temp, Sample:n.sample});
+							count = count + 1
+							});
+							return all_func_data;
+						}
+
+						function sort_nest(x, y){
+							if (x.key < y.key){
+								return -1;
+							} else if (x.key > y.key){
+								return 1;
+							} else {
+								return 0;
+							}
+						}
+
+						//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
+						var taxLevels = d3.keys(taxa_tree_data[0]);
+
+						var bpData = getLinkData();
+						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+
+						bP.draw(data, bpG);
+
+						//draw the stacked bar
+
+						var stackData = getFuncBarData();
+
+						fB.Draw(stackData, samplemap);
+
+						var otu_colors = d3.scale.category20();
+						otu_colors.domain(data_cube.displayed_taxa);
+						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+						otu_bar.draw(otu_colors, otu_bar_data);
+
+
+						function update_otu_bar(){
+							otu_colors.domain(data_cube.displayed_taxa);
+							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+							console.log(otu_bar_data);
+							otu_bar.draw(otu_colors, otu_bar_data);
+						}
+
+						function update_func_bar(){
+								var func_data = getFuncBarData();
+								fB.Draw(func_data, samplemap);
+								console.log(func_data);
+						}
+
+						//data_cube.expand_taxon("Bacteria");
+						//data_cube.expand_func("Metabolism");
+						var bpData = getLinkData();
+						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+						bpvisdata = bP.updateGraph(data, bpG);
+
+						var taxa_data = d3.nest()
+					        .key(function(d) { return d.Kingdom; })
+					        .key(function(d) { return d.Phylum; })
+					        .key(function(d) { return d.Class; })
+					        .key(function(d) { return d.Order; })
+					        .key(function(d) { return d.Family; })
+					        .key(function(d) { return d.Genus; })
+					        .entries(taxa_tree_data);    
+
+							
+					    var curr_taxa = [];
+					    for (var i = 0; i < taxa_data.length; i++){
+						    curr_taxa.push(taxa_data[i]);
+						}
+					    for (; curr_taxa.length > 0;){
+					    	curr_taxon = curr_taxa.shift();
+					    	if (!data_cube.is_leaf(curr_taxon)){
+					    		curr_taxon.values.sort(sort_nest);
+					    		for (var i = 0; i < curr_taxon.values.length; i++){
+					    			curr_taxa.push(curr_taxon.values[i]);
+					    		}
+					    	}
+					    }
+
+					    newTaxaData = {
+					        "key": "All Taxa",
+					        "values": taxa_data,
+					    }
+
+					    taxaroot = newTaxaData;
+					    taxaroot.x0 = height/2;
+					    taxaroot.y0 = 0;
+						
+					    function collapse(d) {
+							d.type = settype;
+					            if (d.values) {
+					                d._values = d.values;
+					                d._values.forEach(collapse);
+					                d.values = null;
+					            }
+					        
+					    }
+						
+						var settype = 'taxa';
+					    taxaroot.values.forEach(collapse);
+						taxaroot.type = 'taxa';
+
+						function countchildren(rootnode) {
+							var totchildren = 0;
+							var addone = 1;
+							if (rootnode.values) {
+								rootnode.values.forEach( function(d) {
+									totchildren = totchildren + countchildren(d);
+								})
+								addone = 0;
+							} 
+							if (rootnode._values) {
+								rootnode._values.forEach( function(d) {
+									totchildren = totchildren + countchildren(d);
+								})
+								addone = 0;
+							}
+							rootnode.Ndescendents = totchildren;
+							return (totchildren + addone);
+						}
+						
+						
+						roots["taxa"] = taxaroot;
+						countchildren(roots["taxa"]);
+					    update(roots["taxa"]);
+
+					    d3.select(self.frameElement).style("height", "800px");
+
+					    var function_data = d3.nest()
+					        .key(function(d) { return d.Category; })
+					        .key(function(d) { return d.SuperPathway; })
+					        .key(function(d) { return d.SubPathway; })
+					        .entries(func_tree_data);  
+
+					    var curr_funcs = [];
+					    for (var i = 0; i < function_data.length; i++){
+						    curr_funcs.push(function_data[i]);
+						}
+					    for (; curr_funcs.length > 0;){
+					    	curr_func = curr_funcs.shift();
+					    	if (!data_cube.is_leaf(curr_func)){
+					    		curr_func.values.sort(sort_nest);
+					    		for (var i = 0; i < curr_func.values.length; i++){
+					    			curr_funcs.push(curr_func.values[i]);
+					    		}
+					    	}
+					    }  
+
+					    newFunctionData = {
+					        "key": "All Functions",
+					        "values": function_data,
+					    }
+
+					    funcroot = newFunctionData;
+					    funcroot.x0 = height/2;
+					    funcroot.y0 = 0;
+						
+						settype = 'func';
+					    funcroot.values.forEach(collapse);
+						funcroot.type = settype;
+						
+						roots["func"] = funcroot;
+						countchildren(roots["func"]);
+					    update(roots['func']);
+
+					    d3.select(self.frameElement).style("height", "800px");
+
+						
+						
+						
+						
+						// Update the tree graphs
+						// Expands or collapses the source node, depending on whether it is currently open or closed
+						function update(source) {
+							// Compute the new tree layout.
+							var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
+								links = trees[source.type].links(nodes);
+								
+							/*
+							var nleaf = 0;
+							nodes.forEach(function (d) {
+								nleaf = nleaf + (d.values ? 0 : 1);
+							})
+
+							//console.log(nleaf);
+							
+							var leafC = 1;
+							*/
+							nodes.forEach(function (d) {
+								if (!(d.values)) { 
+									var dattype = d.type == "taxa" ? 0 : 1;
+									var thedat = -1;
+
+									for (var idxz = 0; idxz < bpvisdata.keys[dattype].length ; idxz++) {
+										if (d.key == bpvisdata.keys[dattype][idxz])
+											thedat = idxz;
+									}
+									
+									if (thedat >= 0) {
+										d.x = bpvisdata.mainBars[dattype][thedat].y;	
+									} else { d.x = 0; 
+									}
+									
+									//d.x = (nleaf - leafC)/nleaf * height;
+									//leafC = leafC + 1;
+								} else { 
+									var sumpos = 0;
+									d.values.forEach(function (dc) {
+										sumpos = sumpos + dc.x;
+									})
+									d.x = sumpos / d.values.length; 
+								}
+							})
+							
+							
+							// Normalize for fixed-depth.
+							var maxDepth = getDepth(roots[source.type]);
+							
+							var depthpos = {};
+							depthpos['taxa'] = [];
+							depthpos['func'] = [];
+							nodes.forEach(function (d) {
+								if (source.type == 'taxa') {
+									//d.y = (d.depth / maxDepth) * treewidth ;
+									if (d.depth == maxDepth) {
+										//d.y = treewidth;
+									}
+									depthpos['taxa'][d.depth] = d.y;
+
+								} else {
+									//d.y = treewidth - (d.depth / maxDepth) * treewidth;
+									d.y = treewidth - d.y;
+									depthpos['func'][d.depth] = d.y;
+								}
+							}); 
+
+							// figure out which depth levels exist
+							curlevelNames[source.type] = [];
+							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
+								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
+							}
+							console.log(curlevelNames[source.type][source.type]);
+							
+							// Update the tree depth labels
+							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+								.data(curlevelNames[source.type])
+								
+							var newdepthlabels = depthlabels.enter().append("g")
+								.attr("class","depthlabel")
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + 50 + ")";
+								});
+								
+							newdepthlabels.append("text")
+								.text(function (d) {
+									return d.name;
+									})
+								.attr("text-anchor","middle")
+								.attr("visibility", "hidden");
+								
+							var upddepthlabels = depthlabels.transition()
+								.duration(duration)
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + 50 + ")";
+								});
+								
+							upddepthlabels.select("text")
+								.attr("visibility", "visible");
+							
+							var labelexit = depthlabels.exit().transition()
+								.duration(duration)
+								.remove();
+								
+							labelexit.select("text")
+								.attr("visibility","hidden");
+								
+							
+								
+							
+							// Update the nodes…
+							var node = SVGs[source.type].selectAll("g.node")
+								.data(nodes, function (d) {
+								return d.id || (d.id = ++i);
+							});
+
+							// Enter any new nodes at the parent's previous position.
+							var nodeEnter = node.enter().append("g")
+								.attr("class", "node")
+								.attr("transform", function (d) {
+									return "translate(" + source.y0 + "," + source.x0 + ")";
+								})
+								.on("click", click);
+
+							nodeEnter.append("circle")
+								.attr("r", 1e-6)
+								.style("fill", function (d) {
+								return d._values ? "lightsteelblue" : "#fff";
+							});
+
+							/*
+							nodeEnter.append("text")
+								.attr("x", function (d) {
+								return source.type == 'taxa' ? 10 : -10;
+							})
+								.attr("dy", ".35em")
+								.attr("text-anchor", function (d) {
+								return source.type == 'taxa' ? "start" : "end";
+							})
+								.text(function (d) {
+								   if(d.key != null)
+									   return d.key;
+							})
+								.style("fill-opacity", 1e-6);
+							*/
+							
+							// Transition nodes to their new position.
+							var nodeUpdate = node.transition()
+								.duration(duration)
+								.attr("transform", function (d) {
+								return "translate(" + d.y + "," + d.x + ")";
+							}); 
+
+							nodeUpdate.select("circle")
+								.attr("r", function (d) {
+									return (4 * Math.sqrt(d.Ndescendents))
+								})
+								.style("fill", function (d) {
+									if (d.values) {
+									return "#fff";
+									} else {  // has d._values
+										if (d._values[0].hasOwnProperty("key")) {
+											return "lightsteelblue";
+										} else {
+											return "#000"
+										}
+									}
+								});
+
+							/*
+							nodeUpdate.select("text")
+								.style("fill-opacity", function(d) {
+									return d.values ? 0 : 1;
+								})
+								.text(function (d) {
+									if( d.values) {
+										return "";
+									} else {
+										if(d.key != null)
+									   return d.key;
+									}
+								}); */
+								
+								
+
+							// Transition exiting nodes to the parent's new position.
+							var nodeExit = node.exit().transition()
+								.duration(duration)
+								.attr("transform", function (d) {
+								return "translate(" + source.y + "," + source.x + ")";
+							})
+								.remove();
+
+							nodeExit.select("circle")
+								.attr("r", 1e-6);
+
+						/*	nodeExit.select("text")
+								.style("fill-opacity", 1e-6); */
+
+							
+							// Update the links…
+							var link = SVGs[source.type].selectAll("path.link")
+								.data(links, function (d) {
+								return d.target.id;
+							});
+
+							// Enter any new links at the parent's previous position.
+							link.enter().insert("path", "g")
+								.attr("class", "link")
+								.attr("d", function (d) {
+								var o = {
+									x: source.x0,
+									y: source.y0
+								};
+								return diagonal({
+									source: o,
+									target: o
+								});
+							});
+
+							// Transition links to their new position.
+							link.transition()
+								.duration(duration)
+								.attr("d", diagonal);
+
+							// Transition exiting nodes to the parent's new position.
+							link.exit().transition()
+								.duration(duration)
+								.attr("d", function (d) {
+								var o = {
+									x: source.x,
+									y: source.y
+								};
+								return diagonal({
+									source: o,
+									target: o
+								});
+							}).remove();
+
+							// Stash the old positions for transition.
+							nodes.forEach(function (d) {
+								//console.log(d.x);
+								//console.log(d.y);
+								d.x0 = d.x;
+								d.y0 = d.y;
+							});
+						}
+
+						// Update the bipartite graph after changes to data_cube
+						function updateBPgraph() {
+							var bpData = getLinkData();
+							var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+							var visdata = bP.updateGraph(data, bpG);
+							return visdata;
+						}
+
+						
+						// Toggle children on click.
+						function click(d) {
+								if (d.values) { //collapse
+									if (d.depth > 0) {//don't collapse the root
+										collapseTree(d);
+										bpvisdata = updateBPgraph();
+									}
+								} else { //expand
+									if (d._values[0].hasOwnProperty('key')) {
+										d.values = d._values;
+										d._values = null;
+										d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
+										bpvisdata = updateBPgraph();
+									} else {
+									}
+									
+							   }
+							update(d);
+							update_otu_bar();
+							update_func_bar();
+						}
+
+						
+						// collapse all children of the collapsing node recursively
+						function collapseTree(d) {
+							if (d.values) {
+								d._values = d.values;
+								d.values = null;
+								d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
+								d._values.forEach(collapseTree);
+							}
+						}
+						
+						// get the total depth of the tree to the deepest leaf
+						function getDepth(rootnode) {
+							var depth = 0;
+							if (rootnode.values) {
+								rootnode.values.forEach(function(d) {
+									var tmpDepth = getDepth(d);
+									if (tmpDepth > depth) {
+										depth = tmpDepth;
+									}
+								})
+							}
+							return 1+depth;
+						}
+						
+						function showInfo(d) {
+							
+						}
+					});
+				});
+			});
+		});
+	});
+});
+
+</script>
+</body>
