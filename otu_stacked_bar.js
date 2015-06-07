@@ -1,7 +1,7 @@
 (function(){
   var otu_bar = {};
 
-  var margin = {top: 20, right: 20, bottom: 80, left: 40},
+  var margin = {top: 20, right: 20, bottom: 80, left: 60},
       width = window.innerWidth - margin.left - margin.right - 250,
       height = window.innerHeight - margin.top - margin.bottom - 50;
 

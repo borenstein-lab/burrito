@@ -7,8 +7,8 @@
 	bP.partData = function(data, displayed_taxa, displayed_funcs){
 		var sData={};
 		var cat1 = d3.keys(data[0])[0], cat2 = d3.keys(data[0])[1], num3 = d3.keys(data[0])[2];
-		console.log(displayed_taxa.toSource());
-		console.log(displayed_funcs.toSource());
+		//console.log(displayed_taxa.toSource());
+		//console.log(displayed_funcs.toSource());
 		sData.keys=[displayed_taxa, displayed_funcs];
 		// sData.keys=[
 		// 	// d3.set(d3.keys(data)).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
