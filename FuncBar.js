@@ -73,7 +73,6 @@ fB.vizData = function(data){
 
 
   getSampleGroup = function(samp, sampledata){
-    console.log(sampledata);
     treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
     day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
     if(treatment==="Antibiotic"){
@@ -111,7 +110,9 @@ fB.Draw = function(stackdata, sampledata){
                   });
 
     svg.selectAll("text").style("fill",function(m){
-     return sampleColor[getSampleGroup(m, sampledata)];
+      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
+        return sampleColor[getSampleGroup(m, sampledata)];        
+      }
     });
       //init the tooltip as invisible
     var tooltip = d3.select("body")
