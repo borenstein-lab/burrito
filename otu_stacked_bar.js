@@ -10,8 +10,6 @@
 
   var y = d3.scale.linear()
       .rangeRound([height, 0]);
-
-  var color = d3.scale.category20();
   
   var sampleColor = d3.scale.ordinal();
   sampleColor["1"] = "red";
@@ -74,7 +72,7 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(colors, bar_data, sampledata){
+  otu_bar.draw = function(bar_data, sampledata, colors){
 
     var x = d3.scale.ordinal()
       .rangeRoundBands([0, width], .3);

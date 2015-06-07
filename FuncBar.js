@@ -9,8 +9,6 @@
 
   var y = d3.scale.linear()
       .rangeRound([height, 0]);
-
-  var color = d3.scale.category20();
   
   var xAxis = d3.svg.axis()
       .scale(x)
@@ -32,8 +30,8 @@
 
 
 //TO DO
-//figure out how to refresh graph
-//also need to zoom in on old function level
+//figure out how to remove old graph
+//
 
 fB.vizData = function(data){
 
@@ -96,9 +94,8 @@ fB.vizData = function(data){
 
 
 
-fB.Draw = function(stackdata, sampledata){
+fB.Draw = function(stackdata, sampledata, colors){
   var viz = fB.vizData(stackdata);
-
     //get the x axis set
     svg.append("g")
         .attr("class", "x axis")
@@ -151,16 +148,14 @@ fB.Draw = function(stackdata, sampledata){
         .attr("width", x.rangeBand())
         .attr("y", function(d) {return y(d.y1); })
         .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
-        .style("fill", function(d) { return color(d.func); })
+        .style("fill", function(d) { return colors(d.func); })
         .on("mouseover", function(d){
           current_rectangle_data = d3.select(this).datum();
           tempcolor = this.style.fill
-          console.log(d3.select(this).style());
           d3.select(this).style("opacity", "0.6");
 
           tooltip.text(" " + current_rectangle_data.func + " ");
           return tooltip.style("visibility", "visible");
-          return Sample.style("fill", "red");
         })
         .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
         .on("mouseout", function(){

@@ -128,7 +128,7 @@
 		};
 	}
 	
-	function drawPart(data, id, p){
+	function drawPart(data, id, p, colors){
 		d3.select("#"+id).append("g").attr("class","part"+p).transition().duration(300)
 			.attr("transform","translate("+( p*(bb+b))+",0)");
 
@@ -154,7 +154,8 @@
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.transition().duration(300);
 
-			
+		data_id = mainbar.map(function(d,i){ return data.keys[p][i]})[0];
+
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
 			.append("rect").attr("class","subbar")
@@ -162,7 +163,7 @@
 			.attr("y",function(d){ return d.y})
 			.attr("width",b)
 			.attr("height",function(d){ return d.h})
-			.style("fill",function(d){ return colors[d.key1];})
+			.style("fill",function(d){ return colors[data_id];})
 			.style("opacity",0.1)
 			.transition().duration(300);
 	}
@@ -176,14 +177,17 @@
 
 	// }
 	
-	function drawEdges(data, id){
+	function drawEdges(data, id, taxa_colors, func_colors){
 		d3.select("#"+id).append("g").attr("class","edges").transition().duration(300).attr("transform","translate("+ b+",0)");
 
-		d3.select("#"+id).select(".edges").selectAll(".edge")
+		edgeBar = d3.select("#"+id).select(".edges").selectAll(".edge")
 			.data(data.edges).enter().append("polygon")
 			.attr("class","edge")
-			.attr("points", edgePolygon)
-			.style("fill",function(d){ return colors[d.key1];})
+			.attr("points", edgePolygon);
+
+		edge_id = edgeBar.map(function(d,i){ return data.keys[0][i];})[0];
+
+		edgeBar.style("fill",function(d){ return taxa_colors[edge_id];})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
 			.on("mouseover", function(d,i){ 
 				d3.select(this).attr("points", edgePolygon2).style("opacity",1);
@@ -231,7 +235,7 @@
 		//
 	}	
 	
-	bP.draw = function(bip, svg){
+	bP.draw = function(bip, svg, taxa_colors, func_colors){
 		svg.append("g")
 			.attr("id", bip.id);
 
@@ -264,9 +268,9 @@
 				//.attr("transform","translate("+ (550*s)+",0)");
 		//console.log(bip.data.data.toSource());		
 		var visData = visualize(bip.data);
-		drawPart(visData, bip.id, 0);
-		drawPart(visData, bip.id, 1); 
-		drawEdges(visData, bip.id);
+		drawPart(visData, bip.id, 0, taxa_colors);
+		drawPart(visData, bip.id, 1, func_colors); 
+		drawEdges(visData, bip.id, taxa_colors, func_colors);
 //		drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
@@ -280,7 +284,7 @@
 
 	}
 	
-	bP.updateGraph = function(bip, svg){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, taxa_colors, func_colors){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
@@ -302,9 +306,9 @@
 		var visData = visualize(bip.data);
 		//updatePart(visData, bip.id, 0);
 		//updatePart(visData, bip.id, 1);
-		drawPart(visData, bip.id, 0);
-		drawPart(visData, bip.id, 1); 
-		drawEdges(visData, bip.id);
+		drawPart(visData, bip.id, 0, taxa_colors);
+		drawPart(visData, bip.id, 1, func_colors); 
+		drawEdges(visData, bip.id, taxa_colors, func_colors);
 		//drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
