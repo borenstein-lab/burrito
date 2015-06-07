@@ -55,6 +55,7 @@ path.link {
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="data_cube.js"></script>
 <script src="bp2.js"></script>
+<script src="FuncBar.js"></script>
 <script>
 
 
@@ -130,6 +131,52 @@ SVGs["func"] = FuncTreeSVG;
 					return all_taxa_links;
 				}
 
+				//this gets the data for the functional bar chart
+
+				getFuncBarData = function(){
+					var contributions = [];
+					var samples = [];
+					var funcs = [];
+					var taxa = [];
+
+					var all_func_data = [];
+					var count = 0;
+					var tcount = 0;
+
+					allSamples = d3.keys(data_cube.displayed_contribution_cube);
+					var all_taxa_links = []; //{Taxa:[], Functions:[]};
+					//loop through all the functions
+					//this keeps all functions together
+
+					//loop through Samples, funcs and taxa and create arrays of the data
+					allSamples.map(function(d){	
+						samples.push({sample:d});
+					});
+					(data_cube.displayed_funcs).map(function(z){
+						funcs.push(z);
+					});
+					(data_cube.displayed_taxa).map(function(t,i){
+						taxa.push(t)
+					});
+					//then loop through sequentially to populate an array of all the samples
+					samples.map(function(n){
+						funcs.map(function(m){
+
+							taxa.map(function(tt){	
+								contributions.push({func:m, Taxa:tt, Sample:n.sample, contributions:data_cube.get_contribution([n.sample],[tt],[m])});})
+						})
+					var temp = [];
+					contributions.map(function(q){
+						if (q.Sample == n.sample) {
+							temp.push({func:q.func, Taxa:q.Taxa, Sample:q.Sample, contributions:q.contributions});}
+					})
+
+					all_func_data.push({data:temp, Sample:n.sample});
+					count = count + 1
+					});
+					return all_func_data;
+				}
+
 				function sort_nest(x, y){
 					if (x.key < y.key){
 						return -1;
@@ -147,6 +194,12 @@ SVGs["func"] = FuncTreeSVG;
 
 				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 				bP.draw(data, svg);
+
+				//draw the stacked bar
+
+				var stackData = getFuncBarData();
+
+				fB.Draw(stackData);
 				//data_cube.expand_taxon("Bacteria");
 				//data_cube.expand_func("Metabolism");
 				var bpData = getLinkData();
@@ -421,6 +474,14 @@ SVGs["func"] = FuncTreeSVG;
 		return visdata;
 	}
 	
+	//update the Function Bar Chart
+	function updatefBChart() {
+		var fBData = getLinkData();
+
+		var updateData = fB.updateGraph(fBData);
+		return updateData;
+
+	}
     // Toggle children on click.
     function click(d) {
             if (d.values) { //collapse

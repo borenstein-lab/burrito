@@ -10,9 +10,7 @@
   var y = d3.scale.linear()
       .rangeRound([height, 0]);
 
-var color = d3.scale.ordinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
+var color = d3.scale.category20();
   var xAxis = d3.svg.axis()
       .scale(x)
       .orient("bottom");
@@ -33,8 +31,8 @@ var color = d3.scale.ordinal()
 
 
 //TO DO
-//figure out how to actually get everything into stacked bar
-//same functions all together
+//figure out how to refresh graph
+//also need to zoom in on old function level
 
 fB.vizData = function(data){
 
@@ -129,7 +127,26 @@ fB.Draw = function(stackdata){
         .attr("width", x.rangeBand())
         .attr("y", function(d) {return y(d.y1); })
         .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
-        .style("fill", function(d) { return color(d.func); });
+        .style("fill", function(d) { return color(d.func); })
+        .on("mouseover", function(d){
+          current_rectangle_data = d3.select(this).datum();
+          tempcolor = this.style.fill
+
+
+          tooltip.text(current_rectangle_data.func + " " + current_rectangle_data.Taxa);
+          return tooltip.style("visibility", "visible");
+        })
+        .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+        .on("mouseout", function(){
+          return tooltip.style("visibility", "hidden");
+
+           
+
+
+
+
+
+        });
 
         svg.append("g")
         .attr("class", "y axis")
@@ -139,16 +156,8 @@ fB.Draw = function(stackdata){
         .attr("y", 6)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
-        .attr("class", "y_label")
+        .attr("class", "y_label");
 
-        
-        .on("mouseover", function(d){
-          current_rectangle_data = d3.select(this).datum();
-          tooltip.text("HEY");
-          return tooltip.style("visibility", "visible");
-        })
-        .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
 
 
 
