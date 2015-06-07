@@ -10,7 +10,8 @@
   var y = d3.scale.linear()
       .rangeRound([height, 0]);
 
-var color = d3.scale.category20();
+  var color = d3.scale.category20();
+  
   var xAxis = d3.svg.axis()
       .scale(x)
       .orient("bottom");
@@ -23,7 +24,7 @@ var color = d3.scale.category20();
   var svg = d3.select("body").append("svg")
       .attr("width", width + margin.left + margin.right+250)
       .attr("height", height + margin.top + margin.bottom)
-    .append("g")
+      .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
@@ -72,11 +73,27 @@ fB.vizData = function(data){
   }
 
 
+  getSampleGroup = function(samp, sampledata){
+    treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
+    day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
+    if(treatment==="Antibiotic"){
+      if(day==="2") return "1";
+      else return "2";
+    } else{
+      if(day==="2") return "3";
+      else return "4";
+    }
 
+  }
 
-fB.Draw = function(stackdata){
+  var sampleColor = d3.scale.ordinal();
+  sampleColor["1"] = "red";
+  sampleColor["2"] = "darkred";
+  sampleColor["3"] = "steelblue";
+  sampleColor["4"] = "darkblue";
+
+fB.Draw = function(stackdata, sampledata){
   var viz = fB.vizData(stackdata);
-
 
     
     //get the x axis set
@@ -91,6 +108,10 @@ fB.Draw = function(stackdata){
               .attr("transform", function(d) {
                   return "rotate(-35)"
                   });
+
+    svg.selectAll("text").style("fill",function(m){
+      return sampleColor[getSampleGroup(m, sampledata)];
+    });
       //init the tooltip as invisible
     var tooltip = d3.select("body")
         .append("div")
