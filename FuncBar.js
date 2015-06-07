@@ -72,6 +72,7 @@ fB.vizData = function(data){
   }
 
 
+
   getSampleGroup = function(samp, sampledata){
     treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
     day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
@@ -92,6 +93,8 @@ fB.vizData = function(data){
   sampleColor["2"] = "darkred";
   sampleColor["3"] = "steelblue";
   sampleColor["4"] = "darkblue";
+
+
 
 fB.Draw = function(stackdata, sampledata){
   var viz = fB.vizData(stackdata);
@@ -120,6 +123,12 @@ fB.Draw = function(stackdata, sampledata){
         .style("position", "absolute")
         .style("z-index", "10")
         .style("visibility", "hidden")
+        .style("background", "lightyellow")
+        .style("opacity", "1")
+        .style("border", "0px")    
+        .style("border-radius", "4px")  
+        .style("padding","2px")
+
         .text("a simple tooltip");
 
 
@@ -132,6 +141,7 @@ fB.Draw = function(stackdata, sampledata){
 
 
         //create rects for each value, transpose based on sample
+
     Sample.selectAll("rect")
       .data(function(d) { 
 
@@ -145,17 +155,25 @@ fB.Draw = function(stackdata, sampledata){
         .on("mouseover", function(d){
           current_rectangle_data = d3.select(this).datum();
           tempcolor = this.style.fill
+          d3.select(this).style("opacity", "0.6");
 
-
-          tooltip.text(current_rectangle_data.func + " " + current_rectangle_data.Taxa);
+          tooltip.text(" " + current_rectangle_data.func + " ");
           return tooltip.style("visibility", "visible");
+          return Sample.style("fill", "red");
         })
         .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
         .on("mouseout", function(){
+          d3.select(this).style("opacity", "1");
           return tooltip.style("visibility", "hidden");
 
 
         });
+
+
+
+
+
+          
 //init y-axis
         svg.append("g")
         .attr("class", "y axis")

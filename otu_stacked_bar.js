@@ -96,6 +96,11 @@
       .style("position", "absolute")
       .style("z-index", "10")
       .style("visibility", "hidden")
+      .style("background", "lightyellow")
+      .style("opacity", "1")
+      .style("border", "0px")    
+      .style("border-radius", "4px")  
+      .style("padding","2px")
       .text("a simple tooltip");
 
     var normalized = true;
@@ -153,12 +158,14 @@
       .on("mouseover", function(d){
         current_rectangle_data = d3.select(this).datum();
         tooltip.text(current_rectangle_data.name);
+        d3.select(this).style("opacity", "0.6");
         return tooltip.style("visibility", "visible");
       })
       .on("mousemove", function(){ 
         return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
       })
       .on("mouseout", function(){
+        d3.select(this).style("opacity", "1");
         return tooltip.style("visibility", "hidden");
       });
 
