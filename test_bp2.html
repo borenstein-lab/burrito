@@ -44,14 +44,13 @@ path.link {
 #funcTree{
 	float:left;
 }
+#navgraph{
+	float:top;
+	}
 </style>
 <body>
-<div id="taxTree">
-</div>
-<div id="bpGraph">
-	</div>
-<div id="funcTree">
-</div>
+<div id="navgraph">   </div>
+<div id="funcbars">   </div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="data_cube.js"></script>
 <script src="bp2.js"></script>
@@ -59,8 +58,8 @@ path.link {
 <script>
 
 
-var width = 400, height = 610, margin ={b:10, top:40, l:80, left:30, right:30, bottom:10};
-
+var width = 1200, height = 600, margin ={b:0, top:20, l:0, left:30, right:30, bottom:20};
+var treewidth = width / 3;
 var i = 0,
     duration = 300,
     taxaroot,
@@ -69,11 +68,11 @@ var i = 0,
 
 var TaxaTree = d3.layout.tree()
     .children(function (d) { return d.values; })
-    .size([height, width/2]);
+    .size([height, treewidth*2/3]);
 
 var FuncTree = d3.layout.tree()
     .children(function (d) { return d.values;})
-    .size([height, width/2]);
+    .size([height, treewidth*2/3]);
 
 var trees = [];
 trees["taxa"] = TaxaTree;
@@ -84,23 +83,24 @@ var diagonal = d3.svg.diagonal()
     return [d.y, d.x];
 });
 
-var TaxaTreeSVG = d3.selectAll("#taxTree").append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var NavSVG = d3.select("#navgraph").append("svg")
+	.attr('width',(margin.left + width + margin.right))
+	.attr('height',(margin.bottom + height + margin.top))
 
-var FuncTreeSVG = d3.select("#funcTree").append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
+var TaxaTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+var bpG = NavSVG.append("g")
+	.attr("transform","translate("+ (margin.left + treewidth) +","+ margin.top +")");
+
+var FuncTreeG = NavSVG.append("g")
+    .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
 
 var bpvisdata;
 
 var SVGs = {};
-SVGs["taxa"] = TaxaTreeSVG;
-SVGs["func"] = FuncTreeSVG;
+SVGs["taxa"] = TaxaTreeG;
+SVGs["func"] = FuncTreeG;
 
 d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
     d3.tsv("taxa_mapping2.txt", function(error, taxa_tree_data){
@@ -110,9 +110,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				var data_cube = data_cube_wrapper.make_cube();
 				data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
 
-				var svg = d3.select("#bpGraph")
-					.append("svg").attr('width',width).attr('height',(height+margin.b+margin.top))
-					.append("g").attr("transform","translate("+ margin.l+","+margin.top+")");
+				
 
 				getLinkData = function(){
 					//get unique linked functions for each taxon
@@ -193,7 +191,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				var bpData = getLinkData();
 
 				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-				bP.draw(data, svg);
+				bP.draw(data, bpG);
 
 				//draw the stacked bar
 
@@ -204,7 +202,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				//data_cube.expand_func("Metabolism");
 				var bpData = getLinkData();
 				var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-				bpvisdata = bP.updateGraph(data, svg);
+				bpvisdata = bP.updateGraph(data, bpG);
 
 				var taxa_data = d3.nest()
 			        .key(function(d) { return d.Kingdom; })
@@ -295,13 +293,15 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 			    d3.select(self.frameElement).style("height", "800px");
 
+				// Update the tree graphs
+				// Expands or collapses the source node, depending on whether it is currently open or closed
 				function update(source) {
 
 					// Compute the new tree layout.
-					
 					var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
 						links = trees[source.type].links(nodes);
 						
+					/*
 					var nleaf = 0;
 					nodes.forEach(function (d) {
 						nleaf = nleaf + (d.values ? 0 : 1);
@@ -310,6 +310,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 					//console.log(nleaf);
 					
 					var leafC = 1;
+					*/
 					nodes.forEach(function (d) {
 						if (!(d.values)) { 
 							var dattype = d.type == "taxa" ? 0 : 1;
@@ -326,7 +327,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							}
 							
 							//d.x = (nleaf - leafC)/nleaf * height;
-							leafC = leafC + 1;
+							//leafC = leafC + 1;
 						} else { 
 							var sumpos = 0;
 							d.values.forEach(function (dc) {
@@ -336,16 +337,19 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						}
 					})
 					
+					
 					// Normalize for fixed-depth.
 					var maxDepth = getDepth(roots[source.type]);
 					nodes.forEach(function (d) {
 						if (source.type == 'taxa') {
-							d.y = (d.depth / maxDepth) * width ;
-						} else {
-							d.y = width - (d.depth / maxDepth) * width;
+							//d.y = (d.depth / maxDepth) * treewidth ;
+							if (d.depth == maxDepth) {
+								//d.y = treewidth;
+						}} else {
+							//d.y = treewidth - (d.depth / maxDepth) * treewidth;
+							d.y = treewidth - d.y;
 						}
-						
-					});
+					}); 
 					
 					// Update the nodes…
 					var node = SVGs[source.type].selectAll("g.node")
@@ -476,7 +480,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 				function updateBPgraph() {
 					var bpData = getLinkData();
 					var data = {data:bP.partData(bpData), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-					var visdata = bP.updateGraph(data, svg);
+					var visdata = bP.updateGraph(data, bpG);
 					return visdata;
 				}
 				
