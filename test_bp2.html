@@ -127,6 +127,10 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 			d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
 				d3.tsv("mice_samplemap.txt", function(error, samplemap){
 					d3.tsv("reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
+
+						var otu_colors = d3.scale.category20();
+						var func_colors = d3.scale.category20();
+
 						//initialize display cube
 						var data_cube = data_cube_wrapper.make_cube();
 						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
@@ -222,24 +226,21 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						var stackData = getFuncBarData();
 
-						fB.Draw(stackData, samplemap);
+						fB.Draw(stackData, samplemap, func_colors);
 
-						var otu_colors = d3.scale.category20();
-						otu_colors.domain(data_cube.displayed_taxa);
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_colors, otu_bar_data, samplemap);
+						otu_bar.draw(otu_bar_data, samplemap, otu_colors);
 
 
 						function update_otu_bar(){
-							otu_colors.domain(data_cube.displayed_taxa);
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
-							otu_bar.draw(otu_colors, otu_bar_data, samplemap);
+							otu_bar.draw(otu_bar_data, samplemap, otu_colors);
 						}
 
 						function update_func_bar(){
 								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap);
+								fB.Draw(func_data, samplemap, func_colors);
 								console.log(func_data);
 						}
 
