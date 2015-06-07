@@ -280,7 +280,7 @@
 
 	}
 	
-	bP.updateGraph = function(bip, svg, colors){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, colors, taxa_colors, func_colors){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
