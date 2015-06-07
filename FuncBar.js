@@ -33,13 +33,6 @@
 //figure out how to remove old graph
 //
 
-fB.update_func_bar = function(samplemap){
-    console.log(d3.selectAll("svg.Sample"));
-    d3.selectAll("svg.g").remove();
-    var func_data = getFuncBarData();
-    fB.Draw(func_data, samplemap);
-            }
-
 fB.vizData = function(data){
 
     var alldata = [];
