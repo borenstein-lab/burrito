@@ -130,7 +130,7 @@
       })
       .on("mouseover", function(d){
         current_rectangle_data = d3.select(this).datum();
-        tooltip.text(current_rectangle_data.name);
+        tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" + (current_rectangle_data.y1-current_rectangle_data.y0)+"%");
         d3.select(this).style("opacity", "0.6");
         return tooltip.style("visibility", "visible");
       })

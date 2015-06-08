@@ -71,7 +71,7 @@ white-space: pre-line;
 <script>
 
 
-var width = 1200, height = 500, margin ={left:40, right:40, top:50, bottom:20, barbottom:80, betwbars:50};
+var width = 1200, height = 500, margin ={left:40, right:40, top:50, bottom:10, bartop:10, barbottom:80, betwbars:50};
 var barDimensions = {width: (width / 2 - margin.betwbars), height: height};
 var treewidth = width / 3;
 var i = 0,
@@ -112,13 +112,13 @@ var FuncTreeG = NavSVG.append("g")
 
 var BarSVG = d3.select("#barsgraph").append("svg")
 	.attr("width", (margin.left + width + margin.right))
-	.attr("height", (margin.barbottom + height + margin.top));
+	.attr("height", (margin.barbottom + height + margin.bartop));
 
 var TaxaBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")");
 
 var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.top + ")");
+	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")");
 
 
 
@@ -244,7 +244,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
 
 
-						bP.draw(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+						bP.draw(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
 
 
 						function update_otu_bar(){
@@ -381,10 +381,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 					    d3.select(self.frameElement).style("height", "800px");
 
-						
-						
-						
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+												
 						// Update the tree graphs
 						// Expands or collapses the source node, depending on whether it is currently open or closed
 						function update(source) {
@@ -412,7 +409,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 											thedat = idxz;
 									}
 									
-									console.log(thedat);
+									//console.log(thedat);
 									if (thedat >= 0) {
 										d.x = bpvisdata.mainBars[dattype][thedat].y;	
 									} else { d.x = 0; 
@@ -469,54 +466,30 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								})
 								.on("click", click)
 								.on("mouseover", function (d) {
-									highlightTree(d, this);
-								
-									if(source.type==="taxa"){
-										m = 0;
-										displayed = data_cube.displayed_taxa;	
-									}  else {
-										m = 1;
-										displayed = data_cube.displayed_funcs;
+									if (~d.values) {
+										if (d.type == 'taxa') {
+											highlightOverall(d.key, "", 1);
+										} else {
+											highlightOverall("", d.key, 2);
+										}
+									} else {
+										highlightTree(d, this);
 									}
-
-									ind = displayed.indexOf(d.key);
-									bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
-
-									// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
-									// 	.selectAll(".mainbar").filter(function(f,i){ 
-									// 	return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
-			
-									// //selectedBar.select(".mainrect").style("stroke-opacity",1);			
-									// selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
-
-									// var selSubBar =  d3.select("#Genomes").select(".part"+m).select(".subbars")
-									// 	.selectAll(".subbar")
-									// 	.filter(function(f,i){
-									// 	return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
-
-									// selSubBar.style("opacity", 1);
-
-									// var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-									// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
-
-									// selectedEdges.attr("points", bP.edgePolygon2).style("opacity", 1);
-
+																	
 
 								})
 								.on("mouseout", function(d) {
-								
-									dehighlightTree(d);
-
-									if(source.type==="taxa"){
-										m = 0;
-										displayed = data_cube.displayed_taxa;	
-									}  else {
-										m = 1;
-										displayed = data_cube.displayed_funcs;
+									if (~d.values) {
+										if (d.type == 'taxa') {
+											dehighlightOverall(d.key, "", 1);
+										} else {
+											dehighlightOverall("", d.key, 2);
+										}
+									} else {
+										dehighlightTree(d, this);
 									}
 
-									ind = displayed.indexOf(d.key);
-									bP.deSelectSegment(m, ind);
+									
 									// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
 									// 	.selectAll(".mainbar").filter(function(f,i){ 
 									// 	return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
@@ -671,7 +644,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
 								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
 							}
-							console.log(curlevelNames[source.type][source.type]);
+							//console.log(curlevelNames[source.type][source.type]);
 							
 							// Update the tree depth labels
 							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
@@ -765,6 +738,131 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							}
 							return 1+depth;
 						}
+						
+						
+						
+						function highlightOverall(taxonName, functionName, highlightwhat) {
+							if (highlightwhat == 1) {
+								// Highlight tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
+									return d.key == taxonName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
+								
+								// Highlight BP graph
+								m = 0;
+								displayed = data_cube.displayed_taxa;
+								ind = displayed.indexOf(taxonName);
+								//console.log(ind);
+								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+							}
+							
+							if (highlightwhat == 2) {
+								// Highlight tree
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
+									return d.key == functionName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
+								
+								// Highlight BP graph
+								m = 1;
+								displayed = data_cube.displayed_funcs;
+								ind = displayed.indexOf(functionName);
+								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+							}
+							
+							if (highlightwhat == 3) {
+							
+							}
+						}
+
+						function dehighlightOverall(taxonName, functionName, highlightwhat) {
+
+							if (highlightwhat == 1) {
+								// dehighlight tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
+								// dehighlight BP graph
+								m = 0;
+								displayed = data_cube.displayed_taxa;	
+								ind = displayed.indexOf(taxonName);
+								bP.deSelectSegment(m, ind);
+							}
+							
+							if (highlightwhat == 2) {
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
+								//dehighlight BP graph
+								m = 1;
+								displayed = data_cube.displayed_funcs;
+								ind = displayed.indexOf(functionName);
+								bP.deSelectSegment(m, ind);
+							}
+							
+							if (highlightwhat == 3) {
+							
+							}
+						}
+
+						function highlightTree( data, thisobj) {
+
+							var thisnode = data;
+							var thisNparents = [];
+							thisNparents.push(thisnode);
+							while (thisnode.parent) {
+								thisnode = thisnode.parent;
+								thisNparents.push(thisnode);
+							}
+							var node = SVGs[data.type].selectAll("g.node");
+							data.thisandparents = node.filter(function (d2) { 
+								var good = false;
+								thisNparents.forEach( function (d4) {
+									if (d2.id == d4.id) {
+										good = true;} 
+										});
+								return good;
+							})
+							
+							data.thisandparents.select("circle")
+								.style("stroke-width", "5")
+								.style("stroke", "green");
+								
+							data.thisandparents.append("text")
+									.text(function (d5) {
+									if (d5.values) {
+										return d5.key 
+									} else {
+										""
+									}
+									})
+									.attr("text-anchor", "middle")
+									.attr("dy", function (d5, isz) {
+										return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") + 6) +  "";
+									});
+									
+						}
+
+						function dehighlightTree(data) {
+							data.thisandparents.select("circle")
+								.style("stroke-width", "1")
+								.style("stroke", "steelblue");
+
+							data.thisandparents.select("text").remove(); 
+						}
+
+
 
 					});
 				});
@@ -773,51 +871,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 	});
 });
 
-function highlightTree( data, thisobj) {
 
-	var thisnode = data;
-	var thisNparents = [];
-	thisNparents.push(thisnode);
-	while (thisnode.parent) {
-		thisnode = thisnode.parent;
-		thisNparents.push(thisnode);
-	}
-	var node = SVGs[data.type].selectAll("g.node");
-	data.thisandparents = node.filter(function (d2) { 
-		var good = false;
-		thisNparents.forEach( function (d4) {
-			if (d2.id == d4.id) {
-				good = true;} 
-				});
-		return good;
-	})
-	
-	data.thisandparents.select("circle")
-		.style("stroke-width", "5")
-		.style("stroke", "green");
-		
-	data.thisandparents.append("text")
-			.text(function (d5) {
-			if (d5.values) {
-				return d5.key 
-			} else {
-				""
-			}
-			})
-			.attr("text-anchor", "middle")
-			.attr("dy", function (d5, isz) {
-				return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") + 6) +  "";
-			});
-			
-}
-
-function dehighlightTree(data) {
-	data.thisandparents.select("circle")
-		.style("stroke-width", "1")
-		.style("stroke", "steelblue");
-
-	data.thisandparents.select("text").remove(); 
-}
 
 </script>
 </body>
