@@ -247,13 +247,16 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 
 						function update_otu_bar(){
+							//remove old graph before redrawing new
+							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
 							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
 						}
 
 						function update_func_bar(){
-								//d3.selectAll("svg.g").remove();
+							//remove old graph before redrawing new
+								FunctionBar.selectAll("g").remove();
 								var func_data = getFuncBarData();
 								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions);
 
@@ -459,7 +462,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var newdepthlabels = depthlabels.enter().append("g")
 								.attr("class","depthlabel")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(-45)";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
 								});
 								
 							newdepthlabels.append("text")
@@ -474,7 +477,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								.duration(duration)
 								.style("font-weight","bold")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(-45)";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
 								});
 								
 							upddepthlabels.select("text")
@@ -528,11 +531,45 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 										
 									d.thisandparents.append("text")
 											.text(function (d5) {
-											return d5.key })
+											if (d5.values) {
+												return d5.key 
+											} else {
+												""
+											}
+											})
 											.attr("text-anchor", "middle")
 											.attr("dy", function (d5, isz) {
 												return "-" + (1* d3.select(this.parentNode).select("circle").attr("r") + 6) +  "";
 											});
+
+									if(source.type==="taxa"){
+										m = 0;
+										displayed = data_cube.displayed_taxa;	
+									}  else {
+										m = 1;
+										displayed = data_cube.displayed_funcs;
+									}
+
+									var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
+										.selectAll(".mainbar").filter(function(f,i){ 
+										return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
+			
+									//selectedBar.select(".mainrect").style("stroke-opacity",1);			
+									selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
+
+									var selSubBar =  d3.select("#Genomes").select(".part"+m).select(".subbars")
+										.selectAll(".subbar")
+										.filter(function(f,i){
+										return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
+
+									selSubBar.style("opacity", 1);
+
+									var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+										.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
+
+									selectedEdges.attr("points", bP.edgePolygon2).style("opacity", 1);
+
+
 								})
 								.on("mouseout", function(d) { 
 								
@@ -541,6 +578,34 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 										.style("stroke", "steelblue");
 
 									d.thisandparents.select("text").remove(); 
+
+									if(source.type==="taxa"){
+										m = 0;
+										displayed = data_cube.displayed_taxa;	
+									}  else {
+										m = 1;
+										displayed = data_cube.displayed_funcs;
+									}
+
+									var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
+										.selectAll(".mainbar").filter(function(f,i){ 
+										return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
+			
+
+									var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
+										.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
+									selSubBar.style("opacity", 0.1);
+
+									//selectedBar.select(".mainrect").style("stroke-opacity",0);			
+									selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
+
+									var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+										.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
+									//console.log(selectedEdges.toSource());
+
+									selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2);
+
+
 									});
 
 							nodeEnter.append("circle")
