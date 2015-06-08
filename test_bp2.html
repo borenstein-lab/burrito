@@ -63,7 +63,8 @@ white-space: pre-line;
 <body>
 <div id="navgraph">   </div>
 <div id="barsgraph">   </div>
-<script src="http://d3js.org/d3.v3.min.js"></script>
+<!--script src="http://d3js.org/d3.v3.min.js"-->
+<script src="d3.v3.min.js"></script>
 <script src="data_cube.js"></script>
 <script src="bp2.js"></script>
 <script src="FuncBar.js"></script>
@@ -71,7 +72,7 @@ white-space: pre-line;
 <script>
 
 
-var width = 1200, height = 500, margin ={left:40, right:40, top:50, bottom:10, bartop:10, barbottom:80, betwbars:50};
+var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10, bartop:10, barbottom:80, betwbars:50};
 var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
 var treewidth = width / 3;
 var i = 0,
@@ -1009,7 +1010,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								.style("stroke-width", "1")
 								.style("stroke", "steelblue");
 
-							data.thisandparents.select("text").remove(); 
+							data.thisandparents.selectAll("text").remove(); 
 						}
 
 
