@@ -202,7 +202,8 @@ fB.select_bars = function(func){
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 1);
+    .style("opacity", 1)
+    .style("width", 16);
 }
 
 fB.deselect_bars = function(func){
@@ -212,7 +213,9 @@ fB.deselect_bars = function(func){
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 0.6);
+    .style("opacity", 0.6)
+    .style("width", 13);
+
 }
 
 fB.select_contribution = function(taxon){
@@ -222,7 +225,9 @@ fB.select_contribution = function(taxon){
     .filter(function(d) {
       return d.Taxa == taxon;
     })
-    .style("opacity", 1);
+    .style("opacity", 1)
+    .style("width", 16);
+
 }
 
 fB.deselect_contribution = function(taxon){
@@ -232,7 +237,9 @@ fB.deselect_contribution = function(taxon){
     .filter(function(d) {
       return d.Taxa == taxon;
     })
-    .style("opacity", 0.6);
+    .style("opacity", 0.6)
+    .style("width", 13);
+
 }
 
 fB.select_single_contribution = function(taxon, func){
@@ -242,7 +249,9 @@ fB.select_single_contribution = function(taxon, func){
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
     })
-    .style("opacity", 1);
+    .style("opacity", 1)
+    .style("width", 16);
+
 }
 
 fB.deselect_single_contribution = function(taxon, func){
@@ -252,7 +261,9 @@ fB.deselect_single_contribution = function(taxon, func){
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
     })
-    .style("opacity", 0.6);
+    .style("opacity", 0.6)
+    .style("width", 13);
+
 }
 
 this.fB = fB;
