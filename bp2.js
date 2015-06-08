@@ -232,7 +232,7 @@
 		//
 	}	
 	
-	bP.draw = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs){
+	bP.draw = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
 		svg.append("g")
 			.attr("id", bip.id);
 
@@ -275,14 +275,25 @@
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
-				.on("mouseover",function(d, i){ return bP.selectSegment(p, i, taxa_colors, func_colors, displayed_taxa, displayed_funcs); })
-				.on("mouseout",function(d, i){ return bP.deSelectSegment(p, i); });	
+				.on("mouseover",function(d, i){ 
+					if (p == 0) {
+						return highlightall(displayed_taxa[i],"",1);
+					} else {
+						return highlightall("", displayed_funcs[i],2);
+				} })						
+				.on("mouseout",function(d, i){ 
+					if (p == 0) {
+						return dehighlightall(displayed_taxa[i],"",1);
+					} else {
+						return dehighlightall("", displayed_funcs[i],2);
+				}
+				});	
 		});
 
 	}
 	
 
-	bP.updateGraph = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
@@ -314,8 +325,19 @@
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
-				.on("mouseover",function(d, i){ return bP.selectSegment(p, i, taxa_colors, func_colors, displayed_taxa, displayed_funcs); })
-				.on("mouseout",function(d, i){ return bP.deSelectSegment(p, i); });	
+				.on("mouseover",function(d, i){ 
+					if (p == 0) {
+						return highlightall(displayed_taxa[i],"",1);
+					} else {
+						return highlightall("", displayed_funcs[i],2);
+				} })						
+				.on("mouseout",function(d, i){ 
+					if (p == 0) {
+						return dehighlightall(displayed_taxa[i],"",1);
+					} else {
+						return dehighlightall("", displayed_funcs[i],2);
+				}
+				});	
 		});
 		
 		return visData;
