@@ -68,11 +68,11 @@ white-space: pre-line;
 <div id="navgraph">   </div>
 <div id="barsgraph">   </div>
 <!--script src="http://d3js.org/d3.v3.min.js"-->
-<script src="/Javascript/d3.v3.min.js"></script>
-<script src="/Javascript/data_cube.js"></script>
-<script src="/Javascript/bp2.js"></script>
-<script src="/Javascript/FuncBar.js"></script>
-<script src="/Javascript/otu_stacked_bar.js"></script>
+<script src="Javascript/d3.v3.min.js"></script>
+<script src="Javascript/data_cube.js"></script>
+<script src="Javascript/bp2.js"></script>
+<script src="Javascript/FuncBar.js"></script>
+<script src="Javascript/otu_stacked_bar.js"></script>
 <script>
 
 
@@ -146,12 +146,12 @@ levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
 curlevelNames['taxa'] = levelNames['taxa'];
 curlevelNames['func'] = levelNames['func'];
 
-d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
-    d3.tsv("/Data/taxa_mapping2.txt", function(error, taxa_tree_data){
-		d3.tsv("/Data/function_mapping2.txt", function(error, func_tree_data){
-			d3.tsv("/Data/reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
-				d3.tsv("/Data/mice_samplemap.txt", function(error, samplemap){
-					d3.tsv("/Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
+d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
+    d3.tsv("Data/taxa_mapping2.txt", function(error, taxa_tree_data){
+		d3.tsv("Data/function_mapping2.txt", function(error, func_tree_data){
+			d3.tsv("Data/reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+				d3.tsv("Data/mice_samplemap.txt", function(error, samplemap){
+					d3.tsv("Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
 
 						var taxa_colors = d3.scale.category20();
 						var func_colors = d3.scale.category20();
