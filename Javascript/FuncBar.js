@@ -112,6 +112,30 @@
   .attr("transform", function(d) {
     return "rotate(-35)"
   });
+  //y axis label
+  svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -50)
+    .attr("x", -110)
+    .attr("font-size",16)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Relative Contribution %");
+
+  //x-axis label
+    svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 470)
+    .attr("x", 300)
+    .attr("font-size",16)
+    .attr("dy", ".75em")
+    .text("Samples");
+
+
+
+
 
   svglink.selectAll("text").style("fill",function(m){
     if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
@@ -202,8 +226,7 @@ fB.select_bars = function(func){
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 1)
-    .style("width", 16);
+    .style("opacity", 1);
 }
 
 fB.deselect_bars = function(func){
@@ -213,8 +236,7 @@ fB.deselect_bars = function(func){
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 0.6)
-    .style("width", 13);
+    .style("opacity", 0.6);
 
 }
 
@@ -225,8 +247,7 @@ fB.select_contribution = function(taxon){
     .filter(function(d) {
       return d.Taxa == taxon;
     })
-    .style("opacity", 1)
-    .style("width", 16);
+    .style("opacity", 1);
 
 }
 
@@ -237,8 +258,7 @@ fB.deselect_contribution = function(taxon){
     .filter(function(d) {
       return d.Taxa == taxon;
     })
-    .style("opacity", 0.6)
-    .style("width", 13);
+    .style("opacity", 0.6);
 
 }
 
@@ -249,8 +269,7 @@ fB.select_single_contribution = function(taxon, func){
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
     })
-    .style("opacity", 1)
-    .style("width", 16);
+    .style("opacity", 1);
 
 }
 
@@ -261,8 +280,7 @@ fB.deselect_single_contribution = function(taxon, func){
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
     })
-    .style("opacity", 0.6)
-    .style("width", 13);
+    .style("opacity", 0.6);
 
 }
 

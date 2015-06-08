@@ -98,6 +98,28 @@
       .attr("transform", function(d) {
         return "rotate(-35)"
       });
+      //y-axis label
+    svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -50)
+    .attr("x", -110)
+    .attr("font-size",16)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Relative Contribution %");
+
+  //x-axis label
+    svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 470)
+    .attr("x", 270)
+    .attr("font-size",15)
+    .attr("font-style","bold")
+    .attr("dy", ".75em")
+    .text("Samples");
+
 
     svglink.selectAll("text").style("fill",function(m){
       if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
@@ -222,8 +244,7 @@
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 1)
-    .style("width", 16);
+    .style("opacity", 1);
 }
 
 otu_bar.deselect_bars = function(taxon){
@@ -233,8 +254,7 @@ otu_bar.deselect_bars = function(taxon){
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 0.7)
-    .style("width", 13);
+    .style("opacity", 0.7);
 }
 
   this.otu_bar = otu_bar;
