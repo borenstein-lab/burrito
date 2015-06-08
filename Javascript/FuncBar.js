@@ -184,6 +184,7 @@
   .attr("y", function(d) {return y(d.y1); })
   .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
   .style("fill", function(d) { return colors(d.func); })
+  .style("opacity", 0.6)
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
     highlight_overall("", current_rectangle_data.func, 2);

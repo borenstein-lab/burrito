@@ -151,6 +151,7 @@
       .style("fill", function(d) { 
         return colors(d.name); 
       })
+      .style("opacity", 0.6)
       .on("mouseover", function(d){
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
