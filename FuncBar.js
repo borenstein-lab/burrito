@@ -86,7 +86,10 @@ fB.Draw = function(stackdata, sampledata, colors, svglink, dims){
 	
   var viz = fB.vizData(stackdata);
     //get the x axis set
+
+
     svglink.append("g")
+        .attr("id", "FuncBar")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis)
@@ -118,10 +121,15 @@ fB.Draw = function(stackdata, sampledata, colors, svglink, dims){
         .text("a simple tooltip");
 
 
+
+
+
+
         //create a Sample object, creates 28 groups(one for each sample)
     var Sample = svglink.selectAll(".Sample")
         .data(viz)
         .enter().append("g")
+        .attr("id","FuncBar")
         .attr("class", "g")
         .attr("transform", function(d) {return "translate(" + x(d.Sample) + ",0)"; });
 
@@ -143,8 +151,7 @@ fB.Draw = function(stackdata, sampledata, colors, svglink, dims){
           tempcolor = this.style.fill
           d3.select(this).style("opacity", "0.6");
 
-          tooltip.text(" " + current_rectangle_data.func + " " + current_rectangle_data.Taxa + " " + current_rectangle_data.contributions*100);
-          console.log(current_rectangle_data);
+          tooltip.html(" " + current_rectangle_data.func + "<br>" + current_rectangle_data.Taxa + " <br>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
         })
         .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
@@ -163,6 +170,8 @@ fB.Draw = function(stackdata, sampledata, colors, svglink, dims){
 //init y-axis
         svglink.append("g")
         .attr("class", "y axis")
+        .attr("id","FuncBar")
+
         .call(yAxis)
       .append("text")
         .attr("transform", "rotate(-90)")
