@@ -105,7 +105,7 @@ var TaxaTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 var bpG = NavSVG.append("g")
-	.attr("transform","translate("+ (margin.left + treewidth + 40) +","+ margin.top +")");
+	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
 
 var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
@@ -392,12 +392,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
 								links = trees[source.type].links(nodes);
 								
-							/*
+
 							var nleaf = 0;
 							nodes.forEach(function (d) {
 								nleaf = nleaf + (d.values ? 0 : 1);
 							})
-
+							/*
 							//console.log(nleaf);
 							
 							var leafC = 1;
@@ -535,11 +535,37 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 									});
 
+							nodeEnter.filter( function(d) { return (~d.values) }).append("rect")
+								.attr("x", function (d) {
+									if (source.type == 'taxa') {
+										return 0; 
+									} else {
+										return (-170 - d.y);
+									}})
+								.attr("width", function(d) {
+									if (source.type == 'taxa') {
+										return "" + (treewidth + margin.left - d.y) + ""
+									} else {
+										return 170+d.y;
+									}})
+								.attr("height", function(d) {
+									return (height / nleaf / 1.5);
+									})
+								.attr("y", function (d) {
+									return (-1 * height / nleaf / 3); })
+								.attr("style","opacity:0")
+								;
+							
 							nodeEnter.append("circle")
 								.attr("r", 1e-6)
 								.style("fill", function (d) {
 								return d._values ? "lightsteelblue" : "#fff";
 							});
+							
+							node.filter( function (d) {
+								return (~d.values) })
+									.filter( function(d) { return d3.select(this).select("rect").empty(); })
+									.append("rect");
 
 							/*
 							nodeEnter.append("text")
@@ -564,6 +590,32 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								return "translate(" + d.y + "," + d.x + ")";
 							}); 
 
+							nodeUpdate.filter( function (d) {return (d.values) } ).selectAll("rect").remove();
+							
+							
+									
+							nodeUpdate.selectAll("rect")
+								.attr("x", function (d) {
+									if (source.type == 'taxa') {
+										return 0; 
+									} else {
+										return (-170 - d.y);
+									}})
+								.attr("width", function(d) {
+									if (source.type == 'taxa') {
+										return "" + (treewidth + margin.left - d.y) + ""
+									} else {
+										return 170+d.y;
+									}})
+								.attr("height", function(d) {
+									return (height / nleaf / 1.5);
+									})
+								.attr("y", function (d) {
+									return (-1 * height / nleaf / 3); })
+								.attr("style","opacity:0")
+								;
+							
+							
 							nodeUpdate.select("circle")
 								.attr("r", function (d) {
 									if(d._values){
@@ -798,7 +850,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								m = 1;
 								displayed = data_cube.displayed_funcs;
 								ind = displayed.indexOf(functionName);
-								console.log(ind);
 								bP.selectSegment(m, ind);
 							}
 							
