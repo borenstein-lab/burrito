@@ -130,8 +130,8 @@
         return colors(d.name); 
       })
       .on("mouseover", function(d){
-        current_rectangle_data = d3.select(this).datum();
-        highlight_overall(current_rectangle_data.taxon, "", 2);
+        var current_rectangle_data = d3.select(this).datum();
+        highlight_overall(current_rectangle_data.name, "", 1);
         tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" + (current_rectangle_data.y1-current_rectangle_data.y0)+"%");
         return tooltip.style("visibility", "visible");
       })
@@ -139,8 +139,8 @@
         return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
       })
       .on("mouseout", function(){
-        current_rectangle_data = d3.select(this).datum();
-        dehighlight_overall(current_rectangle_data.taxon, "", 2);
+        var current_rectangle_data = d3.select(this).datum();
+        dehighlight_overall(current_rectangle_data.name, "", 1);
         return tooltip.style("visibility", "hidden");
       });
 
@@ -220,7 +220,7 @@
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
-      return d.taxon == taxon;
+      return d.name == taxon;
     })
     .style("opacity", 0.6);
 }
@@ -230,7 +230,7 @@ otu_bar.deselect_bars = function(taxon){
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
-      return d.taxon == taxon;
+      return d.name == taxon;
     })
     .style("opacity", 1);
 }

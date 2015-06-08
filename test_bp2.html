@@ -115,10 +115,12 @@ var BarSVG = d3.select("#barsgraph").append("svg")
 	.attr("height", (margin.barbottom + height + margin.bartop));
 
 var TaxaBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")");
+	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")")
+	.attr("id", "taxa_bars");
 
 var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")");
+	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
+	.attr("id", "func_bars");
 
 
 
@@ -238,10 +240,10 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						var stackData = getFuncBarData();
 
-						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions);
+						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
 
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
+						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
 
 
 						bP.draw(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
@@ -252,14 +254,14 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
-							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
+							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
 						}
 
 						function update_func_bar(){
 							//remove old graph before redrawing new
 								FunctionBar.selectAll("g").remove();
 								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions);
+								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
 
 						}
 
@@ -797,6 +799,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								ind = displayed.indexOf(taxonName);
 								//console.log(ind);
 								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+								// Highlight  Taxa Bar Chart
+								otu_bar.select_bars(taxonName);
+
+								// Highlight Function Bar Chart
+								fB.select_contribution(taxonName);
 							}
 							
 							if (highlightwhat == 2) {
@@ -814,10 +822,17 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								displayed = data_cube.displayed_funcs;
 								ind = displayed.indexOf(functionName);
 								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+								// Highlight Function Bar Chart
+								fB.select_bars(functionName);
 							}
 							
 							if (highlightwhat == 3) {
-							
+								// Highlight Taxa Bar Chart
+								otu_bar.select_bars(taxonName);
+
+								// Highlight Function Bar Chart
+								fB.select_single_contribution(taxonName, functionName);
 							}
 						}
 
@@ -835,6 +850,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								displayed = data_cube.displayed_taxa;	
 								ind = displayed.indexOf(taxonName);
 								bP.deSelectSegment(m, ind);
+
+								// dehighlight Taxon Bar Chart
+								otu_bar.deselect_bars(taxonName);
+
+								// dehighligh Function Bar Chart
+								fB.deselect_contribution(taxonName);
 							}
 							
 							if (highlightwhat == 2) {
@@ -848,9 +869,17 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								displayed = data_cube.displayed_funcs;
 								ind = displayed.indexOf(functionName);
 								bP.deSelectSegment(m, ind);
+
+								// dehighlight Function Bar Chart
+								fB.deselect_bars(functionName);
 							}
 							
 							if (highlightwhat == 3) {
+								// dehighlight Taxa Bar Chart
+								otu_bar.deselect_bars(taxonName);
+
+								// dehighlight Function Bar Chart
+								fB.deselect_single_contribution(taxonName, functionName);
 							
 							}
 						}

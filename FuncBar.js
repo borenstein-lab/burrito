@@ -137,7 +137,6 @@
   Sample.selectAll("rect")
   .data(function(d) { 
 
-<<<<<<< HEAD
    return d.data;
  })
   .enter().append("rect")
@@ -149,16 +148,14 @@
   .style("fill", function(d) { return colors(d.func); })
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
-    highlight_overall("", current_rectangle_data.func, 1);
+    highlight_overall("", current_rectangle_data.func, 2);
           tooltip.html("<strong>Function: </strong>" + current_rectangle_data.func + "<br>" + "<strong>Taxa: </strong>" + current_rectangle_data.Taxa + " <br>" + "<strong>Relative Contribution: </strong>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
         })
-    return tooltip.style("visibility", "visible");
-  })
   .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
   .on("mouseout", function(){
     current_rectangle_data = d3.select(this).datum();
-    dehighlight_overall("", current_rectangle_data.func, 1);
+    dehighlight_overall("", current_rectangle_data.func, 2);
     return tooltip.style("visibility", "hidden");
 
 
@@ -206,11 +203,11 @@ fB.deselect_bars = function(func){
 }
 
 fB.select_contribution = function(taxon){
-  d3.select("#func_bars")
+  var selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
-      return d.taxon == taxon;
+      return d.Taxa == taxon;
     })
     .style("opacity", 0.6);
 }
@@ -220,7 +217,7 @@ fB.deselect_contribution = function(taxon){
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
-      return d.taxon == taxon;
+      return d.Taxa == taxon;
     })
     .style("opacity", 1);
 }
@@ -230,7 +227,7 @@ fB.select_single_contribution = function(taxon, func){
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
-      return d.func == func && d.taxon == taxon;
+      return d.func == func && d.Taxa == taxon;
     })
     .style("opacity", 0.6);
 }
@@ -240,7 +237,7 @@ fB.deselect_single_contribution = function(taxon, func){
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
-      return d.func == func && d.taxon == taxon;
+      return d.func == func && d.Taxa == taxon;
     })
     .style("opacity", 1);
 }
