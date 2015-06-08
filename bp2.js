@@ -276,8 +276,8 @@
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
-				.on("mouseover",function(d, i){ return bP.selectSegment(bip, p, i); })
-				.on("mouseout",function(d, i){ return bP.deSelectSegment(bip, p, i); });	
+				.on("mouseover",function(d, i){ return bP.selectSegment(p, i); })
+				.on("mouseout",function(d, i){ return bP.deSelectSegment(p, i); });	
 		});
 
 	}
@@ -315,14 +315,14 @@
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
-				.on("mouseover",function(d, i){ return bP.selectSegment(bip, p, i); })
-				.on("mouseout",function(d, i){ return bP.deSelectSegment(bip, p, i); });	
+				.on("mouseover",function(d, i){ return bP.selectSegment(p, i); })
+				.on("mouseout",function(d, i){ return bP.deSelectSegment(p, i); });	
 		});
 		
 		return visData;
 	} 
 
-	bP.selectSegment = function(k, m, s){ //s # of node, m which side of nodes
+	bP.selectSegment = function(m, s){ //s # of node, m which side of nodes
 			// var newdata =  {keys:[], data:[]};	
 				
 			// newdata.keys = k.data.keys.map( function(d){ return d;});
@@ -334,14 +334,14 @@
 			
 			// transition(visualize(newdata), k.id);
 				
-			var selectedBar = d3.select("#"+k.id).select(".part"+m).select(".mainbars")
+			var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
 				.selectAll(".mainbar").filter(function(d,i){ return (i==s);}); //return sth element of main bar only
 			
 			//selectedBar.select(".mainrect").style("stroke-opacity",1);			
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 ;
 
-			var selSubBar =  d3.select("#"+k.id).select(".part"+m).select(".subbars")
+			var selSubBar =  d3.select("#Genomes").select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
 			//console.log(selSubBar.toSource());
@@ -349,7 +349,7 @@
 
 			selSubBar.style("opacity", 1);
 
-			var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
+			var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 			//console.log(selectedEdges.toSource());
 
@@ -359,19 +359,19 @@
 			//selectedBar.select(".barpercent").style('font-weight','bold');
 	}	
 	
-	bP.deSelectSegment = function(k, m, s){
+	bP.deSelectSegment = function(m, s){
 		//transition(visualize(k.data), k.id);
-		var selectedBar = d3.select("#"+k.id).select(".part"+m).select(".mainbars")
+		var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ return (i==s);});
 
-			var selSubBar = d3.select("#"+k.id).select(".part"+m).select(".subbars").selectAll(".subbar")
+			var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
 			selSubBar.style("opacity", 0.1);
 
 		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
 		selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
 
-		var selectedEdges = d3.select("#"+k.id).select(".edges").selectAll(".edge")
+		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
 
@@ -384,7 +384,7 @@
 	bP.selectEdge = function(id, i, current_data){
 		//bold associated names
 		[0,1].forEach(function(m){
-		var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
+		var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
