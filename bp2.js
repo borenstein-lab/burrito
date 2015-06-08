@@ -158,8 +158,8 @@
 			fontSize=24;	
 		}  else{
 			fontSize = 24/Math.log(data.keys[p].length) + 2;
-			mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
 		}
+		mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
 
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
