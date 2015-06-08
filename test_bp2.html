@@ -244,7 +244,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
 
 
-						bP.draw(data, bpG, taxa_colors, func_colors);
+						bP.draw(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 
 						function update_otu_bar(){
@@ -267,7 +267,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						//data_cube.expand_func("Metabolism");
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-						bpvisdata = bP.updateGraph(data, bpG, taxa_colors, func_colors);
+						bpvisdata = bP.updateGraph(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 						var taxa_data = d3.nest()
 					        .key(function(d) { return d.Kingdom; })
@@ -471,8 +471,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								.on("mouseover", function (d) {
 									highlightTree(d, this);
 								
-									
-
 									if(source.type==="taxa"){
 										m = 0;
 										displayed = data_cube.displayed_taxa;	
@@ -482,8 +480,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 									}
 
 									ind = displayed.indexOf(d.key);
-									console.log(ind);
-									bP.selectSegment(m, ind);
+									bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 									// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
 									// 	.selectAll(".mainbar").filter(function(f,i){ 
@@ -716,7 +713,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						function updateBPgraph() {
 							var bpData = getLinkData();
 							var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-							var visdata = bP.updateGraph(data, bpG, taxa_colors, func_colors);
+							var visdata = bP.updateGraph(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 							return visdata;
 						}
 
