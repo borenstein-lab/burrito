@@ -831,6 +831,23 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							}
 							
 							if (highlightwhat == 3) {
+								//highlight taxa tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
+									return d.key == taxonName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
+								
+								//highlight function tree
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
+									return d.key == functionName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
 							
 							}
 						}
@@ -865,7 +882,18 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							}
 							
 							if (highlightwhat == 3) {
-							
+								// dehighlight taxa tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
+								//dehighlight function tree
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
 							}
 						}
 
