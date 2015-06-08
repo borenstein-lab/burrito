@@ -1,33 +1,15 @@
 !function(){
   var fB = {};
-  var margin = {top: 20, right: 20, bottom: 80, left: 60},
-      width = window.innerWidth - margin.left - margin.right - 250,
-      height = window.innerHeight - margin.top - margin.bottom - 50;
 
-  var x = d3.scale.ordinal()
-      .rangeRoundBands([0, width], .3);
-
+  var x = d3.scale.ordinal();
   var y = d3.scale.linear()
-      .rangeRound([height, 0]);
-  
+      
   var xAxis = d3.svg.axis()
-      .scale(x)
       .orient("bottom");
 
   var yAxis = d3.svg.axis()
-      .scale(y)
       .orient("left")
       .tickFormat(d3.format(".2s"));
-
-  var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right+250)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-
-
 
 //TO DO
 //figure out how to remove old graph
@@ -94,10 +76,17 @@ fB.vizData = function(data){
 
 
 
-fB.Draw = function(stackdata, sampledata, colors){
+fB.Draw = function(stackdata, sampledata, colors, svglink, dims){
+	
+	x.rangeRoundBands([0, dims.width], .3);
+	y.rangeRound([dims.height, 0]);
+	
+	xAxis.scale(x);
+	yAxis.scale(y);
+	
   var viz = fB.vizData(stackdata);
     //get the x axis set
-    svg.append("g")
+    svglink.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis)
@@ -109,7 +98,7 @@ fB.Draw = function(stackdata, sampledata, colors){
                   return "rotate(-35)"
                   });
 
-    svg.selectAll("text").style("fill",function(m){
+    svglink.selectAll("text").style("fill",function(m){
       if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
         return sampleColor[getSampleGroup(m, sampledata)];        
       }
@@ -130,7 +119,7 @@ fB.Draw = function(stackdata, sampledata, colors){
 
 
         //create a Sample object, creates 28 groups(one for each sample)
-    var Sample = svg.selectAll(".Sample")
+    var Sample = svglink.selectAll(".Sample")
         .data(viz)
         .enter().append("g")
         .attr("class", "g")
@@ -171,7 +160,7 @@ fB.Draw = function(stackdata, sampledata, colors){
 
           
 //init y-axis
-        svg.append("g")
+        svglink.append("g")
         .attr("class", "y axis")
         .call(yAxis)
       .append("text")

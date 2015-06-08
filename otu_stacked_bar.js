@@ -1,36 +1,11 @@
 (function(){
   var otu_bar = {};
 
-  var margin = {top: 20, right: 20, bottom: 80, left: 60},
-      width = window.innerWidth - margin.left - margin.right - 250,
-      height = window.innerHeight - margin.top - margin.bottom - 50;
-
-  var x = d3.scale.ordinal()
-      .rangeRoundBands([0, width], .3);
-
-  var y = d3.scale.linear()
-      .rangeRound([height, 0]);
-  
   var sampleColor = d3.scale.ordinal();
   sampleColor["1"] = "red";
   sampleColor["2"] = "darkred";
   sampleColor["3"] = "steelblue";
   sampleColor["4"] = "darkblue";
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .tickFormat(d3.format(".2s"));
-
-  var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right+250)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   getSampleGroup = function(samp, sampledata){
     treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
@@ -72,13 +47,13 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(bar_data, sampledata, colors){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims){
 
     var x = d3.scale.ordinal()
-      .rangeRoundBands([0, width], .3);
+      .rangeRoundBands([0, dims.width], .3);
 
     var y = d3.scale.linear()
-      .rangeRound([height, 0]);
+      .rangeRound([dims.height, 0]);
 
     var xAxis = d3.svg.axis()
       .scale(x)
@@ -112,7 +87,7 @@
       })
     })
 
-    svg.append("g")
+    svglink.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
@@ -124,13 +99,13 @@
         return "rotate(-35)"
       });
 
-    svg.selectAll("text").style("fill",function(m){
+    svglink.selectAll("text").style("fill",function(m){
       if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
         return sampleColor[getSampleGroup(m, sampledata)];        
       }
     });
 
-    var Sample = svg.selectAll(".Sample")
+    var Sample = svglink.selectAll(".Sample")
       .data(bar_data)
       .enter().append("g")
       .attr("class", "g")
@@ -167,7 +142,7 @@
         return tooltip.style("visibility", "hidden");
       });
 
-    svg.append("g")
+    svglink.append("g")
       .attr("class", "y axis")
       .call(yAxis)
       .append("text")
