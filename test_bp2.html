@@ -77,7 +77,7 @@ white-space: pre-line;
 
 
 
-var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10, bartop:10, barbottom:80, betwbars:50};
+var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10 , barleft:60, bartop:10, barbottom:80, betwbars:70};
 var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
 var bpdims = {height: height};
 var treewidth = width / 3;
@@ -120,15 +120,15 @@ var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
 
 var BarSVG = d3.select("#barsgraph").append("svg")
-	.attr("width", (margin.left + width + margin.right))
+	.attr("width", (margin.barleft + width + margin.right))
 	.attr("height", (margin.barbottom + height + margin.bartop));
 
 var TaxaBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")")
+	.attr("transform", "translate(" + margin.barleft + "," + margin.bartop + ")")
 	.attr("id", "taxa_bars");
 
 var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
+	.attr("transform", "translate(" + (margin.barleft + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
 	.attr("id", "func_bars");
 
 
