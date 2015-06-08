@@ -56,10 +56,13 @@ body{
 white-space: pre-line;
 </style>
 <head>
+<div style="float:left">
 <h2>Exploring microbial community taxa and functions</h2>
 <h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
 <p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
 <p> data from Theriot et al <i>Nature Communications</i> (2014)</p>
+</div>
+<button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
 </head>
 <body>
 <div id="navgraph">   </div>
@@ -102,6 +105,7 @@ var diagonal = d3.svg.diagonal()
 });
 
 var NavSVG = d3.select("#navgraph").append("svg")
+	.attr("id","navsvg")
 	.attr('width',(margin.left + width + margin.right))
 	.attr('height',(margin.bottom + height + margin.top));
 
@@ -1028,7 +1032,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 });
 
 function hideheader () {
-	window.location = '#navgraph';
+	window.location = '#navsvg';
 }
 
 </script>
