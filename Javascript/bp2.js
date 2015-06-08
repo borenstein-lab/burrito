@@ -57,8 +57,7 @@
 			
 			var scaleFact=leftoverHeight/Math.max(neededHeight,1), sum=0;
 			ret.forEach(
-				function(d, i){
-					d.key = i;
+				function(d){ 
 					d.percent = scaleFact*d.percent; 
 					d.height= scaleFact; //*d.value; //(d.height==m? m : d.height*scaleFact);
 					d.middle=sum+b+d.height/2;
@@ -140,23 +139,11 @@
 			.selectAll(".mainbar").data(data.mainBars[p])
 			.enter().append("g").attr("class","mainbar");
 
-		var padding = 0;
-		var nbar = data.mainBars[p].length;
-		console.log(nbar)
-
-		if ( nbar < 5) { padding = 20;
-		}else if (nbar < 11) {padding = 10;
-		}else if (nbar < 25) {padding = 5;
-		}else { nbar = 4;}
-
 		mainbar.append("rect").attr("class","mainrect")
-			.attr("x", 0)
-			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
-			.attr("width",b)
-			.attr("height",function(d){ return (d.height - padding); })
+			.attr("x", 0).attr("y",function(d){ return d.middle-d.height/2; })
+			.attr("width",b).attr("height",function(d){ return d.height; })
 			.style("shape-rendering","auto")
-			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
-			.style("fill-opacity",1).style("stroke-width","0.5")
+			.style("fill-opacity",0).style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
 			
@@ -166,29 +153,25 @@
 			.text(function(d,i){ return data.keys[p][i];})
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.transition().duration(300);
-			
-			
+
 		if(data.keys[p].length==1){
 			fontSize=24;	
 		}  else{
 			fontSize = 24/Math.log(data.keys[p].length) + 2;
 		}
 		mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
-		/*
+
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
 			.append("rect").attr("class","subbar")
 			.attr("x", 0)
 			.attr("y",function(d){ return d.y})
 			.attr("width",b)
-			.attr("height",function(d){ 
-				return d.h
-			})
+			.attr("height",function(d){ return d.h})
 			.style("fill",function(d){ 
 				return colors(data.keys[p][d["key"+(p+1)]]);})
-			.style("opacity",0)
+			.style("opacity",0.1)
 			.transition().duration(300);
-		*/
 	}
 
 	// function updatePart(data, id, p){
@@ -386,11 +369,10 @@
 			//selectedBar.select(".mainrect").style("stroke-opacity",1);			
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 ;
-			/*
+
 			var selSubBar =  d3.select("#Genomes").select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
-			*/
 			//console.log(selSubBar.toSource());
 			//console.log(selectedBar.toSource());
 
