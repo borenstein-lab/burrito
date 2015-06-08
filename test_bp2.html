@@ -73,8 +73,10 @@ white-space: pre-line;
 <script>
 
 
+
 var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10, bartop:10, barbottom:80, betwbars:50};
 var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
+var bpdims = {height: height};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -249,7 +251,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
 
 
-						bP.draw(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
+						bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
 
 
 						function update_otu_bar(){
@@ -271,7 +273,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 						//data_cube.expand_func("Metabolism");
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-						bpvisdata = bP.updateGraph(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
+						bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
 
 						var taxa_data = d3.nest()
 					        .key(function(d) { return d.Kingdom; })
@@ -384,7 +386,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 					    update(roots['func']);
 
 					    d3.select(self.frameElement).style("height", "800px");
-
+						
 												
 						// Update the tree graphs
 						// Expands or collapses the source node, depending on whether it is currently open or closed
@@ -781,7 +783,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 						function updateBPgraph() {
 							var bpData = getLinkData();
 							var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-							var visdata = bP.updateGraph(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
+							var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
 							return visdata;
 						}
 
@@ -1023,7 +1025,9 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 	});
 });
 
-
+function hideheader () {
+	window.location = '#navgraph';
+}
 
 </script>
 </body>
