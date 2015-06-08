@@ -183,7 +183,7 @@
 
 	// }
 	
-	function drawEdges(data, id, taxa_colors, func_colors){
+	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
 		d3.select("#"+id).append("g").attr("class","edges").transition().duration(300).attr("transform","translate("+ b+",0)");
 
 		edgeBar = d3.select("#"+id).select(".edges").selectAll(".edge")
@@ -196,12 +196,12 @@
 			.on("mouseover", function(d,i){ 
 				d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 				var current_data = this._current;
-				bP.selectEdge(id, i, current_data, taxa_colors, func_colors);
+				bP.selectEdge(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall);
 			})
 			.on("mouseout", function(d,i){ 
 				d3.select(this).attr("points", bP.edgePolygon).style("opacity",0.2).style("fill", "grey");
 				var current_data = this._current;
-				bP.deselectEdge(id, i, current_data);
+				bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall);
 			})
 			.transition().duration(300);
 			//brush would go here
@@ -274,7 +274,7 @@
 		var visData = visualize(bip.data);
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
-		drawEdges(visData, bip.id, taxa_colors, func_colors);
+		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall);
 //		drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
@@ -324,7 +324,7 @@
 		//updatePart(visData, bip.id, 1);
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
-		drawEdges(visData, bip.id, taxa_colors, func_colors);
+		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall);
 		//drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
@@ -419,7 +419,7 @@
 		//selectedBar.select(".barpercent").style('font-weight','normal');
 	}
 
-	bP.selectEdge = function(id, i, current_data){
+	bP.selectEdge = function(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall){
 		//bold associated names
 		[0,1].forEach(function(m){
 		var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
@@ -432,10 +432,12 @@
 				.filter(function(d,i){ 
 					return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
 			selSubBar.style("opacity", 1);
+
+		highlightall(displayed_taxa[current_data["key1"]], displayed_funcs[current_data["key2"]], 3);
 		});
 	}
 
-	bP.deselectEdge = function(id, i, current_data){
+	bP.deselectEdge = function(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall){
 		[0,1].forEach(function(m){
 		var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ 
@@ -447,6 +449,7 @@
 				return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
 		selSubBar.style("opacity", 0.2);
 		});		
+		dehighlightall(displayed_taxa[current_data["key1"]], displayed_funcs[current_data["key2"]], 3);
 
 	}
 
