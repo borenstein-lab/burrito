@@ -72,7 +72,7 @@ white-space: pre-line;
 <h2>Exploring microbial community taxa and functions</h2>
 <h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
 <p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
-<p> data from Theriot et al <i>Nature Communications</i> (2014)</p>
+<p> data from <a href="http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html?message-global=remove" target="_blank">Theriot et al <i>Nature Communications</i> (2014)</a></p>
 </div>
 <button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
 </head>
@@ -177,7 +177,8 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 					d3.tsv("Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
 
 						var taxa_colors = d3.scale.category20();
-						var func_colors = d3.scale.category20();
+						var func_colors = d3.scale.category20b();
+						//d3.shuffle(func_colors);
 
 						//initialize display cube
 						var data_cube = data_cube_wrapper.make_cube();
@@ -414,7 +415,8 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 					    update(roots['func']);
 
 					    d3.select(self.frameElement).style("height", "800px");
-						
+						click(roots['taxa'].values[0])
+
 												
 						// Update the tree graphs
 						// Expands or collapses the source node, depending on whether it is currently open or closed
@@ -888,7 +890,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 								otu_bar.select_bars(taxonName);
 
 								// Highlight Function Bar Chart
-								console.log(func_colors);
+								//console.log(func_colors);
 								fB.select_contribution(taxonName, func_colors);
 							}
 							
