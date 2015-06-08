@@ -1,6 +1,6 @@
 (function(){
 	var bP={};	
-	var b=20, bb=150, height=500, buffMargin=1, minHeight=14;
+	var b=20, bb=150, height=0, buffMargin=1, minHeight=14;
 	var c1=[-15, 35], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
 	var colors = d3.scale.category20().range();
 	
@@ -239,7 +239,7 @@
 		//
 	}	
 	
-	bP.draw = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
+	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
 		svg.append("g")
 			.attr("id", bip.id);
 
@@ -268,7 +268,7 @@
 		// 	.selectAll('rect')
 		// 	.attr('height', height);
 
-
+		height = dims.height;
 				//.attr("transform","translate("+ (550*s)+",0)");
 		//console.log(bip.data.data.toSource());		
 		var visData = visualize(bip.data);
@@ -300,13 +300,14 @@
 	}
 	
 
-	bP.updateGraph = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
 		svg.append("g")
 			.attr("id", bip.id);
-
+			
+		height = dims.height;
 
 // var svg = d3.select('#barChart')
 //        .append('svg')
