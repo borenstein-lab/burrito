@@ -151,7 +151,7 @@ fB.Draw = function(stackdata, sampledata, colors, svglink, dims){
           tempcolor = this.style.fill
           d3.select(this).style("opacity", "0.6");
 
-          tooltip.html(" " + current_rectangle_data.func + "<br>" + current_rectangle_data.Taxa + " <br>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
+          tooltip.html("<strong>Function: </strong>" + current_rectangle_data.func + "<br>" + "<strong>Taxa: </strong>" + current_rectangle_data.Taxa + " <br>" + "<strong>Relative Contribution: </strong>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
         })
         .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
