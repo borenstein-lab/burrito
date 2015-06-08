@@ -184,16 +184,15 @@
 			.attr("class","edge")
 			.attr("points", bP.edgePolygon);
 
-		edgeBar.style("fill",function(d){ 
-			return taxa_colors(data.keys[0][d.key1]) ;})
+		edgeBar.style("fill", "grey") //function(d){ return taxa_colors(data.keys[0][d.key1]) ;})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
 			.on("mouseover", function(d,i){ 
 				d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 				var current_data = this._current;
-				bP.selectEdge(id, i, current_data);
+				bP.selectEdge(id, i, current_data, taxa_colors, func_colors);
 			})
 			.on("mouseout", function(d,i){ 
-				d3.select(this).attr("points", bP.edgePolygon).style("opacity",0.2);
+				d3.select(this).attr("points", bP.edgePolygon).style("opacity",0.2).style("fill", "grey");
 				var current_data = this._current;
 				bP.deselectEdge(id, i, current_data);
 			})
@@ -233,7 +232,7 @@
 		//
 	}	
 	
-	bP.draw = function(bip, svg, taxa_colors, func_colors){
+	bP.draw = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs){
 		svg.append("g")
 			.attr("id", bip.id);
 
@@ -276,14 +275,14 @@
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
-				.on("mouseover",function(d, i){ return bP.selectSegment(p, i); })
+				.on("mouseover",function(d, i){ return bP.selectSegment(p, i, taxa_colors, func_colors, displayed_taxa, displayed_funcs); })
 				.on("mouseout",function(d, i){ return bP.deSelectSegment(p, i); });	
 		});
 
 	}
 	
 
-	bP.updateGraph = function(bip, svg, taxa_colors, func_colors){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, taxa_colors, func_colors, displayed_taxa, displayed_funcs){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
@@ -315,14 +314,14 @@
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
-				.on("mouseover",function(d, i){ return bP.selectSegment(p, i); })
+				.on("mouseover",function(d, i){ return bP.selectSegment(p, i, taxa_colors, func_colors, displayed_taxa, displayed_funcs); })
 				.on("mouseout",function(d, i){ return bP.deSelectSegment(p, i); });	
 		});
 		
 		return visData;
 	} 
 
-	bP.selectSegment = function(m, s){ //s # of node, m which side of nodes
+	bP.selectSegment = function(m, s, taxa_colors, func_colors, displayed_taxa, displayed_funcs){ //s # of node, m which side of nodes
 			// var newdata =  {keys:[], data:[]};	
 				
 			// newdata.keys = k.data.keys.map( function(d){ return d;});
@@ -353,7 +352,17 @@
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 			//console.log(selectedEdges.toSource());
 
-			selectedEdges.attr("points", bP.edgePolygon2).style("opacity", 1);
+			if(m==0){
+				n = 1;
+			} else{
+				n = 0;
+			} 
+
+			selectedEdges.attr("points", bP.edgePolygon2).style("opacity", 1).style("fill", function(f){ if(n==1){
+				return func_colors(displayed_funcs[f["key2"]]);	
+			} else{
+				return taxa_colors(displayed_taxa[f["key1"]]);
+			} });
 			//selectedEdges.select("_current").style("stroke-opacity", 1);
 			//selectedBar.select(".barvalue").style('font-weight','bold');
 			//selectedBar.select(".barpercent").style('font-weight','bold');
@@ -369,13 +378,13 @@
 			selSubBar.style("opacity", 0.1);
 
 		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
-		selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
+		selectedBar.select(".barlabel").style('font-weight','normal'); //.style("visibility", "hidden");
 
 		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
 
-		selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2);
+		selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2).style("fill", "grey");
 
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');

@@ -244,7 +244,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
 
 
-						bP.draw(data, bpG, taxa_colors, func_colors, highlightOverall, dehighlightOverall);
+						bP.draw(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
 
 
 						function update_otu_bar(){
@@ -267,7 +267,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						//data_cube.expand_func("Metabolism");
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-						bpvisdata = bP.updateGraph(data, bpG, taxa_colors, func_colors);
+						bpvisdata = bP.updateGraph(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 						var taxa_data = d3.nest()
 					        .key(function(d) { return d.Kingdom; })
@@ -381,10 +381,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 					    d3.select(self.frameElement).style("height", "800px");
 
-						
-						highlightOverall();
-						
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+												
 						// Update the tree graphs
 						// Expands or collapses the source node, depending on whether it is currently open or closed
 						function update(source) {
@@ -478,28 +475,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 									} else {
 										highlightTree(d, this);
 									}
-								
-									
-
-									// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
-									// 	.selectAll(".mainbar").filter(function(f,i){ 
-									// 	return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
-			
-									// //selectedBar.select(".mainrect").style("stroke-opacity",1);			
-									// selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
-
-									// var selSubBar =  d3.select("#Genomes").select(".part"+m).select(".subbars")
-									// 	.selectAll(".subbar")
-									// 	.filter(function(f,i){
-									// 	return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
-
-									// selSubBar.style("opacity", 1);
-
-									// var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-									// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
-
-									// selectedEdges.attr("points", bP.edgePolygon2).style("opacity", 1);
-
+																	
 
 								})
 								.on("mouseout", function(d) {
@@ -762,7 +738,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						function updateBPgraph() {
 							var bpData = getLinkData();
 							var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-							var visdata = bP.updateGraph(data, bpG, taxa_colors, func_colors);
+							var visdata = bP.updateGraph(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 							return visdata;
 						}
 
@@ -833,7 +809,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								displayed = data_cube.displayed_taxa;
 								ind = displayed.indexOf(taxonName);
 								//console.log(ind);
-								bP.selectSegment(m, ind);
+								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 							}
 							
 							if (highlightwhat == 2) {
@@ -850,7 +826,8 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								m = 1;
 								displayed = data_cube.displayed_funcs;
 								ind = displayed.indexOf(functionName);
-								bP.selectSegment(m, ind);
+								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
 							}
 							
 							if (highlightwhat == 3) {
