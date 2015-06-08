@@ -215,24 +215,36 @@
     //   .text("Raw Counts");
   };
 
-  otu_bar.select_bars = function(taxon){
-  d3.select("#taxa_bars")
+otu_bar.select_bars = function(taxon){
+ selected =  d3.select("#taxa_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.name == taxon;
-    })
-    .style("opacity", 0.6);
+    });
+current_color = selected.style("fill");
+
+  var t = textures.lines()
+    .thicker()
+    .background(current_color)
+    .stroke("white");
+
+  d3.select("#taxa_bars").call(t);
+
+    selected.style("opacity", 1)
+        .style("fill", t.url());
+
 }
 
-otu_bar.deselect_bars = function(taxon){
+otu_bar.deselect_bars = function(taxon, colors){
   d3.select("#taxa_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 1);
+    .style("opacity", 0.6)
+    .style("fill", function(d){ return colors(d.name); });
 }
 
   this.otu_bar = otu_bar;

@@ -37,7 +37,18 @@ body{
     font-family: "Verdana", Verdana, sans-serif;
     font-size:12px;
 }
-
+/*.svg_pattern {
+    display:inline-block;
+    width: 30%;
+    padding: 10px;
+    background-color: "yellow";
+    border: 1px solid #ddd;
+ }
+*/
+.crosshatch {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==");
+  background-repeat: repeat;
+}
 #csvdata {
    display: none;
 }
@@ -55,6 +66,7 @@ body{
 	}
 white-space: pre-line;
 </style>
+   
 <head>
 <h2>Exploring microbial community taxa and functions</h2>
 <h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
@@ -63,9 +75,20 @@ white-space: pre-line;
 </head>
 <body>
 <div id="navgraph">   </div>
-<div id="barsgraph">   </div>
+<div id="barsgraph">  
+/*<svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="4" height="4">
+      <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==" x="0" y="0" width="4" height="4">
+      </image>
+    </pattern>
+  </defs>
+</svg>
+*/ 
+</div>
 <!--script src="http://d3js.org/d3.v3.min.js"-->
 <script src="d3.v3.min.js"></script>
+<script src="textures.js"></script>
 <script src="data_cube.js"></script>
 <script src="bp2.js"></script>
 <script src="FuncBar.js"></script>
@@ -858,7 +881,8 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								otu_bar.select_bars(taxonName);
 
 								// Highlight Function Bar Chart
-								fB.select_contribution(taxonName);
+								console.log(func_colors);
+								fB.select_contribution(taxonName, func_colors);
 							}
 							
 							if (highlightwhat == 2) {
@@ -878,7 +902,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 								// Highlight Function Bar Chart
-								fB.select_bars(functionName);
+								fB.select_bars(functionName, func_colors);
 							}
 							
 							if (highlightwhat == 3) {
@@ -904,7 +928,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								otu_bar.select_bars(taxonName);
 
 								// Highlight Function Bar Chart
-								fB.select_single_contribution(taxonName, functionName);
+								fB.select_single_contribution(taxonName, functionName, func_colors);
 							}
 						}
 
@@ -924,10 +948,10 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								bP.deSelectSegment(m, ind);
 
 								// dehighlight Taxon Bar Chart
-								otu_bar.deselect_bars(taxonName);
+								otu_bar.deselect_bars(taxonName, taxa_colors);
 
 								// dehighligh Function Bar Chart
-								fB.deselect_contribution(taxonName);
+								fB.deselect_contribution(taxonName, func_colors);
 							}
 							
 							if (highlightwhat == 2) {
@@ -943,7 +967,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								bP.deSelectSegment(m, ind);
 
 								// dehighlight Function Bar Chart
-								fB.deselect_bars(functionName);
+								fB.deselect_bars(functionName, func_colors);
 							}
 							
 							if (highlightwhat == 3) {
@@ -960,10 +984,10 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								dehighlightTree( treedatainterest[0]);
 								
 								// dehighlight Taxa Bar Chart
-								otu_bar.deselect_bars(taxonName);
+								otu_bar.deselect_bars(taxonName, taxa_colors);
 
 								// dehighlight Function Bar Chart
-								fB.deselect_single_contribution(taxonName, functionName);
+								fB.deselect_single_contribution(taxonName, functionName, func_colors);
 							
 							}
 						}

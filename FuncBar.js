@@ -11,6 +11,7 @@
   .orient("left")
   .tickFormat(d3.format(".2s"));
 
+
   //TO DO
   //figure out how to remove old graph
   //
@@ -195,64 +196,103 @@
 
 }
 
-fB.select_bars = function(func){
+fB.select_bars = function(func, colors){
+  selected = d3.select("#func_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.func == func;
+    });
+  current_color = selected.style("fill");
+
+  var t = textures.lines()
+    .thicker()
+    .background(colors(func))
+    .stroke("white");
+
+  d3.select("#func_bars").call(t);
+
+    selected.style("opacity", 1)
+        .style("fill", t.url());
+
+    // .style("stroke", "yellow")
+    // .style("stroke-width",2);
+}
+
+fB.deselect_bars = function(func, colors){
   d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 0.6);
+    .style("opacity", 0.6)
+    .style("fill", colors(func));
 }
 
-fB.deselect_bars = function(func){
-  d3.select("#func_bars")
-    .selectAll(".g")
-    .selectAll("rect")
-    .filter(function(d) {
-      return d.func == func;
-    })
-    .style("opacity", 1);
-}
-
-fB.select_contribution = function(taxon){
+fB.select_contribution = function(taxon, colors){
+  console.log(colors);
   var selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.Taxa == taxon;
-    })
-    .style("opacity", 0.6);
+    });
+
+  selected.style("opacity", 1)
+    .style("fill", function(d){
+      col = colors(d.func);
+      var t = textures.lines()
+        .thicker()
+        .background(col)
+        .stroke("white");
+
+      d3.select("#func_bars").call(t);
+
+      return t.url();
+    });
 }
 
-fB.deselect_contribution = function(taxon){
-  d3.select("#func_bars")
+fB.deselect_contribution = function(taxon, colors){
+  selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.Taxa == taxon;
-    })
-    .style("opacity", 1);
+    });
+    selected.style("opacity", 0.6).style("fill",function(d){ return colors(d.func); });
 }
 
-fB.select_single_contribution = function(taxon, func){
-  d3.select("#func_bars")
+fB.select_single_contribution = function(taxon, func, colors){
+  selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
-    })
-    .style("opacity", 0.6);
+    });
+
+
+  var t = textures.lines()
+    .thicker()
+    .background(colors(func))
+    .stroke("white");
+
+  d3.select("#func_bars").call(t);
+
+  selected.style("opacity", 1)
+    .style("fill", t.url());
+
 }
 
-fB.deselect_single_contribution = function(taxon, func){
-  d3.select("#func_bars")
+fB.deselect_single_contribution = function(taxon, func, colors){
+  selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
-    })
-    .style("opacity", 1);
+    });
+
+    selected.style("opacity", 0.6).style("fill", function(d){ return colors(d.func); });
 }
 
 this.fB = fB;
