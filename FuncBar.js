@@ -20,20 +20,33 @@
     var alldata = [];
     var y0 = 0;
     var y1 = 0;
-
+    var total = 0;
     data.forEach(function(d) {
+      var length = d.data.length;
       var y0 = 0;
       var y1 = 0;
       var h = d.length-1;
 
       //assign values for size of bars
       d.data.forEach(function(e){
-
         e.y0 = y0*100;
         e.y1= (y0 += +e.contributions)*100; 
 
 
+
       })
+
+      total = d.data[length-1].y1;
+
+      d.data.forEach(function(e){
+        e.total = total;
+
+        e.y0 = Math.round(e.y0/e.total*100*100)/100;
+        e.y1 = Math.round(e.y1/e.total*100*100)/100;
+
+
+      })
+
 
       
     });
