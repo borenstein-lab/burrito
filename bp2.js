@@ -124,7 +124,7 @@
 		var i = d3.interpolate(this._current, a);
 		this._current = i(0);
 		return function(t) {
-			return edgePolygon(i(t));
+			return bP.edgePolygon(i(t));
 		};
 	}
 	
@@ -182,18 +182,18 @@
 		edgeBar = d3.select("#"+id).select(".edges").selectAll(".edge")
 			.data(data.edges).enter().append("polygon")
 			.attr("class","edge")
-			.attr("points", edgePolygon);
+			.attr("points", bP.edgePolygon);
 
 		edgeBar.style("fill",function(d){ 
 			return taxa_colors(data.keys[0][d.key1]) ;})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
 			.on("mouseover", function(d,i){ 
-				d3.select(this).attr("points", edgePolygon2).style("opacity",1);
+				d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 				var current_data = this._current;
 				bP.selectEdge(id, i, current_data);
 			})
 			.on("mouseout", function(d,i){ 
-				d3.select(this).attr("points", edgePolygon).style("opacity",0.2);
+				d3.select(this).attr("points", bP.edgePolygon).style("opacity",0.2);
 				var current_data = this._current;
 				bP.deselectEdge(id, i, current_data);
 			})
@@ -220,11 +220,11 @@
 		});
 	}
 	
-	function edgePolygon(d){
+	bP.edgePolygon = function(d){
 		return [0, d.y1, bb, d.y2, bb, d.y2+d.h2, 0, d.y1+d.h1].join(" ");
 	}	
 
-	function edgePolygon2(d){
+	bP.edgePolygon2 = function(d){
 		if(d.wid===1){ //don't change
 			return [0, d.y1, bb, d.y2, bb, d.y2+d.h2, 0, d.y1+d.h1].join(" ");
 		} else{
@@ -353,7 +353,7 @@
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 			//console.log(selectedEdges.toSource());
 
-			selectedEdges.attr("points", edgePolygon2).style("opacity", 1);
+			selectedEdges.attr("points", bP.edgePolygon2).style("opacity", 1);
 			//selectedEdges.select("_current").style("stroke-opacity", 1);
 			//selectedBar.select(".barvalue").style('font-weight','bold');
 			//selectedBar.select(".barpercent").style('font-weight','bold');
@@ -375,7 +375,7 @@
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
 
-		selectedEdges.attr("points", edgePolygon).style("opacity", 0.2);
+		selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2);
 
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');
