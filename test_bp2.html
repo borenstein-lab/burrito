@@ -461,7 +461,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var newdepthlabels = depthlabels.enter().append("g")
 								.attr("class","depthlabel")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(-45)";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
 								});
 								
 							newdepthlabels.append("text")
@@ -476,7 +476,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								.duration(duration)
 								.style("font-weight","bold")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(-45)";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
 								});
 								
 							upddepthlabels.select("text")
@@ -530,7 +530,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 										
 									d.thisandparents.append("text")
 											.text(function (d5) {
-											return d5.key })
+											if (d5.values) {
+												return d5.key 
+											} else {
+												""
+											}
+											})
 											.attr("text-anchor", "middle")
 											.attr("dy", function (d5, isz) {
 												return "-" + (1* d3.select(this.parentNode).select("circle").attr("r") + 6) +  "";
