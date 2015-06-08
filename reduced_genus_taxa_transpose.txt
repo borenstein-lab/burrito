@@ -1,4 +1,4 @@
-Sample	4	7	Lactobacillus	5	Pseudomonas	6	Ruminococcus	Oscillospira	3	Turicibacter	8	Bacteroides	rc4-4	[Ruminococcus]	Coprococcus	Anaeroplasma	9
+Sample	unknownS24-7	unknownRuminococcaceae	Lactobacillus	unknownClostridiales	Pseudomonas	unknownLachnospiraceae	Ruminococcus	Oscillospira	unknownRikenellaceae	Turicibacter	unknownMoraxellaceae	Bacteroides	rc4-4	[Ruminococcus]	Coprococcus	Anaeroplasma	unknownRF39
 Cef2dayrec21	0	0	0.997647058823529	0.00235294117647059	0	0	0	0	0	0	0	0	0	0	0	0	0
 Cef2dayrec22	0	0	1	0	0	0	0	0	0	0	0	0	0	0	0	0	0
 Cef2dayrec23	0	0	0.981308411214953	0	0.0186915887850467	0	0	0	0	0	0	0	0	0	0	0	0
