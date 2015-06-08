@@ -57,7 +57,8 @@
 			
 			var scaleFact=leftoverHeight/Math.max(neededHeight,1), sum=0;
 			ret.forEach(
-				function(d){ 
+				function(d, i){ 
+					d.key = i;
 					d.percent = scaleFact*d.percent; 
 					d.height= scaleFact; //*d.value; //(d.height==m? m : d.height*scaleFact);
 					d.middle=sum+b+d.height/2;
@@ -139,11 +140,22 @@
 			.selectAll(".mainbar").data(data.mainBars[p])
 			.enter().append("g").attr("class","mainbar");
 
+		var padding = 0;
+		var nbar = data.mainBars[p].length;
+
+		if ( nbar < 5) { padding = 20;
+		}else if (nbar < 11) {padding = 10;
+		}else if (nbar < 25) {padding = 5;
+		}else { nbar = 4;}
+		
 		mainbar.append("rect").attr("class","mainrect")
-			.attr("x", 0).attr("y",function(d){ return d.middle-d.height/2; })
-			.attr("width",b).attr("height",function(d){ return d.height; })
+			.attr("x", 0)
+			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
+			.attr("width",b)
+			.attr("height",function(d){ return (d.height - padding); })
 			.style("shape-rendering","auto")
-			.style("fill-opacity",0).style("stroke-width","0.5")
+			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
+			.style("fill-opacity",.6).style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
 			
@@ -160,7 +172,7 @@
 			fontSize = 24/Math.log(data.keys[p].length) + 2;
 		}
 		mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
-
+		/*
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
 			.append("rect").attr("class","subbar")
@@ -172,6 +184,7 @@
 				return colors(data.keys[p][d["key"+(p+1)]]);})
 			.style("opacity",0.1)
 			.transition().duration(300);
+		*/
 	}
 
 	// function updatePart(data, id, p){
@@ -368,15 +381,26 @@
 			
 			//selectedBar.select(".mainrect").style("stroke-opacity",1);			
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
-;
 
+			selectedBar.select(".mainrect").style('fill-opacity',1);
+			/*
+			  var t = textures.lines()
+				.thicker()
+				//.background(colors(func))
+				.stroke("white");
+
+				d3.select("#Genomes").select(".part"+m).select(".mainbars").selectAll(".mainbar").selectAll(".rect").call(t);
+			*/
+				
+			/*
 			var selSubBar =  d3.select("#Genomes").select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
+			*/
 			//console.log(selSubBar.toSource());
 			//console.log(selectedBar.toSource());
 
-			selSubBar.style("opacity", 1);
+			//selSubBar.style("opacity", 1);
 
 			var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
@@ -407,9 +431,10 @@
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
 			selSubBar.style("opacity", 0.1);
 
-		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
+		
 		selectedBar.select(".barlabel").style('font-weight','normal'); //.style("visibility", "hidden");
-
+		selectedBar.select(".mainrect").style('fill-opacity',.6);
+		
 		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
@@ -427,6 +452,7 @@
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
+			selectedBar.select(".mainrect").style("fill-opacity",1)
 
 			var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
@@ -444,6 +470,7 @@
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
 		selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
+		selectedBar.select(".mainrect").style("fill-opacity",.6)
 		var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 			.selectAll(".subbar")
 			.filter(function(d,i){ 

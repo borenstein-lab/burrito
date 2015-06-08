@@ -98,6 +98,28 @@
       .attr("transform", function(d) {
         return "rotate(-35)"
       });
+      //y-axis label
+    svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -50)
+    .attr("x", -110)
+    .attr("font-size",16)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Relative Contribution %");
+
+  //x-axis label
+    svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 470)
+    .attr("x", 270)
+    .attr("font-size",15)
+    .attr("font-style","bold")
+    .attr("dy", ".75em")
+    .text("Samples");
+
 
     svglink.selectAll("text").style("fill",function(m){
       if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
@@ -129,6 +151,7 @@
       .style("fill", function(d) { 
         return colors(d.name); 
       })
+      .style("opacity", 0.6)
       .on("mouseover", function(d){
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
@@ -215,26 +238,36 @@
     //   .text("Raw Counts");
   };
 
-  otu_bar.select_bars = function(taxon){
-  d3.select("#taxa_bars")
+otu_bar.select_bars = function(taxon){
+ selected =  d3.select("#taxa_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.name == taxon;
-    })
-    .style("opacity", 1)
-    .style("width", 16);
+    });
+current_color = selected.style("fill");
+
+  var t = textures.lines()
+    .thicker()
+    .background(current_color)
+    .stroke("white");
+
+  d3.select("#taxa_bars").call(t);
+
+    selected.style("opacity", 1)
+        .style("fill", t.url());
+
 }
 
-otu_bar.deselect_bars = function(taxon){
+otu_bar.deselect_bars = function(taxon, colors){
   d3.select("#taxa_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 0.7)
-    .style("width", 13);
+    .style("opacity", 0.6)
+    .style("fill", function(d){ return colors(d.name); });
 }
 
   this.otu_bar = otu_bar;

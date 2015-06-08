@@ -11,6 +11,7 @@
   .orient("left")
   .tickFormat(d3.format(".2s"));
 
+
   //TO DO
   //figure out how to remove old graph
   //
@@ -112,6 +113,30 @@
   .attr("transform", function(d) {
     return "rotate(-35)"
   });
+  //y axis label
+  svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -50)
+    .attr("x", -110)
+    .attr("font-size",16)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Relative Contribution %");
+
+  //x-axis label
+    svglink.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 470)
+    .attr("x", 300)
+    .attr("font-size",16)
+    .attr("dy", ".75em")
+    .text("Samples");
+
+
+
+
 
   svglink.selectAll("text").style("fill",function(m){
     if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
@@ -159,6 +184,7 @@
   .attr("y", function(d) {return y(d.y1); })
   .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
   .style("fill", function(d) { return colors(d.func); })
+  .style("opacity", 0.6)
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
     highlight_overall("", current_rectangle_data.func, 2);
@@ -195,18 +221,30 @@
 
 }
 
-fB.select_bars = function(func){
-  d3.select("#func_bars")
+fB.select_bars = function(func, colors){
+  selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func;
-    })
-    .style("opacity", 1)
-    .style("width", 16);
+    });
+  current_color = selected.style("fill");
+
+  var t = textures.lines()
+    .thicker()
+    .background(colors(func))
+    .stroke("white");
+
+  d3.select("#func_bars").call(t);
+
+    selected.style("opacity", 1)
+        .style("fill", t.url());
+
+    // .style("stroke", "yellow")
+    // .style("stroke-width",2);
 }
 
-fB.deselect_bars = function(func){
+fB.deselect_bars = function(func, colors){
   d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
@@ -214,56 +252,72 @@ fB.deselect_bars = function(func){
       return d.func == func;
     })
     .style("opacity", 0.6)
-    .style("width", 13);
-
+    .style("fill", colors(func));
 }
 
-fB.select_contribution = function(taxon){
+fB.select_contribution = function(taxon, colors){
+  console.log(colors);
   var selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.Taxa == taxon;
-    })
-    .style("opacity", 1)
-    .style("width", 16);
+    });
+
+  selected.style("opacity", 1)
+    .style("fill", function(d){
+      col = colors(d.func);
+      var t = textures.lines()
+        .thicker()
+        .background(col)
+        .stroke("white");
+
+      d3.select("#func_bars").call(t);
+
+      return t.url();
+    });
 
 }
 
-fB.deselect_contribution = function(taxon){
-  d3.select("#func_bars")
+fB.deselect_contribution = function(taxon, colors){
+  selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.Taxa == taxon;
-    })
-    .style("opacity", 0.6)
-    .style("width", 13);
-
+    });
+    selected.style("opacity", 0.6).style("fill",function(d){ return colors(d.func); });
 }
 
-fB.select_single_contribution = function(taxon, func){
-  d3.select("#func_bars")
+fB.select_single_contribution = function(taxon, func, colors){
+  selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
-    })
-    .style("opacity", 1)
-    .style("width", 16);
+    });
+
+  var t = textures.lines()
+    .thicker()
+    .background(colors(func))
+    .stroke("white");
+
+  d3.select("#func_bars").call(t);
+
+  selected.style("opacity", 1)
+    .style("fill", t.url());
 
 }
 
-fB.deselect_single_contribution = function(taxon, func){
-  d3.select("#func_bars")
+fB.deselect_single_contribution = function(taxon, func, colors){
+  selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
-    })
-    .style("opacity", 0.6)
-    .style("width", 13);
+    });
 
+    selected.style("opacity", 0.6).style("fill", function(d){ return colors(d.func); });
 }
 
 this.fB = fB;

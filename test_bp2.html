@@ -37,7 +37,18 @@ body{
     font-family: "Verdana", Verdana, sans-serif;
     font-size:12px;
 }
-
+/*.svg_pattern {
+    display:inline-block;
+    width: 30%;
+    padding: 10px;
+    background-color: "yellow";
+    border: 1px solid #ddd;
+ }
+*/
+.crosshatch {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==");
+  background-repeat: repeat;
+}
 #csvdata {
    display: none;
 }
@@ -55,29 +66,41 @@ body{
 	}
 white-space: pre-line;
 </style>
+   
 <head>
 <div style="float:left">
 <h2>Exploring microbial community taxa and functions</h2>
 <h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
 <p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
-<p> data from Theriot et al <i>Nature Communications</i> (2014)</p>
+<p> data from <a href="http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html?message-global=remove" target="_blank">Theriot et al <i>Nature Communications</i> (2014)</a></p>
 </div>
 <button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
 </head>
 <body>
 <div id="navgraph">   </div>
-<div id="barsgraph">   </div>
-<!--script src="http://d3js.org/d3.v3.min.js"-->
-<script src="/Javascript/d3.v3.min.js"></script>
-<script src="/Javascript/data_cube.js"></script>
-<script src="/Javascript/bp2.js"></script>
-<script src="/Javascript/FuncBar.js"></script>
-<script src="/Javascript/otu_stacked_bar.js"></script>
+<div id="barsgraph">  
+/*<svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="4" height="4">
+      <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==" x="0" y="0" width="4" height="4">
+      </image>
+    </pattern>
+  </defs>
+</svg>
+*/ 
+</div>
+<script src="Javascript/textures.js"></script>
+<script src="Javascript/d3.v3.min.js"></script>
+<script src="Javascript/data_cube.js"></script>
+<script src="Javascript/bp2.js"></script>
+<script src="Javascript/FuncBar.js"></script>
+<script src="Javascript/otu_stacked_bar.js"></script>
+
 <script>
 
 
 
-var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10, bartop:10, barbottom:80, betwbars:50};
+var width = 1200, height = 400, margin ={left:40, right:40, top:70, bottom:10 , barleft:60, bartop:10, barbottom:105, betwbars:70};
 var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
 var bpdims = {height: height};
 var treewidth = width / 3;
@@ -108,6 +131,10 @@ var NavSVG = d3.select("#navgraph").append("svg")
 	.attr("id","navsvg")
 	.attr('width',(margin.left + width + margin.right))
 	.attr('height',(margin.bottom + height + margin.top));
+	
+NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
+NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
+
 
 var bpG = NavSVG.append("g")
 	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
@@ -120,15 +147,15 @@ var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
 
 var BarSVG = d3.select("#barsgraph").append("svg")
-	.attr("width", (margin.left + width + margin.right))
+	.attr("width", (margin.barleft + width + margin.right))
 	.attr("height", (margin.barbottom + height + margin.bartop));
 
 var TaxaBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")")
+	.attr("transform", "translate(" + margin.barleft + "," + margin.bartop + ")")
 	.attr("id", "taxa_bars");
 
 var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
+	.attr("transform", "translate(" + (margin.barleft + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
 	.attr("id", "func_bars");
 
 
@@ -146,15 +173,17 @@ levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
 curlevelNames['taxa'] = levelNames['taxa'];
 curlevelNames['func'] = levelNames['func'];
 
-d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
-    d3.tsv("/Data/taxa_mapping2.txt", function(error, taxa_tree_data){
-		d3.tsv("/Data/function_mapping2.txt", function(error, func_tree_data){
-			d3.tsv("/Data/reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
-				d3.tsv("/Data/mice_samplemap.txt", function(error, samplemap){
-					d3.tsv("/Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
+d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
+    d3.tsv("Data/taxa_mapping2.txt", function(error, taxa_tree_data){
+		d3.tsv("Data/function_mapping2.txt", function(error, func_tree_data){
+			d3.tsv("Data/reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+				d3.tsv("Data/mice_samplemap.txt", function(error, samplemap){
+					d3.tsv("Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
 
-						var taxa_colors = d3.scale.category20();
+						var taxa_colors = d3.scale.category10();
 						var func_colors = d3.scale.category20();
+						//console.log(func_colors);
+						//d3.shuffle(func_colors);
 
 						//initialize display cube
 						var data_cube = data_cube_wrapper.make_cube();
@@ -391,7 +420,8 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 					    update(roots['func']);
 
 					    d3.select(self.frameElement).style("height", "800px");
-						
+						click(roots['taxa'].values[0])
+
 												
 						// Update the tree graphs
 						// Expands or collapses the source node, depending on whether it is currently open or closed
@@ -865,7 +895,8 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 								otu_bar.select_bars(taxonName);
 
 								// Highlight Function Bar Chart
-								fB.select_contribution(taxonName);
+								//console.log(func_colors);
+								fB.select_contribution(taxonName, func_colors);
 							}
 							
 							if (highlightwhat == 2) {
@@ -885,7 +916,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 								// Highlight Function Bar Chart
-								fB.select_bars(functionName);
+								fB.select_bars(functionName, func_colors);
 							}
 							
 							if (highlightwhat == 3) {
@@ -911,7 +942,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 								otu_bar.select_bars(taxonName);
 
 								// Highlight Function Bar Chart
-								fB.select_single_contribution(taxonName, functionName);
+								fB.select_single_contribution(taxonName, functionName, func_colors);
 							}
 						}
 
@@ -931,10 +962,10 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 								bP.deSelectSegment(m, ind);
 
 								// dehighlight Taxon Bar Chart
-								otu_bar.deselect_bars(taxonName);
+								otu_bar.deselect_bars(taxonName, taxa_colors);
 
 								// dehighligh Function Bar Chart
-								fB.deselect_contribution(taxonName);
+								fB.deselect_contribution(taxonName, func_colors);
 							}
 							
 							if (highlightwhat == 2) {
@@ -950,7 +981,7 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 								bP.deSelectSegment(m, ind);
 
 								// dehighlight Function Bar Chart
-								fB.deselect_bars(functionName);
+								fB.deselect_bars(functionName, func_colors);
 							}
 							
 							if (highlightwhat == 3) {
@@ -967,10 +998,10 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 								dehighlightTree( treedatainterest[0]);
 								
 								// dehighlight Taxa Bar Chart
-								otu_bar.deselect_bars(taxonName);
+								otu_bar.deselect_bars(taxonName, taxa_colors);
 
 								// dehighlight Function Bar Chart
-								fB.deselect_single_contribution(taxonName, functionName);
+								fB.deselect_single_contribution(taxonName, functionName, func_colors);
 							
 							}
 						}
