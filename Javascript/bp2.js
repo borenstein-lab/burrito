@@ -155,7 +155,7 @@
 			.attr("height",function(d){ return (d.height - padding); })
 			.style("shape-rendering","auto")
 			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
-			.style("fill-opacity",1).style("stroke-width","0.5")
+			.style("fill-opacity",.6).style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
 			
@@ -382,6 +382,7 @@
 			//selectedBar.select(".mainrect").style("stroke-opacity",1);			
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 
+			selectedBar.select(".mainrect").style('fill-opacity',1);
 			/*
 			  var t = textures.lines()
 				.thicker()
@@ -430,9 +431,10 @@
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
 			selSubBar.style("opacity", 0.1);
 
-		//selectedBar.select(".mainrect").style("stroke-opacity",0);			
+		
 		selectedBar.select(".barlabel").style('font-weight','normal'); //.style("visibility", "hidden");
-
+		selectedBar.select(".mainrect").style('fill-opacity',.6);
+		
 		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
@@ -450,6 +452,7 @@
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
+			selectedBar.select(".mainrect").style("fill-opacity",1)
 
 			var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
@@ -467,6 +470,7 @@
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
 		selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
+		selectedBar.select(".mainrect").style("fill-opacity",.6)
 		var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 			.selectAll(".subbar")
 			.filter(function(d,i){ 

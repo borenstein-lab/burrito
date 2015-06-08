@@ -100,7 +100,7 @@ white-space: pre-line;
 
 
 
-var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10 , barleft:60, bartop:10, barbottom:105, betwbars:70};
+var width = 1200, height = 400, margin ={left:40, right:40, top:70, bottom:10 , barleft:60, bartop:10, barbottom:105, betwbars:70};
 var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
 var bpdims = {height: height};
 var treewidth = width / 3;
@@ -131,6 +131,10 @@ var NavSVG = d3.select("#navgraph").append("svg")
 	.attr("id","navsvg")
 	.attr('width',(margin.left + width + margin.right))
 	.attr('height',(margin.bottom + height + margin.top));
+	
+NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
+NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
+
 
 var bpG = NavSVG.append("g")
 	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
@@ -176,8 +180,9 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 				d3.tsv("Data/mice_samplemap.txt", function(error, samplemap){
 					d3.tsv("Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
 
-						var taxa_colors = d3.scale.category20();
-						var func_colors = d3.scale.category20b();
+						var taxa_colors = d3.scale.category10();
+						var func_colors = d3.scale.category20();
+						//console.log(func_colors);
 						//d3.shuffle(func_colors);
 
 						//initialize display cube
