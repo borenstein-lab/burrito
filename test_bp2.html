@@ -405,7 +405,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 											thedat = idxz;
 									}
 									
-									console.log(thedat);
 									if (thedat >= 0) {
 										d.x = bpvisdata.mainBars[dattype][thedat].y;	
 									} else { d.x = 0; 
@@ -449,7 +448,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
 								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
 							}
-							console.log(curlevelNames[source.type][source.type]);
 							
 							// Update the tree depth labels
 							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")

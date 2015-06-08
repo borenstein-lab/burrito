@@ -155,7 +155,6 @@
 			.transition().duration(300);
 
 		data_id = mainbar.map(function(d,i){ return data.keys[p][i]})[0];
-		console.log(colors);
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
 			.append("rect").attr("class","subbar")
