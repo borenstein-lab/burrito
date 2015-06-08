@@ -185,7 +185,6 @@
 			.attr("points", edgePolygon);
 
 		edgeBar.style("fill",function(d){ 
-			console.log(d.toSource());
 			return taxa_colors(data.keys[0][d.key1]) ;})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
 			.on("mouseover", function(d,i){ 
