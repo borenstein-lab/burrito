@@ -105,11 +105,12 @@ var NavSVG = d3.select("#navgraph").append("svg")
 	.attr('width',(margin.left + width + margin.right))
 	.attr('height',(margin.bottom + height + margin.top));
 
+var bpG = NavSVG.append("g")
+	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
+	
 var TaxaTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
-var bpG = NavSVG.append("g")
-	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
 
 var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
@@ -1004,7 +1005,8 @@ d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(erro
 									.attr("text-anchor", "middle")
 									.attr("dy", function (d5, isz) {
 										return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") + 6) +  "";
-									});
+									})
+									.attr("transform", "rotate(" + (data.type == 'taxa' ? -30 : 30) + ")");
 									
 						}
 
