@@ -115,10 +115,12 @@ var BarSVG = d3.select("#barsgraph").append("svg")
 	.attr("height", (margin.barbottom + height + margin.bartop));
 
 var TaxaBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")");
+	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")")
+	.attr("id", "taxa_bars");
 
 var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")");
+	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
+	.attr("id", "func_bars");
 
 
 
@@ -238,10 +240,10 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						var stackData = getFuncBarData();
 
-						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions);
+						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
 
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
+						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
 
 
 						bP.draw(data, bpG, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
@@ -252,14 +254,14 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
-							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
+							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
 						}
 
 						function update_func_bar(){
 							//remove old graph before redrawing new
 								FunctionBar.selectAll("g").remove();
 								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions);
+								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
 
 						}
 
@@ -409,7 +411,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 											thedat = idxz;
 									}
 									
-									//console.log(thedat);
 									if (thedat >= 0) {
 										d.x = bpvisdata.mainBars[dattype][thedat].y;	
 									} else { d.x = 0; 
@@ -448,6 +449,46 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								}
 							}); 
 
+							// figure out which depth levels exist
+							curlevelNames[source.type] = [];
+							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
+								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
+							}
+							
+							// Update the tree depth labels
+							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+								.data(curlevelNames[source.type])
+								
+							var newdepthlabels = depthlabels.enter().append("g")
+								.attr("class","depthlabel")
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
+								});
+								
+							newdepthlabels.append("text")
+								.text(function (d) {
+									return d.name;
+									})
+								.style("font-weight","bold")
+								.attr("text-anchor","middle")
+								.attr("visibility", "hidden");
+								
+							var upddepthlabels = depthlabels.transition()
+								.duration(duration)
+								.style("font-weight","bold")
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
+								});
+								
+							upddepthlabels.select("text")
+								.attr("visibility", "visible");
+							
+							var labelexit = depthlabels.exit().transition()
+								.duration(duration)
+								.remove();
+								
+							labelexit.select("text")
+								.attr("visibility","hidden");
 								
 							
 								
@@ -810,6 +851,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								ind = displayed.indexOf(taxonName);
 								//console.log(ind);
 								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+								// Highlight  Taxa Bar Chart
+								otu_bar.select_bars(taxonName);
+
+								// Highlight Function Bar Chart
+								fB.select_contribution(taxonName);
 							}
 							
 							if (highlightwhat == 2) {
@@ -828,6 +875,8 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								ind = displayed.indexOf(functionName);
 								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
+								// Highlight Function Bar Chart
+								fB.select_bars(functionName);
 							}
 							
 							if (highlightwhat == 3) {
@@ -849,6 +898,11 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								})
 								highlightTree( treedatainterest[0], treedatainterestobj[0]);
 							
+								// Highlight Taxa Bar Chart
+								otu_bar.select_bars(taxonName);
+
+								// Highlight Function Bar Chart
+								fB.select_single_contribution(taxonName, functionName);
 							}
 						}
 
@@ -866,6 +920,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								displayed = data_cube.displayed_taxa;	
 								ind = displayed.indexOf(taxonName);
 								bP.deSelectSegment(m, ind);
+
+								// dehighlight Taxon Bar Chart
+								otu_bar.deselect_bars(taxonName);
+
+								// dehighligh Function Bar Chart
+								fB.deselect_contribution(taxonName);
 							}
 							
 							if (highlightwhat == 2) {
@@ -879,6 +939,9 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								displayed = data_cube.displayed_funcs;
 								ind = displayed.indexOf(functionName);
 								bP.deSelectSegment(m, ind);
+
+								// dehighlight Function Bar Chart
+								fB.deselect_bars(functionName);
 							}
 							
 							if (highlightwhat == 3) {
@@ -894,6 +957,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								} );
 								dehighlightTree( treedatainterest[0]);
 								
+								// dehighlight Taxa Bar Chart
+								otu_bar.deselect_bars(taxonName);
+
+								// dehighlight Function Bar Chart
+								fB.deselect_single_contribution(taxonName, functionName);
+							
 							}
 						}
 

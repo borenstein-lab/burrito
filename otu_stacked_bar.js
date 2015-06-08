@@ -47,7 +47,7 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
 
     var x = d3.scale.ordinal()
       .rangeRoundBands([0, dims.width], .3);
@@ -118,6 +118,7 @@
         return d.taxa; 
       })
       .enter().append("rect")
+      .attr("taxon", function(d){ return d.name; })
       .attr("width", x.rangeBand())
       .attr("y", function(d) { 
         return y(d.y1); 
@@ -129,16 +130,17 @@
         return colors(d.name); 
       })
       .on("mouseover", function(d){
-        current_rectangle_data = d3.select(this).datum();
+        var current_rectangle_data = d3.select(this).datum();
+        highlight_overall(current_rectangle_data.name, "", 1);
         tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" + (current_rectangle_data.y1-current_rectangle_data.y0)+"%");
-        d3.select(this).style("opacity", "0.6");
         return tooltip.style("visibility", "visible");
       })
       .on("mousemove", function(){ 
         return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
       })
       .on("mouseout", function(){
-        d3.select(this).style("opacity", "1");
+        var current_rectangle_data = d3.select(this).datum();
+        dehighlight_overall(current_rectangle_data.name, "", 1);
         return tooltip.style("visibility", "hidden");
       });
 
@@ -212,6 +214,26 @@
     //   .style("z-index", "10")
     //   .text("Raw Counts");
   };
+
+  otu_bar.select_bars = function(taxon){
+  d3.select("#taxa_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.name == taxon;
+    })
+    .style("opacity", 0.6);
+}
+
+otu_bar.deselect_bars = function(taxon){
+  d3.select("#taxa_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.name == taxon;
+    })
+    .style("opacity", 1);
+}
 
   this.otu_bar = otu_bar;
 })();
