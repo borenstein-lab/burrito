@@ -61,7 +61,7 @@ body{
 </head>
 <body>
 <div id="navgraph">   </div>
-<div id="funcbars">   </div>
+<div id="barsgraph">   </div>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="data_cube.js"></script>
 <script src="bp2.js"></script>
@@ -70,7 +70,8 @@ body{
 <script>
 
 
-var width = 1200, height = 500, margin ={left:40, right:40, top:50, bottom:20};
+var width = 1200, height = 500, margin ={left:40, right:40, top:50, bottom:20, barbottom:80, betwbars:50};
+var barDimensions = {width: (width / 2 - margin.betwbars), height: height};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -108,15 +109,17 @@ var bpG = NavSVG.append("g")
 var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
 
-var BarSVG = d3.select("#funcbars").append("svg")
-	.attr("width", (margin.left + width+margin.right))
-	.attr("height", (margin.bottom + height + margin.top));
+var BarSVG = d3.select("#barsgraph").append("svg")
+	.attr("width", (margin.left + width + margin.right))
+	.attr("height", (margin.barbottom + height + margin.top));
 
 var TaxaBar = BarSVG.append("g")
 	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.top + ")");
+
+
 
 var bpvisdata;
 
@@ -234,10 +237,10 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						var stackData = getFuncBarData();
 
-						fB.Draw(stackData, samplemap, func_colors);
+						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions);
 
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_bar_data, samplemap, taxa_colors);
+						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
 
 
 						bP.draw(data, bpG, taxa_colors, func_colors);
@@ -246,13 +249,13 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						function update_otu_bar(){
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
-							otu_bar.draw(otu_bar_data, samplemap, taxa_colors);
+							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
 						}
 
 						function update_func_bar(){
 								//d3.selectAll("svg.g").remove();
 								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap, func_colors);
+								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions);
 
 						}
 
