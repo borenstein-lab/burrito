@@ -231,6 +231,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
 						var taxLevels = d3.keys(taxa_tree_data[0]);
+						//data_cube.expand_taxon("Bacteria");
 
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
@@ -265,7 +266,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						}
 
-						//data_cube.expand_taxon("Bacteria");
 						//data_cube.expand_func("Metabolism");
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
