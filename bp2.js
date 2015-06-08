@@ -154,8 +154,6 @@
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.transition().duration(300);
 
-		data_id = mainbar.map(function(d,i){ return data.keys[p][i]})[0];
-		console.log(colors);
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
 			.append("rect").attr("class","subbar")
@@ -163,7 +161,8 @@
 			.attr("y",function(d){ return d.y})
 			.attr("width",b)
 			.attr("height",function(d){ return d.h})
-			.style("fill",function(d){ return colors(data_id);})
+			.style("fill",function(d){ 
+				return colors(data.keys[p][d["key"+(p+1)]]);})
 			.style("opacity",0.1)
 			.transition().duration(300);
 	}
@@ -185,9 +184,9 @@
 			.attr("class","edge")
 			.attr("points", edgePolygon);
 
-		edge_id = edgeBar.map(function(d,i){ return data.keys[0][i];})[0];
-
-		edgeBar.style("fill",function(d){ return taxa_colors[edge_id];})
+		edgeBar.style("fill",function(d){ 
+			console.log(d.toSource());
+			return taxa_colors(data.keys[0][d.key1]) ;})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
 			.on("mouseover", function(d,i){ 
 				d3.select(this).attr("points", edgePolygon2).style("opacity",1);
