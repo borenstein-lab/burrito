@@ -469,40 +469,9 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								})
 								.on("click", click)
 								.on("mouseover", function (d) {
+									highlightTree(d, this);
 								
-									var thisnode = d;
-									var thisNparents = [];
-									thisNparents.push(thisnode);
-									while (thisnode.parent) {
-										thisnode = thisnode.parent;
-										thisNparents.push(thisnode);
-									}
-										
-									d.thisandparents = node.filter(function (d2) { 
-										var good = false;
-										thisNparents.forEach( function (d4) {
-											if (d2.id == d4.id) {
-												good = true;} 
-												});
-										return good;
-									})
 									
-									d.thisandparents.select("circle")
-										.style("stroke-width", "5")
-										.style("stroke", "green");
-										
-									d.thisandparents.append("text")
-											.text(function (d5) {
-											if (d5.values) {
-												return d5.key 
-											} else {
-												""
-											}
-											})
-											.attr("text-anchor", "middle")
-											.attr("dy", function (d5, isz) {
-												return "-" + (1* d3.select(this.parentNode).select("circle").attr("r") + 6) +  "";
-											});
 
 									if(source.type==="taxa"){
 										m = 0;
@@ -533,13 +502,9 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 
 								})
-								.on("mouseout", function(d) { 
+								.on("mouseout", function(d) {
 								
-									d.thisandparents.select("circle")
-										.style("stroke-width", "1")
-										.style("stroke", "steelblue");
-
-									d.thisandparents.select("text").remove(); 
+									dehighlightTree(d);
 
 									if(source.type==="taxa"){
 										m = 0;
@@ -804,6 +769,52 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 		});
 	});
 });
+
+function highlightTree( data, thisobj) {
+
+	var thisnode = data;
+	var thisNparents = [];
+	thisNparents.push(thisnode);
+	while (thisnode.parent) {
+		thisnode = thisnode.parent;
+		thisNparents.push(thisnode);
+	}
+	var node = SVGs[data.type].selectAll("g.node");
+	data.thisandparents = node.filter(function (d2) { 
+		var good = false;
+		thisNparents.forEach( function (d4) {
+			if (d2.id == d4.id) {
+				good = true;} 
+				});
+		return good;
+	})
+	
+	data.thisandparents.select("circle")
+		.style("stroke-width", "5")
+		.style("stroke", "green");
+		
+	data.thisandparents.append("text")
+			.text(function (d5) {
+			if (d5.values) {
+				return d5.key 
+			} else {
+				""
+			}
+			})
+			.attr("text-anchor", "middle")
+			.attr("dy", function (d5, isz) {
+				return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") + 6) +  "";
+			});
+			
+}
+
+function dehighlightTree(data) {
+	data.thisandparents.select("circle")
+		.style("stroke-width", "1")
+		.style("stroke", "steelblue");
+
+	data.thisandparents.select("text").remove(); 
+}
 
 </script>
 </body>
