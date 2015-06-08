@@ -383,7 +383,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 						
 						
 						
-						
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 						// Update the tree graphs
 						// Expands or collapses the source node, depending on whether it is currently open or closed
 						function update(source) {
@@ -734,6 +734,49 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								d.x0 = d.x;
 								d.y0 = d.y;
 							});
+							
+					/////////////////////// Do depth labels /////////////////////////////
+							// figure out which depth levels exist
+							curlevelNames[source.type] = [];
+							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
+								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
+							}
+							console.log(curlevelNames[source.type][source.type]);
+							
+							// Update the tree depth labels
+							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+								.data(curlevelNames[source.type])
+								
+							var newdepthlabels = depthlabels.enter().append("g")
+								.attr("class","depthlabel")
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
+								});
+								
+							newdepthlabels.append("text")
+								.text(function (d) {
+									return d.name;
+									})
+								.style("font-weight","bold")
+								.attr("text-anchor","middle")
+								.attr("visibility", "hidden");
+								
+							var upddepthlabels = depthlabels.transition()
+								.duration(duration)
+								.style("font-weight","bold")
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
+								});
+								
+							upddepthlabels.select("text")
+								.attr("visibility", "visible");
+							
+							var labelexit = depthlabels.exit().transition()
+								.duration(duration)
+								.remove();
+								
+							labelexit.select("text")
+								.attr("visibility","hidden");
 						}
 
 						// Update the bipartite graph after changes to data_cube
