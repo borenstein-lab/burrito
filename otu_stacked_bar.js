@@ -222,7 +222,7 @@
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 0.6);
+    .style("opacity", 1);
 }
 
 otu_bar.deselect_bars = function(taxon){
@@ -232,7 +232,7 @@ otu_bar.deselect_bars = function(taxon){
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 1);
+    .style("opacity", 0.6);
 }
 
   this.otu_bar = otu_bar;
