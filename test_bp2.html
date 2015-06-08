@@ -247,13 +247,16 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 
 						function update_otu_bar(){
+							//remove old graph before redrawing new
+							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
 							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions);
 						}
 
 						function update_func_bar(){
-								//d3.selectAll("svg.g").remove();
+							//remove old graph before redrawing new
+								FunctionBar.selectAll("g").remove();
 								var func_data = getFuncBarData();
 								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions);
 
