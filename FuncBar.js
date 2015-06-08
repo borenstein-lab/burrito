@@ -137,6 +137,7 @@
   Sample.selectAll("rect")
   .data(function(d) { 
 
+<<<<<<< HEAD
    return d.data;
  })
   .enter().append("rect")
@@ -149,8 +150,9 @@
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
     highlight_overall("", current_rectangle_data.func, 1);
-
-    tooltip.html(" " + current_rectangle_data.func + "<br>" + current_rectangle_data.Taxa + " <br>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
+          tooltip.html("<strong>Function: </strong>" + current_rectangle_data.func + "<br>" + "<strong>Taxa: </strong>" + current_rectangle_data.Taxa + " <br>" + "<strong>Relative Contribution: </strong>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
+          return tooltip.style("visibility", "visible");
+        })
     return tooltip.style("visibility", "visible");
   })
   .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
