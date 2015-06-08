@@ -154,6 +154,13 @@
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.transition().duration(300);
 
+		if(data.keys[p].length==1){
+			fontSize=24;	
+		}  else{
+			fontSize = 24/Math.log(data.keys[p].length);
+			mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
+		}
+
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
 			.append("rect").attr("class","subbar")
