@@ -1,38 +1,11 @@
 (function(){
   var otu_bar = {};
 
-  var margin = {top: 20, right: 20, bottom: 80, left: 60},
-      width = window.innerWidth - margin.left - margin.right - 250,
-      height = window.innerHeight - margin.top - margin.bottom - 50;
-
-  var x = d3.scale.ordinal()
-      .rangeRoundBands([0, width], .3);
-
-  var y = d3.scale.linear()
-      .rangeRound([height, 0]);
-
-  var color = d3.scale.category20();
-  
   var sampleColor = d3.scale.ordinal();
   sampleColor["1"] = "red";
   sampleColor["2"] = "darkred";
   sampleColor["3"] = "steelblue";
   sampleColor["4"] = "darkblue";
-
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .tickFormat(d3.format(".2s"));
-
-  var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right+250)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   getSampleGroup = function(samp, sampledata){
     treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
@@ -74,13 +47,13 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(colors, bar_data, sampledata){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
 
     var x = d3.scale.ordinal()
-      .rangeRoundBands([0, width], .3);
+      .rangeRoundBands([0, dims.width], .3);
 
     var y = d3.scale.linear()
-      .rangeRound([height, 0]);
+      .rangeRound([dims.height, 0]);
 
     var xAxis = d3.svg.axis()
       .scale(x)
@@ -114,7 +87,7 @@
       })
     })
 
-    svg.append("g")
+    svglink.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
@@ -126,13 +99,13 @@
         return "rotate(-35)"
       });
 
-    svg.selectAll("text").style("fill",function(m){
+    svglink.selectAll("text").style("fill",function(m){
       if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
         return sampleColor[getSampleGroup(m, sampledata)];        
       }
     });
 
-    var Sample = svg.selectAll(".Sample")
+    var Sample = svglink.selectAll(".Sample")
       .data(bar_data)
       .enter().append("g")
       .attr("class", "g")
@@ -145,6 +118,7 @@
         return d.taxa; 
       })
       .enter().append("rect")
+      .attr("taxon", function(d){ return d.name; })
       .attr("width", x.rangeBand())
       .attr("y", function(d) { 
         return y(d.y1); 
@@ -156,20 +130,21 @@
         return colors(d.name); 
       })
       .on("mouseover", function(d){
-        current_rectangle_data = d3.select(this).datum();
-        tooltip.text(current_rectangle_data.name);
-        d3.select(this).style("opacity", "0.6");
+        var current_rectangle_data = d3.select(this).datum();
+        highlight_overall(current_rectangle_data.name, "", 1);
+        tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" + (current_rectangle_data.y1-current_rectangle_data.y0)+"%");
         return tooltip.style("visibility", "visible");
       })
       .on("mousemove", function(){ 
         return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
       })
       .on("mouseout", function(){
-        d3.select(this).style("opacity", "1");
+        var current_rectangle_data = d3.select(this).datum();
+        dehighlight_overall(current_rectangle_data.name, "", 1);
         return tooltip.style("visibility", "hidden");
       });
 
-    svg.append("g")
+    svglink.append("g")
       .attr("class", "y axis")
       .call(yAxis)
       .append("text")
@@ -239,6 +214,28 @@
     //   .style("z-index", "10")
     //   .text("Raw Counts");
   };
+
+  otu_bar.select_bars = function(taxon){
+  d3.select("#taxa_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.name == taxon;
+    })
+    .style("opacity", 1)
+    .style("width", 16);
+}
+
+otu_bar.deselect_bars = function(taxon){
+  d3.select("#taxa_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.name == taxon;
+    })
+    .style("opacity", 0.7)
+    .style("width", 13);
+}
 
   this.otu_bar = otu_bar;
 })();

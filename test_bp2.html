@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <meta charset="utf-8">
 <style> /*
 body{ 
@@ -53,24 +53,33 @@ body{
 #navgraph{
 	float:top;
 	}
+white-space: pre-line;
 </style>
 <head>
-<p>Visualizing metagenomic data</p>
-<p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker, </p>
-<p> data from ________ reference </p>
+<div style="float:left">
+<h2>Exploring microbial community taxa and functions</h2>
+<h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
+<p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
+<p> data from Theriot et al <i>Nature Communications</i> (2014)</p>
+</div>
+<button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
 </head>
 <body>
 <div id="navgraph">   </div>
-<div id="funcbars">   </div>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="data_cube.js"></script>
-<script src="bp2.js"></script>
-<script src="FuncBar.js"></script>
-<script src="otu_stacked_bar.js"></script>
+<div id="barsgraph">   </div>
+<!--script src="http://d3js.org/d3.v3.min.js"-->
+<script src="/Javascript/d3.v3.min.js"></script>
+<script src="/Javascript/data_cube.js"></script>
+<script src="/Javascript/bp2.js"></script>
+<script src="/Javascript/FuncBar.js"></script>
+<script src="/Javascript/otu_stacked_bar.js"></script>
 <script>
 
 
-var width = 1200, height = 500, margin ={left:40, right:40, top:50, bottom:20};
+
+var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10, bartop:10, barbottom:80, betwbars:50};
+var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
+var bpdims = {height: height};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -96,17 +105,33 @@ var diagonal = d3.svg.diagonal()
 });
 
 var NavSVG = d3.select("#navgraph").append("svg")
+	.attr("id","navsvg")
 	.attr('width',(margin.left + width + margin.right))
-	.attr('height',(margin.bottom + height + margin.top))
+	.attr('height',(margin.bottom + height + margin.top));
 
+var bpG = NavSVG.append("g")
+	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
+	
 var TaxaTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
-var bpG = NavSVG.append("g")
-	.attr("transform","translate("+ (margin.left + treewidth + 40) +","+ margin.top +")");
 
 var FuncTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
+
+var BarSVG = d3.select("#barsgraph").append("svg")
+	.attr("width", (margin.left + width + margin.right))
+	.attr("height", (margin.barbottom + height + margin.bartop));
+
+var TaxaBar = BarSVG.append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.bartop + ")")
+	.attr("id", "taxa_bars");
+
+var FunctionBar = BarSVG.append("g")
+	.attr("transform", "translate(" + (margin.left + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
+	.attr("id", "func_bars");
+
+
 
 var bpvisdata;
 
@@ -121,18 +146,21 @@ levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
 curlevelNames['taxa'] = levelNames['taxa'];
 curlevelNames['func'] = levelNames['func'];
 
-d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
-    d3.tsv("taxa_mapping2.txt", function(error, taxa_tree_data){
-		d3.tsv("function_mapping2.txt", function(error, func_tree_data){
-			d3.tsv("reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
-				d3.tsv("mice_samplemap.txt", function(error, samplemap){
-					d3.tsv("reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
+d3.tsv("/Data/reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
+    d3.tsv("/Data/taxa_mapping2.txt", function(error, taxa_tree_data){
+		d3.tsv("/Data/function_mapping2.txt", function(error, func_tree_data){
+			d3.tsv("/Data/reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
+				d3.tsv("/Data/mice_samplemap.txt", function(error, samplemap){
+					d3.tsv("/Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
+
+						var taxa_colors = d3.scale.category20();
+						var func_colors = d3.scale.category20();
+
 						//initialize display cube
 						var data_cube = data_cube_wrapper.make_cube();
 						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
 
 						
-
 						getLinkData = function(){
 							//get unique linked functions for each taxon
 							allSamples = d3.keys(data_cube.displayed_contribution_cube);
@@ -171,10 +199,14 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							allSamples.map(function(d){	
 								samples.push({sample:d});
 							});
-							(data_cube.displayed_funcs).map(function(z){
+							var my_displayed_funcs = data_cube.displayed_funcs.slice(0);
+							my_displayed_funcs.reverse();
+							(my_displayed_funcs).map(function(z){
 								funcs.push(z);
 							});
-							(data_cube.displayed_taxa).map(function(t,i){
+							var my_displayed_taxa = data_cube.displayed_taxa.slice(0);
+							my_displayed_taxa.reverse();
+							(my_displayed_taxa).map(function(t,i){
 								taxa.push(t)
 							});
 							//then loop through sequentially to populate an array of all the samples
@@ -208,42 +240,45 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 
 						//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
 						var taxLevels = d3.keys(taxa_tree_data[0]);
+						//data_cube.expand_taxon("Bacteria");
 
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 
-						bP.draw(data, bpG);
 
 						//draw the stacked bar
 
 						var stackData = getFuncBarData();
 
-						fB.Draw(stackData, samplemap);
+						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
 
-						var otu_colors = d3.scale.category20();
-						otu_colors.domain(data_cube.displayed_taxa);
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_colors, otu_bar_data, samplemap);
+						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
+
+
+						bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
 
 
 						function update_otu_bar(){
-							otu_colors.domain(data_cube.displayed_taxa);
+							//remove old graph before redrawing new
+							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
-							otu_bar.draw(otu_colors, otu_bar_data, samplemap);
+							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
 						}
 
 						function update_func_bar(){
+							//remove old graph before redrawing new
+								FunctionBar.selectAll("g").remove();
 								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap);
-								console.log(func_data);
+								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
+
 						}
 
-						//data_cube.expand_taxon("Bacteria");
 						//data_cube.expand_func("Metabolism");
 						var bpData = getLinkData();
 						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-						bpvisdata = bP.updateGraph(data, bpG);
+						bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
 
 						var taxa_data = d3.nest()
 					        .key(function(d) { return d.Kingdom; })
@@ -356,11 +391,8 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 					    update(roots['func']);
 
 					    d3.select(self.frameElement).style("height", "800px");
-
 						
-						
-						
-						
+												
 						// Update the tree graphs
 						// Expands or collapses the source node, depending on whether it is currently open or closed
 						function update(source) {
@@ -368,12 +400,12 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
 								links = trees[source.type].links(nodes);
 								
-							/*
+
 							var nleaf = 0;
 							nodes.forEach(function (d) {
 								nleaf = nleaf + (d.values ? 0 : 1);
 							})
-
+							/*
 							//console.log(nleaf);
 							
 							var leafC = 1;
@@ -388,7 +420,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 											thedat = idxz;
 									}
 									
-									console.log(thedat);
 									if (thedat >= 0) {
 										d.x = bpvisdata.mainBars[dattype][thedat].y;	
 									} else { d.x = 0; 
@@ -432,7 +463,6 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
 								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
 							}
-							console.log(curlevelNames[source.type][source.type]);
 							
 							// Update the tree depth labels
 							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
@@ -441,7 +471,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							var newdepthlabels = depthlabels.enter().append("g")
 								.attr("class","depthlabel")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(-45)";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
 								});
 								
 							newdepthlabels.append("text")
@@ -456,7 +486,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								.duration(duration)
 								.style("font-weight","bold")
 								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(-45)";
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
 								});
 								
 							upddepthlabels.select("text")
@@ -484,13 +514,84 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								.attr("transform", function (d) {
 									return "translate(" + source.y0 + "," + source.x0 + ")";
 								})
-								.on("click", click);
+								.on("click", click)
+								.on("mouseover", function (d) {
+									if (~d.values) {
+										if (d.type == 'taxa') {
+											highlightOverall(d.key, "", 1);
+										} else {
+											highlightOverall("", d.key, 2);
+										}
+									} else {
+										highlightTree(d, this);
+									}
+																	
 
+								})
+								.on("mouseout", function(d) {
+									if (~d.values) {
+										if (d.type == 'taxa') {
+											dehighlightOverall(d.key, "", 1);
+										} else {
+											dehighlightOverall("", d.key, 2);
+										}
+									} else {
+										dehighlightTree(d, this);
+									}
+
+									
+									// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
+									// 	.selectAll(".mainbar").filter(function(f,i){ 
+									// 	return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
+			
+
+									// var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
+									// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
+									// selSubBar.style("opacity", 0.1);
+
+									// //selectedBar.select(".mainrect").style("stroke-opacity",0);			
+									// selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
+
+									// var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+									// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
+									// //console.log(selectedEdges.toSource());
+
+									// selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2);
+
+
+									});
+
+							nodeEnter.filter( function(d) { return (~d.values) }).append("rect")
+								.attr("x", function (d) {
+									if (source.type == 'taxa') {
+										return 0; 
+									} else {
+										return (-170 - d.y);
+									}})
+								.attr("width", function(d) {
+									if (source.type == 'taxa') {
+										return "" + (treewidth + margin.left - d.y) + ""
+									} else {
+										return 170+d.y;
+									}})
+								.attr("height", function(d) {
+									return (height / nleaf / 1.5);
+									})
+								.attr("y", function (d) {
+									return (-1 * height / nleaf / 3); })
+								.attr("style","opacity:0")
+								;
+							
 							nodeEnter.append("circle")
 								.attr("r", 1e-6)
 								.style("fill", function (d) {
 								return d._values ? "lightsteelblue" : "#fff";
 							});
+							
+							node.filter( function (d) {
+								return (~d.values) })
+									.filter( function(d) { return d3.select(this).select("rect").empty(); })
+									.append("rect");
 
 							/*
 							nodeEnter.append("text")
@@ -515,6 +616,32 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								return "translate(" + d.y + "," + d.x + ")";
 							}); 
 
+							nodeUpdate.filter( function (d) {return (d.values) } ).selectAll("rect").remove();
+							
+							
+									
+							nodeUpdate.selectAll("rect")
+								.attr("x", function (d) {
+									if (source.type == 'taxa') {
+										return 0; 
+									} else {
+										return (-170 - d.y);
+									}})
+								.attr("width", function(d) {
+									if (source.type == 'taxa') {
+										return "" + (treewidth + margin.left - d.y) + ""
+									} else {
+										return 170+d.y;
+									}})
+								.attr("height", function(d) {
+									return (height / nleaf / 1.5);
+									})
+								.attr("y", function (d) {
+									return (-1 * height / nleaf / 3); })
+								.attr("style","opacity:0")
+								;
+							
+							
 							nodeUpdate.select("circle")
 								.attr("r", function (d) {
 									if(d._values){
@@ -612,13 +739,56 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 								d.x0 = d.x;
 								d.y0 = d.y;
 							});
+							
+					/////////////////////// Do depth labels /////////////////////////////
+							// figure out which depth levels exist
+							curlevelNames[source.type] = [];
+							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
+								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
+							}
+							//console.log(curlevelNames[source.type][source.type]);
+							
+							// Update the tree depth labels
+							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+								.data(curlevelNames[source.type])
+								
+							var newdepthlabels = depthlabels.enter().append("g")
+								.attr("class","depthlabel")
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
+								});
+								
+							newdepthlabels.append("text")
+								.text(function (d) {
+									return d.name;
+									})
+								.style("font-weight","bold")
+								.attr("text-anchor","middle")
+								.attr("visibility", "hidden");
+								
+							var upddepthlabels = depthlabels.transition()
+								.duration(duration)
+								.style("font-weight","bold")
+								.attr("transform", function(d) {
+									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
+								});
+								
+							upddepthlabels.select("text")
+								.attr("visibility", "visible");
+							
+							var labelexit = depthlabels.exit().transition()
+								.duration(duration)
+								.remove();
+								
+							labelexit.select("text")
+								.attr("visibility","hidden");
 						}
 
 						// Update the bipartite graph after changes to data_cube
 						function updateBPgraph() {
 							var bpData = getLinkData();
 							var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-							var visdata = bP.updateGraph(data, bpG);
+							var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
 							return visdata;
 						}
 
@@ -630,7 +800,7 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 										collapseTree(d);
 										d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
 										bpvisdata = updateBPgraph();
-										console.log(bpvisdata.toSource());
+										//console.log(bpvisdata.toSource());
 									}
 								} else { //expand
 									if (d._values[0].hasOwnProperty('key')) {
@@ -671,15 +841,199 @@ d3.tsv("reduced_genus_pathway_metagenome_contributions.txt", function(error, con
 							return 1+depth;
 						}
 						
-						function showInfo(d) {
+						
+						
+						function highlightOverall(taxonName, functionName, highlightwhat) {
+							if (highlightwhat == 1) {
+								// Highlight tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
+									return d.key == taxonName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
+								
+								// Highlight BP graph
+								m = 0;
+								displayed = data_cube.displayed_taxa;
+								ind = displayed.indexOf(taxonName);
+								//console.log(ind);
+								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+								// Highlight  Taxa Bar Chart
+								otu_bar.select_bars(taxonName);
+
+								// Highlight Function Bar Chart
+								fB.select_contribution(taxonName);
+							}
 							
+							if (highlightwhat == 2) {
+								// Highlight tree
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
+									return d.key == functionName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
+								
+								// Highlight BP graph
+								m = 1;
+								displayed = data_cube.displayed_funcs;
+								ind = displayed.indexOf(functionName);
+								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+								// Highlight Function Bar Chart
+								fB.select_bars(functionName);
+							}
+							
+							if (highlightwhat == 3) {
+								//highlight taxa tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
+									return d.key == taxonName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
+								
+								//highlight function tree
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
+									return d.key == functionName;
+								})
+								highlightTree( treedatainterest[0], treedatainterestobj[0]);
+							
+								// Highlight Taxa Bar Chart
+								otu_bar.select_bars(taxonName);
+
+								// Highlight Function Bar Chart
+								fB.select_single_contribution(taxonName, functionName);
+							}
 						}
+
+						function dehighlightOverall(taxonName, functionName, highlightwhat) {
+
+							if (highlightwhat == 1) {
+								// dehighlight tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
+								// dehighlight BP graph
+								m = 0;
+								displayed = data_cube.displayed_taxa;	
+								ind = displayed.indexOf(taxonName);
+								bP.deSelectSegment(m, ind);
+
+								// dehighlight Taxon Bar Chart
+								otu_bar.deselect_bars(taxonName);
+
+								// dehighligh Function Bar Chart
+								fB.deselect_contribution(taxonName);
+							}
+							
+							if (highlightwhat == 2) {
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
+								//dehighlight BP graph
+								m = 1;
+								displayed = data_cube.displayed_funcs;
+								ind = displayed.indexOf(functionName);
+								bP.deSelectSegment(m, ind);
+
+								// dehighlight Function Bar Chart
+								fB.deselect_bars(functionName);
+							}
+							
+							if (highlightwhat == 3) {
+								// dehighlight taxa tree
+								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+									return d.key == taxonName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
+								//dehighlight function tree
+								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+									return d.key == functionName;
+								} );
+								dehighlightTree( treedatainterest[0]);
+								
+								// dehighlight Taxa Bar Chart
+								otu_bar.deselect_bars(taxonName);
+
+								// dehighlight Function Bar Chart
+								fB.deselect_single_contribution(taxonName, functionName);
+							
+							}
+						}
+
+						function highlightTree( data, thisobj) {
+
+							var thisnode = data;
+							var thisNparents = [];
+							thisNparents.push(thisnode);
+							while (thisnode.parent) {
+								thisnode = thisnode.parent;
+								thisNparents.push(thisnode);
+							}
+							var node = SVGs[data.type].selectAll("g.node");
+							data.thisandparents = node.filter(function (d2) { 
+								var good = false;
+								thisNparents.forEach( function (d4) {
+									if (d2.id == d4.id) {
+										good = true;} 
+										});
+								return good;
+							})
+							
+							data.thisandparents.select("circle")
+								.style("stroke-width", "5")
+								.style("stroke", "green");
+								
+							data.thisandparents.append("text")
+									.text(function (d5) {
+									if (d5.values) {
+										return d5.key 
+									} else {
+										""
+									}
+									})
+									.attr("text-anchor", "middle")
+									.attr("dy", function (d5, isz) {
+										return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") + 6) +  "";
+									})
+									.attr("transform", "rotate(" + (data.type == 'taxa' ? -30 : 30) + ")");
+									
+						}
+
+						function dehighlightTree(data) {
+							data.thisandparents.select("circle")
+								.style("stroke-width", "1")
+								.style("stroke", "steelblue");
+
+							data.thisandparents.selectAll("text").remove(); 
+						}
+
+
+
 					});
 				});
 			});
 		});
 	});
 });
+
+function hideheader () {
+	window.location = '#navsvg';
+}
 
 </script>
 </body>
