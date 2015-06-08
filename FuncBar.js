@@ -3,19 +3,19 @@
 
   var x = d3.scale.ordinal();
   var y = d3.scale.linear()
-      
+
   var xAxis = d3.svg.axis()
-      .orient("bottom");
+  .orient("bottom");
 
   var yAxis = d3.svg.axis()
-      .orient("left")
-      .tickFormat(d3.format(".2s"));
+  .orient("left")
+  .tickFormat(d3.format(".2s"));
 
-//TO DO
-//figure out how to remove old graph
-//
+  //TO DO
+  //figure out how to remove old graph
+  //
 
-fB.vizData = function(data){
+  fB.vizData = function(data){
 
     var alldata = [];
     var y0 = 0;
@@ -36,19 +36,19 @@ fB.vizData = function(data){
       })
 
       
-  });
+    });
 
     var h = [];
     data.map(function(d) { 
-    d.data.map(function(e){
-      h.push(e.Sample);
-      return e.Sample;
-    })  });
+      d.data.map(function(e){
+        h.push(e.Sample);
+        return e.Sample;
+      })  });
     x.domain(h);
     y.domain([0, 100]);
 
 
-   return data;
+    return data;
   }
 
 
@@ -66,7 +66,7 @@ fB.vizData = function(data){
 
   }
 
-  
+
 
   var sampleColor = d3.scale.ordinal();
   sampleColor["1"] = "red";
@@ -76,115 +76,172 @@ fB.vizData = function(data){
 
 
 
-fB.Draw = function(stackdata, sampledata, colors, svglink, dims){
-	
-	x.rangeRoundBands([0, dims.width], .3);
-	y.rangeRound([dims.height, 0]);
-	
-	xAxis.scale(x);
-	yAxis.scale(y);
-	
-  var viz = fB.vizData(stackdata);
+  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
+
+   x.rangeRoundBands([0, dims.width], .3);
+   y.rangeRound([dims.height, 0]);
+
+   xAxis.scale(x);
+   yAxis.scale(y);
+
+   var viz = fB.vizData(stackdata);
     //get the x axis set
 
 
-    svglink.append("g")
-        .attr("id", "FuncBar")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .selectAll("text")
-              .style("text-anchor", "end")
-              .attr("dx", "-.8em")
-              .attr("dy", ".15em")
-              .attr("transform", function(d) {
-                  return "rotate(-35)"
-                  });
+  svglink.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(0," + height + ")")
+  .call(xAxis)
+  .selectAll("text")
+  .style("text-anchor", "end")
+  .attr("dx", "-.8em")
+  .attr("dy", ".15em")
+  .attr("transform", function(d) {
+    return "rotate(-35)"
+  });
 
-    svglink.selectAll("text").style("fill",function(m){
-      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-        return sampleColor[getSampleGroup(m, sampledata)];        
-      }
-    });
-      //init the tooltip as invisible
-    var tooltip = d3.select("body")
-        .append("div")
-        .style("position", "absolute")
-        .style("z-index", "10")
-        .style("visibility", "hidden")
-        .style("background", "lightyellow")
-        .style("opacity", "1")
-        .style("border", "0px")    
-        .style("border-radius", "4px")  
-        .style("padding","2px")
+  svglink.selectAll("text").style("fill",function(m){
+    if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
+      return sampleColor[getSampleGroup(m, sampledata)];        
+    }
+  });
+    //init the tooltip as invisible
+  var tooltip = d3.select("body")
+  .append("div")
+  .style("position", "absolute")
+  .style("z-index", "10")
+  .style("visibility", "hidden")
+  .style("background", "lightyellow")
+  .style("opacity", "1")
+  .style("border", "0px")    
+  .style("border-radius", "4px")  
+  .style("padding","2px")
 
-        .text("a simple tooltip");
-
+  .text("a simple tooltip");
 
 
 
 
 
-        //create a Sample object, creates 28 groups(one for each sample)
-    var Sample = svglink.selectAll(".Sample")
-        .data(viz)
-        .enter().append("g")
-        .attr("id","FuncBar")
-        .attr("class", "g")
-        .attr("transform", function(d) {return "translate(" + x(d.Sample) + ",0)"; });
+
+    //create a Sample object, creates 28 groups(one for each sample)
+  var Sample = svglink.selectAll(".Sample")
+  .data(viz)
+  .enter().append("g")
+  .attr("class", "g")
+  .attr("transform", function(d) {return "translate(" + x(d.Sample) + ",0)"; });
 
 
-        //create rects for each value, transpose based on sample
+    //create rects for each value, transpose based on sample
 
-    Sample.selectAll("rect")
-      .data(function(d) { 
+  Sample.selectAll("rect")
+  .data(function(d) { 
 
-       return d.data;
-      })
-      .enter().append("rect")
-        .attr("width", x.rangeBand())
-        .attr("y", function(d) {return y(d.y1); })
-        .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
-        .style("fill", function(d) { return colors(d.func); })
-        .on("mouseover", function(d){
-          current_rectangle_data = d3.select(this).datum();
-          tempcolor = this.style.fill
-          d3.select(this).style("opacity", "0.6");
+   return d.data;
+ })
+  .enter().append("rect")
+  .attr("func", function(d) {return d.func})
+  .attr("taxon", function(d) { return d.Taxa})
+  .attr("width", x.rangeBand())
+  .attr("y", function(d) {return y(d.y1); })
+  .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
+  .style("fill", function(d) { return colors(d.func); })
+  .on("mouseover", function(d){
+    current_rectangle_data = d3.select(this).datum();
+    highlight_overall("", current_rectangle_data.func, 1);
 
-          tooltip.html(" " + current_rectangle_data.func + "<br>" + current_rectangle_data.Taxa + " <br>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
-          return tooltip.style("visibility", "visible");
-        })
-        .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-        .on("mouseout", function(){
-          d3.select(this).style("opacity", "1");
-          return tooltip.style("visibility", "hidden");
-
-
-        });
-
+    tooltip.html(" " + current_rectangle_data.func + "<br>" + current_rectangle_data.Taxa + " <br>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
+    return tooltip.style("visibility", "visible");
+  })
+  .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+  .on("mouseout", function(){
+    current_rectangle_data = d3.select(this).datum();
+    dehighlight_overall("", current_rectangle_data.func, 1);
+    return tooltip.style("visibility", "hidden");
 
 
+  });
 
 
-          
-//init y-axis
-        svglink.append("g")
-        .attr("class", "y axis")
-        .attr("id","FuncBar")
 
-        .call(yAxis)
-      .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .attr("class", "y_label");
+
+
+
+    //init y-axis
+  svglink.append("g")
+  .attr("class", "y axis")
+  .call(yAxis)
+  .append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("y", 6)
+  .attr("dy", ".71em")
+  .style("text-anchor", "end")
+  .attr("class", "y_label");
 
 
 
 
 }
 
+fB.select_bars = function(func){
+  d3.select("#func_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.func == func;
+    })
+    .style("opacity", 0.6);
+}
+
+fB.deselect_bars = function(func){
+  d3.select("#func_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.func == func;
+    })
+    .style("opacity", 1);
+}
+
+fB.select_contribution = function(taxon){
+  d3.select("#func_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.taxon == taxon;
+    })
+    .style("opacity", 0.6);
+}
+
+fB.deselect_contribution = function(taxon){
+  d3.select("#func_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.taxon == taxon;
+    })
+    .style("opacity", 1);
+}
+
+fB.select_single_contribution = function(taxon, func){
+  d3.select("#func_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.func == func && d.taxon == taxon;
+    })
+    .style("opacity", 0.6);
+}
+
+fB.deselect_single_contribution = function(taxon, func){
+  d3.select("#func_bars")
+    .selectAll(".g")
+    .selectAll("rect")
+    .filter(function(d) {
+      return d.func == func && d.taxon == taxon;
+    })
+    .style("opacity", 1);
+}
 
 this.fB = fB;
 }();
