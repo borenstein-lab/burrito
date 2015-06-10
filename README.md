@@ -1,4 +1,4 @@
-# CSE 512 Final Project
+A web-based tool for interactive data exploration of metagenomic datasets.
 ####Cecilia Noecker, Alex Eng, Colin McNally, Will Gagne-Maynard
 
   Human-associated microbial communities, known as the human microbiome, have been associated with a range of diseases including obesity and inflammatory bowel disease. Analyses of these communities through metagenomic sequencing have focused on two related but separate questions: 1) which microbial species are present, and 2) what genetic functions are present?  These functions can be present in all species, some subset of species, or only a single species. The high dimensional nature of these data presents challenges for visualization. A sample may have 500-1,000 different species, each with 1,000-5,000 genes (which can be grouped into a smaller set of functional categories), and a typical study consists of 10-100 samples across different environments, disease states, or time points. 
