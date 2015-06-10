@@ -13,18 +13,18 @@ OR download this repository and run python -m SimpleHTTPServer 9000 at the root.
 
 ###Credits
 ####Cecilia Noecker
-*Responsible for all data cleaning and organization prior to loading data into our visualization
-*Generated the bipartite graph and assisted in linking it to the tree structure
-*Developed coloring scales for the visualization as a whole
+-Responsible for all data cleaning and organization prior to loading data into our visualization
+-Generated the bipartite graph and assisted in linking it to the tree structure
+-Developed coloring scales for the visualization as a whole
 ####Alex Eng
-*Developed our "data cube" structure to hold our data
-*Created the taxa stacked bar plot
-*Developed the highting interactivity between seperate parts of the visualization
+-Developed our "data cube" structure to hold our data
+-Created the taxa stacked bar plot
+-Developed the highting interactivity between seperate parts of the visualization
 ####Colin McNally
-*Developed the tree structure for both Taxa and Function
-*Worked on linking the tree structure to the bipartite graph
-*Created the final visualization product on one page
+-Developed the tree structure for both Taxa and Function
+-Worked on linking the tree structure to the bipartite graph
+-Created the final visualization product on one page
 ####Will Gagne-Maynard
-*Generated the stacked bar plot for functions
-*assisted in linking the stacked bar plots with the bipartite graph and tree
-*Gave design and use feedback throughout the study
+-Generated the stacked bar plot for functions
+-Assisted in linking the stacked bar plots with the bipartite graph and tree
+-Gave design and use feedback throughout the study
