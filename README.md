@@ -6,6 +6,8 @@
   We have developed a visualization tool to facilitate exploration of this type of dataset. Our tool can display the distributions of species abundances, the distributions of function abundances, and the contributions of each species to each function, and will furthermore allow interactive comparisons between different samples and subsets. Our preliminary plan is to implement a bipartite graph visualization showing links between taxa and genes connected to a stacked bar plot or area plot showing the composition of either genes or taxa across samples, with lots of options for interactive zooming, brushing, and sorting to explore how different subsets of taxa contribute to gene variation across samples and vice versa.
 
 
-View our project at:
+###Running Instructions
+Access our visualization [HERE](http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/)
 
-http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/
+OR download this repository and run python -m SimpleHTTPServer 9000 at the root. Then access the visualization from http://localhost:9000/ using your favorite web browser.
+
