@@ -5,9 +5,12 @@
 
   We have developed a visualization tool to facilitate exploration of this type of dataset. Our tool can display the distributions of species abundances, the distributions of function abundances, and the contributions of each species to each function, and furthermore allows interactive comparisons between different samples and subsets. 
 
+![](/images/Final_Image.png)
 
 ###Running Instructions
 Access our visualization [HERE](http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/)
+
+Note: If the entire visualization does not fit on your screen, try increasing your monitor's resolution or using your browsers zoom-out function(⌘ and - or Windows Key and -)
 
 OR download this repository and run python -m SimpleHTTPServer 9000 at the root. Then access the visualization from http://localhost:9000/ using your favorite web browser.
 
