@@ -12,10 +12,6 @@
   .tickFormat(d3.format(".2s"));
 
 
-  //TO DO
-  //figure out how to remove old graph
-  //
-
   fB.vizData = function(data){
 
     var alldata = [];
@@ -66,31 +62,22 @@
   }
 
 
-
   getSampleGroup = function(samp, sampledata){
-    treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
-    day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
-    if(treatment==="Antibiotic"){
-      if(day==="2") return "1";
-      else return "2";
-    } else{
-      if(day==="2") return "3";
-      else return "4";
-    }
-
+    group = sampledata.filter(function(e){ return e.Sample==samp;})[0].Group;
+    return group;
   }
 
 
 
-  var sampleColor = d3.scale.ordinal();
-  sampleColor["1"] = "red";
-  sampleColor["2"] = "darkred";
-  sampleColor["3"] = "steelblue";
-  sampleColor["4"] = "darkblue";
+  // var sampleColor = d3.scale.ordinal();
+  // sampleColor["1"] = "red";
+  // sampleColor["2"] = "darkred";
+  // sampleColor["3"] = "steelblue";
+  // sampleColor["4"] = "darkblue";
 
 
 
-  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
+  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
 
    x.rangeRoundBands([0, dims.width], .3);
    y.rangeRound([dims.height, 0]);
@@ -140,7 +127,7 @@
 
   svglink.selectAll("text").style("fill",function(m){
     if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-      return sampleColor[getSampleGroup(m, sampledata)];        
+      return sampleColor(getSampleGroup(m, sampledata));        
     }
   });
     //init the tooltip as invisible

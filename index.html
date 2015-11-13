@@ -95,6 +95,7 @@ white-space: pre-line;
 <script src="Javascript/bp2.js"></script>
 <script src="Javascript/FuncBar.js"></script>
 <script src="Javascript/otu_stacked_bar.js"></script>
+<script src="Javascript/colorbrewer.js"></script>
 
 <script>
 
@@ -180,15 +181,88 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 				d3.tsv("Data/mice_samplemap.txt", function(error, samplemap){
 					d3.tsv("Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
 
-						var taxa_colors = d3.scale.category10();
-						var func_colors = d3.scale.category20();
-						//console.log(func_colors);
-						//d3.shuffle(func_colors);
 
 						//initialize display cube
 						var data_cube = data_cube_wrapper.make_cube();
 						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
 
+						//set up colors using data cube
+/*						var taxa_colors = d3.scale.category20b();
+						console.log(taxa_colors.range())
+						taxa_colors_categories = d3.scale.ordinal()
+						taxa_colors_categories.range(taxa_colors.range())
+						taxa_colors_categories.range(taxa_colors_categories.range().filter(function(d,i){ return i % 4===0; }))
+						console.log(taxa_colors_categories.range().length)
+						taxa_colors_sub = {}
+						for (i = 0; i < taxa_colors_categories.range().length; i++){
+							taxa_colors_sub[i] = d3.scale.ordinal()
+							taxa_colors_sub[i].range(taxa_colors.range().slice(i*4,i*4+4));
+						}
+						console.log(taxa_colors_categories.range());
+
+*/						
+						//colors	
+						//start one level in for bacteria but at the 0th level for functions
+						console.log(data_cube)
+						num_function_categories = data_cube.func_tree.length
+						num_taxa_categories = data_cube.taxa_tree[0].values.length
+						console.log(num_function_categories)					
+						console.log(num_taxa_categories)					
+
+						var taxa_colors = d3.scale.ordinal()
+						taxa_colors.range(colorbrewer["Set3"][num_taxa_categories])
+						main_taxa = data_cube.taxa_tree[0].values.map(function(d){ return d.key;})
+						taxa_colors.domain(main_taxa)
+						console.log(taxa_colors(main_taxa[0]))
+						console.log(main_taxa)
+
+						for(j=0; j < main_taxa.length; j++){
+							var descendents = [];
+					      // Use a BFS to collect all descendents
+      						var curr_nodes = [];
+      						curr_nodes.push(data_cube.taxa_lookup[main_taxa[j]]);
+      						console.log(data_cube.taxa_lookup[main_taxa[j]])
+      						for (; curr_nodes.length > 0;){
+        						curr_node = curr_nodes.shift();
+          						descendents.push(curr_node.key);
+          						if(data_cube.is_leaf(curr_node)===false){
+          							for (var i = 0; i < curr_node.values.length; i++){
+					            		curr_nodes.push(curr_node.values[i]);
+					          		}
+          						}
+					      	}
+					      	descendents = descendents.slice(1) //get rid of parent
+					      	console.log(descendents)
+
+					      	for(k=0; k < descendents.length; k++){
+					      		if(k % 2 === 1){
+									sub_taxa_color = d3.lab(taxa_colors(main_taxa[j])).brighter(0.15*k).toString()
+								} else{
+									sub_taxa_color = d3.lab(taxa_colors(main_taxa[j])).darker(0.15*k).toString()
+								}
+								taxa_colors.range(taxa_colors.range().concat(sub_taxa_color))
+								console.log(taxa_colors(descendents[k]));
+					      	}
+						}
+						console.log(taxa_colors.domain())
+
+
+						var func_colors = d3.scale.ordinal()
+						func_colors.range(colorbrewer["Set1"][num_function_categories])
+						console.log(func_colors.range());
+
+						//var func_colors = d3.scale.category20c();
+						//console.log(func_colors);
+						//d3.shuffle(func_colors);
+
+						groupValsAll = samplemap.map(function(d,i){ 
+							return d["Group"]; })
+
+						groupVals = groupValsAll.filter(function(d,i){ return groupValsAll.indexOf(d)===i; })
+
+						var sampleColor = d3.scale.ordinal().domain(groupVals).range(colorbrewer["Paired"][Math.max(4,groupVals.length)].slice(0,groupVals.length));
+						console.log(sampleColor.domain())
+						console.log(sampleColor.range())
 						
 						getLinkData = function(){
 							//get unique linked functions for each taxon
@@ -279,10 +353,12 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 
 						var stackData = getFuncBarData();
 
-						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
+						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
+
+
+						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 
 						bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
@@ -293,14 +369,14 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
-							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
+							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 						}
 
 						function update_func_bar(){
 							//remove old graph before redrawing new
 								FunctionBar.selectAll("g").remove();
 								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
+								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 						}
 

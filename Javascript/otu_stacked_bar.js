@@ -1,23 +1,9 @@
 (function(){
   var otu_bar = {};
 
-  var sampleColor = d3.scale.ordinal();
-  sampleColor["1"] = "red";
-  sampleColor["2"] = "darkred";
-  sampleColor["3"] = "steelblue";
-  sampleColor["4"] = "darkblue";
-
   getSampleGroup = function(samp, sampledata){
-    treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
-    day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
-    if(treatment==="Antibiotic"){
-      if(day==="2") return "1";
-      else return "2";
-    } else{
-      if(day==="2") return "3";
-      else return "4";
-    }
-
+    group = sampledata.filter(function(e){ return e.Sample==samp;})[0].Group;
+    return group;
   }
 
 
@@ -47,7 +33,7 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
 
     var x = d3.scale.ordinal()
       .rangeRoundBands([0, dims.width], .3);
@@ -87,6 +73,7 @@
       })
     })
 
+
     svglink.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
@@ -123,7 +110,7 @@
 
     svglink.selectAll("text").style("fill",function(m){
       if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-        return sampleColor[getSampleGroup(m, sampledata)];        
+        return sampleColor(getSampleGroup(m, sampledata));        
       }
     });
 
