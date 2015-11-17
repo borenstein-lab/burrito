@@ -171,7 +171,7 @@
   .attr("y", function(d) {return y(d.y1); })
   .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
   .style("fill", function(d) { return colors(d.func); })
-  .style("opacity", 0.6)
+  .style("opacity", 0.75)
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
     highlight_overall("", current_rectangle_data.func, 2);
@@ -238,12 +238,11 @@ fB.deselect_bars = function(func, colors){
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 0.6)
+    .style("opacity", 0.75)
     .style("fill", colors(func));
 }
 
 fB.select_contribution = function(taxon, colors){
-  console.log(colors);
   var selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
@@ -273,7 +272,7 @@ fB.deselect_contribution = function(taxon, colors){
     .filter(function(d) {
       return d.Taxa == taxon;
     });
-    selected.style("opacity", 0.6).style("fill",function(d){ return colors(d.func); });
+    selected.style("opacity", 0.75).style("fill",function(d){ return colors(d.func); });
 }
 
 fB.select_single_contribution = function(taxon, func, colors){
@@ -304,7 +303,7 @@ fB.deselect_single_contribution = function(taxon, func, colors){
       return d.func == func && d.Taxa == taxon;
     });
 
-    selected.style("opacity", 0.6).style("fill", function(d){ return colors(d.func); });
+    selected.style("opacity", 0.75).style("fill", function(d){ return colors(d.func); });
 }
 
 this.fB = fB;

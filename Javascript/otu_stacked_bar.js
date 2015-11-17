@@ -138,7 +138,7 @@
       .style("fill", function(d) { 
         return colors(d.name); 
       })
-      .style("opacity", 0.6)
+      .style("opacity", 0.75)
       .on("mouseover", function(d){
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
@@ -253,7 +253,7 @@ otu_bar.deselect_bars = function(taxon, colors){
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 0.6)
+    .style("opacity", 0.75)
     .style("fill", function(d){ return colors(d.name); });
 }
 
