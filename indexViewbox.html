@@ -1,0 +1,159 @@
+	<!DOCTYPE html>
+<meta charset="utf-8">
+<style> 
+
+#mainsvg {
+	position:fixed;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+}
+</style>
+<!--  #Removed the header for now to work on positioning the main figure -CM
+<head>
+<div style="float:left">
+<h2>Exploring microbial community taxa and functions</h2>
+<h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
+<p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
+<p> data from <a href="http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html?message-global=remove" target="_blank">Theriot et al <i>Nature Communications</i> (2014)</a></p>
+</div>
+<button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
+</head> -->
+<body>
+<div id="mainplot"></div>
+
+<script src="Javascript/d3.v3.min.js"></script>
+
+<script>
+
+var width = Math.max(window.innerWidth, 800);
+var height = Math.max(window.innerHeight, 600);
+//var width = document.getElementById("mainplot").clientWidth;
+//var height = 400;
+var margin ={left:2, right:2, top:2, bottom:2 , barleft:2, bartop:2, barbottom:2, betwbars:4};
+var barDimensions = {width: (width / 2 - margin.betwbars), height: (height / 2) };
+var bpdims = {height: (height / 2)};
+var treewidth = width / 3;
+var i = 0,
+    duration = 300,
+    taxaroot,
+	funcroot,
+	roots = {};
+
+
+var MainSVG = d3.select("body").append("svg")
+	.attr("id","mainsvg")
+	//.attr("top","0")
+	//.attr("left","0")
+	//.attr("width","100%")
+	//.attr("height","100%")
+	//.attr("position","fixed");
+	//.attr("width",width)
+	//.attr("height",height)
+	.attr("viewBox","0 0 100 100")
+	.attr("preserveAspectRatio","none");
+
+	
+MainSVG.append("circle")
+	.attr("cx",0)
+	.attr("cy",0)
+	.attr("r",3)
+	.attr("fill","red");
+	
+	MainSVG.append("circle")
+	.attr("cx",0)
+	.attr("cy",100)
+	.attr("r",3)
+	.attr("fill","red");
+	
+	MainSVG.append("circle")
+	.attr("cx",100)
+	.attr("cy",100)
+	.attr("r",3)
+	.attr("fill","red");
+	
+	MainSVG.append("circle")
+	.attr("cx",100)
+	.attr("cy",0)
+	.attr("r",3)
+	.attr("fill","red");
+	
+
+var TaxaBar = MainSVG.append("svg")
+	.attr("x",margin.left)
+	.attr("y",50 + margin.bartop)
+	.attr("width",50 - margin.left - (margin.betwbars / 2))
+	.attr("height",50 - margin.bottom - margin.bartop)
+	.attr("viewBox","0 0 46 46")
+	//.attr("preserveAspectRatio","none")
+	.attr("id", "taxa_bars");
+	
+TaxaBar.append("rect")
+	.attr("fill","#000")
+	.attr("x",0)
+	.attr("y",0)
+	.attr("width","10")
+	.attr("height","10");
+	
+	TaxaBar.append("circle")
+	.attr("cx",46)
+	.attr("cy",46)
+	.attr("r",3)
+	.attr("fill","red");
+	
+	
+	
+	MainSVG.append("circle")
+	.attr("cx",50 - (margin.betwbars / 2))
+	.attr("cy",100 - margin.bottom)
+	.attr("r",2)
+	.attr("fill","blue");
+	
+
+	
+	
+/*
+var bpG = MainSVG.append("svg")
+	.attr("transform","translate("+ 50 +","+ margin.top +")");
+	
+var TaxaTreeG = MainSVG.append("svg")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+
+var FuncTreeG = MainSVG.append("svg")
+    .attr("x",margin.left + treewidth*2) +
+	.attr("y",margin.top)
+	.attr("width", )
+	.attr("height", )
+	.attr("viewBox", );
+
+
+
+var FunctionBar = MainSVG.append("svg")
+	.attr("x",50 + (margin.betwbars / 2))
+	.attr("y",50 + margin.bartop)
+	.attr("width",50 - margin.right - (margin.betwbars / 2))
+	.attr("height",50 - margin.bottom - margin.bartop)
+	.attr("viewBox","0 0 100 100")
+	.attr("id", "func_bars");
+
+
+
+var bpvisdata;
+
+var SVGs = {};
+SVGs["taxa"] = TaxaTreeG;
+SVGs["func"] = FuncTreeG;
+
+var levelNames = {};
+var curlevelNames = {};
+levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus"];
+levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+curlevelNames['taxa'] = levelNames['taxa'];
+curlevelNames['func'] = levelNames['func'];
+
+
+*/
+</script>
+</body>

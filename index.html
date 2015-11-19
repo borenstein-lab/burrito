@@ -19,8 +19,8 @@ rect{
 }
 */
 body {
-	width:100%;
-	height:100%;
+/*	width:100%;
+	height:100%; */
 	font-family: "Verdana", Verdana, sans-serif;
     font-size:12px;
 }
@@ -69,6 +69,7 @@ path.link {
 #mainplot{
 	width:100%;
 	height:100%;
+	vertical-align:top;
 }
 white-space: pre-line;
 </style>
@@ -106,11 +107,11 @@ white-space: pre-line;
 
 <script>
 
-var width = window.innerWidth;
-var height = window.innerHeight;
+var width = Math.max(window.innerWidth, 800);
+var height = Math.max(window.innerHeight, 600);
 //var width = document.getElementById("mainplot").clientWidth;
 //var height = 400;
-var margin ={left:0, right:0, top:0, bottom:0 , barleft:0, bartop:0, barbottom:0, betwbars:0};
+var margin ={left:2, right:2, top:2, bottom:2 , barleft:0, bartop:0, barbottom:0, betwbars:0};
 var barDimensions = {width: (width / 2 - margin.betwbars), height: (height / 2) };
 var bpdims = {height: (height / 2)};
 var treewidth = width / 3;
@@ -137,35 +138,44 @@ var diagonal = d3.svg.diagonal()
     return [d.y, d.x];
 });
 
-var NavSVG = d3.select("#navgraph").append("svg")
-	.attr("id","navsvg")
-	.attr('width',(margin.left + width + margin.right))
-	.attr('height',(margin.bottom + (height / 2) + margin.top));
-	
-NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
-NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
+var MainSVG = d3.select("#mainplot").append("svg")
+	.attr("id","mainsvg")
+	.attr("width",width)
+	.attr("height",height)
+	.attr("viewBox","0 0 100 100");
+
+//NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
+//NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
 
 
-var bpG = NavSVG.append("g")
-	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
+var bpG = MainSVG.append("svg")
+	.attr("transform","translate("+ 50 +","+ margin.top +")");
 	
-var TaxaTreeG = NavSVG.append("g")
+var TaxaTreeG = MainSVG.append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 
-var FuncTreeG = NavSVG.append("g")
-    .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
+var FuncTreeG = MainSVG.append("svg")
+    .attr("x",margin.left + treewidth*2) +
+	.attr("y",margin.top)
+	.attr("width", )
+	.attr("height", )
+	.attr("viewBox", );
 
-var BarSVG = d3.select("#barsgraph").append("svg")
-	.attr("width", (margin.barleft + width + margin.right))
-	.attr("height", (margin.barbottom + (height / 2) + margin.bartop));
-
-var TaxaBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.barleft + "," + margin.bartop + ")")
+var TaxaBar = MainSVG.append("svg")
+	.attr("x",margin.left)
+	.attr("y",50 + margin.bartop)
+	.attr("width",50 - margin.left - (margin.betwbars / 2))
+	.attr("height",50 - margin.bottom - margin.bartop)
+	.attr("viewBox","0 0 100 100")
 	.attr("id", "taxa_bars");
 
-var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + (margin.barleft + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
+var FunctionBar = MainSVG.append("svg")
+	.attr("x",50 + (margin.betwbars / 2))
+	.attr("y",50 + margin.bartop)
+	.attr("width",50 - margin.right - (margin.betwbars / 2))
+	.attr("height",50 - margin.bottom - margin.bartop)
+	.attr("viewBox","0 0 100 100")
 	.attr("id", "func_bars");
 
 
