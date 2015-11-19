@@ -106,11 +106,13 @@ white-space: pre-line;
 
 <script>
 
-var width = document.getElementById("mainplot").clientWidth;
-var height = 400;
-var margin ={left:40, right:40, top:70, bottom:10 , barleft:60, bartop:10, barbottom:105, betwbars:70};
-var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
-var bpdims = {height: height};
+var width = window.innerWidth;
+var height = window.innerHeight;
+//var width = document.getElementById("mainplot").clientWidth;
+//var height = 400;
+var margin ={left:0, right:0, top:0, bottom:0 , barleft:0, bartop:0, barbottom:0, betwbars:0};
+var barDimensions = {width: (width / 2 - margin.betwbars), height: (height / 2) };
+var bpdims = {height: (height / 2)};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -120,11 +122,11 @@ var i = 0,
 
 var TaxaTree = d3.layout.tree()
     .children(function (d) { return d.values; })
-    .size([height, treewidth*2/3]);
+    .size([(height/2), treewidth*2/3]);
 
 var FuncTree = d3.layout.tree()
     .children(function (d) { return d.values;})
-    .size([height, treewidth*2/3]);
+    .size([(height/2), treewidth*2/3]);
 
 var trees = [];
 trees["taxa"] = TaxaTree;
@@ -138,7 +140,7 @@ var diagonal = d3.svg.diagonal()
 var NavSVG = d3.select("#navgraph").append("svg")
 	.attr("id","navsvg")
 	.attr('width',(margin.left + width + margin.right))
-	.attr('height',(margin.bottom + height + margin.top));
+	.attr('height',(margin.bottom + (height / 2) + margin.top));
 	
 NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
 NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
@@ -156,7 +158,7 @@ var FuncTreeG = NavSVG.append("g")
 
 var BarSVG = d3.select("#barsgraph").append("svg")
 	.attr("width", (margin.barleft + width + margin.right))
-	.attr("height", (margin.barbottom + height + margin.bartop));
+	.attr("height", (margin.barbottom + (height / 2) + margin.bartop));
 
 var TaxaBar = BarSVG.append("g")
 	.attr("transform", "translate(" + margin.barleft + "," + margin.bartop + ")")
@@ -347,7 +349,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 					    }
 
 					    taxaroot = newTaxaData;
-					    taxaroot.x0 = height/2;
+					    taxaroot.x0 = height/4;
 					    taxaroot.y0 = 0;
 						
 					    function collapse(d) {
@@ -416,7 +418,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 					    }
 
 					    funcroot = newFunctionData;
-					    funcroot.x0 = height/2;
+					    funcroot.x0 = height/4;
 					    funcroot.y0 = 0;
 						
 						settype = 'func';
@@ -613,10 +615,10 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 										return 170+d.y;
 									}})
 								.attr("height", function(d) {
-									return (height / nleaf / 1.5);
+									return (height / 2 / nleaf / 1.5);
 									})
 								.attr("y", function (d) {
-									return (-1 * height / nleaf / 3); })
+									return (-1 * height / 2 / nleaf / 3); })
 								.attr("style","opacity:0")
 								;
 							
@@ -672,7 +674,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 										return 170+d.y;
 									}})
 								.attr("height", function(d) {
-									return (height / nleaf / 1.5);
+									return (height / 2 / nleaf / 1.5);
 									})
 								.attr("y", function (d) {
 									return (-1 * height / nleaf / 3); })
