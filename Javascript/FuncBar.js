@@ -256,7 +256,7 @@ fB.deselect_bars = function(func, colors){
 }
 
 fB.select_contribution = function(taxon, colors){
-  console.log(colors);
+  //console.log(colors);
   var selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
