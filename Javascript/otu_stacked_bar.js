@@ -49,11 +49,12 @@
 
   otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
 
+	var graphdims = {width: dims.width * 8/9, height: dims.height * 8/10}
     var x = d3.scale.ordinal()
-      .rangeRoundBands([0, dims.width], .3);
+      .rangeRoundBands([0, graphdims.width], .3);
 
     var y = d3.scale.linear()
-      .rangeRound([dims.height, 0]);
+      .rangeRound([graphdims.height, 0]);
 
     var xAxis = d3.svg.axis()
       .scale(x)
@@ -89,7 +90,7 @@
 
     svglink.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
+      .attr("transform", "translate(0," + graphdims.height + ")")
       .call(xAxis)
       .selectAll("text")
       .style("text-anchor", "end")
@@ -102,9 +103,9 @@
     svglink.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", -50)
-    .attr("x", -110)
-    .attr("font-size",16)
+    .attr("y", dims.height / 9)
+    .attr("x", 0)
+    .attr("font-size","10px")
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
     .text("Relative Contribution %");

@@ -71,6 +71,16 @@ path.link {
 	height:100%;
 	vertical-align:top;
 }
+#mainsvg {
+	position:fixed;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+}
+#sidebar {
+	z-index:5;
+}
 white-space: pre-line;
 </style>
 <!--  #Removed the header for now to work on positioning the main figure -CM
@@ -85,9 +95,9 @@ white-space: pre-line;
 </head> -->
 <body>
 <div id="mainplot">
-	<div id="navgraph">   </div>
-	<div id="barsgraph">  
-</dif>
+
+
+
 <svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
   <defs>
     <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="4" height="4">
@@ -98,6 +108,14 @@ white-space: pre-line;
 </svg>
 
 </div>
+
+<!--
+<defs>
+<svg id="sidebar" x="0px" width="250px" height="500px" position="absolute">
+	<rect width="100%" height="100%" fill="#F0F"/>
+</svg>
+</defs>  -->
+
 <script src="Javascript/textures.js"></script>
 <script src="Javascript/d3.v3.min.js"></script>
 <script src="Javascript/data_cube.js"></script>
@@ -107,12 +125,18 @@ white-space: pre-line;
 
 <script>
 
-var width = Math.max(window.innerWidth, 800);
-var height = Math.max(window.innerHeight, 600);
+
+
+var aspecrat = window.innerWidth / window.innerHeight;
+
+//var width = Math.max(window.innerWidth, 800);
+//var height = Math.max(window.innerHeight, 600);
+var width = 1000 * aspecrat;
+var height = 1000;
 //var width = document.getElementById("mainplot").clientWidth;
 //var height = 400;
-var margin ={left:2, right:2, top:2, bottom:2 , barleft:0, bartop:0, barbottom:0, betwbars:0};
-var barDimensions = {width: (width / 2 - margin.betwbars), height: (height / 2) };
+var margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
+var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
 var bpdims = {height: (height / 2)};
 var treewidth = width / 3;
 var i = 0,
@@ -140,46 +164,76 @@ var diagonal = d3.svg.diagonal()
 
 var MainSVG = d3.select("#mainplot").append("svg")
 	.attr("id","mainsvg")
-	.attr("width",width)
-	.attr("height",height)
-	.attr("viewBox","0 0 100 100");
+	.attr("viewBox","0 0 " + width + " " + height + "")
+	.attr("preserveAspectRatio","none");
 
 //NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
 //NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
 
+var NavSVG = MainSVG.append("svg")
+    .attr("x",margin.left)
+	.attr("y",margin.top)
+	.attr("width", width - margin.left - margin.right)
+	.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
+	.attr("id","navbar");
 
-var bpG = MainSVG.append("svg")
-	.attr("transform","translate("+ 50 +","+ margin.top +")");
+
+var bpG = NavSVG.append("g")
+	.attr("transform","translate("+ (width * 4.15/10) +","+ margin.top +")");
 	
-var TaxaTreeG = MainSVG.append("svg")
+var TaxaTreeG = NavSVG.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 
-var FuncTreeG = MainSVG.append("svg")
-    .attr("x",margin.left + treewidth*2) +
-	.attr("y",margin.top)
-	.attr("width", )
-	.attr("height", )
-	.attr("viewBox", );
+var FuncTreeG = NavSVG.append("g")
+    .attr("transform", "translate(" + (width*2/3) +  "," + margin.top + ")");
+
+
 
 var TaxaBar = MainSVG.append("svg")
 	.attr("x",margin.left)
-	.attr("y",50 + margin.bartop)
-	.attr("width",50 - margin.left - (margin.betwbars / 2))
-	.attr("height",50 - margin.bottom - margin.bartop)
-	.attr("viewBox","0 0 100 100")
-	.attr("id", "taxa_bars");
+	.attr("y",(height/2) + (margin.btwnavbar/2))
+	.attr("width",(width/2) - margin.left - (margin.btwbars/2))
+	.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+	//.attr("width",100)
+	//.attr("height",100)
+	//.attr("viewBox","0 0 100 100")
+	.attr("id", "taxa_bars")
+	//.attr("preserveAspectRatio","none");
+	//.attr("transform","scale(2.0)");
 
 var FunctionBar = MainSVG.append("svg")
-	.attr("x",50 + (margin.betwbars / 2))
-	.attr("y",50 + margin.bartop)
-	.attr("width",50 - margin.right - (margin.betwbars / 2))
-	.attr("height",50 - margin.bottom - margin.bartop)
-	.attr("viewBox","0 0 100 100")
+	.attr("x",(width/2) + (margin.btwbars/2))
+	.attr("y",(height/2) + (margin.btwnavbar/2))
+	.attr("width",(width/2) - margin.right - (margin.btwbars/2))
+	.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+	//.attr("viewBox","0 0 100 100")
 	.attr("id", "func_bars");
 
+	
 
 
+console.log("hi")
+var sidebarz = d3.select("#mainsvg").append("rect")
+	.attr("id","sidebar")
+	.attr("x",0)
+	.attr("y",0)
+	.attr("width","220")
+	.attr("height","400")
+	.attr("fill","#F0F");
+	
+sidebarz.on("click",function() {
+console.log("clicked")
+		var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
+		console.log(curpos)
+		if (curpos > -10) {
+			sidebarz.attr("x","-200");
+		} else {
+			sidebarz.attr("x","0");
+		}
+	} );
+	
+	
 var bpvisdata;
 
 var SVGs = {};
@@ -1087,5 +1141,7 @@ function hideheader () {
 	window.location = '#navsvg';
 } */
 
+
+	
 </script>
 </body>
