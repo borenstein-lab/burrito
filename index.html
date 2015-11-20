@@ -207,16 +207,15 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 	          						}
 						      	}
 						      	unique_desc = d3.set(descendents).values()
-						      	console.log(unique_desc)
 
 						      	sub_colors = []
 						      	for(k=0; k < unique_desc.length; k++){
 						      		new_color = d3.hcl(color_scale(main_list[j]))
 						      		color_range = Math.floor(unique_desc.length/2) //number of colors to expand in each direction
 						      		if(k <= unique_desc.length/2){
-						      			console.log(k/(color_range+1))
+/*						      			console.log(k/(color_range+1))
 						      			console.log(new_color)
-						      			new_color["l"] = new_color["l"] + 28 - 28*k/(color_range+1) //fill in the range of colors with increasing k
+*/						      			new_color["l"] = new_color["l"] + 28 - 28*k/(color_range+1) //fill in the range of colors with increasing k
 						      			new_color["h"] = new_color["h"] + 8 - 8*k/(color_range+1)
 						      			new_color["c"] = new_color["c"] + 4 - 4*k/(color_range+1)
 						      		} else{
@@ -364,8 +363,8 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 
 						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
-						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
+						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
 						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
@@ -377,7 +376,6 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							//remove old graph before redrawing new
 							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-
 							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 						}
 
@@ -460,9 +458,63 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							return (totchildren + addone);
 						}
 						
-						
+						//get mean taxon abundances across samples
+						var taxa_means = {}
+
+						function get_taxa_sample_means(otu_abundance_data, data_cube){
+							otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d != "Sample"})
+							for(j = 0; j < otus.length; j++){
+								taxa_means[otus[j]] = 0
+								for(k = 0; k < otu_abundance_data.length; k++){
+									taxa_means[otus[j]] += otu_abundance_data[k][otus[j]]*1
+								}
+								taxa_means[otus[j]] = taxa_means[otus[j]]/(otu_abundance_data.length)
+							}
+						}
+
+						function getAvgs(rootnode){
+					    	if(rootnode.type=="func"){
+					    		if(rootnode.key != "All Functions"){
+					    			func_leaves = data_cube.get_leaves(rootnode.key, data_cube.func_lookup)
+									funcAvg = 0
+									for(j = 0; j < func_leaves.length; j++){
+										funcAvg += data_cube.funcMeans[func_leaves[j]]
+									}
+									rootnode.sampleAvg = funcAvg
+						    	} else {
+						    		rootnode.values.forEach(function(d){
+										getAvgs(d)
+									})
+						    		rootnode.sampleAvg = 0.1
+						    	}
+							} else {
+								//taxa Avgs
+								if(rootnode.key != "All Taxa"){
+					    			taxa_leaves = data_cube.get_leaves(rootnode.key, data_cube.taxa_lookup)
+									taxaAvg = 0
+									for(j = 0; j < taxa_leaves.length; j++){
+										taxaAvg += taxa_means[taxa_leaves[j]]
+									}
+									rootnode.sampleAvg = taxaAvg
+								} else {
+									rootnode.values.forEach(function(d){
+										getAvgs(d)
+									})
+									rootnode.sampleAvg = 0.1
+								}
+							}
+							if(rootnode._values){
+								rootnode._values.forEach(function(d){
+									if(d._values){ getAvgs(d)}
+									
+								})
+							}
+						}
 						roots["taxa"] = taxaroot;
 						countchildren(roots["taxa"]);
+						//get means for all OTUs, then for all the way up the tree
+						get_taxa_sample_means(otu_abundance_data, data_cube)
+						getAvgs(roots["taxa"])
 					    update(roots["taxa"]);
 
 					    d3.select(self.frameElement).style("height", "800px");
@@ -502,6 +554,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 						
 						roots["func"] = funcroot;
 						countchildren(roots["func"]);
+						getAvgs(roots["func"])
 					    update(roots['func']);
 
 					    d3.select(self.frameElement).style("height", "800px");
@@ -764,9 +817,9 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							
 							nodeUpdate.select("circle")
 								.attr("r", function (d) {
-									if(d._values){
-										console.log(d.key)
-										return (4 * Math.sqrt(d.Ndescendents))
+									if(d.sampleAvg && d._values){
+										return 25 * Math.sqrt(d.sampleAvg)
+										//return (4 * Math.sqrt(d.Ndescendents))
 									}else{
 										return 4;
 									}

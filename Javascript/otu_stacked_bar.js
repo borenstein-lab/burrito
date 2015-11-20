@@ -142,7 +142,7 @@
       .on("mouseover", function(d){
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
-        tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" + (current_rectangle_data.y1-current_rectangle_data.y0)+"%");
+        tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
         return tooltip.style("visibility", "visible");
       })
       .on("mousemove", function(){ 
