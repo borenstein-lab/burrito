@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <style> /*
 body{ 
-	width:1200px;
+	width:100%;
 	margin:100px auto;
 }
 svg text{
@@ -18,10 +18,16 @@ rect{
   shape-rendering: crispEdges;
 }
 */
+body {
+/*	width:100%;
+	height:100%; */
+	font-family: "Verdana", Verdana, sans-serif;
+    font-size:12px;
+}
 .node circle {
    cursor: pointer;
    fill: #fff;
-   stroke: steelblue;
+   stroke: grey;
    stroke-width: 1.5px;
 }
 .node text {
@@ -33,11 +39,21 @@ path.link {
    stroke-width: 1.5px;
 }
 
-body{
-    font-family: "Verdana", Verdana, sans-serif;
-    font-size:12px;
+/*.svg_pattern {
+    display:inline-block;
+    width: 30%;
+    padding: 10px;
+    background-color: "yellow";
+    border: 1px solid #ddd;
+ }
+*/
+.error {
+	background-color="FF0000";
 }
-
+.crosshatch {
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==");
+  background-repeat: repeat;
+}
 #csvdata {
    display: none;
 }
@@ -52,34 +68,88 @@ body{
 }
 #navgraph{
 	float:top;
-	}
+}
+#mainplot{
+	width:100%;
+	height:100%;
+	vertical-align:top;
+}
+#mainsvg {
+	position:fixed;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+}
+#sidebar {
+	z-index:5;
+}
+
 white-space: pre-line;
 </style>
-<head>
+<body>
 <div style="float:left">
 <h2>Exploring microbial community taxa and functions</h2>
 <h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
 <p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
-<p> data from Theriot et al <i>Nature Communications</i> (2014)</p>
+<p> data from <a href="http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html?message-global=remove" target="_blank">Theriot et al <i>Nature Communications</i> (2014)</a></p>
+<p> Choose a file of taxonomic abundances: </p>
+<input type="file" id="taxonomic_abundances" onchange="document.getElementById('tax_abund_message').innerHTML=''"><span class="error" id="tax_abund_message"></span>
+<p> Choose a file of function abundances: </p>
+<input type="file" id="function_abundances" onchange="document.getElementById('func_abund_message').innerHTML=''"><span class="error" id="func_abund_message"></span>
+<p> Choose a file indicating functional contributions of taxa to functions by sample (for example, PiCrust output): </p>
+<input type="file" id="function_contributions" onchange="document.getElementById('func_contrib_message').innerHTML=''"><span class="error" id="func_contrib_message"></span>
+<p> Choose a file describing the taxonomic hierarchy of your data: </p>
+<input type="file" id="taxonomic_hierarchy" onchange="document.getElementById('tax_hierarchy_message').innerHTML=''"><span class="error" id="tax_hierarchy_message"></span>
+<p> Choose a file describing the functional hierarchy of your data: </p>
+<input type="file" id="function_hierarchy" onchange="document.getElementById('func_hierarchy_message').innerHTML=''"><span class="error" id="func_hierarchy_message"></span>
+<p> (Optional) Choose a file describing the division of samples by condition: </p>
+<input type="file" id="sample_map">
+<br>
+<button id="update_button" type="button">Update Graphics</button>
+<span class="error" id="upload_message"></span>
 </div>
 <button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
-</head>
-<body>
-<div id="navgraph">   </div>
-<div id="barsgraph">   </div>
-<!--script src="http://d3js.org/d3.v3.min.js"-->
+<div id="mainplot">
+
+
+
+<svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="4" height="4">
+      <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==" x="0" y="0" width="4" height="4">
+      </image>
+    </pattern>
+  </defs>
+</svg>
+
+</div>
+
+
+<script src="Javascript/textures.js"></script>
 <script src="Javascript/d3.v3.min.js"></script>
 <script src="Javascript/data_cube.js"></script>
 <script src="Javascript/bp2.js"></script>
 <script src="Javascript/FuncBar.js"></script>
 <script src="Javascript/otu_stacked_bar.js"></script>
+<script src="Javascript/colorbrewer.js"></script>
+<script src="Javascript/upload.js"></script>
+
 <script>
 
 
 
-var width = 1200, height = 400, margin ={left:40, right:40, top:50, bottom:10 , barleft:60, bartop:10, barbottom:105, betwbars:70};
-var barDimensions = {width: (width / 2 - margin.betwbars), height:height };
-var bpdims = {height: height};
+var aspecrat = window.innerWidth / window.innerHeight;
+
+//var width = Math.max(window.innerWidth, 800);
+//var height = Math.max(window.innerHeight, 600);
+var width = 1000 * aspecrat;
+var height = 1000;
+//var width = document.getElementById("mainplot").clientWidth;
+//var height = 400;
+var margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
+var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+var bpdims = {height: (height / 2)};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -89,11 +159,11 @@ var i = 0,
 
 var TaxaTree = d3.layout.tree()
     .children(function (d) { return d.values; })
-    .size([height, treewidth*2/3]);
+    .size([(height/2), treewidth*2/3]);
 
 var FuncTree = d3.layout.tree()
     .children(function (d) { return d.values;})
-    .size([height, treewidth*2/3]);
+    .size([(height/2), treewidth*2/3]);
 
 var trees = [];
 trees["taxa"] = TaxaTree;
@@ -104,936 +174,1330 @@ var diagonal = d3.svg.diagonal()
     return [d.y, d.x];
 });
 
-var NavSVG = d3.select("#navgraph").append("svg")
-	.attr("id","navsvg")
-	.attr('width',(margin.left + width + margin.right))
-	.attr('height',(margin.bottom + height + margin.top));
+var MainSVG = d3.select("#mainplot").append("svg")
+	.attr("id","mainsvg")
+	.attr("viewBox","0 0 " + width + " " + height + "")
+	.attr("preserveAspectRatio","none");
 
-var bpG = NavSVG.append("g")
-	.attr("transform","translate("+ (margin.left * 2 + treewidth) +","+ margin.top +")");
+var sidebarz = d3.select("#mainsvg").append("svg")
+.attr("id","sidebar")
+.attr("x",0)
+.attr("y",0)
+.attr("width","220")
+.attr("height","700")
+
+var sidebar_background = d3.select("#sidebar").append("rect")
+.attr("id","sidebar_background")
+.attr("x",0)
+.attr("y",0)
+.attr("width","220")
+.attr("height","700")
+.attr("fill","#8B8386");
+
+var sidebar_hide = d3.select("#sidebar").append("rect")
+.attr("id","sidebar_hide")
+.attr("x",190)
+.attr("y",0)
+.attr("width","30")
+.attr("height","30")
+.attr("fill","#000000");
+
+sidebar_hide.on("click",function() {
+console.log("clicked")
+	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
+	console.log(curpos)
+	if (curpos > -10) {
+		sidebarz.attr("x","-190");
+	} else {
+		sidebarz.attr("x","0");
+	}
+} );
+
+var tax_abund_button = d3.select("#sidebar").append("rect")
+.attr("id", "svg_tax_abund_button")
+.attr("x", 10)
+.attr("y", 10)
+.attr("width", "140")
+.attr("height", "70")
+.attr("fill","#FF0000");
+
+tax_abund_button.on("click", function(){
+	document.getElementById("taxonomic_abundances").click();
+	});
+
+var tax_abund_button_text_1 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 40)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Taxonomic");
+
+var tax_abund_button_text_2 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 60)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Abundances");
+
+var func_abund_button = d3.select("#sidebar").append("rect")
+.attr("id", "svg_func_abund_button")
+.attr("x", 10)
+.attr("y", 100)
+.attr("width", "140")
+.attr("height", "70")
+.attr("fill","#FF0000");
+
+func_abund_button.on("click", function(){
+	document.getElementById("function_abundances").click();
+	});
+
+var func_abund_button_text_1 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 130)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Function");
+
+var func_abund_button_text_2 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 150)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Abundances");
+
+var func_contrib_button = d3.select("#sidebar").append("rect")
+.attr("id", "svg_func_contrib_button")
+.attr("x", 10)
+.attr("y", 190)
+.attr("width", "140")
+.attr("height", "70")
+.attr("fill","#FF0000");
+
+func_contrib_button.on("click", function(){
+	document.getElementById("function_contributions").click();
+	});
+
+var func_contrib_button_text_1 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 220)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Function");
+
+var func_contrib_button_text_2 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 240)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Contributions");
+
+var tax_hierarchy_button = d3.select("#sidebar").append("rect")
+.attr("id", "svg_tax_hierarchy_button")
+.attr("x", 10)
+.attr("y", 280)
+.attr("width", "140")
+.attr("height", "70")
+.attr("fill","#FF0000");
+
+tax_hierarchy_button.on("click", function(){
+	document.getElementById("taxonomic_hierarchy").click();
+	});
+
+var tax_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 310)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Taxonomic");
+
+var tax_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 330)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Hierarchy");
+
+var func_hierarchy_button = d3.select("#sidebar").append("rect")
+.attr("id", "svg_func_hierarchy_button")
+.attr("x", 10)
+.attr("y", 370)
+.attr("width", "140")
+.attr("height", "70")
+.attr("fill","#FF0000");
+
+func_hierarchy_button.on("click", function(){
+	document.getElementById("function_hierarchy").click();
+	});
+
+var func_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 400)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Function");
+
+var func_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 420)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Hierarchy");
+
+var samp_map_button = d3.select("#sidebar").append("rect")
+.attr("id", "svg_samp_map_button")
+.attr("x", 10)
+.attr("y", 460)
+.attr("width", "140")
+.attr("height", "70")
+.attr("fill","#FF0000");
+
+samp_map_button.on("click", function(){
+	document.getElementById("sample_map").click();
+	});
+
+var tax_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 490)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Sample");
+
+var tax_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
+.attr("x", 80)
+.attr("y", 510)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Mapping");
+
+var update_button = d3.select("#sidebar").append("rect")
+.attr("id", "svg_update_button")
+.attr("x", 40)
+.attr("y", 600)
+.attr("width", "140")
+.attr("height", "70")
+.attr("fill","#0000FF");
+
+update_button.on("click", function(){
+	document.getElementById("update_button").click();
+	});
+
+var update_button_text_1 = d3.select("#sidebar").append("text")
+.attr("x", 110)
+.attr("y", 630)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Update");
+
+var update_button_text_2 = d3.select("#sidebar").append("text")
+.attr("x", 110)
+.attr("y", 650)
+.attr("font-size", "20px")
+.attr("text-anchor", "middle")
+.text("Graphics");
+
+//NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
+//NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
+
+draw_everything = function(tax_abund_text, func_abund_text, func_contrib_text, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
+
+	d3.select("#navbar").remove()
+	d3.select("#taxa_bars").remove()
+	d3.select("#func_bars").remove()
+
+	var NavSVG = MainSVG.insert("svg", "#sidebar")
+	    .attr("x",margin.left)
+		.attr("y",margin.top)
+		.attr("width", width - margin.left - margin.right)
+		.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
+		.attr("id","navbar");
+
+
+	var bpG = NavSVG.append("g")
+		.attr("transform","translate("+ (width * 4.15/10) +","+ margin.top +")");
+		
+	var TaxaTreeG = NavSVG.append("g")
+	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+
+	var FuncTreeG = NavSVG.append("g")
+	    .attr("transform", "translate(" + (width*2/3) +  "," + margin.top + ")");
+
+
+
+	var TaxaBar = MainSVG.insert("svg", "#sidebar")
+		.attr("x",margin.left)
+		.attr("y",(height/2) + (margin.btwnavbar/2))
+		.attr("width",(width/2) - margin.left - (margin.btwbars/2))
+		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+		//.attr("width",100)
+		//.attr("height",100)
+		//.attr("viewBox","0 0 100 100")
+		.attr("id", "taxa_bars")
+		//.attr("preserveAspectRatio","none");
+		//.attr("transform","scale(2.0)");
+
+	var FunctionBar = MainSVG.insert("svg", "#sidebar")
+		.attr("x",(width/2) + (margin.btwbars/2))
+		.attr("y",(height/2) + (margin.btwnavbar/2))
+		.attr("width",(width/2) - margin.right - (margin.btwbars/2))
+		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+		//.attr("viewBox","0 0 100 100")
+		.attr("id", "func_bars");
+		
+		
+	var bpvisdata;
+
+	var SVGs = {};
+	SVGs["taxa"] = TaxaTreeG;
+	SVGs["func"] = FuncTreeG;
+
+	var levelNames = {};
+	var curlevelNames = {};
+	levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus"];
+	levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+	curlevelNames['taxa'] = levelNames['taxa'];
+	curlevelNames['func'] = levelNames['func'];
+
+	contribution_data = d3.tsv.parse(func_contrib_text);
+	taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
+	func_tree_data = d3.tsv.parse(func_hierarchy_text);
+	func_rel_abundance_data = d3.tsv.parse(func_abund_text);
+	samplemap = d3.tsv.parse(samp_map_text);
+	otu_abundance_data = d3.tsv.parse(tax_abund_text);
+
+
+	//initialize display cube
+	var data_cube = data_cube_wrapper.make_cube();
+	data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
+	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
+		for(j=0; j < main_list.length; j++){
+			var descendents = [];
+	      // Use a BFS to collect all descendents
+				var curr_nodes = [];
+				if(list_type=="taxa") {
+					parent = data_cube.taxa_lookup[main_list[j]]
+					} else if(list_type=="funcs"){
+						parent = data_cube.func_lookup[main_list[j]]
+					} 
+				curr_nodes.push(parent);
+				for (; curr_nodes.length > 0;){
+				curr_node = curr_nodes.shift();
+					if(curr_node.key !== main_list[j]) descendents.push(curr_node.key);
+					if(data_cube.is_leaf(curr_node)===false){
+						for (var i = 0; i < curr_node.values.length; i++){
+	            		curr_nodes.push(curr_node.values[i]);
+	          		}
+					}
+	      	}
+	      	unique_desc = d3.set(descendents).values()
+
+	      	sub_colors = []
+	      	for(k=0; k < unique_desc.length; k++){
+	      		new_color = d3.hcl(color_scale(main_list[j]))
+	      		color_range = Math.floor(unique_desc.length/2) //number of colors to expand in each direction
+	      		if(k <= unique_desc.length/2){
+/*						      			console.log(k/(color_range+1))
+	      			console.log(new_color)
+*/						      			new_color["l"] = new_color["l"] + 28 - 28*k/(color_range+1) //fill in the range of colors with increasing k
+	      			new_color["h"] = new_color["h"] + 8 - 8*k/(color_range+1)
+	      			new_color["c"] = new_color["c"] + 4 - 4*k/(color_range+1)
+	      		} else{
+	      			new_color["l"] = new_color["l"] - 28 + 28*k/(color_range+1)
+	      			new_color["h"] = new_color["h"] - 8 + 8*k/(color_range+1)
+	      			new_color["c"] = new_color["c"] - 4 + 4*k/(color_range+1)
+				}
+	      		sub_colors.push(new_color.toString())						      			
+			}
+			d3.shuffle(sub_colors)
+
+	      	color_scale.range(color_scale.range().concat(sub_colors))
+	      	//assign colors to unique elements
+	      	for(k = 0; k < unique_desc.length; k++){
+	      		color_scale(unique_desc[k])
+	      		//console.log(color_scale(unique_desc[k]))
+	      	}
+		}
+		return color_scale;
+
+	}
+
+	//set up colors using data cube
+	//colors	
+	//start one level in for bacteria but at the 0th level for functions
+	num_function_categories = data_cube.func_tree.length
+	num_taxa_categories = data_cube.taxa_tree[0].values.length
+
+	//taxa colors
+	var taxa_colors = d3.scale.ordinal()
+	taxa_colors.range((colorbrewer["Set3"][num_taxa_categories]).reverse())
+	main_taxa = data_cube.taxa_tree[0].values.map(function(d){ return d.key;})
+	taxa_colors.domain(main_taxa)
+	taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
+	taxa_colors.range().push("black")
+	console.log(taxa_colors("Bacteria"))
+	taxa_colors.range().push("black")
+	console.log(taxa_colors("All Taxa"))
+
+	//func colors
+	var func_colors = d3.scale.ordinal()
+	func_colors.range(colorbrewer["Set1"][num_function_categories])
+	main_funcs = data_cube.func_tree.map(function(d){ return d.key;})
+	func_colors.domain(main_funcs)
+	func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
+	func_colors.range().push("black")
+	console.log(func_colors("All Functions"))
+
+
+	//sample colors
+	groupValsAll = samplemap.map(function(d,i){ 
+		return d["Group"]; })
+
+	groupVals = groupValsAll.filter(function(d,i){ return groupValsAll.indexOf(d)===i; })
+
+	var sampleColor = d3.scale.ordinal().domain(groupVals).range(colorbrewer["Paired"][Math.max(4,groupVals.length)].slice(0,groupVals.length));
 	
-var TaxaTreeG = NavSVG.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	getLinkData = function(){
+		//get unique linked functions for each taxon
+		allSamples = d3.keys(data_cube.displayed_contribution_cube);
+		var all_taxa_links = []; //{Taxa:[], Functions:[]};
+		data_cube.displayed_taxa.map(function(t,i){
+			data_cube.displayed_funcs.map(function(f,i){
+				var foo = allSamples.map(function(d){
+					return data_cube.get_contribution(d,t,f);
+				})
+				if(d3.sum(foo)!==0){
+					all_taxa_links.push({Taxa:t, Functions:f, numKO:1});
+				}
+			})
+		});
+		return all_taxa_links;
+	}
+
+	//this gets the data for the functional bar chart
+
+	getFuncBarData = function(){
+		var contributions = [];
+		var samples = [];
+		var funcs = [];
+		var taxa = [];
+
+		var all_func_data = [];
+		var count = 0;
+		var tcount = 0;
+
+		allSamples = d3.keys(data_cube.displayed_contribution_cube).sort();
+		var all_taxa_links = []; //{Taxa:[], Functions:[]};
+		//loop through all the functions
+		//this keeps all functions together
+
+		//loop through Samples, funcs and taxa and create arrays of the data
+		allSamples.map(function(d){	
+			samples.push({sample:d});
+		});
+		var my_displayed_funcs = data_cube.displayed_funcs.slice(0);
+		my_displayed_funcs.reverse();
+		(my_displayed_funcs).map(function(z){
+			funcs.push(z);
+		});
+		var my_displayed_taxa = data_cube.displayed_taxa.slice(0);
+		my_displayed_taxa.reverse();
+		(my_displayed_taxa).map(function(t,i){
+			taxa.push(t)
+		});
+		//then loop through sequentially to populate an array of all the samples
+		samples.map(function(n){
+			funcs.map(function(m){
+
+				taxa.map(function(tt){	
+					contributions.push({func:m, Taxa:tt, Sample:n.sample, contributions:data_cube.get_contribution([n.sample],[tt],[m])});})
+			})
+		var temp = [];
+		contributions.map(function(q){
+			if (q.Sample == n.sample) {
+				temp.push({func:q.func, Taxa:q.Taxa, Sample:q.Sample, contributions:q.contributions});}
+		})
+
+		all_func_data.push({data:temp, Sample:n.sample});
+		count = count + 1
+		});
+		return all_func_data;
+	}
+
+	function sort_nest(x, y){
+		if (x.key < y.key){
+			return -1;
+		} else if (x.key > y.key){
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
+	var taxLevels = d3.keys(taxa_tree_data[0]);
+	//data_cube.expand_taxon("Bacteria");
+
+	var bpData = getLinkData();
+	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+
+
+	//draw the stacked bar
+
+	var stackData = getFuncBarData();
+
+	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+
+
+	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+
+	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+
+
+	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
+
+
+	function update_otu_bar(){
+		//remove old graph before redrawing new
+		TaxaBar.selectAll("g").remove();
+		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+	}
+
+	function update_func_bar(){
+		//remove old graph before redrawing new
+			FunctionBar.selectAll("g").remove();
+			var func_data = getFuncBarData();
+			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+
+	}
+
+	//data_cube.expand_func("Metabolism");
+	var bpData = getLinkData();
+	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
+
+	var taxa_data = d3.nest()
+        .key(function(d) { return d.Kingdom; })
+        .key(function(d) { return d.Phylum; })
+        .key(function(d) { return d.Class; })
+        .key(function(d) { return d.Order; })
+        .key(function(d) { return d.Family; })
+        .key(function(d) { return d.Genus; })
+        .entries(taxa_tree_data);    
+
+		
+    var curr_taxa = [];
+    for (var i = 0; i < taxa_data.length; i++){
+	    curr_taxa.push(taxa_data[i]);
+	}
+    for (; curr_taxa.length > 0;){
+    	curr_taxon = curr_taxa.shift();
+    	if (!data_cube.is_leaf(curr_taxon)){
+    		curr_taxon.values.sort(sort_nest);
+    		for (var i = 0; i < curr_taxon.values.length; i++){
+    			curr_taxa.push(curr_taxon.values[i]);
+    		}
+    	}
+    }
+
+    newTaxaData = {
+        "key": "All Taxa",
+        "values": taxa_data,
+    }
+
+    taxaroot = newTaxaData;
+    taxaroot.x0 = height/4;
+    taxaroot.y0 = 0;
 	
+    function collapse(d) {
+		d.type = settype;
+            if (d.values) {
+                d._values = d.values;
+                d._values.forEach(collapse);
+                d.values = null;
+            }
+        
+    }
+	
+	var settype = 'taxa';
+    taxaroot.values.forEach(collapse);
+	taxaroot.type = 'taxa';
 
-var FuncTreeG = NavSVG.append("g")
-    .attr("transform", "translate(" + (margin.left + treewidth*2) + "," + margin.top + ")");
+	function countchildren(rootnode) {
+		var totchildren = 0;
+		var addone = 1;
+		if (rootnode.values) {
+			rootnode.values.forEach( function(d) {
+				totchildren = totchildren + countchildren(d);
+			})
+			addone = 0;
+		} 
+		if (rootnode._values) {
+			rootnode._values.forEach( function(d) {
+				totchildren = totchildren + countchildren(d);
+			})
+			addone = 0;
+		}
+		rootnode.Ndescendents = totchildren;
+		return (totchildren + addone);
+	}
+	
+	//get mean taxon abundances across samples
+	var taxa_means = {}
 
-var BarSVG = d3.select("#barsgraph").append("svg")
-	.attr("width", (margin.barleft + width + margin.right))
-	.attr("height", (margin.barbottom + height + margin.bartop));
+	function get_taxa_sample_means(otu_abundance_data, data_cube){
+		otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d != "Sample"})
+		for(j = 0; j < otus.length; j++){
+			taxa_means[otus[j]] = 0
+			for(k = 0; k < otu_abundance_data.length; k++){
+				taxa_means[otus[j]] += otu_abundance_data[k][otus[j]]*1
+			}
+			taxa_means[otus[j]] = taxa_means[otus[j]]/(otu_abundance_data.length)
+		}
+	}
 
-var TaxaBar = BarSVG.append("g")
-	.attr("transform", "translate(" + margin.barleft + "," + margin.bartop + ")")
-	.attr("id", "taxa_bars");
+	function getAvgs(rootnode){
+    	if(rootnode.type=="func"){
+    		if(rootnode.key != "All Functions"){
+    			func_leaves = data_cube.get_leaves(rootnode.key, data_cube.func_lookup)
+				funcAvg = 0
+				for(j = 0; j < func_leaves.length; j++){
+					funcAvg += data_cube.funcMeans[func_leaves[j]]
+				}
+				rootnode.sampleAvg = funcAvg
+	    	} else {
+	    		rootnode.values.forEach(function(d){
+					getAvgs(d)
+				})
+	    		rootnode.sampleAvg = 0.1
+	    	}
+		} else {
+			//taxa Avgs
+			if(rootnode.key != "All Taxa"){
+    			taxa_leaves = data_cube.get_leaves(rootnode.key, data_cube.taxa_lookup)
+				taxaAvg = 0
+				for(j = 0; j < taxa_leaves.length; j++){
+					taxaAvg += taxa_means[taxa_leaves[j]]
+				}
+				rootnode.sampleAvg = taxaAvg
+			} else {
+				rootnode.values.forEach(function(d){
+					getAvgs(d)
+				})
+				rootnode.sampleAvg = 0.1
+			}
+		}
+		if(rootnode._values){
+			rootnode._values.forEach(function(d){
+				if(d._values){ getAvgs(d)}
+				
+			})
+		}
+	}
+	roots["taxa"] = taxaroot;
+	countchildren(roots["taxa"]);
+	//get means for all OTUs, then for all the way up the tree
+	get_taxa_sample_means(otu_abundance_data, data_cube)
+	getAvgs(roots["taxa"])
+    update(roots["taxa"]);
 
-var FunctionBar = BarSVG.append("g")
-	.attr("transform", "translate(" + (margin.barleft + barDimensions.width + margin.betwbars) + "," + margin.bartop + ")")
-	.attr("id", "func_bars");
+    d3.select(self.frameElement).style("height", "800px");
 
+    var function_data = d3.nest()
+        .key(function(d) { return d.Category; })
+        .key(function(d) { return d.SuperPathway; })
+        .key(function(d) { return d.SubPathway; })
+        .entries(func_tree_data);  
 
+    var curr_funcs = [];
+    for (var i = 0; i < function_data.length; i++){
+	    curr_funcs.push(function_data[i]);
+	}
+    for (; curr_funcs.length > 0;){
+    	curr_func = curr_funcs.shift();
+    	if (!data_cube.is_leaf(curr_func)){
+    		curr_func.values.sort(sort_nest);
+    		for (var i = 0; i < curr_func.values.length; i++){
+    			curr_funcs.push(curr_func.values[i]);
+    		}
+    	}
+    }  
 
-var bpvisdata;
+    newFunctionData = {
+        "key": "All Functions",
+        "values": function_data,
+    }
 
-var SVGs = {};
-SVGs["taxa"] = TaxaTreeG;
-SVGs["func"] = FuncTreeG;
+    funcroot = newFunctionData;
+    funcroot.x0 = height/4;
+    funcroot.y0 = 0;
+	
+	settype = 'func';
+    funcroot.values.forEach(collapse);
+	funcroot.type = settype;
+	
+	roots["func"] = funcroot;
+	countchildren(roots["func"]);
+	getAvgs(roots["func"])
+    update(roots['func']);
 
-var levelNames = {};
-var curlevelNames = {};
-levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus"];
-levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
-curlevelNames['taxa'] = levelNames['taxa'];
-curlevelNames['func'] = levelNames['func'];
-
-d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error, contribution_data) {
-    d3.tsv("Data/taxa_mapping2.txt", function(error, taxa_tree_data){
-		d3.tsv("Data/function_mapping2.txt", function(error, func_tree_data){
-			d3.tsv("Data/reduced_pathway_functions_transpose.txt", function(error, func_rel_abundance_data){
-				d3.tsv("Data/mice_samplemap.txt", function(error, samplemap){
-					d3.tsv("Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
-
-						var taxa_colors = d3.scale.category20();
-						var func_colors = d3.scale.category20();
-
-						//initialize display cube
-						var data_cube = data_cube_wrapper.make_cube();
-						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
-
-						
-						getLinkData = function(){
-							//get unique linked functions for each taxon
-							allSamples = d3.keys(data_cube.displayed_contribution_cube);
-							var all_taxa_links = []; //{Taxa:[], Functions:[]};
-							data_cube.displayed_taxa.map(function(t,i){
-								data_cube.displayed_funcs.map(function(f,i){
-									var foo = allSamples.map(function(d){
-										return data_cube.get_contribution(d,t,f);
-									})
-									if(d3.sum(foo)!==0){
-										all_taxa_links.push({Taxa:t, Functions:f, numKO:1});
-									}
-								})
-							});
-							return all_taxa_links;
-						}
-
-						//this gets the data for the functional bar chart
-
-						getFuncBarData = function(){
-							var contributions = [];
-							var samples = [];
-							var funcs = [];
-							var taxa = [];
-
-							var all_func_data = [];
-							var count = 0;
-							var tcount = 0;
-
-							allSamples = d3.keys(data_cube.displayed_contribution_cube).sort();
-							var all_taxa_links = []; //{Taxa:[], Functions:[]};
-							//loop through all the functions
-							//this keeps all functions together
-
-							//loop through Samples, funcs and taxa and create arrays of the data
-							allSamples.map(function(d){	
-								samples.push({sample:d});
-							});
-							var my_displayed_funcs = data_cube.displayed_funcs.slice(0);
-							my_displayed_funcs.reverse();
-							(my_displayed_funcs).map(function(z){
-								funcs.push(z);
-							});
-							var my_displayed_taxa = data_cube.displayed_taxa.slice(0);
-							my_displayed_taxa.reverse();
-							(my_displayed_taxa).map(function(t,i){
-								taxa.push(t)
-							});
-							//then loop through sequentially to populate an array of all the samples
-							samples.map(function(n){
-								funcs.map(function(m){
-
-									taxa.map(function(tt){	
-										contributions.push({func:m, Taxa:tt, Sample:n.sample, contributions:data_cube.get_contribution([n.sample],[tt],[m])});})
-								})
-							var temp = [];
-							contributions.map(function(q){
-								if (q.Sample == n.sample) {
-									temp.push({func:q.func, Taxa:q.Taxa, Sample:q.Sample, contributions:q.contributions});}
-							})
-
-							all_func_data.push({data:temp, Sample:n.sample});
-							count = count + 1
-							});
-							return all_func_data;
-						}
-
-						function sort_nest(x, y){
-							if (x.key < y.key){
-								return -1;
-							} else if (x.key > y.key){
-								return 1;
-							} else {
-								return 0;
-							}
-						}
-
-						//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
-						var taxLevels = d3.keys(taxa_tree_data[0]);
-						//data_cube.expand_taxon("Bacteria");
-
-						var bpData = getLinkData();
-						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-
-
-						//draw the stacked bar
-
-						var stackData = getFuncBarData();
-
-						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
-
-						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
-
-
-						bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
-
-
-						function update_otu_bar(){
-							//remove old graph before redrawing new
-							TaxaBar.selectAll("g").remove();
-							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-
-							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
-						}
-
-						function update_func_bar(){
-							//remove old graph before redrawing new
-								FunctionBar.selectAll("g").remove();
-								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
-
-						}
-
-						//data_cube.expand_func("Metabolism");
-						var bpData = getLinkData();
-						var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-						bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
-
-						var taxa_data = d3.nest()
-					        .key(function(d) { return d.Kingdom; })
-					        .key(function(d) { return d.Phylum; })
-					        .key(function(d) { return d.Class; })
-					        .key(function(d) { return d.Order; })
-					        .key(function(d) { return d.Family; })
-					        .key(function(d) { return d.Genus; })
-					        .entries(taxa_tree_data);    
+    d3.select(self.frameElement).style("height", "800px");
+	click(roots['taxa'].values[0])
 
 							
-					    var curr_taxa = [];
-					    for (var i = 0; i < taxa_data.length; i++){
-						    curr_taxa.push(taxa_data[i]);
-						}
-					    for (; curr_taxa.length > 0;){
-					    	curr_taxon = curr_taxa.shift();
-					    	if (!data_cube.is_leaf(curr_taxon)){
-					    		curr_taxon.values.sort(sort_nest);
-					    		for (var i = 0; i < curr_taxon.values.length; i++){
-					    			curr_taxa.push(curr_taxon.values[i]);
-					    		}
-					    	}
-					    }
-
-					    newTaxaData = {
-					        "key": "All Taxa",
-					        "values": taxa_data,
-					    }
-
-					    taxaroot = newTaxaData;
-					    taxaroot.x0 = height/2;
-					    taxaroot.y0 = 0;
-						
-					    function collapse(d) {
-							d.type = settype;
-					            if (d.values) {
-					                d._values = d.values;
-					                d._values.forEach(collapse);
-					                d.values = null;
-					            }
-					        
-					    }
-						
-						var settype = 'taxa';
-					    taxaroot.values.forEach(collapse);
-						taxaroot.type = 'taxa';
-
-						function countchildren(rootnode) {
-							var totchildren = 0;
-							var addone = 1;
-							if (rootnode.values) {
-								rootnode.values.forEach( function(d) {
-									totchildren = totchildren + countchildren(d);
-								})
-								addone = 0;
-							} 
-							if (rootnode._values) {
-								rootnode._values.forEach( function(d) {
-									totchildren = totchildren + countchildren(d);
-								})
-								addone = 0;
-							}
-							rootnode.Ndescendents = totchildren;
-							return (totchildren + addone);
-						}
-						
-						
-						roots["taxa"] = taxaroot;
-						countchildren(roots["taxa"]);
-					    update(roots["taxa"]);
-
-					    d3.select(self.frameElement).style("height", "800px");
-
-					    var function_data = d3.nest()
-					        .key(function(d) { return d.Category; })
-					        .key(function(d) { return d.SuperPathway; })
-					        .key(function(d) { return d.SubPathway; })
-					        .entries(func_tree_data);  
-
-					    var curr_funcs = [];
-					    for (var i = 0; i < function_data.length; i++){
-						    curr_funcs.push(function_data[i]);
-						}
-					    for (; curr_funcs.length > 0;){
-					    	curr_func = curr_funcs.shift();
-					    	if (!data_cube.is_leaf(curr_func)){
-					    		curr_func.values.sort(sort_nest);
-					    		for (var i = 0; i < curr_func.values.length; i++){
-					    			curr_funcs.push(curr_func.values[i]);
-					    		}
-					    	}
-					    }  
-
-					    newFunctionData = {
-					        "key": "All Functions",
-					        "values": function_data,
-					    }
-
-					    funcroot = newFunctionData;
-					    funcroot.x0 = height/2;
-					    funcroot.y0 = 0;
-						
-						settype = 'func';
-					    funcroot.values.forEach(collapse);
-						funcroot.type = settype;
-						
-						roots["func"] = funcroot;
-						countchildren(roots["func"]);
-					    update(roots['func']);
-
-					    d3.select(self.frameElement).style("height", "800px");
-						
-												
-						// Update the tree graphs
-						// Expands or collapses the source node, depending on whether it is currently open or closed
-						function update(source) {
-							// Compute the new tree layout.
-							var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
-								links = trees[source.type].links(nodes);
-								
-
-							var nleaf = 0;
-							nodes.forEach(function (d) {
-								nleaf = nleaf + (d.values ? 0 : 1);
-							})
-							/*
-							//console.log(nleaf);
-							
-							var leafC = 1;
-							*/
-							nodes.forEach(function (d) {
-								if (!(d.values)) { 
-									var dattype = d.type == "taxa" ? 0 : 1;
-									var thedat = -1;
-
-									for (var idxz = 0; idxz < bpvisdata.keys[dattype].length ; idxz++) {
-										if (d.key == bpvisdata.keys[dattype][idxz])
-											thedat = idxz;
-									}
-									
-									if (thedat >= 0) {
-										d.x = bpvisdata.mainBars[dattype][thedat].y;	
-									} else { d.x = 0; 
-									}
-									
-									//d.x = (nleaf - leafC)/nleaf * height;
-									//leafC = leafC + 1;
-								} else { 
-									var sumpos = 0;
-									d.values.forEach(function (dc) {
-										sumpos = sumpos + dc.x;
-									})
-									d.x = sumpos / d.values.length; 
-								}
-							})
-							
-							
-							// Normalize for fixed-depth.
-							var maxDepth = getDepth(roots[source.type]);
-							
-							var depthpos = {};
-							depthpos['taxa'] = [];
-							depthpos['func'] = [];
-							nodes.forEach(function (d) {
-								if (source.type == 'taxa') {
-									//d.y = (d.depth / maxDepth) * treewidth ;
-									if (d.depth == maxDepth) {
-										//d.y = treewidth;
-									}
-									depthpos['taxa'][d.depth] = d.y;
-
-								} else {
-									//d.y = treewidth - (d.depth / maxDepth) * treewidth;
-									d.y = treewidth - d.y;
-									depthpos['func'][d.depth] = d.y;
-								}
-							}); 
-
-							// figure out which depth levels exist
-							curlevelNames[source.type] = [];
-							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
-								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
-							}
-							
-							// Update the tree depth labels
-							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
-								.data(curlevelNames[source.type])
-								
-							var newdepthlabels = depthlabels.enter().append("g")
-								.attr("class","depthlabel")
-								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
-								});
-								
-							newdepthlabels.append("text")
-								.text(function (d) {
-									return d.name;
-									})
-								.style("font-weight","bold")
-								.attr("text-anchor","middle")
-								.attr("visibility", "hidden");
-								
-							var upddepthlabels = depthlabels.transition()
-								.duration(duration)
-								.style("font-weight","bold")
-								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
-								});
-								
-							upddepthlabels.select("text")
-								.attr("visibility", "visible");
-							
-							var labelexit = depthlabels.exit().transition()
-								.duration(duration)
-								.remove();
-								
-							labelexit.select("text")
-								.attr("visibility","hidden");
-								
-							
-								
-							
-							// Update the nodes…
-							var node = SVGs[source.type].selectAll("g.node")
-								.data(nodes, function (d) {
-								return d.id || (d.id = ++i);
-							});
-
-							// Enter any new nodes at the parent's previous position.
-							var nodeEnter = node.enter().append("g")
-								.attr("class", "node")
-								.attr("transform", function (d) {
-									return "translate(" + source.y0 + "," + source.x0 + ")";
-								})
-								.on("click", click)
-								.on("mouseover", function (d) {
-									if (~d.values) {
-										if (d.type == 'taxa') {
-											highlightOverall(d.key, "", 1);
-										} else {
-											highlightOverall("", d.key, 2);
-										}
-									} else {
-										highlightTree(d, this);
-									}
-																	
-
-								})
-								.on("mouseout", function(d) {
-									if (~d.values) {
-										if (d.type == 'taxa') {
-											dehighlightOverall(d.key, "", 1);
-										} else {
-											dehighlightOverall("", d.key, 2);
-										}
-									} else {
-										dehighlightTree(d, this);
-									}
-
-									
-									// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
-									// 	.selectAll(".mainbar").filter(function(f,i){ 
-									// 	return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
+	// Update the tree graphs
+	// Expands or collapses the source node, depending on whether it is currently open or closed
+	function update(source) {
+		// Compute the new tree layout.
+		var nodes = trees[source.type].nodes(roots[source.type]).reverse(),
+			links = trees[source.type].links(nodes);
 			
 
-									// var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
-									// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
-									// selSubBar.style("opacity", 0.1);
+		var nleaf = 0;
+		nodes.forEach(function (d) {
+			nleaf = nleaf + (d.values ? 0 : 1);
+		})
+		/*
+		//console.log(nleaf);
+		
+		var leafC = 1;
+		*/
+		nodes.forEach(function (d) {
+			if (!(d.values)) { 
+				var dattype = d.type == "taxa" ? 0 : 1;
+				var thedat = -1;
 
-									// //selectedBar.select(".mainrect").style("stroke-opacity",0);			
-									// selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
+				for (var idxz = 0; idxz < bpvisdata.keys[dattype].length ; idxz++) {
+					if (d.key == bpvisdata.keys[dattype][idxz])
+						thedat = idxz;
+				}
+				
+				if (thedat >= 0) {
+					d.x = bpvisdata.mainBars[dattype][thedat].y;	
+				} else { d.x = 0; 
+				}
+				
+				//d.x = (nleaf - leafC)/nleaf * height;
+				//leafC = leafC + 1;
+			} else { 
+				var sumpos = 0;
+				d.values.forEach(function (dc) {
+					sumpos = sumpos + dc.x;
+				})
+				d.x = sumpos / d.values.length; 
+			}
+		})
+		
+		
+		// Normalize for fixed-depth.
+		var maxDepth = getDepth(roots[source.type]);
+		
+		var depthpos = {};
+		depthpos['taxa'] = [];
+		depthpos['func'] = [];
+		nodes.forEach(function (d) {
+			if (source.type == 'taxa') {
+				//d.y = (d.depth / maxDepth) * treewidth ;
+				if (d.depth == maxDepth) {
+					//d.y = treewidth;
+				}
+				depthpos['taxa'][d.depth] = d.y;
 
-									// var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-									// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
-									// //console.log(selectedEdges.toSource());
+			} else {
+				//d.y = treewidth - (d.depth / maxDepth) * treewidth;
+				d.y = treewidth - d.y;
+				depthpos['func'][d.depth] = d.y;
+			}
+		}); 
 
-									// selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2);
+		// figure out which depth levels exist
+		curlevelNames[source.type] = [];
+		for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
+			curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
+		}
+		
+		// Update the tree depth labels
+		var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+			.data(curlevelNames[source.type])
+			
+		var newdepthlabels = depthlabels.enter().append("g")
+			.attr("class","depthlabel")
+			.attr("transform", function(d) {
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
+			});
+			
+		newdepthlabels.append("text")
+			.text(function (d) {
+				return d.name;
+				})
+			.style("font-weight","bold")
+			.attr("text-anchor","middle")
+			.attr("visibility", "hidden");
+			
+		var upddepthlabels = depthlabels.transition()
+			.duration(duration)
+			.style("font-weight","bold")
+			.attr("transform", function(d) {
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
+			});
+			
+		upddepthlabels.select("text")
+			.attr("visibility", "visible");
+		
+		var labelexit = depthlabels.exit().transition()
+			.duration(duration)
+			.remove();
+			
+		labelexit.select("text")
+			.attr("visibility","hidden");
+			
+		
+			
+		
+		// Update the nodes…
+		var node = SVGs[source.type].selectAll("g.node")
+			.data(nodes, function (d) {
+			return d.id || (d.id = ++i);
+		});
 
+		// Enter any new nodes at the parent's previous position.
+		var nodeEnter = node.enter().append("g")
+			.attr("class", "node")
+			.attr("transform", function (d) {
+				return "translate(" + source.y0 + "," + source.x0 + ")";
+			})
+			.on("click", click)
+			.on("mouseover", function (d) {
+				if (~d.values) {
+					if (d.type == 'taxa') {
+						highlightOverall(d.key, "", 1);
+					} else {
+						highlightOverall("", d.key, 2);
+					}
+				} else {
+					highlightTree(d, this);
+				}
+												
 
-									});
+			})
+			.on("mouseout", function(d) {
+				if (~d.values) {
+					if (d.type == 'taxa') {
+						dehighlightOverall(d.key, "", 1);
+					} else {
+						dehighlightOverall("", d.key, 2);
+					}
+				} else {
+					dehighlightTree(d, this);
+				}
 
-							nodeEnter.filter( function(d) { return (~d.values) }).append("rect")
-								.attr("x", function (d) {
-									if (source.type == 'taxa') {
-										return 0; 
-									} else {
-										return (-170 - d.y);
-									}})
-								.attr("width", function(d) {
-									if (source.type == 'taxa') {
-										return "" + (treewidth + margin.left - d.y) + ""
-									} else {
-										return 170+d.y;
-									}})
-								.attr("height", function(d) {
-									return (height / nleaf / 1.5);
-									})
-								.attr("y", function (d) {
-									return (-1 * height / nleaf / 3); })
-								.attr("style","opacity:0")
-								;
-							
-							nodeEnter.append("circle")
-								.attr("r", 1e-6)
-								.style("fill", function (d) {
-								return d._values ? "lightsteelblue" : "#fff";
-							});
-							
-							node.filter( function (d) {
-								return (~d.values) })
-									.filter( function(d) { return d3.select(this).select("rect").empty(); })
-									.append("rect");
-
-							/*
-							nodeEnter.append("text")
-								.attr("x", function (d) {
-								return source.type == 'taxa' ? 10 : -10;
-							})
-								.attr("dy", ".35em")
-								.attr("text-anchor", function (d) {
-								return source.type == 'taxa' ? "start" : "end";
-							})
-								.text(function (d) {
-								   if(d.key != null)
-									   return d.key;
-							})
-								.style("fill-opacity", 1e-6);
-							*/
-							
-							// Transition nodes to their new position.
-							var nodeUpdate = node.transition()
-								.duration(duration)
-								.attr("transform", function (d) {
-								return "translate(" + d.y + "," + d.x + ")";
-							}); 
-
-							nodeUpdate.filter( function (d) {return (d.values) } ).selectAll("rect").remove();
-							
-							
-									
-							nodeUpdate.selectAll("rect")
-								.attr("x", function (d) {
-									if (source.type == 'taxa') {
-										return 0; 
-									} else {
-										return (-170 - d.y);
-									}})
-								.attr("width", function(d) {
-									if (source.type == 'taxa') {
-										return "" + (treewidth + margin.left - d.y) + ""
-									} else {
-										return 170+d.y;
-									}})
-								.attr("height", function(d) {
-									return (height / nleaf / 1.5);
-									})
-								.attr("y", function (d) {
-									return (-1 * height / nleaf / 3); })
-								.attr("style","opacity:0")
-								;
-							
-							
-							nodeUpdate.select("circle")
-								.attr("r", function (d) {
-									if(d._values){
-										return (4 * Math.sqrt(d.Ndescendents))
-									}else{
-										return 4;
-									}
-								})
-								.style("fill", function (d) {
-									if (d.values) {
-									return "#fff";
-									} else {  // has d._values
-										if (d._values[0].hasOwnProperty("key")) {
-											return "lightsteelblue";
-										} else {
-											return "#000"
-										}
-									}
-								});
-
-							/*
-							nodeUpdate.select("text")
-								.style("fill-opacity", function(d) {
-									return d.values ? 0 : 1;
-								})
-								.text(function (d) {
-									if( d.values) {
-										return "";
-									} else {
-										if(d.key != null)
-									   return d.key;
-									}
-								}); */
-								
-								
-
-							// Transition exiting nodes to the parent's new position.
-							var nodeExit = node.exit().transition()
-								.duration(duration)
-								.attr("transform", function (d) {
-								return "translate(" + source.y + "," + source.x + ")";
-							})
-								.remove();
-
-							nodeExit.select("circle")
-								.attr("r", 1e-6);
-
-						/*	nodeExit.select("text")
-								.style("fill-opacity", 1e-6); */
-
-							
-							// Update the links…
-							var link = SVGs[source.type].selectAll("path.link")
-								.data(links, function (d) {
-								return d.target.id;
-							});
-
-							// Enter any new links at the parent's previous position.
-							link.enter().insert("path", "g")
-								.attr("class", "link")
-								.attr("d", function (d) {
-								var o = {
-									x: source.x0,
-									y: source.y0
-								};
-								return diagonal({
-									source: o,
-									target: o
-								});
-							});
-
-							// Transition links to their new position.
-							link.transition()
-								.duration(duration)
-								.attr("d", diagonal);
-
-							// Transition exiting nodes to the parent's new position.
-							link.exit().transition()
-								.duration(duration)
-								.attr("d", function (d) {
-								var o = {
-									x: source.x,
-									y: source.y
-								};
-								return diagonal({
-									source: o,
-									target: o
-								});
-							}).remove();
-
-							// Stash the old positions for transition.
-							nodes.forEach(function (d) {
-								//console.log(d.x);
-								//console.log(d.y);
-								d.x0 = d.x;
-								d.y0 = d.y;
-							});
-							
-					/////////////////////// Do depth labels /////////////////////////////
-							// figure out which depth levels exist
-							curlevelNames[source.type] = [];
-							for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
-								curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
-							}
-							//console.log(curlevelNames[source.type][source.type]);
-							
-							// Update the tree depth labels
-							var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
-								.data(curlevelNames[source.type])
-								
-							var newdepthlabels = depthlabels.enter().append("g")
-								.attr("class","depthlabel")
-								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
-								});
-								
-							newdepthlabels.append("text")
-								.text(function (d) {
-									return d.name;
-									})
-								.style("font-weight","bold")
-								.attr("text-anchor","middle")
-								.attr("visibility", "hidden");
-								
-							var upddepthlabels = depthlabels.transition()
-								.duration(duration)
-								.style("font-weight","bold")
-								.attr("transform", function(d) {
-									return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
-								});
-								
-							upddepthlabels.select("text")
-								.attr("visibility", "visible");
-							
-							var labelexit = depthlabels.exit().transition()
-								.duration(duration)
-								.remove();
-								
-							labelexit.select("text")
-								.attr("visibility","hidden");
-						}
-
-						// Update the bipartite graph after changes to data_cube
-						function updateBPgraph() {
-							var bpData = getLinkData();
-							var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-							var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
-							return visdata;
-						}
-
-						
-						// Toggle children on click.
-						function click(d) {
-								if (d.values) { //collapse
-									if (d.depth > 0) {//don't collapse the root
-										collapseTree(d);
-										d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
-										bpvisdata = updateBPgraph();
-										//console.log(bpvisdata.toSource());
-									}
-								} else { //expand
-									if (d._values[0].hasOwnProperty('key')) {
-										d.values = d._values;
-										d._values = null;
-										d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
-										bpvisdata = updateBPgraph();
-									} else {
-									}
-									
-							   }
-							update(d);
-							update_otu_bar();
-							update_func_bar();
-						}
-
-						
-						// collapse all children of the collapsing node recursively
-						function collapseTree(d) {
-							if (d.values) {
-								d._values = d.values;
-								d.values = null;
-								d._values.forEach(collapseTree);
-							}
-						}
-						
-						// get the total depth of the tree to the deepest leaf
-						function getDepth(rootnode) {
-							var depth = 0;
-							if (rootnode.values) {
-								rootnode.values.forEach(function(d) {
-									var tmpDepth = getDepth(d);
-									if (tmpDepth > depth) {
-										depth = tmpDepth;
-									}
-								})
-							}
-							return 1+depth;
-						}
-						
-						
-						
-						function highlightOverall(taxonName, functionName, highlightwhat) {
-							if (highlightwhat == 1) {
-								// Highlight tree
-								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
-									return d.key == taxonName;
-								} );
-								var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
-									return d.key == taxonName;
-								})
-								highlightTree( treedatainterest[0], treedatainterestobj[0]);
-								
-								// Highlight BP graph
-								m = 0;
-								displayed = data_cube.displayed_taxa;
-								ind = displayed.indexOf(taxonName);
-								//console.log(ind);
-								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
-
-								// Highlight  Taxa Bar Chart
-								otu_bar.select_bars(taxonName);
-
-								// Highlight Function Bar Chart
-								fB.select_contribution(taxonName);
-							}
-							
-							if (highlightwhat == 2) {
-								// Highlight tree
-								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
-									return d.key == functionName;
-								} );
-								var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
-									return d.key == functionName;
-								})
-								highlightTree( treedatainterest[0], treedatainterestobj[0]);
-								
-								// Highlight BP graph
-								m = 1;
-								displayed = data_cube.displayed_funcs;
-								ind = displayed.indexOf(functionName);
-								bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
-
-								// Highlight Function Bar Chart
-								fB.select_bars(functionName);
-							}
-							
-							if (highlightwhat == 3) {
-								//highlight taxa tree
-								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
-									return d.key == taxonName;
-								} );
-								var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
-									return d.key == taxonName;
-								})
-								highlightTree( treedatainterest[0], treedatainterestobj[0]);
-								
-								//highlight function tree
-								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
-									return d.key == functionName;
-								} );
-								var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
-									return d.key == functionName;
-								})
-								highlightTree( treedatainterest[0], treedatainterestobj[0]);
-							
-								// Highlight Taxa Bar Chart
-								otu_bar.select_bars(taxonName);
-
-								// Highlight Function Bar Chart
-								fB.select_single_contribution(taxonName, functionName);
-							}
-						}
-
-						function dehighlightOverall(taxonName, functionName, highlightwhat) {
-
-							if (highlightwhat == 1) {
-								// dehighlight tree
-								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
-									return d.key == taxonName;
-								} );
-								dehighlightTree( treedatainterest[0]);
-								
-								// dehighlight BP graph
-								m = 0;
-								displayed = data_cube.displayed_taxa;	
-								ind = displayed.indexOf(taxonName);
-								bP.deSelectSegment(m, ind);
-
-								// dehighlight Taxon Bar Chart
-								otu_bar.deselect_bars(taxonName);
-
-								// dehighligh Function Bar Chart
-								fB.deselect_contribution(taxonName);
-							}
-							
-							if (highlightwhat == 2) {
-								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
-									return d.key == functionName;
-								} );
-								dehighlightTree( treedatainterest[0]);
-								
-								//dehighlight BP graph
-								m = 1;
-								displayed = data_cube.displayed_funcs;
-								ind = displayed.indexOf(functionName);
-								bP.deSelectSegment(m, ind);
-
-								// dehighlight Function Bar Chart
-								fB.deselect_bars(functionName);
-							}
-							
-							if (highlightwhat == 3) {
-								// dehighlight taxa tree
-								var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
-									return d.key == taxonName;
-								} );
-								dehighlightTree( treedatainterest[0]);
-								
-								//dehighlight function tree
-								var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
-									return d.key == functionName;
-								} );
-								dehighlightTree( treedatainterest[0]);
-								
-								// dehighlight Taxa Bar Chart
-								otu_bar.deselect_bars(taxonName);
-
-								// dehighlight Function Bar Chart
-								fB.deselect_single_contribution(taxonName, functionName);
-							
-							}
-						}
-
-						function highlightTree( data, thisobj) {
-
-							var thisnode = data;
-							var thisNparents = [];
-							thisNparents.push(thisnode);
-							while (thisnode.parent) {
-								thisnode = thisnode.parent;
-								thisNparents.push(thisnode);
-							}
-							var node = SVGs[data.type].selectAll("g.node");
-							data.thisandparents = node.filter(function (d2) { 
-								var good = false;
-								thisNparents.forEach( function (d4) {
-									if (d2.id == d4.id) {
-										good = true;} 
-										});
-								return good;
-							})
-							
-							data.thisandparents.select("circle")
-								.style("stroke-width", "5")
-								.style("stroke", "green");
-								
-							data.thisandparents.append("text")
-									.text(function (d5) {
-									if (d5.values) {
-										return d5.key 
-									} else {
-										""
-									}
-									})
-									.attr("text-anchor", "middle")
-									.attr("dy", function (d5, isz) {
-										return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") + 6) +  "";
-									})
-									.attr("transform", "rotate(" + (data.type == 'taxa' ? -30 : 30) + ")");
-									
-						}
-
-						function dehighlightTree(data) {
-							data.thisandparents.select("circle")
-								.style("stroke-width", "1")
-								.style("stroke", "steelblue");
-
-							data.thisandparents.selectAll("text").remove(); 
-						}
+				
+				// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
+				// 	.selectAll(".mainbar").filter(function(f,i){ 
+				// 	return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
 
 
+				// var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
+				// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
+				// selSubBar.style("opacity", 0.1);
 
-					});
+				// //selectedBar.select(".mainrect").style("stroke-opacity",0);			
+				// selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
+
+				// var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+				// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
+				// //console.log(selectedEdges.toSource());
+
+				// selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2);
+
+
 				});
+
+		nodeEnter.filter( function(d) { return (~d.values) }).append("rect")
+			.attr("x", function (d) {
+				if (source.type == 'taxa') {
+					return 0; 
+				} else {
+					return (-170 - d.y);
+				}})
+			.attr("width", function(d) {
+				if (source.type == 'taxa') {
+					return "" + (treewidth + margin.left - d.y) + ""
+				} else {
+					return 170+d.y;
+				}})
+			.attr("height", function(d) {
+				return (height / 2 / nleaf / 1.5);
+				})
+			.attr("y", function (d) {
+				return (-1 * height / 2 / nleaf / 3); })
+			.attr("style","opacity:0")
+			;
+		
+		nodeEnter.append("circle")
+			.attr("r", 1e-6)
+			.style("fill", function (d) { 
+				if(source.type==="taxa"){
+					return taxa_colors(d.key); } else {
+				 	return func_colors(d.key);
+				 } });
+
+/*								return d._values ? "lightsteelblue" : "#fff";
+		});
+*/							
+		node.filter( function (d) {
+			return (~d.values) })
+				.filter( function(d) { return d3.select(this).select("rect").empty(); })
+				.append("rect");
+
+		/*
+		nodeEnter.append("text")
+			.attr("x", function (d) {
+			return source.type == 'taxa' ? 10 : -10;
+		})
+			.attr("dy", ".35em")
+			.attr("text-anchor", function (d) {
+			return source.type == 'taxa' ? "start" : "end";
+		})
+			.text(function (d) {
+			   if(d.key != null)
+				   return d.key;
+		})
+			.style("fill-opacity", 1e-6);
+		*/
+		
+		// Transition nodes to their new position.
+		var nodeUpdate = node.transition()
+			.duration(duration)
+			.attr("transform", function (d) {
+			return "translate(" + d.y + "," + d.x + ")";
+		}); 
+
+		nodeUpdate.filter( function (d) {return (d.values) } ).selectAll("rect").remove();
+		
+		
+				
+		nodeUpdate.selectAll("rect")
+			.attr("x", function (d) {
+				if (source.type == 'taxa') {
+					return 0; 
+				} else {
+					return (-170 - d.y);
+				}})
+			.attr("width", function(d) {
+				if (source.type == 'taxa') {
+					return "" + (treewidth + margin.left - d.y) + ""
+				} else {
+					return 170+d.y;
+				}})
+			.attr("height", function(d) {
+				return (height / 2 / nleaf / 1.5);
+				})
+			.attr("y", function (d) {
+				return (-1 * height / nleaf / 3); })
+			.attr("style","opacity:0")
+			;
+		
+		
+		nodeUpdate.select("circle")
+			.attr("r", function (d) {
+				if(d.sampleAvg && d._values){
+					return 25 * Math.sqrt(d.sampleAvg)
+					//return (4 * Math.sqrt(d.Ndescendents))
+				}else{
+					return 4;
+				}
+			})
+			.style("fill", function (d) { 
+				if(source.type==="taxa"){
+					return taxa_colors(d.key); } else {
+				 	return func_colors(d.key);
+				 } });
+
+/*								.style("fill", function (d) {
+				if (d.values) {
+				return "#fff";
+				} else {  // has d._values
+					if (d._values[0].hasOwnProperty("key")) {
+						return "lightsteelblue";
+					} else {
+						return "#000"
+					}
+				}
+			});
+*/
+		/*
+		nodeUpdate.select("text")
+			.style("fill-opacity", function(d) {
+				return d.values ? 0 : 1;
+			})
+			.text(function (d) {
+				if( d.values) {
+					return "";
+				} else {
+					if(d.key != null)
+				   return d.key;
+				}
+			}); */
+			
+			
+
+		// Transition exiting nodes to the parent's new position.
+		var nodeExit = node.exit().transition()
+			.duration(duration)
+			.attr("transform", function (d) {
+			return "translate(" + source.y + "," + source.x + ")";
+		})
+			.remove();
+
+		nodeExit.select("circle")
+			.attr("r", 1e-6);
+
+	/*	nodeExit.select("text")
+			.style("fill-opacity", 1e-6); */
+
+		
+		// Update the links…
+		var link = SVGs[source.type].selectAll("path.link")
+			.data(links, function (d) {
+			return d.target.id;
+		});
+
+		// Enter any new links at the parent's previous position.
+		link.enter().insert("path", "g")
+			.attr("class", "link")
+			.attr("d", function (d) {
+			var o = {
+				x: source.x0,
+				y: source.y0
+			};
+			return diagonal({
+				source: o,
+				target: o
 			});
 		});
-	});
-});
 
-function hideheader () {
-	window.location = '#navsvg';
+		// Transition links to their new position.
+		link.transition()
+			.duration(duration)
+			.attr("d", diagonal);
+
+		// Transition exiting nodes to the parent's new position.
+		link.exit().transition()
+			.duration(duration)
+			.attr("d", function (d) {
+			var o = {
+				x: source.x,
+				y: source.y
+			};
+			return diagonal({
+				source: o,
+				target: o
+			});
+		}).remove();
+
+		// Stash the old positions for transition.
+		nodes.forEach(function (d) {
+			//console.log(d.x);
+			//console.log(d.y);
+			d.x0 = d.x;
+			d.y0 = d.y;
+		});
+		
+/////////////////////// Do depth labels /////////////////////////////
+		// figure out which depth levels exist
+		curlevelNames[source.type] = [];
+		for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
+			curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
+		}
+		//console.log(curlevelNames[source.type][source.type]);
+		
+		// Update the tree depth labels
+		var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+			.data(curlevelNames[source.type])
+			
+		var newdepthlabels = depthlabels.enter().append("g")
+			.attr("class","depthlabel")
+			.attr("transform", function(d) {
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
+			});
+			
+		newdepthlabels.append("text")
+			.text(function (d) {
+				return d.name;
+				})
+			.style("font-weight","bold")
+			.attr("text-anchor","middle")
+			.attr("visibility", "hidden");
+			
+		var upddepthlabels = depthlabels.transition()
+			.duration(duration)
+			.style("font-weight","bold")
+			.attr("transform", function(d) {
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
+			});
+			
+		upddepthlabels.select("text")
+			.attr("visibility", "visible");
+		
+		var labelexit = depthlabels.exit().transition()
+			.duration(duration)
+			.remove();
+			
+		labelexit.select("text")
+			.attr("visibility","hidden");
+	}
+
+	// Update the bipartite graph after changes to data_cube
+	function updateBPgraph() {
+		var bpData = getLinkData();
+		var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
+		return visdata;
+	}
+
+	
+	// Toggle children on click.
+	function click(d) {
+			if (d.values) { //collapse
+				if (d.depth > 0) {//don't collapse the root
+					collapseTree(d);
+					d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
+					bpvisdata = updateBPgraph();
+					//console.log(bpvisdata.toSource());
+				}
+			} else { //expand
+				if (d._values[0].hasOwnProperty('key')) {
+					d.values = d._values;
+					d._values = null;
+					d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
+					bpvisdata = updateBPgraph();
+				} else {
+				}
+				
+		   }
+		update(d);
+		update_otu_bar();
+		update_func_bar();
+	}
+
+	
+	// collapse all children of the collapsing node recursively
+	function collapseTree(d) {
+		if (d.values) {
+			d._values = d.values;
+			d.values = null;
+			d._values.forEach(collapseTree);
+		}
+	}
+	
+	// get the total depth of the tree to the deepest leaf
+	function getDepth(rootnode) {
+		var depth = 0;
+		if (rootnode.values) {
+			rootnode.values.forEach(function(d) {
+				var tmpDepth = getDepth(d);
+				if (tmpDepth > depth) {
+					depth = tmpDepth;
+				}
+			})
+		}
+		return 1+depth;
+	}
+	
+	
+	
+	function highlightOverall(taxonName, functionName, highlightwhat) {
+		if (highlightwhat == 1) {
+			// Highlight tree
+			var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+				return d.key == taxonName;
+			} );
+			var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
+				return d.key == taxonName;
+			})
+			highlightTree( treedatainterest[0], treedatainterestobj[0]);
+			
+			// Highlight BP graph
+			m = 0;
+			displayed = data_cube.displayed_taxa;
+			ind = displayed.indexOf(taxonName);
+			//console.log(ind);
+			bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+			// Highlight  Taxa Bar Chart
+			otu_bar.select_bars(taxonName);
+
+			// Highlight Function Bar Chart
+			//console.log(func_colors);
+			fB.select_contribution(taxonName, func_colors);
+		}
+		
+		if (highlightwhat == 2) {
+			// Highlight tree
+			var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+				return d.key == functionName;
+			} );
+			var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
+				return d.key == functionName;
+			})
+			highlightTree( treedatainterest[0], treedatainterestobj[0]);
+			
+			// Highlight BP graph
+			m = 1;
+			displayed = data_cube.displayed_funcs;
+			ind = displayed.indexOf(functionName);
+			bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+			// Highlight Function Bar Chart
+			fB.select_bars(functionName, func_colors);
+		}
+		
+		if (highlightwhat == 3) {
+			//highlight taxa tree
+			var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+				return d.key == taxonName;
+			} );
+			var treedatainterestobj = SVGs['taxa'].selectAll("g.node").filter( function(d) {
+				return d.key == taxonName;
+			})
+			highlightTree( treedatainterest[0], treedatainterestobj[0]);
+			
+			//highlight function tree
+			var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+				return d.key == functionName;
+			} );
+			var treedatainterestobj = SVGs['func'].selectAll("g.node").filter( function(d) {
+				return d.key == functionName;
+			})
+			highlightTree( treedatainterest[0], treedatainterestobj[0]);
+		
+			// Highlight Taxa Bar Chart
+			otu_bar.select_bars(taxonName);
+
+			// Highlight Function Bar Chart
+			fB.select_single_contribution(taxonName, functionName, func_colors);
+		}
+	}
+
+	function dehighlightOverall(taxonName, functionName, highlightwhat) {
+
+		if (highlightwhat == 1) {
+			// dehighlight tree
+			var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+				return d.key == taxonName;
+			} );
+			dehighlightTree( treedatainterest[0]);
+			
+			// dehighlight BP graph
+			m = 0;
+			displayed = data_cube.displayed_taxa;	
+			ind = displayed.indexOf(taxonName);
+			bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+			// dehighlight Taxon Bar Chart
+			otu_bar.deselect_bars(taxonName, taxa_colors);
+
+			// dehighligh Function Bar Chart
+			fB.deselect_contribution(taxonName, func_colors);
+		}
+		
+		if (highlightwhat == 2) {
+			var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+				return d.key == functionName;
+			} );
+			dehighlightTree( treedatainterest[0]);
+			
+			//dehighlight BP graph
+			m = 1;
+			displayed = data_cube.displayed_funcs;
+			ind = displayed.indexOf(functionName);
+			bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+
+			// dehighlight Function Bar Chart
+			fB.deselect_bars(functionName, func_colors);
+		}
+		
+		if (highlightwhat == 3) {
+			// dehighlight taxa tree
+			var treedatainterest = trees['taxa'].nodes(roots['taxa']).filter( function(d) {
+				return d.key == taxonName;
+			} );
+			dehighlightTree( treedatainterest[0]);
+			
+			//dehighlight function tree
+			var treedatainterest = trees['func'].nodes(roots['func']).filter( function(d) {
+				return d.key == functionName;
+			} );
+			dehighlightTree( treedatainterest[0]);
+			
+			// dehighlight Taxa Bar Chart
+			otu_bar.deselect_bars(taxonName, taxa_colors);
+
+			// dehighlight Function Bar Chart
+			fB.deselect_single_contribution(taxonName, functionName, func_colors);
+		
+		}
+	}
+
+	function highlightTree( data, thisobj) {
+
+		var thisnode = data;
+		var thisNparents = [];
+		thisNparents.push(thisnode);
+		while (thisnode.parent) {
+			thisnode = thisnode.parent;
+			thisNparents.push(thisnode);
+		}
+		var node = SVGs[data.type].selectAll("g.node");
+		data.thisandparents = node.filter(function (d2) { 
+			var good = false;
+			thisNparents.forEach( function (d4) {
+				if (d2.id == d4.id) {
+					good = true;} 
+					});
+			return good;
+		})
+		
+		data.thisandparents.select("circle")
+			.style("stroke-width", "5")
+			.style("stroke", "black");
+			
+		data.thisandparents.append("text")
+				.text(function (d5) {
+				if (d5.values) {
+					return d5.key 
+				} else {
+					""
+				}
+				})
+				.attr("text-anchor", "middle")
+				.attr("dy", function (d5, isz) {
+					return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") + 6) +  "";
+				})
+				.attr("transform", "rotate(" + (data.type == 'taxa' ? -30 : 30) + ")");
+				
+	}
+
+	function dehighlightTree(data) {
+		data.thisandparents.select("circle")
+			.style("stroke-width", "1")
+			.style("stroke", "grey");
+
+		data.thisandparents.selectAll("text").remove(); 
+	}
 }
 
+/* #commented because I removed the header for now -CM
+function hideheader () {
+	window.location = '#navsvg';
+} */
+
+var uploader = uploader_wrapper.make_uploader(draw_everything);
+document.getElementById("update_button").onclick = (function(){
+	uploader.update_plots();
+})
+uploader.load_default_data();
+	
 </script>
 </body>

@@ -39,7 +39,6 @@
 
 
 
-
     var normalized = true;
 
     data.forEach(function(d) {
@@ -50,6 +49,7 @@
 
     //data.sort(function(a, b) { return a['male'] - b['male']; });
     x.domain(data.map(function(d) { return d.Sample; }));
+    console.log(x.domain);
     y.domain([0, 100]);
     data.forEach(function(d) {
       d.genes.forEach(function(e){
@@ -77,19 +77,23 @@
         .style("visibility", "hidden")
         .text("a simple tooltip");
 
+    console.log(data);
     var Sample = svg.selectAll(".Sample")
         .data(data)
-      .enter().append("g")
+        .enter().append("g")
         .attr("class", "g")
         .attr("transform", function(d) { return "translate(" + x(d.Sample) + ",0)"; });
+      console.log(Sample);
 
+
+    
     Sample.selectAll("rect")
         .data(function(d) { return d.genes; })
       .enter().append("rect")
         .attr("width", x.rangeBand())
         .attr("y", function(d) { return y(d.y1); })
         .attr("height", function(d) { return y(d.y0) - y(d.y1); })
-        .style("fill", function(d) { return color(d.name); })
+        .style("fill", function(d) { return color(d.name); });
         .on("mouseover", function(d){
           current_rectangle_data = d3.select(this).datum();
           tooltip.text(current_rectangle_data.name);

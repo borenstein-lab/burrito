@@ -15,6 +15,8 @@
     data_cube.displayed_funcs = [];
     data_cube.original_contribution_cube = {};
     data_cube.displayed_contribution_cube = {};
+    data_cube.meansOverSamples = {};
+    data_cube.funcMeans = {};
 
     /////////////////////////////////////////////////////////////////////// is_leaf /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -31,6 +33,10 @@
         return false;
       }
     }
+
+    //check whether a node is the only child of its parent
+    // data_cube.only_child = function(node, lookup){
+    // }
 
     data_cube.get_leaves = function(parent, lookup){
       var leaves = [];
@@ -422,7 +428,7 @@
         var curr_taxon_index = this.displayed_taxa.indexOf(curr_taxon.key);
         for (var i = 0; i < child_taxa.length; i++){
           this.displayed_taxa.splice(curr_taxon_index + i, 0, child_taxa[i]);
-        }       
+        }
 
         // Remove the function being expanded
         this.displayed_taxa.splice(this.displayed_taxa.indexOf(curr_taxon.key), 1);
@@ -623,6 +629,7 @@
         };
       }, this);
 
+
       /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
       // Create a cube of the currently displayed contribution data
@@ -652,8 +659,41 @@
       for (var i = 0; i < this.func_tree.length; i++){
         this.displayed_funcs.push(this.func_tree[i].key);
       }
-    }
 
+
+               ////get mean abundances over all samples, this is slow
+      var all_taxa = this.get_leaves(this.taxa_tree[0].key, this.taxa_lookup)
+      all_funcs = []
+      for(j = 0; j < this.func_tree.length; j++){
+        all_funcs = all_funcs.concat(all_funcs, this.get_leaves(this.func_tree[j].key, this.func_lookup))
+      }
+      for(var i = 0; i < all_taxa.length; i++){ //for all OTUs
+        taxon = all_taxa[i]
+        this.meansOverSamples[taxon] = {}
+        for(k = 0; k < all_funcs.length; k++){
+          func = all_funcs[k]
+          this.meansOverSamples[taxon][func] = 0
+          for (var j = 0; j < this.samples.length; j++){
+            if(this.original_contribution_cube[this.samples[j]].hasOwnProperty(taxon)){
+              if(this.original_contribution_cube[this.samples[j]][taxon].hasOwnProperty(func)){
+                this.meansOverSamples[taxon][func] = this.meansOverSamples[taxon][func] + this.original_contribution_cube[this.samples[j]][taxon][func]
+              }
+            } 
+          }
+          this.meansOverSamples[taxon][func] = this.meansOverSamples[taxon][func]/this.samples.length; //mean
+        }
+      }
+      for(var j = 0; j < all_funcs.length; j++){
+        func = all_funcs[j]
+        this.funcMeans[func] = 0
+        //sum over all OTUs
+        for(k = 0; k < all_taxa.length; k++){
+          this.funcMeans[func] = this.funcMeans[func] + this.meansOverSamples[all_taxa[k]][func]
+        }
+      }
+
+
+    }
 
     /////////////////////////////////////////////////////////////////////// get_contribution /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -663,8 +703,10 @@
       //return no_cube_calculate_new_contribution(sample, taxon, func);
     }
 
+
     return data_cube;
-  }
+
+    }
 
   this.data_cube_wrapper = data_cube_wrapper;
 })();
