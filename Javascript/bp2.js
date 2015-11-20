@@ -155,10 +155,10 @@
 			.attr("height",function(d){ return (d.height - padding); })
 			.style("shape-rendering","auto")
 			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
-			.style("fill-opacity",.6).style("stroke-width","0.5")
+			.style("fill-opacity",.75).style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
-			
+
 		mainbar.append("text").attr("class","barlabel")
 			.attr("x", c1[p])
 			.attr("y",function(d){ return d.middle+5;})
@@ -214,7 +214,7 @@
 			.on("mouseout", function(d,i){ 
 				d3.select(this).attr("points", bP.edgePolygon).style("opacity",0.2).style("fill", "grey");
 				var current_data = this._current;
-				bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall);
+				bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);
 			})
 			.transition().duration(300);
 			//brush would go here
@@ -382,25 +382,21 @@
 			//selectedBar.select(".mainrect").style("stroke-opacity",1);			
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 
-			selectedBar.select(".mainrect").style('fill-opacity',1);
-			/*
-			  var t = textures.lines()
-				.thicker()
-				//.background(colors(func))
-				.stroke("white");
+			if(m==1){
+				current_color = func_colors(displayed_funcs[s]) } else {
+					current_color = taxa_colors(displayed_taxa[s]);
+				}
 
-				d3.select("#Genomes").select(".part"+m).select(".mainbars").selectAll(".mainbar").selectAll(".rect").call(t);
-			*/
-				
-			/*
-			var selSubBar =  d3.select("#Genomes").select(".part"+m).select(".subbars")
-				.selectAll(".subbar")
-				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
-			*/
-			//console.log(selSubBar.toSource());
-			//console.log(selectedBar.toSource());
+			var t = textures.lines()
+			    .thicker()
+			    .background(current_color)
+			    .stroke("white");
 
-			//selSubBar.style("opacity", 1);
+			selectedBar.call(t);
+
+			selectedBar.select(".mainrect")
+				.style('fill-opacity',1)
+				.style("fill", t.url());
 
 			var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
@@ -422,19 +418,26 @@
 			//selectedBar.select(".barpercent").style('font-weight','bold');
 	}	
 	
-	bP.deSelectSegment = function(m, s){
+	bP.deSelectSegment = function(m, s, taxa_colors, func_colors, displayed_taxa, displayed_funcs){
 		//transition(visualize(k.data), k.id);
 		var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ return (i==s);});
 
-			var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
+		var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
 			selSubBar.style("opacity", 0.1);
 
-		
+		if(m==1){
+			current_color = func_colors(displayed_funcs[s]) } else {
+				current_color = taxa_colors(displayed_taxa[s]);
+			}
+
 		selectedBar.select(".barlabel").style('font-weight','normal'); //.style("visibility", "hidden");
-		selectedBar.select(".mainrect").style('fill-opacity',.6);
+		selectedBar.select(".mainrect")
+			.style('fill-opacity',.75)
+			.style("fill", current_color);
 		
+
 		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
@@ -452,25 +455,50 @@
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
-			selectedBar.select(".mainrect").style("fill-opacity",1)
+
+			if(m==1){
+				current_color = func_colors(displayed_funcs[current_data["key"+(m+1)]]) } else {
+				current_color = taxa_colors(displayed_taxa[current_data["key"+(m+1)]]);
+			}
+
+			var t = textures.lines()
+			    .thicker()
+			    .background(current_color)
+			    .stroke("white");
+
+			selectedBar.call(t);
+
+			selectedBar.select(".mainrect")
+				.style("fill-opacity",1)
+				.style("fill", t.url())
 
 			var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
 				.filter(function(d,i){ 
 					return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
+
 			selSubBar.style("opacity", 1);
 
 		highlightall(displayed_taxa[current_data["key1"]], displayed_funcs[current_data["key2"]], 3);
 		});
 	}
 
-	bP.deselectEdge = function(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall){
+	bP.deselectEdge = function(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors){
 		[0,1].forEach(function(m){
 		var selectedBar = d3.select("#"+id).select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ 
 				return (i==current_data["key"+(m+1)]);});
 		selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
-		selectedBar.select(".mainrect").style("fill-opacity",.6)
+		if(m==1){
+			current_color = func_colors(displayed_funcs[current_data["key"+(m+1)]]) } else {
+			current_color = taxa_colors(displayed_taxa[current_data["key"+(m+1)]]);
+		}
+
+		selectedBar.select(".mainrect")
+			.style("fill-opacity",.75)
+			.style("fill", current_color)
+
+
 		var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 			.selectAll(".subbar")
 			.filter(function(d,i){ 

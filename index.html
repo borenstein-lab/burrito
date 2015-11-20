@@ -27,7 +27,7 @@ body {
 .node circle {
    cursor: pointer;
    fill: #fff;
-   stroke: steelblue;
+   stroke: grey;
    stroke-width: 1.5px;
 }
 .node text {
@@ -122,6 +122,7 @@ white-space: pre-line;
 <script src="Javascript/bp2.js"></script>
 <script src="Javascript/FuncBar.js"></script>
 <script src="Javascript/otu_stacked_bar.js"></script>
+<script src="Javascript/colorbrewer.js"></script>
 
 <script>
 
@@ -254,15 +255,96 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 				d3.tsv("Data/mice_samplemap.txt", function(error, samplemap){
 					d3.tsv("Data/reduced_genus_taxa_transpose.txt", function(error, otu_abundance_data){
 
-						var taxa_colors = d3.scale.category10();
-						var func_colors = d3.scale.category20();
-						//console.log(func_colors);
-						//d3.shuffle(func_colors);
 
 						//initialize display cube
 						var data_cube = data_cube_wrapper.make_cube();
 						data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
 
+						var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
+							for(j=0; j < main_list.length; j++){
+								var descendents = [];
+						      // Use a BFS to collect all descendents
+	      						var curr_nodes = [];
+	      						if(list_type=="taxa") {
+	      							parent = data_cube.taxa_lookup[main_list[j]]
+	      							} else if(list_type=="funcs"){
+	      								parent = data_cube.func_lookup[main_list[j]]
+	      							} 
+	      						curr_nodes.push(parent);
+	      						for (; curr_nodes.length > 0;){
+	        						curr_node = curr_nodes.shift();
+	          						if(curr_node.key !== main_list[j]) descendents.push(curr_node.key);
+	          						if(data_cube.is_leaf(curr_node)===false){
+	          							for (var i = 0; i < curr_node.values.length; i++){
+						            		curr_nodes.push(curr_node.values[i]);
+						          		}
+	          						}
+						      	}
+						      	unique_desc = d3.set(descendents).values()
+
+						      	sub_colors = []
+						      	for(k=0; k < unique_desc.length; k++){
+						      		new_color = d3.hcl(color_scale(main_list[j]))
+						      		color_range = Math.floor(unique_desc.length/2) //number of colors to expand in each direction
+						      		if(k <= unique_desc.length/2){
+/*						      			console.log(k/(color_range+1))
+						      			console.log(new_color)
+*/						      			new_color["l"] = new_color["l"] + 28 - 28*k/(color_range+1) //fill in the range of colors with increasing k
+						      			new_color["h"] = new_color["h"] + 8 - 8*k/(color_range+1)
+						      			new_color["c"] = new_color["c"] + 4 - 4*k/(color_range+1)
+						      		} else{
+						      			new_color["l"] = new_color["l"] - 28 + 28*k/(color_range+1)
+						      			new_color["h"] = new_color["h"] - 8 + 8*k/(color_range+1)
+						      			new_color["c"] = new_color["c"] - 4 + 4*k/(color_range+1)
+									}
+						      		sub_colors.push(new_color.toString())						      			
+								}
+								d3.shuffle(sub_colors)
+
+						      	color_scale.range(color_scale.range().concat(sub_colors))
+						      	//assign colors to unique elements
+						      	for(k = 0; k < unique_desc.length; k++){
+						      		console.log(color_scale(unique_desc[k]))
+						      	}
+							}
+							return color_scale;
+
+						}
+
+						//set up colors using data cube
+						//colors	
+						//start one level in for bacteria but at the 0th level for functions
+						num_function_categories = data_cube.func_tree.length
+						num_taxa_categories = data_cube.taxa_tree[0].values.length
+
+						//taxa colors
+						var taxa_colors = d3.scale.ordinal()
+						taxa_colors.range((colorbrewer["Set3"][num_taxa_categories]).reverse())
+						main_taxa = data_cube.taxa_tree[0].values.map(function(d){ return d.key;})
+						taxa_colors.domain(main_taxa)
+						taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
+						taxa_colors.range().push("black")
+						console.log(taxa_colors("Bacteria"))
+						taxa_colors.range().push("black")
+						console.log(taxa_colors("All Taxa"))
+
+						//func colors
+						var func_colors = d3.scale.ordinal()
+						func_colors.range(colorbrewer["Set1"][num_function_categories])
+						main_funcs = data_cube.func_tree.map(function(d){ return d.key;})
+						func_colors.domain(main_funcs)
+						func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
+						func_colors.range().push("black")
+						console.log(func_colors("All Functions"))
+
+
+						//sample colors
+						groupValsAll = samplemap.map(function(d,i){ 
+							return d["Group"]; })
+
+						groupVals = groupValsAll.filter(function(d,i){ return groupValsAll.indexOf(d)===i; })
+
+						var sampleColor = d3.scale.ordinal().domain(groupVals).range(colorbrewer["Paired"][Math.max(4,groupVals.length)].slice(0,groupVals.length));
 						
 						getLinkData = function(){
 							//get unique linked functions for each taxon
@@ -353,10 +435,12 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 
 						var stackData = getFuncBarData();
 
-						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
+						fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+
 
 						var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
+
+						otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 
 						bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
@@ -366,15 +450,14 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							//remove old graph before redrawing new
 							TaxaBar.selectAll("g").remove();
 							otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-
-							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall);
+							otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 						}
 
 						function update_func_bar(){
 							//remove old graph before redrawing new
 								FunctionBar.selectAll("g").remove();
 								var func_data = getFuncBarData();
-								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall);
+								fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 						}
 
@@ -449,9 +532,63 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							return (totchildren + addone);
 						}
 						
-						
+						//get mean taxon abundances across samples
+						var taxa_means = {}
+
+						function get_taxa_sample_means(otu_abundance_data, data_cube){
+							otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d != "Sample"})
+							for(j = 0; j < otus.length; j++){
+								taxa_means[otus[j]] = 0
+								for(k = 0; k < otu_abundance_data.length; k++){
+									taxa_means[otus[j]] += otu_abundance_data[k][otus[j]]*1
+								}
+								taxa_means[otus[j]] = taxa_means[otus[j]]/(otu_abundance_data.length)
+							}
+						}
+
+						function getAvgs(rootnode){
+					    	if(rootnode.type=="func"){
+					    		if(rootnode.key != "All Functions"){
+					    			func_leaves = data_cube.get_leaves(rootnode.key, data_cube.func_lookup)
+									funcAvg = 0
+									for(j = 0; j < func_leaves.length; j++){
+										funcAvg += data_cube.funcMeans[func_leaves[j]]
+									}
+									rootnode.sampleAvg = funcAvg
+						    	} else {
+						    		rootnode.values.forEach(function(d){
+										getAvgs(d)
+									})
+						    		rootnode.sampleAvg = 0.1
+						    	}
+							} else {
+								//taxa Avgs
+								if(rootnode.key != "All Taxa"){
+					    			taxa_leaves = data_cube.get_leaves(rootnode.key, data_cube.taxa_lookup)
+									taxaAvg = 0
+									for(j = 0; j < taxa_leaves.length; j++){
+										taxaAvg += taxa_means[taxa_leaves[j]]
+									}
+									rootnode.sampleAvg = taxaAvg
+								} else {
+									rootnode.values.forEach(function(d){
+										getAvgs(d)
+									})
+									rootnode.sampleAvg = 0.1
+								}
+							}
+							if(rootnode._values){
+								rootnode._values.forEach(function(d){
+									if(d._values){ getAvgs(d)}
+									
+								})
+							}
+						}
 						roots["taxa"] = taxaroot;
 						countchildren(roots["taxa"]);
+						//get means for all OTUs, then for all the way up the tree
+						get_taxa_sample_means(otu_abundance_data, data_cube)
+						getAvgs(roots["taxa"])
 					    update(roots["taxa"]);
 
 					    d3.select(self.frameElement).style("height", "800px");
@@ -491,6 +628,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 						
 						roots["func"] = funcroot;
 						countchildren(roots["func"]);
+						getAvgs(roots["func"])
 					    update(roots['func']);
 
 					    d3.select(self.frameElement).style("height", "800px");
@@ -688,10 +826,15 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							
 							nodeEnter.append("circle")
 								.attr("r", 1e-6)
-								.style("fill", function (d) {
-								return d._values ? "lightsteelblue" : "#fff";
+								.style("fill", function (d) { 
+									if(source.type==="taxa"){
+										return taxa_colors(d.key); } else {
+									 	return func_colors(d.key);
+									 } });
+
+/*								return d._values ? "lightsteelblue" : "#fff";
 							});
-							
+*/							
 							node.filter( function (d) {
 								return (~d.values) })
 									.filter( function(d) { return d3.select(this).select("rect").empty(); })
@@ -748,13 +891,20 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							
 							nodeUpdate.select("circle")
 								.attr("r", function (d) {
-									if(d._values){
-										return (4 * Math.sqrt(d.Ndescendents))
+									if(d.sampleAvg && d._values){
+										return 25 * Math.sqrt(d.sampleAvg)
+										//return (4 * Math.sqrt(d.Ndescendents))
 									}else{
 										return 4;
 									}
 								})
-								.style("fill", function (d) {
+								.style("fill", function (d) { 
+									if(source.type==="taxa"){
+										return taxa_colors(d.key); } else {
+									 	return func_colors(d.key);
+									 } });
+
+/*								.style("fill", function (d) {
 									if (d.values) {
 									return "#fff";
 									} else {  // has d._values
@@ -765,7 +915,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 										}
 									}
 								});
-
+*/
 							/*
 							nodeUpdate.select("text")
 								.style("fill-opacity", function(d) {
@@ -1033,7 +1183,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 								m = 0;
 								displayed = data_cube.displayed_taxa;	
 								ind = displayed.indexOf(taxonName);
-								bP.deSelectSegment(m, ind);
+								bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 								// dehighlight Taxon Bar Chart
 								otu_bar.deselect_bars(taxonName, taxa_colors);
@@ -1052,7 +1202,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 								m = 1;
 								displayed = data_cube.displayed_funcs;
 								ind = displayed.indexOf(functionName);
-								bP.deSelectSegment(m, ind);
+								bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
 								// dehighlight Function Bar Chart
 								fB.deselect_bars(functionName, func_colors);
@@ -1101,7 +1251,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 							
 							data.thisandparents.select("circle")
 								.style("stroke-width", "5")
-								.style("stroke", "green");
+								.style("stroke", "black");
 								
 							data.thisandparents.append("text")
 									.text(function (d5) {
@@ -1122,7 +1272,7 @@ d3.tsv("Data/reduced_genus_pathway_metagenome_contributions.txt", function(error
 						function dehighlightTree(data) {
 							data.thisandparents.select("circle")
 								.style("stroke-width", "1")
-								.style("stroke", "steelblue");
+								.style("stroke", "grey");
 
 							data.thisandparents.selectAll("text").remove(); 
 						}
