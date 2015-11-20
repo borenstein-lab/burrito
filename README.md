@@ -14,10 +14,6 @@ Note: If the entire visualization does not fit on your screen, try increasing yo
 
 OR download this repository and run python -m SimpleHTTPServer 9000 at the root. Then access the visualization from http://localhost:9000/ using your favorite web browser.
 
-### Paper and Poster
-[Paper](http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/final/Paper-cnoecker-engal-cmcn-wgagne-mayard.pdf)
-[Poster](http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/final/Poster-cnoecker-engal-cmcn-wgagne-mayard.pdf)
-
 ###Credits
 ####Cecilia Noecker
 - Responsible for all data cleaning and organization prior to loading data into our visualization
