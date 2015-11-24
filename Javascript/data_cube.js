@@ -428,7 +428,7 @@
         var curr_taxon_index = this.displayed_taxa.indexOf(curr_taxon.key);
         for (var i = 0; i < child_taxa.length; i++){
           this.displayed_taxa.splice(curr_taxon_index + i, 0, child_taxa[i]);
-        }       
+        }
 
         // Remove the function being expanded
         this.displayed_taxa.splice(this.displayed_taxa.indexOf(curr_taxon.key), 1);
