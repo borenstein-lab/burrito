@@ -166,7 +166,6 @@
 					all_loaded = false;
 				}
 			}
-			console.log(load_flags);
 
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded){
@@ -194,37 +193,36 @@
 		uploader.execute_on_tax_abund_load = function() {
 			uploader.tax_abund_text = this.result;
 			uploader.tax_abund_loaded = true;
-			console.log([uploader.tax_abund_loaded, uploader.func_abund_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded])
 		}
 
 		uploader.execute_on_func_abund_load = function() {
 			uploader.func_abund_text = this.result;
 			uploader.func_abund_loaded = true;
-			console.log([uploader.tax_abund_loaded, uploader.func_abund_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded])
+
 		}
 
 		uploader.execute_on_func_contrib_load = function() {
 			uploader.func_contrib_text = this.result;
 			uploader.func_contrib_loaded = true;
-			console.log([uploader.tax_abund_loaded, uploader.func_abund_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded])
+
 		}
 
 		uploader.execute_on_tax_hierarchy_load = function() {
 			uploader.tax_hierarchy_text = this.result;
 			uploader.tax_hierarchy_loaded = true;
-			console.log([uploader.tax_abund_loaded, uploader.func_abund_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded])
+
 		}
 
 		uploader.execute_on_func_hierarchy_load = function() {
 			uploader.func_hierarchy_text = this.result;
 			uploader.func_hierarchy_loaded = true;
-			console.log([uploader.tax_abund_loaded, uploader.func_abund_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded])
+
 		}
 
 		uploader.execute_on_samp_map_load = function() {
 			uploader.samp_map_text = this.result;
 			uploader.samp_map_loaded = true;
-			console.log([uploader.tax_abund_loaded, uploader.func_abund_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded])
+
 		}
 
 		uploader.execute_on_default_tax_abund_load = function() {
