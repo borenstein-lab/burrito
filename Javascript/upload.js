@@ -113,15 +113,22 @@
 			if (tax_abund || func_abund || func_contrib || tax_hierarchy || func_hierarchy || samp_map){
 
 				// If all of the necessary files have been selected, then we can try to update
-				if (tax_abund && func_abund && func_contrib && tax_hierarchy && func_hierarchy){
+				if (tax_abund && func_abund && func_contrib){
 
-					// If a sample map has been uploaded, we wait for all 6 files to load
-					if (samp_map){
-						this.check_loaded([this.tax_abund_loaded, this.func_abund_loaded, this.func_contrib_loaded, this.tax_hierarchy_loaded, this.func_hierarchy_loaded, this.samp_map_loaded], draw_everything)
-					} else {
-						// If there is no new sample map selected, then we wait for just the necessary files to load
-						this.check_loaded([this.tax_abund_loaded, this.func_abund_loaded, this.func_contrib_loaded, this.tax_hierarchy_loaded, this.func_hierarchy_loaded], draw_everything)
+					var to_load = [this.tax_abund_loaded, this.func_abund_loaded, this.func_contrib_loaded];
+
+					// Check which optional files we should wait for
+					if (tax_hierarchy){
+						to_load.push(tax_hierarchy_loaded)
 					}
+					if (func_hierarchy){
+						to_load.push(func_hierarchy_loaded)
+					}
+					if (samp_map){
+						to_load.push(samp_map_loaded)
+					}
+
+					this.check_loaded(to_load, draw_everything)
 				} else {
 					// If only a subset of necessary files have been selected, notify the user which ones are missing
 
@@ -136,14 +143,6 @@
 
 					if (!func_contrib){
 						document.getElementById("func_contrib_message").innerHTML = "You're missing a file of taxonomnic contributions to functions."
-					}
-
-					if (!tax_hierarchy){
-						document.getElementById("tax_hierarchy_message").innerHTML = "You're missing a taxonomic hierarchy file."
-					}
-
-					if (!func_hierarchy){
-						document.getElementById("func_hierarchy_message").innerHTML = "You're missing a functional hierarchy file."
 					}
 				}
 				// If no files have been uploaded, then we can just reset 
