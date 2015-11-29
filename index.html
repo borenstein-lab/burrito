@@ -134,6 +134,7 @@ white-space: pre-line;
 <script src="Javascript/otu_stacked_bar.js"></script>
 <script src="Javascript/colorbrewer.js"></script>
 <script src="Javascript/upload.js"></script>
+<script src="Javascript/buttons.js"></script>
 
 <script>
 
@@ -194,15 +195,7 @@ var sidebar_background = d3.select("#sidebar").append("rect")
 .attr("height","700")
 .attr("fill","#8B8386");
 
-var sidebar_hide = d3.select("#sidebar").append("rect")
-.attr("id","sidebar_hide")
-.attr("x",190)
-.attr("y",0)
-.attr("width","30")
-.attr("height","30")
-.attr("fill","#000000");
-
-sidebar_hide.on("click",function() {
+button_maker.add_button(d3.select("#sidebar"), "sidebar_hide", 190, 0, 30, 30, "#000000", "sidebar_hide_text", "", function() {
 console.log("clicked")
 	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	console.log(curpos)
@@ -211,189 +204,35 @@ console.log("clicked")
 	} else {
 		sidebarz.attr("x","0");
 	}
-} );
+})
 
-var tax_abund_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_tax_abund_button")
-.attr("x", 10)
-.attr("y", 10)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-tax_abund_button.on("click", function(){
+button_maker.add_button(d3.select("#sidebar"), "svg_tax_abund_button", 10, 10, 140, 70, "#FF0000", "svg_tax_abund_button_text", "Taxonomic Abundances", function(){
 	document.getElementById("taxonomic_abundances").click();
-	});
+	})
 
-var tax_abund_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 40)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Taxonomic");
-
-var tax_abund_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 60)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Abundances");
-
-var func_abund_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_func_abund_button")
-.attr("x", 10)
-.attr("y", 100)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-func_abund_button.on("click", function(){
+button_maker.add_button(d3.select("#sidebar"), "svg_func_contrib_button", 10, 100, 140, 70, "#FF0000", "svg_func_abund_button_text", "Function Abundances", function(){
 	document.getElementById("function_abundances").click();
-	});
+	})
 
-var func_abund_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 130)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Function");
-
-var func_abund_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 150)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Abundances");
-
-var func_contrib_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_func_contrib_button")
-.attr("x", 10)
-.attr("y", 190)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-func_contrib_button.on("click", function(){
+button_maker.add_button(d3.select("#sidebar"), "svg_func_contrib_button", 10, 190, 140, 70, "#FF0000", "svg_func_contrib_button_text", "Function Contributions", function(){
 	document.getElementById("function_contributions").click();
-	});
+	})
 
-var func_contrib_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 220)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Function");
-
-var func_contrib_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 240)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Contributions");
-
-var tax_hierarchy_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_tax_hierarchy_button")
-.attr("x", 10)
-.attr("y", 280)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-tax_hierarchy_button.on("click", function(){
+button_maker.add_button(d3.select("#sidebar"), "svg_tax_hierarchy_button", 10, 280, 140, 70, "#FF0000", "svg_tax_hierarchy_button_text", "Taxonomic Hierarchy", function(){
 	document.getElementById("taxonomic_hierarchy").click();
-	});
+	})
 
-var tax_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 310)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Taxonomic");
-
-var tax_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 330)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Hierarchy");
-
-var func_hierarchy_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_func_hierarchy_button")
-.attr("x", 10)
-.attr("y", 370)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-func_hierarchy_button.on("click", function(){
+button_maker.add_button(d3.select("#sidebar"), "svg_func_hierarchy_button", 10, 370, 140, 70, "#FF0000", "svg_func_hierarchy_button_text", "Function Hierarchy", function(){
 	document.getElementById("function_hierarchy").click();
-	});
+	})
 
-var func_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 400)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Function");
-
-var func_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 420)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Hierarchy");
-
-var samp_map_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_samp_map_button")
-.attr("x", 10)
-.attr("y", 460)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-samp_map_button.on("click", function(){
+button_maker.add_button(d3.select("#sidebar"), "svg_samp_map_button", 10, 460, 140, 70, "#FF0000", "svg_samp_map_button_text", "Sample Mapping", function(){
 	document.getElementById("sample_map").click();
-	});
+	})
 
-var tax_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 490)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Sample");
-
-var tax_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 510)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Mapping");
-
-var update_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_update_button")
-.attr("x", 40)
-.attr("y", 600)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#0000FF");
-
-update_button.on("click", function(){
+button_maker.add_button(d3.select("#sidebar"), "svg_update_button", 40, 600, 140, 70, "#0000FF", "svg_update_button_text", "Update Graphics", function(){
 	document.getElementById("update_button").click();
-	});
-
-var update_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 110)
-.attr("y", 630)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Update");
-
-var update_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 110)
-.attr("y", 650)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Graphics");
+	})
 
 //NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
 //NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
