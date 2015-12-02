@@ -79,8 +79,9 @@
 
   fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
 
-   x.rangeRoundBands([0, dims.width], .3);
-   y.rangeRound([dims.height, 0]);
+	var graphdims = {width: dims.width * 8/9, height: dims.height * 8/10, buffer:7}
+   x.rangeRoundBands([0, graphdims.width], .3);
+   y.rangeRound([graphdims.height, 0]);
 
    xAxis.scale(x);
    yAxis.scale(y);
@@ -91,12 +92,12 @@
 
   svglink.append("g")
   .attr("class", "x axis")
-  .attr("transform", "translate(0," + height + ")")
+  .attr("transform", "translate(" + (dims.width-graphdims.width) + "," + (graphdims.height + graphdims.buffer) + ")")
   .call(xAxis)
   .selectAll("text")
   .style("text-anchor", "end")
-  .attr("dx", "-.8em")
-  .attr("dy", ".15em")
+  .attr("dx", "-4")
+  .attr("dy", "5")
   .attr("transform", function(d) {
     return "rotate(-35)"
   });
@@ -104,9 +105,9 @@
   svglink.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", -50)
-    .attr("x", -110)
-    .attr("font-size",16)
+    .attr("y", 18)
+    .attr("x", -1*dims.height/10)
+    .attr("font-size",18)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
     .text("Relative Contribution %");
@@ -115,9 +116,9 @@
     svglink.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", 470)
-    .attr("x", 300)
-    .attr("font-size",16)
+    .attr("y", dims.height-18)
+    .attr("x", (dims.width - graphdims.width) + graphdims.width/2)
+    .attr("font-size",18)
     .attr("dy", ".75em")
     .text("Samples");
 
@@ -154,7 +155,7 @@
   .data(viz)
   .enter().append("g")
   .attr("class", "g")
-  .attr("transform", function(d) {return "translate(" + x(d.Sample) + ",0)"; });
+  .attr("transform", function(d) {return "translate(" + (dims.width-graphdims.width + x(d.Sample)) + "," + graphdims.buffer + ")"; });
 
 
     //create rects for each value, transpose based on sample
@@ -195,6 +196,7 @@
     //init y-axis
   svglink.append("g")
   .attr("class", "y axis")
+  .attr("transform","translate(" + (dims.width-graphdims.width) +"," +graphdims.buffer + ")")
   .call(yAxis)
   .append("text")
   .attr("transform", "rotate(-90)")
