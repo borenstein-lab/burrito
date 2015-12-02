@@ -80,6 +80,7 @@ path.link {
 	left:0;
 	height:100%;
 	width:100%;
+	background-color:white;
 }
 #sidebar {
 	z-index:5;
@@ -436,6 +437,15 @@ draw_everything = function(tax_abund_text, func_abund_text, func_contrib_text, t
 		//.attr("preserveAspectRatio","none");
 		//.attr("transform","scale(2.0)");
 
+	MainSVG.append("rect")
+		.attr("x",margin.left)
+		.attr("y",(height/2) + (margin.btwnavbar/2))
+		.attr("width",(width/2) - margin.left - (margin.btwbars/2))
+		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+		.style("fill","none")
+		.style("stroke","green")
+		
+		
 	var FunctionBar = MainSVG.insert("svg", "#sidebar")
 		.attr("x",(width/2) + (margin.btwbars/2))
 		.attr("y",(height/2) + (margin.btwnavbar/2))
