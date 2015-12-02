@@ -521,13 +521,12 @@
 
     /////////////////////////////////////////////////////////////////////// initialize_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
-    data_cube.initialize_cube = function(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data){
+    data_cube.initialize_cube = function(contribution_table, taxa_tree_data, func_tree_data){
 
       /////////////////////////////////////////////////////////////////////// samples /////////////////////////////////////////////////////////////////////////////////////////////
 
       // Create array of sample names from contributions file
-      for (var i = 0; i < contribution_data.length; i++){
-        var sample = contribution_data[i].Sample;
+      for (sample in contribution_table){
         if (this.samples.indexOf(sample) == -1){
           this.samples.push(sample);
         }
@@ -600,35 +599,25 @@
 
       // For each row in the original TSV, make an entry in the original_contribution_cube
       // Accessed by original_contribution_cube[sample][taxon][func], returns the contribution of the given taxon to the given func relative to the total functional abundance in the given sample
-      contribution_data.forEach(function(d) {
-        var ko = d.SubPathway;
-        var otu = d.Genus;
-        var sample = d.Sample;
-        var contribution = parseFloat(d.ContributionPercentOfSample);
-        var contribution_fraction = 0;
-        for (var i = 0; i < func_rel_abundance_data.length; i++){
-          if (sample == func_rel_abundance_data[i].Sample){
-            contribution_fraction = parseFloat(func_rel_abundance_data[i][ko]);
+      var totals = {};
+      for (sample in contribution_table){
+        totals[sample] = 0;
+        for (otu in contribution_table[sample]){
+          for(ko in contribution_table[sample][otu]){
+            totals[sample] += contribution_table[sample][otu][ko]
           }
         }
-        contribution *= contribution_fraction
-        // If there's already an entry for the sample, move on to check for the otu entry, otherwise add an entry for the sample
-        if (sample in this.original_contribution_cube){
+      }
 
-          // If there's already an entry for the otu in this sample, move on to add the ko contribution data, otherwise add an entry for the otu
-          if (otu in this.original_contribution_cube[sample]){
-            this.original_contribution_cube[sample][otu][ko] = contribution;
-          } else {
-            this.original_contribution_cube[sample][otu] = {};
-            this.original_contribution_cube[sample][otu][ko] = contribution;
-          }
-        } else {
-          this.original_contribution_cube[sample] = {};
+      for (sample in contribution_table){
+        this.original_contribution_cube[sample] = {};
+        for (otu in contribution_table[sample]){
           this.original_contribution_cube[sample][otu] = {};
-          this.original_contribution_cube[sample][otu][ko] = contribution;
-        };
-      }, this);
-
+          for (ko in contribution_table[sample][otu]){
+            this.original_contribution_cube[sample][otu][ko] = contribution_table[sample][otu][ko]/totals[sample];
+          }
+        }
+      }
 
       /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
