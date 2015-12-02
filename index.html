@@ -89,23 +89,11 @@ path.link {
 white-space: pre-line;
 </style>
 <body>
-<div style="float:left">
+<div style="float:left" id="button_holder">
 <h2>Exploring microbial community taxa and functions</h2>
 <h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
 <p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
 <p> data from <a href="http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html?message-global=remove" target="_blank">Theriot et al <i>Nature Communications</i> (2014)</a></p>
-<p> Choose a file of taxonomic abundances: </p>
-<input type="file" id="taxonomic_abundances" onchange="document.getElementById('tax_abund_message').innerHTML=''"><span class="error" id="tax_abund_message"></span>
-<p> Choose a file of function abundances: </p>
-<input type="file" id="function_abundances" onchange="document.getElementById('func_abund_message').innerHTML=''"><span class="error" id="func_abund_message"></span>
-<p> Choose a file indicating functional contributions of taxa to functions by sample (for example, PiCrust output): </p>
-<input type="file" id="function_contributions" onchange="document.getElementById('func_contrib_message').innerHTML=''"><span class="error" id="func_contrib_message"></span>
-<p> Choose a file describing the taxonomic hierarchy of your data: </p>
-<input type="file" id="taxonomic_hierarchy" onchange="document.getElementById('tax_hierarchy_message').innerHTML=''"><span class="error" id="tax_hierarchy_message"></span>
-<p> Choose a file describing the functional hierarchy of your data: </p>
-<input type="file" id="function_hierarchy" onchange="document.getElementById('func_hierarchy_message').innerHTML=''"><span class="error" id="func_hierarchy_message"></span>
-<p> (Optional) Choose a file describing the division of samples by condition: </p>
-<input type="file" id="sample_map">
 <br>
 <button id="update_button" type="button">Update Graphics</button>
 <span class="error" id="upload_message"></span>
@@ -135,6 +123,8 @@ white-space: pre-line;
 <script src="Javascript/otu_stacked_bar.js"></script>
 <script src="Javascript/colorbrewer.js"></script>
 <script src="Javascript/upload.js"></script>
+<script src="Javascript/buttons.js"></script>
+<script src="Javascript/input_parsing.js"></script>
 
 <script>
 
@@ -184,222 +174,82 @@ var sidebarz = d3.select("#mainsvg").append("svg")
 .attr("id","sidebar")
 .attr("x",0)
 .attr("y",0)
-.attr("width","220")
-.attr("height","700")
+.attr("width","480")
+.attr("height","600")
 
 var sidebar_background = d3.select("#sidebar").append("rect")
 .attr("id","sidebar_background")
 .attr("x",0)
 .attr("y",0)
-.attr("width","220")
-.attr("height","700")
+.attr("width","480")
+.attr("height","600")
 .attr("fill","#8B8386");
 
-var sidebar_hide = d3.select("#sidebar").append("rect")
-.attr("id","sidebar_hide")
-.attr("x",190)
-.attr("y",0)
-.attr("width","30")
-.attr("height","30")
-.attr("fill","#000000");
-
-sidebar_hide.on("click",function() {
+button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, 30, "#000000", "", function() {
 console.log("clicked")
 	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	console.log(curpos)
 	if (curpos > -10) {
-		sidebarz.attr("x","-190");
+		sidebarz.attr("x","-450");
 	} else {
 		sidebarz.attr("x","0");
 	}
-} );
+})
 
-var tax_abund_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_tax_abund_button")
+d3.select("#sidebar").append("text")
 .attr("x", 10)
-.attr("y", 10)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-tax_abund_button.on("click", function(){
-	document.getElementById("taxonomic_abundances").click();
-	});
-
-var tax_abund_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
 .attr("y", 40)
 .attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Taxonomic");
+.text("Genome Annotations")
 
-var tax_abund_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 60)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Abundances");
+button_maker.add_radio_button(d3.select("#sidebar"), "svg_genome_annotation_select_button", 25, 90, 15, ["svg_16S_select_button", "svg_contribution_select_button"], ["svg_tax_abund_button", "svg_genome_annotation_button"], ["svg_16S_button", "svg_tax_abund_button_2", "svg_func_contrib_button"])
 
-var func_abund_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_func_abund_button")
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_abund_button", "taxonomic_abundances_1", 70, 55, 140, 70, button_maker.button_off_color, "Taxonomic Abundances")
+
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_genome_annotation_button", "genome_annotations", 220, 55, 140, 70, button_maker.button_off_color, "Genome Annotations")
+
+d3.select("#sidebar").append("text")
 .attr("x", 10)
-.attr("y", 100)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-func_abund_button.on("click", function(){
-	document.getElementById("function_abundances").click();
-	});
-
-var func_abund_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 130)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Function");
-
-var func_abund_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
 .attr("y", 150)
 .attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Abundances");
+.text("16S Reads")
 
-var func_contrib_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_func_contrib_button")
+button_maker.add_radio_button(d3.select("#sidebar"), "svg_16S_select_button", 25, 200, 15, ["svg_genome_annotation_select_button", "svg_contribution_select_button"], ["svg_16S_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_tax_abund_button_2", "svg_func_contrib_button"])
+
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_16S_button", "16S_counts", 70, 165, 140, 70, button_maker.button_off_color, "16S Read Counts")
+
+d3.select("#sidebar").append("text")
 .attr("x", 10)
-.attr("y", 190)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-func_contrib_button.on("click", function(){
-	document.getElementById("function_contributions").click();
-	});
-
-var func_contrib_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 220)
+.attr("y", 260)
 .attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Function");
+.text("Function Contributions")
 
-var func_contrib_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 240)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Contributions");
+button_maker.add_radio_button(d3.select("#sidebar"), "svg_contribution_select_button", 25, 310, 15, ["svg_genome_annotation_select_button", "svg_16S_select_button"], ["svg_tax_abund_button_2", "svg_func_contrib_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_16S_button"])
 
-var tax_hierarchy_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_tax_hierarchy_button")
-.attr("x", 10)
-.attr("y", 280)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_abund_button_2", "taxonomic_abundances_2", 70, 275, 140, 70, button_maker.button_off_color, "Taxonomic Abundances")
 
-tax_hierarchy_button.on("click", function(){
-	document.getElementById("taxonomic_hierarchy").click();
-	});
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_func_contrib_button", "function_contributions", 220, 275, 140, 70, button_maker.button_off_color, "Function Contributions")
 
-var tax_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 310)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Taxonomic");
-
-var tax_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 330)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Hierarchy");
-
-var func_hierarchy_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_func_hierarchy_button")
+d3.select("#sidebar").append("text")
 .attr("x", 10)
 .attr("y", 370)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
-
-func_hierarchy_button.on("click", function(){
-	document.getElementById("function_hierarchy").click();
-	});
-
-var func_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 400)
 .attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Function");
+.text("Optional Files")
 
-var func_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 420)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Hierarchy");
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", 20, 390, 140, 70, button_maker.button_on_color, "Taxonomic Hierarchy")
+document.getElementById("svg_tax_hierarchy_button").setAttribute("on", true)
 
-var samp_map_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_samp_map_button")
-.attr("x", 10)
-.attr("y", 460)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#FF0000");
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_func_hierarchy_button", "function_hierarchy", 170, 390, 140, 70, button_maker.button_on_color, "Function Hierarchy")
+document.getElementById("svg_func_hierarchy_button").setAttribute("on", true)
 
-samp_map_button.on("click", function(){
-	document.getElementById("sample_map").click();
-	});
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_map_button", "sample_map", 320, 390, 140, 70, button_maker.button_on_color, "Sample Mapping")
+document.getElementById("svg_samp_map_button").setAttribute("on", true)
 
-var tax_hierarchy_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 490)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Sample");
-
-var tax_hierarchy_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 80)
-.attr("y", 510)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Mapping");
-
-var update_button = d3.select("#sidebar").append("rect")
-.attr("id", "svg_update_button")
-.attr("x", 40)
-.attr("y", 600)
-.attr("width", "140")
-.attr("height", "70")
-.attr("fill","#0000FF");
-
-update_button.on("click", function(){
+button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 330, 500, 140, 70, "#0000FF", "Update Graphics", function(){
 	document.getElementById("update_button").click();
-	});
+	})
 
-var update_button_text_1 = d3.select("#sidebar").append("text")
-.attr("x", 110)
-.attr("y", 630)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Update");
-
-var update_button_text_2 = d3.select("#sidebar").append("text")
-.attr("x", 110)
-.attr("y", 650)
-.attr("font-size", "20px")
-.attr("text-anchor", "middle")
-.text("Graphics");
-
-//NavSVG.append("text").attr("x",margin.left + treewidth-85).attr("y", 15).text("Taxa / Species").attr("font-size",15)
-//NavSVG.append("text").attr("x",margin.left*2 + treewidth * 3/2).attr("y", 15).text("Functions / Genes").attr("font-size",15)
-
-draw_everything = function(tax_abund_text, func_abund_text, func_contrib_text, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
+draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
 
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
@@ -468,17 +318,16 @@ draw_everything = function(tax_abund_text, func_abund_text, func_contrib_text, t
 	curlevelNames['taxa'] = levelNames['taxa'];
 	curlevelNames['func'] = levelNames['func'];
 
-	contribution_data = d3.tsv.parse(func_contrib_text);
 	taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
 	func_tree_data = d3.tsv.parse(func_hierarchy_text);
-	func_rel_abundance_data = d3.tsv.parse(func_abund_text);
 	samplemap = d3.tsv.parse(samp_map_text);
 	otu_abundance_data = d3.tsv.parse(tax_abund_text);
 
 
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube();
-	data_cube.initialize_cube(contribution_data, taxa_tree_data, func_tree_data, func_rel_abundance_data);
+	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data);
+
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		for(j=0; j < main_list.length; j++){
 			var descendents = [];
@@ -1507,6 +1356,7 @@ var uploader = uploader_wrapper.make_uploader(draw_everything);
 document.getElementById("update_button").onclick = (function(){
 	uploader.update_plots();
 })
+document.getElementById("svg_contribution_select_button_base").setAttribute("selected", true);
 uploader.load_default_data();
 	
 </script>
