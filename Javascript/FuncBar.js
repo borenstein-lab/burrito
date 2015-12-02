@@ -12,6 +12,10 @@
   .tickFormat(d3.format(".2s"));
 
 
+  //TO DO
+  //figure out how to remove old graph
+  //
+
   fB.vizData = function(data){
 
     var alldata = [];
@@ -62,22 +66,31 @@
   }
 
 
+
   getSampleGroup = function(samp, sampledata){
-    group = sampledata.filter(function(e){ return e.Sample==samp;})[0].Group;
-    return group;
+    treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
+    day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
+    if(treatment==="Antibiotic"){
+      if(day==="2") return "1";
+      else return "2";
+    } else{
+      if(day==="2") return "3";
+      else return "4";
+    }
+
   }
 
 
 
-  // var sampleColor = d3.scale.ordinal();
-  // sampleColor["1"] = "red";
-  // sampleColor["2"] = "darkred";
-  // sampleColor["3"] = "steelblue";
-  // sampleColor["4"] = "darkblue";
+  var sampleColor = d3.scale.ordinal();
+  sampleColor["1"] = "red";
+  sampleColor["2"] = "darkred";
+  sampleColor["3"] = "steelblue";
+  sampleColor["4"] = "darkblue";
 
 
 
-  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
+  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
 
    x.rangeRoundBands([0, dims.width], .3);
    y.rangeRound([dims.height, 0]);
@@ -127,7 +140,7 @@
 
   svglink.selectAll("text").style("fill",function(m){
     if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-      return sampleColor(getSampleGroup(m, sampledata));        
+      return sampleColor[getSampleGroup(m, sampledata)];        
     }
   });
     //init the tooltip as invisible
@@ -171,7 +184,7 @@
   .attr("y", function(d) {return y(d.y1); })
   .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
   .style("fill", function(d) { return colors(d.func); })
-  .style("opacity", 0.75)
+  .style("opacity", 0.6)
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
     highlight_overall("", current_rectangle_data.func, 2);
@@ -238,11 +251,12 @@ fB.deselect_bars = function(func, colors){
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 0.75)
+    .style("opacity", 0.6)
     .style("fill", colors(func));
 }
 
 fB.select_contribution = function(taxon, colors){
+  console.log(colors);
   var selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
@@ -272,7 +286,7 @@ fB.deselect_contribution = function(taxon, colors){
     .filter(function(d) {
       return d.Taxa == taxon;
     });
-    selected.style("opacity", 0.75).style("fill",function(d){ return colors(d.func); });
+    selected.style("opacity", 0.6).style("fill",function(d){ return colors(d.func); });
 }
 
 fB.select_single_contribution = function(taxon, func, colors){
@@ -303,7 +317,7 @@ fB.deselect_single_contribution = function(taxon, func, colors){
       return d.func == func && d.Taxa == taxon;
     });
 
-    selected.style("opacity", 0.75).style("fill", function(d){ return colors(d.func); });
+    selected.style("opacity", 0.6).style("fill", function(d){ return colors(d.func); });
 }
 
 this.fB = fB;

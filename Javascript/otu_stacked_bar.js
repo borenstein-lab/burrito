@@ -1,9 +1,23 @@
 (function(){
   var otu_bar = {};
 
+  var sampleColor = d3.scale.ordinal();
+  sampleColor["1"] = "red";
+  sampleColor["2"] = "darkred";
+  sampleColor["3"] = "steelblue";
+  sampleColor["4"] = "darkblue";
+
   getSampleGroup = function(samp, sampledata){
-    group = sampledata.filter(function(e){ return e.Sample==samp;})[0].Group;
-    return group;
+    treatment = sampledata.filter(function(e){ return e.Sample==samp; })[0].Treatment;
+    day=sampledata.filter(function(e){ return e.Sample==samp; })[0].Day;
+    if(treatment==="Antibiotic"){
+      if(day==="2") return "1";
+      else return "2";
+    } else{
+      if(day==="2") return "3";
+      else return "4";
+    }
+
   }
 
 
@@ -33,14 +47,13 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall){
 
-	var graphdims = {width: dims.width * 8/9, height: dims.height * 8/10}
     var x = d3.scale.ordinal()
-      .rangeRoundBands([0, graphdims.width], .3);
+      .rangeRoundBands([0, dims.width], .3);
 
     var y = d3.scale.linear()
-      .rangeRound([graphdims.height, 0]);
+      .rangeRound([dims.height, 0]);
 
     var xAxis = d3.svg.axis()
       .scale(x)
@@ -74,10 +87,9 @@
       })
     })
 
-
     svglink.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + graphdims.height + ")")
+      .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
       .selectAll("text")
       .style("text-anchor", "end")
@@ -90,9 +102,9 @@
     svglink.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", dims.height / 9)
-    .attr("x", 0)
-    .attr("font-size","10px")
+    .attr("y", -50)
+    .attr("x", -110)
+    .attr("font-size",16)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
     .text("Relative Contribution %");
@@ -111,7 +123,7 @@
 
     svglink.selectAll("text").style("fill",function(m){
       if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-        return sampleColor(getSampleGroup(m, sampledata));        
+        return sampleColor[getSampleGroup(m, sampledata)];        
       }
     });
 
@@ -139,11 +151,11 @@
       .style("fill", function(d) { 
         return colors(d.name); 
       })
-      .style("opacity", 0.75)
+      .style("opacity", 0.6)
       .on("mouseover", function(d){
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
-        tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+        tooltip.html("<strong>Taxa</strong>: " + current_rectangle_data.name + "<br>" + "<strong>Relative Contribution: </strong>" + (current_rectangle_data.y1-current_rectangle_data.y0)+"%");
         return tooltip.style("visibility", "visible");
       })
       .on("mousemove", function(){ 
@@ -254,7 +266,7 @@ otu_bar.deselect_bars = function(taxon, colors){
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 0.75)
+    .style("opacity", 0.6)
     .style("fill", function(d){ return colors(d.name); });
 }
 
