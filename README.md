@@ -8,7 +8,7 @@
 ![](/images/Final_Image.png)
 
 ###Running Instructions
-Access our visualization [HERE](http://cse512-15s.github.io/fp-cnoecker-engal-cmcn-wgagne-maynard/)
+Access our visualization [HERE](http://borenstein-lab.github.io/burrito/)
 
 Note: If the entire visualization does not fit on your screen, try increasing your monitor's resolution or using your browsers zoom-out function(⌘ and - or Windows Key and -)
 
