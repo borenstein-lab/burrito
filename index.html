@@ -329,8 +329,22 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data);
 
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
+
+		depth_tree = 1 //depth from main categories
+		if(list_type=="taxa"){
+			curr_node = data_cube.taxa_lookup[main_list[0]]
+		} else {
+			curr_node = data_cube.func_lookup[main_list[0]]
+		}
+		while(data_cube.is_leaf(curr_node)===false){
+			depth_tree += 1
+			curr_node = curr_node.values[0]
+		}
+		console.log(depth_tree)
+
 		for(j=0; j < main_list.length; j++){
-			var descendents = [];
+
+/*			var descendents = [];
 	      // Use a BFS to collect all descendents
 				var curr_nodes = [];
 				if(list_type=="taxa") {
@@ -347,35 +361,107 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	            		curr_nodes.push(curr_node.values[i]);
 	          		}
 					}
-	      	}
-	      	unique_desc = d3.set(descendents).values()
+	      		}
 
-	      	sub_colors = []
-	      	for(k=0; k < unique_desc.length; k++){
-	      		new_color = d3.hcl(color_scale(main_list[j]))
-	      		color_range = Math.floor(unique_desc.length/2) //number of colors to expand in each direction
-	      		if(k <= unique_desc.length/2){
-/*						      			console.log(k/(color_range+1))
-	      			console.log(new_color)
-*/						      			new_color["l"] = new_color["l"] + 28 - 28*k/(color_range+1) //fill in the range of colors with increasing k
-	      			new_color["h"] = new_color["h"] + 8 - 8*k/(color_range+1)
-	      			new_color["c"] = new_color["c"] + 4 - 4*k/(color_range+1)
-	      		} else{
-	      			new_color["l"] = new_color["l"] - 28 + 28*k/(color_range+1)
-	      			new_color["h"] = new_color["h"] - 8 + 8*k/(color_range+1)
-	      			new_color["c"] = new_color["c"] - 4 + 4*k/(color_range+1)
-				}
-	      		sub_colors.push(new_color.toString())						      			
+*/	      	
+
+	      	if(list_type=="taxa"){
+				var leaves = data_cube.get_leaves(main_list[j], data_cube.taxa_lookup)
+
+			} else {
+				var leaves = data_cube.get_leaves(main_list[j], data_cube.func_lookup)
 			}
-			d3.shuffle(sub_colors)
 
-	      	color_scale.range(color_scale.range().concat(sub_colors))
-	      	//assign colors to unique elements
-	      	for(k = 0; k < unique_desc.length; k++){
-	      		color_scale(unique_desc[k])
-	      		//console.log(color_scale(unique_desc[k]))
+				      	
+//			unique_desc = d3.set(descendents).values()
+			console.log(main_list[j])
+			//now, assign colors for each depth level starting with leaves
+	      	sub_colors = []
+	      	for(k=0; k < leaves.length; k++){
+	      		new_color = d3.hcl(color_scale(main_list[j]))
+	      		color_range = Math.floor(leaves.length/2) //number of colors to expand in each direction
+	      		if(k < leaves.length/2){
+					new_color["l"] = new_color["l"] + 28 - 28*(k+1)/(color_range+1) //fill in the range of colors with increasing k
+	      			new_color["h"] = new_color["h"] + 8 - 8*(k+1)/(color_range+1)
+	      			new_color["c"] = new_color["c"] + 4 - 4*(k+1)/(color_range+1)
+	      		} else{
+	      			new_color["l"] = new_color["l"] - 28 + 28*(k+1)/(color_range+1)
+	      			new_color["h"] = new_color["h"] - 8 + 8*(k+1)/(color_range+1)
+	      			new_color["c"] = new_color["c"] - 4 + 4*(k+1)/(color_range+1)
+				}
+	      		sub_colors.push(new_color.toString())
 	      	}
-		}
+	      	for(k = 0; k < leaves.length; k++){
+	      		console.log(leaves[k])
+			    color_scale.range().push(sub_colors[k])
+			    console.log(sub_colors[k])
+		      	console.log(color_scale(leaves[k]))
+		      	if(color_scale.range().length != color_scale.domain().length){
+		      		console.log(color_scale.range())
+		      		console.log(color_scale.range().length)
+		      		console.log(color_scale.domain())
+		      		console.log(color_scale.domain().length)
+		      	}
+	      	}
+
+	      	if(list_type=="taxa"){
+	      		layer1 = data_cube.taxa_lookup[main_list[j]]
+	      	} else {
+	      		layer1 = data_cube.func_lookup[main_list[j]]
+	      	}
+
+	      	assignChildrenColors = function(layer){
+	      		//go back to top and find our way down to leaves - assign color to descendents
+	      		console.log(layer)
+	      		if(data_cube.is_leaf(layer)==false & layer.hasOwnProperty("Category")===false){ //if layer has children 
+	      			if(data_cube.is_leaf(layer.values[0])==false & layer.values[0].hasOwnProperty("Category")===false){ //and children are not leaves
+	      				console.log(layer.key)
+	      				if(list_type=="taxa"){
+							layer_leaves = data_cube.get_leaves(layer.key, data_cube.taxa_lookup)
+						} else {
+							layer_leaves = data_cube.get_leaves(layer.key, data_cube.func_lookup)
+						}
+						layer_children = layer.values
+						if(layer_children.length == 1){
+							console.log("single descendent")
+	      					same_color = color_scale(layer.key)
+	      					color_scale.range().push(same_color)
+		      				color_scale(layer_children[0].key)
+	      				} else {
+	      					console.log("multiple descendents")
+	      					leaf_colors = layer_leaves.map(function(d){ return color_scale(d) })
+	      					leaf_colors = leaf_colors.map(function(d){ return d3.hcl(d)})
+/*	      					leaf_colors_lvals = leaf_colors.map(function(d){ return d.l})
+	      					new_color = leaf_colors[leaf_colors_lvals.indexOf(d3.max(leaf_colors_lvals))] //max color
+	      					*/
+	      					for(b = 0; b < layer_children.length; b++){ //for now just give them one of the leaf colors slightly different
+	      						new_color = leaf_colors[b]
+	      						if(color_scale.domain().indexOf(layer_children[b].key)==-1){ //if same name not already in color scale
+	      							color_scale.range().push(new_color.toString())
+		      						color_scale(layer_children[b].key)	//assign max color of leaves to this node
+	      						}
+	      					}
+	      				}
+	      			}
+	      		}
+	      	}
+	      	assignChildrenColors(layer1) //initial assignment of colors to category children
+	      	var curr_nodes = [];
+			curr_nodes.push(layer1);
+			for (; curr_nodes.length > 0;){
+				curr_node = curr_nodes.shift();
+				if(data_cube.is_leaf(curr_node)===false & curr_node.hasOwnProperty("Category")==false){
+					console.log(curr_node.key)
+					for (var i = 0; i < curr_node.values.length; i++){
+	            		curr_nodes.push(curr_node.values[i]);
+	          		}
+	          		if(main_list.indexOf(curr_node.key)==-1 & data_cube.is_leaf(curr_node.values[0])==false & curr_node.values[0].hasOwnProperty("Category")==false){
+	          			assignChildrenColors(curr_node)
+	          		} 
+				}
+	      	}
+
+	      	}
 		return color_scale;
 
 	}
