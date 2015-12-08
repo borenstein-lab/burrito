@@ -1,0 +1,5 @@
+Sample	Bacteroides	Coprococcus	Pseudomonas
+S1	0	0.3	0.7
+S2	0.3	0.5	0.2
+S3	0.2	0.3	0.5
+S4	0.8	0.1	0.1

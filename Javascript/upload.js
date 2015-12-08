@@ -169,13 +169,13 @@
 
 					// Check which optional files we should wait for
 					if (tax_hierarchy){
-						to_load.push(tax_hierarchy_loaded)
+						to_load.push(this.tax_hierarchy_loaded)
 					}
 					if (func_hierarchy){
-						to_load.push(func_hierarchy_loaded)
+						to_load.push(this.func_hierarchy_loaded)
 					}
 					if (samp_map){
-						to_load.push(samp_map_loaded)
+						to_load.push(this.samp_map_loaded)
 					}
 
 					this.check_loaded(to_load, draw_everything);
@@ -229,7 +229,7 @@
 					this.tax_abund_1_loaded = false;
 					this.genome_annotation_loaded = false;
 					document.getElementById("taxonomic_abundances_1").value = "";
-					document.getElementById("genome_annotaions").value = "";
+					document.getElementById("genome_annotations").value = "";
 
 				} else if (document.getElementById("svg_16S_select_button_base").getAttribute("selected") == "true"){
 
@@ -258,25 +258,83 @@
 			var output = [];
 
 			var lines = func_contrib_text.split('\n');
-			for (i = 1; i < lines.length - 1; i++){
+			for (i = 1; i < lines.length; i++){
+				if (lines[i] != ''){
+					fields = lines[i].split('\t');
+					sample = fields[this.sample_col];
+					otu = fields[this.otu_col];
+					ko = fields[this.ko_col];
+					read_counts = fields[this.read_count_col];
 
-				fields = lines[i].split('\t');
-				sample = fields[this.sample_col];
-				otu = fields[this.otu_col];
-				ko = fields[this.ko_col];
-				read_counts = fields[this.read_count_col];
-
-				// Make empty entries to add to if necessary
-				if (!output.hasOwnProperty(sample)){
-					output[sample] = [];
+					// Make empty entries to add to if necessary
+					if (!output.hasOwnProperty(sample)){
+						output[sample] = [];
+					}
+					if (!output[sample].hasOwnProperty(otu)){
+						output[sample][otu] = [];
+					}
+					output[sample][otu][ko] = parseFloat(read_counts);
 				}
-				if (!output[sample].hasOwnProperty(otu)){
-					output[sample][otu] = [];
-				}
-				output[sample][otu][ko] = parseFloat(read_counts);
 			}
 
 			return output;
+		}
+
+		uploader.parse_genome_annotation = function(tax_abund, annotations){
+			tax_table = this.matrix_parser(tax_abund);
+			annotation_map = this.long_table_parser(annotations);
+			output = [];
+			for (sample in tax_table){
+				output[sample] = [];
+				for (otu in tax_table[sample]){
+					output[sample][otu] = [];
+					for (ko in annotation_map[otu]){
+						output[sample][otu][ko] = parseFloat(tax_table[sample][otu]) * parseFloat(annotation_map[otu][ko]);
+					}
+				}
+			}
+
+			return(output);
+		}
+
+		uploader.matrix_parser = function(matrix_text){
+			var output = [];
+
+			var lines = matrix_text.split('\n');
+			for (i = 1; i < lines.length; i++){
+				if (lines[i] != ''){
+					fields = lines[i].split('\t');
+					row = fields[0];
+					output[row] = [];
+					for (j = 1; j < fields.length; j++){
+						col = lines[0].split('\t')[j];
+						output[row][col] = fields[j];
+					}
+				}
+			}
+
+			return(output);
+		}
+
+		uploader.long_table_parser = function(long_table_text){
+			var output = [];
+
+			var lines = long_table_text.split('\n');
+			for (i = 0; i < lines.length - 1; i++){
+				if (lines[i] != ''){
+					fields = lines[i].split('\t')
+					curr_table = output;
+					for (j = 0; j < fields.length - 2; j++){
+						if (!output.hasOwnProperty(fields[j])){
+							curr_table[fields[j]] = [];
+						}
+						curr_table = curr_table[fields[j]];
+					}
+					curr_table[fields[fields.length - 2]] = fields[fields.length - 1];
+				}
+			}
+
+			return(output);
 		}
 
 		uploader.execute_on_tax_abund_1_load = function() {

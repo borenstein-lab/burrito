@@ -1,0 +1,5 @@
+Category	SuperPathway	SubPathway
+Metabolism	Carbohydrate metabolism	Glycolysis___Gluconeogenesis
+Genetic Information Processing	Replication and repair	Mismatch_repair
+Cellular Processes	Cell motility	Flagellar_assembly
+Human Diseases	Infectious diseases	Vibrio_cholerae_pathogenic_cycle

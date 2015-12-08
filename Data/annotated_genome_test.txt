@@ -1,5 +1,6 @@
-OTU_1	K00001	2
-OTU_1	K00002	1
-OTU_1	K00003	1.5
-OTU_2	K00002	1.2
-OTU_2	K00004	3
+Bacteroides	Glycolysis__Gluconeogenesis	2
+Bacteroides	Mismatch_repair	1
+Bacteroides	Vibrio_cholerae_pathogenic_cycle	1.5
+Coprococcus	Mismatch_repair	1.2
+Coprococcus	Flagellar_assembly	3
+Pseudomonas	Flagellar_assembly 2

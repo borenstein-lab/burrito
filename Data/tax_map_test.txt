@@ -1,0 +1,4 @@
+Kingdom	Phylum	Class	Order	Family	Genus
+Bacteria	Bacteroidetes	Bacteroidia	Bacteroidales	Bacteroidaceae	Bacteroides
+Bacteria	Firmicutes	Clostridia	Clostridiales	Lachnospiraceae	Coprococcus
+Bacteria	Proteobacteria	Gammaproteobacteria	Pseudomonadales	Pseudomonadaceae	Pseudomonas
