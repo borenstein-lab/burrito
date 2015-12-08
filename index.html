@@ -140,7 +140,7 @@ var height = 1000;
 //var height = 400;
 var margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
 var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-var bpdims = {height: (height / 2)};
+var bpdims = {height: (height / 2) - margin.top - (margin.btwbars/2)};
 var treewidth = width / 3;
 var i = 0,
     duration = 300,
@@ -262,7 +262,15 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
 		.attr("id","navbar");
 
-
+	MainSVG.append("rect")
+		.attr("x",margin.left)
+		.attr("y",margin.top)
+		.attr("width",width - margin.left - margin.right)
+		.attr("height",(height/2) - margin.top - (margin.btwnavbar / 2))
+		.style("fill","none")
+		.style("stroke","green") 
+		
+		
 	var bpG = NavSVG.append("g")
 		.attr("transform","translate("+ (width * 4.15/10) +","+ margin.top +")");
 		
@@ -287,13 +295,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		//.attr("preserveAspectRatio","none");
 		//.attr("transform","scale(2.0)");
 
-	/*MainSVG.append("rect")
-		.attr("x",margin.left)
-		.attr("y",(height/2) + (margin.btwnavbar/2))
-		.attr("width",(width/2) - margin.left - (margin.btwbars/2))
-		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
-		.style("fill","none")
-		.style("stroke","green") */
+
 		
 		
 	var FunctionBar = MainSVG.insert("svg", "#sidebar")
@@ -700,7 +702,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	getAvgs(roots["func"])
     update(roots['func']);
 
-    d3.select(self.frameElement).style("height", "800px");
+    //d3.select(self.frameElement).style("height", "800px");
 	click(roots['taxa'].values[0])
 
 							
@@ -1078,7 +1080,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		var newdepthlabels = depthlabels.enter().append("g")
 			.attr("class","depthlabel")
 			.attr("transform", function(d) {
-				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(" + (source.type == 'taxa' ? -15 : 15) + ")" ;
 			});
 			
 		newdepthlabels.append("text")
@@ -1093,7 +1095,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 			.duration(duration)
 			.style("font-weight","bold")
 			.attr("transform", function(d) {
-				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(" + (source.type == 'taxa' ? -15 : 15) + ")";
 			});
 			
 		upddepthlabels.select("text")
@@ -1346,11 +1348,6 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		data.thisandparents.selectAll("text").remove(); 
 	}
 }
-
-/* #commented because I removed the header for now -CM
-function hideheader () {
-	window.location = '#navsvg';
-} */
 
 var uploader = uploader_wrapper.make_uploader(draw_everything);
 document.getElementById("update_button").onclick = (function(){
