@@ -325,84 +325,47 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 
 
 	//initialize display cube
-	var data_cube = data_cube_wrapper.make_cube();
+	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data);
 
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 
-		depth_tree = 1 //depth from main categories
-		if(list_type=="taxa"){
-			curr_node = data_cube.taxa_lookup[main_list[0]]
-		} else {
-			curr_node = data_cube.func_lookup[main_list[0]]
-		}
-		while(data_cube.is_leaf(curr_node)===false){
-			depth_tree += 1
-			curr_node = curr_node.values[0]
-		}
-		console.log(depth_tree)
-
 		for(j=0; j < main_list.length; j++){
-
-/*			var descendents = [];
-	      // Use a BFS to collect all descendents
-				var curr_nodes = [];
-				if(list_type=="taxa") {
-					parent = data_cube.taxa_lookup[main_list[j]]
-					} else if(list_type=="funcs"){
-						parent = data_cube.func_lookup[main_list[j]]
-					} 
-				curr_nodes.push(parent);
-				for (; curr_nodes.length > 0;){
-				curr_node = curr_nodes.shift();
-					if(curr_node.key !== main_list[j]) descendents.push(curr_node.key);
-					if(data_cube.is_leaf(curr_node)===false){
-						for (var i = 0; i < curr_node.values.length; i++){
-	            		curr_nodes.push(curr_node.values[i]);
-	          		}
-					}
-	      		}
-
-*/	      	
+			//assign colors for each depth level starting with leaves
 
 	      	if(list_type=="taxa"){
 				var leaves = data_cube.get_leaves(main_list[j], data_cube.taxa_lookup)
-
 			} else {
 				var leaves = data_cube.get_leaves(main_list[j], data_cube.func_lookup)
 			}
 
-				      	
-//			unique_desc = d3.set(descendents).values()
-			console.log(main_list[j])
-			//now, assign colors for each depth level starting with leaves
 	      	sub_colors = []
 	      	for(k=0; k < leaves.length; k++){
 	      		new_color = d3.hcl(color_scale(main_list[j]))
-	      		color_range = Math.floor(leaves.length/2) //number of colors to expand in each direction
-	      		if(k < leaves.length/2){
-					new_color["l"] = new_color["l"] + 28 - 28*(k+1)/(color_range+1) //fill in the range of colors with increasing k
+	      		color_range = Math.floor(leaves.length/2) //number of colors to expand in each direction depends on # of leaves
+	      		if(k % 2 ==0){
+					new_color["l"] = new_color["l"] + 22 - 22*(k+1)/(color_range+1) //fill in the range of colors with increasing k
 	      			new_color["h"] = new_color["h"] + 8 - 8*(k+1)/(color_range+1)
 	      			new_color["c"] = new_color["c"] + 4 - 4*(k+1)/(color_range+1)
 	      		} else{
-	      			new_color["l"] = new_color["l"] - 28 + 28*(k+1)/(color_range+1)
+	      			new_color["l"] = new_color["l"] - 22 + 22*(k+1)/(color_range+1)
 	      			new_color["h"] = new_color["h"] - 8 + 8*(k+1)/(color_range+1)
 	      			new_color["c"] = new_color["c"] - 4 + 4*(k+1)/(color_range+1)
 				}
 	      		sub_colors.push(new_color.toString())
 	      	}
 	      	for(k = 0; k < leaves.length; k++){
-	      		console.log(leaves[k])
+	      		//console.log(leaves[k])
 			    color_scale.range().push(sub_colors[k])
-			    console.log(sub_colors[k])
-		      	console.log(color_scale(leaves[k]))
-		      	if(color_scale.range().length != color_scale.domain().length){
+			    //console.log(sub_colors[k])
+		      	color_scale(leaves[k])
+/*		      	if(color_scale.range().length != color_scale.domain().length){
 		      		console.log(color_scale.range())
 		      		console.log(color_scale.range().length)
 		      		console.log(color_scale.domain())
 		      		console.log(color_scale.domain().length)
 		      	}
-	      	}
+*/	      	}
 
 	      	if(list_type=="taxa"){
 	      		layer1 = data_cube.taxa_lookup[main_list[j]]
@@ -434,11 +397,34 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 /*	      					leaf_colors_lvals = leaf_colors.map(function(d){ return d.l})
 	      					new_color = leaf_colors[leaf_colors_lvals.indexOf(d3.max(leaf_colors_lvals))] //max color
 	      					*/
-	      					for(b = 0; b < layer_children.length; b++){ //for now just give them one of the leaf colors slightly different
-	      						new_color = leaf_colors[b]
-	      						if(color_scale.domain().indexOf(layer_children[b].key)==-1){ //if same name not already in color scale
+	      					for(b = 0; b < layer_children.length; b++){ //function of their own leaf colors 
+	      						if(list_type=="taxa"){ 
+	      							child_leaves = data_cube.get_leaves(layer_children[b].key, data_cube.taxa_lookup)
+	      							} else {
+	      								child_leaves = data_cube.get_leaves(layer_children[b].key, data_cube.func_lookup)
+	      							}
+	      						leaf_colors = child_leaves.map(function(d){ return color_scale(d) })
+	      						leaf_colors = leaf_colors.map(function(d){ return d3.hcl(d)})
+	      						new_colors = {}
+	      						if(b % 2 == 0 ){ //switch off between max and min extremes of children
+	      							new_color["h"] = d3.max(leaf_colors.map(function(d){ return d.h })) //d3.sum(leaf_colors.map(function(d){ return d.c }))/leaf_colors.length
+	      							} else{
+	      							new_color["h"] = d3.min(leaf_colors.map(function(d){ return d.h })) //d3.sum(leaf_colors.map(function(d){ return d.h }))/
+	      							}
+	      						if(b % 2 == 0 ){ //switch off between max and min extremes of children
+	      							new_color["c"] = d3.max(leaf_colors.map(function(d){ return d.c })) //d3.sum(leaf_colors.map(function(d){ return d.c }))/leaf_colors.length
+	      						} else {	
+	      							new_color["c"] = d3.min(leaf_colors.map(function(d){ return d.c })) //d3.sum(leaf_colors.map(function(d){ return d.c }))/leaf_colors.length
+	      						}
+	      						new_color["l"] = d3.sum(leaf_colors.map(function(d){ return d.l }))/leaf_colors.length
+/*	      						if(b % 2 == 0 | leaf_colors.length <= 2){ //switch off between lighter and darker ends
+	      							new_color = leaf_colors[b]
+	      						} else {
+	      							new_color = leaf_colors[leaf_colors.length - 1 - b]
+	      						}
+*/	      						if(color_scale.domain().indexOf(layer_children[b].key)==-1){ //if same name not already in color scale
 	      							color_scale.range().push(new_color.toString())
-		      						color_scale(layer_children[b].key)	//assign max color of leaves to this node
+		      						color_scale(layer_children[b].key)	
 	      						}
 	      					}
 	      				}
