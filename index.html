@@ -109,6 +109,15 @@ white-space: pre-line;
       <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==" x="0" y="0" width="4" height="4">
       </image>
     </pattern>
+	
+	<pattern id="rarrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
+	    <rect x="0" y="0" width="30" height="30" fill="#D0D0D0" />
+		<path d="M 0 2 L 27 10 L 0 18" fill="none" stroke="green" stroke-width="4" />
+	</pattern>
+	<pattern id="larrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
+	    <rect x="0" y="0" width="30" height="30" fill="#D0D0D0" />
+		<path d="M 30 2 L 3 10 L 30 18" fill="none" stroke="green" stroke-width="4" />
+	</pattern>
   </defs>
 </svg>
 
@@ -175,24 +184,26 @@ var sidebarz = d3.select("#mainsvg").append("svg")
 .attr("x",0)
 .attr("y",0)
 .attr("width","480")
-.attr("height","600")
+.attr("height",height)
 
 var sidebar_background = d3.select("#sidebar").append("rect")
 .attr("id","sidebar_background")
 .attr("x",0)
 .attr("y",0)
 .attr("width","480")
-.attr("height","600")
+.attr("height",height)
 .attr("fill","#8B8386");
 
-button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, 30, "#000000", "", function() {
+button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, height, "url(#larrowspat)", "", function() {
 console.log("clicked")
 	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	console.log(curpos)
 	if (curpos > -10) {
-		sidebarz.attr("x","-450");
+		sidebarz.transition().attr("x","-450");
+		sidebarz.select("#sidebar_hide").transition().attr("fill","url(#rarrowspat)");
 	} else {
-		sidebarz.attr("x","0");
+		sidebarz.transition().attr("x","0");
+		sidebarz.select("#sidebar_hide").transition().attr("fill","url(#larrowspat)");
 	}
 })
 
@@ -242,10 +253,10 @@ document.getElementById("svg_tax_hierarchy_button").setAttribute("on", true)
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_func_hierarchy_button", "function_hierarchy", 170, 390, 140, 70, button_maker.button_on_color, "Function Hierarchy")
 document.getElementById("svg_func_hierarchy_button").setAttribute("on", true)
 
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_map_button", "sample_map", 320, 390, 140, 70, button_maker.button_on_color, "Sample Mapping")
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_map_button", "sample_map", 320, 390, 130, 70, button_maker.button_on_color, "Sample Mapping")
 document.getElementById("svg_samp_map_button").setAttribute("on", true)
 
-button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 330, 500, 140, 70, "#0000FF", "Update Graphics", function(){
+button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 300, 500, 140, 70, "#0000FF", "Update Graphics", function(){
 	document.getElementById("update_button").click();
 	})
 
@@ -262,9 +273,9 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
 		.attr("id","navbar");
 
-	MainSVG.append("rect")
-		.attr("x",margin.left)
-		.attr("y",margin.top)
+	NavSVG.append("rect")
+		.attr("x",0)
+		.attr("y",0)
 		.attr("width",width - margin.left - margin.right)
 		.attr("height",(height/2) - margin.top - (margin.btwnavbar / 2))
 		.style("fill","none")
