@@ -12,8 +12,13 @@
 
 	button_maker.add_rect_button = function(element, id, x, y, width, height, fill, text, on_click){
 
-		element.append("rect")
+	var thisg = element.append("g")
+			.attr("class","sidebutton")
+			.attr("id", id)
+	
+		thisg.append("rect")
 		.attr("id", id)
+		.attr("class","sidebutton")
 		.attr("x", x)
 		.attr("y", y)
 		.attr("width", width)
@@ -25,7 +30,7 @@
 		var text_components = text.split(" ");
 
 		for (i = 0; i < text_components.length; i++){
-			element.append("text")
+			thisg.append("text")
 			.attr("id", id + this.text_tag + "_" + i)
 			.attr("x", x + (width / 2))
 			.attr("y", y + 6 + (height * (i + 1)/ (text_components.length + 1)))
