@@ -13,7 +13,7 @@
 	button_maker.add_rect_button = function(element, id, x, y, width, height, fill, text, on_click){
 
 	var thisg = element.append("g")
-			.attr("class","sidebutton")
+			.attr("class","sidebutton noselect")
 			.attr("id", id)
 	
 		thisg.append("rect")
