@@ -65,13 +65,17 @@
 			this.default_func_hierarchy_file.addEventListener("load", this.execute_on_default_func_hierarchy_load);
 			this.default_samp_map_file.addEventListener("load", this.execute_on_default_samp_map_load);
 
-			this.default_tax_abund_file.open("GET", "Data/reduced_genus_taxa_transpose.txt", true);
+			this.default_tax_abund_file.open("GET", "Data/otu_table_even_2.txt", true);
+			//this.default_tax_abund_file.open("GET", "Data/reduced_genus_taxa_transpose.txt", true);
 			this.default_tax_abund_file.send();
-			this.default_func_contrib_file.open("GET", "Data/reduced_genus_pathway_metagenome_contributions_fixed.txt", true);
+			this.default_func_contrib_file.open("GET", "Data/mice_metagenome_contributions.txt", true);
+			//this.default_func_contrib_file.open("GET", "Data/reduced_genus_pathway_metagenome_contributions_fixed.txt", true);
 			this.default_func_contrib_file.send();
-			this.default_tax_hierarchy_file.open("GET", "Data/taxa_mapping2.txt", true);
+			this.default_tax_hierarchy_file.open("GET", "Data/full_gg_taxa_mapping_parsed.txt", true);
+			//this.default_tax_hierarchy_file.open("GET", "Data/taxa_mapping2.txt", true);
 			this.default_tax_hierarchy_file.send();
-			this.default_func_hierarchy_file.open("GET", "Data/function_mapping2.txt", true);
+			//this.default_func_hierarchy_file.open("GET", "Data/function_mapping2.txt", true);
+			this.default_func_hierarchy_file.open("GET", "Data/classes_parsed2.tsv", true);
 			this.default_func_hierarchy_file.send();
 			this.default_samp_map_file.open("GET", "Data/mice_samplemap.txt", true);
 			this.default_samp_map_file.send();
@@ -262,16 +266,17 @@
 				if (lines[i] != ''){
 					fields = lines[i].split('\t');
 					sample = fields[this.sample_col];
-					otu = fields[this.otu_col];
+					otu = fields[this.otu_col]; 
 					ko = fields[this.ko_col];
 					read_counts = fields[this.read_count_col];
 
 					// Make empty entries to add to if necessary
+					//needs to be object to avoid issues with OTU ID indices
 					if (!output.hasOwnProperty(sample)){
-						output[sample] = [];
+						output[sample] = {};
 					}
-					if (!output[sample].hasOwnProperty(otu)){
-						output[sample][otu] = [];
+					if (!output[sample].hasOwnProperty(otu.toString())){
+						output[sample][otu.toString()] = [];
 					}
 					output[sample][otu][ko] = parseFloat(read_counts);
 				}
