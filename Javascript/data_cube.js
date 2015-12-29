@@ -576,28 +576,8 @@
 
 
       /////////////////////////////////////////////////////////////////////// func_tree /////////////////////////////////////////////////////////////////////////////////////////////
-      ///list of all kos in data (should probably do similar for taxa to allow for use of generic mapping file)
+      ///list of all kos in data (need to do similar for taxa)
 
-      //first filter to only include KOs in contribution data
-      all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
-      all_kos = all_kos.filter(function(d){
-        count = 0
-        sample_count = 0
-        while(count == 0 & sample_count < (data_cube.samples).length){
-          for(otu in contribution_table[data_cube.samples[sample_count]]){
-            if(contribution_table[data_cube.samples[sample_count]][otu].hasOwnProperty(d)){
-              count += 1
-            }
-          }
-          sample_count += 1
-        }
-        return count > 0
-      })
-      console.log(func_tree_data.length)
-      func_tree_data = func_tree_data.filter(function(d){
-        return all_kos.indexOf(d.KO) != -1
-      })
-      console.log(func_tree_data.length)
 
       func_tree_full = d3.nest()
         .key(function(d) { return d.Category; })
@@ -621,6 +601,7 @@
         //.key(function(d) { return d.KO; })
         .entries(func_tree_data);
 
+        console.log(this.func_tree[0])
       /////////////////////////////////////////////////////////////////////// taxa_lookup /////////////////////////////////////////////////////////////////////////////////////////////
       //figure out how to set up to sum over OTUs, etc
       // Create a lookup table to get the node in the taxa tree from the name
@@ -696,7 +677,7 @@
         }
       }
 
-
+      all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
       norm_factors = []
       for(k=0; k < all_kos.length; k++){
         sub_data = func_tree_data.filter(function(d){ return d.KO===all_kos[k]})
@@ -835,7 +816,6 @@
     //Reduce OTU abundance data to genus-level abundances (to go with genus-level contribution cube)
     //Also make relative abundances
     data_cube.reduce_to_genus = function(otu_abundance_data){
-      console.log(otu_abundance_data)
       new_otu_abundance_data = []
       
       taxa_display_leaves = []
