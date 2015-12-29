@@ -250,7 +250,6 @@ button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 330, 50
 	})
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
-
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
@@ -321,12 +320,55 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
 	func_tree_data = d3.tsv.parse(func_hierarchy_text);
 	samplemap = d3.tsv.parse(samp_map_text);
-	otu_abundance_data = d3.tsv.parse(tax_abund_text);
+	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
+	var fix_otus = function(otu_data, samples){
+		new_otu_data = []
+		for(j=0; j < samples.length; j++){
+			new_otu_data[j] = {}
+			new_otu_data[j]["Sample"] = samples[j]
+			for(k=0; k < otu_data.length; k++){
+				new_key = otu_data[k]["OTU_ID"]
+				new_otu_data[j][new_key] = +otu_data[k][samples[j]]
+			}
+		}
+		return new_otu_data;
+	}
+
+	otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
+
+	//filter out things in mapping files but not in input data
+
+	taxa_tree_data = taxa_tree_data.filter(function(d){
+		return d3.keys(otu_abundance_data[0]).indexOf(d.OTU_ID) != -1
+		})
+
+    all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
+    all_kos = all_kos.filter(function(d){
+        count = 0
+        sample_count = 0
+        while(count == 0 & sample_count < (d3.keys(contribution_table)).length){
+          for(otu in contribution_table[d3.keys(contribution_table)[sample_count]]){
+            if(contribution_table[d3.keys(contribution_table)[sample_count]][otu].hasOwnProperty(d)){
+            	if(contribution_table[d3.keys(contribution_table)[sample_count]][otu][d] != 0){
+            		count += 1
+            	}
+            }
+          }
+          sample_count += 1
+        }
+        return count > 0
+      })
+      func_tree_data = func_tree_data.filter(function(d){
+        return all_kos.indexOf(d.KO) != -1
+      })
 
 
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data);
+
+	//if( not expand to OTU level
+	genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)
 
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 
@@ -375,10 +417,8 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 
 	      	assignChildrenColors = function(layer){
 	      		//go back to top and find our way down to leaves - assign color to descendents
-	      		console.log(layer)
 	      		if(data_cube.is_leaf(layer)==false & layer.hasOwnProperty("Category")===false){ //if layer has children 
 	      			if(data_cube.is_leaf(layer.values[0])==false & layer.values[0].hasOwnProperty("Category")===false){ //and children are not leaves
-	      				console.log(layer.key)
 	      				if(list_type=="taxa"){
 							layer_leaves = data_cube.get_leaves(layer.key, data_cube.taxa_lookup)
 						} else {
@@ -386,12 +426,10 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 						}
 						layer_children = layer.values
 						if(layer_children.length == 1){
-							console.log("single descendent")
 	      					same_color = color_scale(layer.key)
 	      					color_scale.range().push(same_color)
 		      				color_scale(layer_children[0].key)
 	      				} else {
-	      					console.log("multiple descendents")
 	      					leaf_colors = layer_leaves.map(function(d){ return color_scale(d) })
 	      					leaf_colors = leaf_colors.map(function(d){ return d3.hcl(d)})
 /*	      					leaf_colors_lvals = leaf_colors.map(function(d){ return d.l})
@@ -437,7 +475,6 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 			for (; curr_nodes.length > 0;){
 				curr_node = curr_nodes.shift();
 				if(data_cube.is_leaf(curr_node)===false & curr_node.hasOwnProperty("Category")==false){
-					console.log(curr_node.key)
 					for (var i = 0; i < curr_node.values.length; i++){
 	            		curr_nodes.push(curr_node.values[i]);
 	          		}
@@ -476,7 +513,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	func_colors.domain(main_funcs)
 	func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
 	func_colors.range().push("black")
-	console.log(func_colors("All Functions"))
+	func_colors("All Functions")
 
 
 	//sample colors
@@ -579,7 +616,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 
-	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+	var otu_bar_data = otu_bar.make_data(genus_abundance_data, data_cube);
 
 	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
@@ -590,7 +627,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	function update_otu_bar(){
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
-		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+		otu_bar_data = otu_bar.make_data(genus_abundance_data, data_cube);
 		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 	}
 
@@ -616,11 +653,11 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
         .key(function(d) { return d.Genus; })
         .entries(taxa_tree_data);    
 
-		
     var curr_taxa = [];
     for (var i = 0; i < taxa_data.length; i++){
 	    curr_taxa.push(taxa_data[i]);
 	}
+
     for (; curr_taxa.length > 0;){
     	curr_taxon = curr_taxa.shift();
     	if (!data_cube.is_leaf(curr_taxon)){
@@ -689,6 +726,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 
 	function getAvgs(rootnode){
     	if(rootnode.type=="func"){
+    		//console.log(rootnode)
     		if(rootnode.key != "All Functions"){
     			func_leaves = data_cube.get_leaves(rootnode.key, data_cube.func_lookup)
 				funcAvg = 0
@@ -728,17 +766,23 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	roots["taxa"] = taxaroot;
 	countchildren(roots["taxa"]);
 	//get means for all OTUs, then for all the way up the tree
-	get_taxa_sample_means(otu_abundance_data, data_cube)
+	get_taxa_sample_means(genus_abundance_data, data_cube)
 	getAvgs(roots["taxa"])
     update(roots["taxa"]);
 
     d3.select(self.frameElement).style("height", "800px");
+
 
     var function_data = d3.nest()
         .key(function(d) { return d.Category; })
         .key(function(d) { return d.SuperPathway; })
         .key(function(d) { return d.SubPathway; })
         .entries(func_tree_data);  
+
+    //var function_data2 = data_cube.func_tree
+
+	//console.log(function_data)
+	//console.log(function_data2)
 
     var curr_funcs = [];
     for (var i = 0; i < function_data.length; i++){
@@ -771,6 +815,9 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	countchildren(roots["func"]);
 	getAvgs(roots["func"])
     update(roots['func']);
+
+
+
 
     d3.select(self.frameElement).style("height", "800px");
 	click(roots['taxa'].values[0])
@@ -921,27 +968,6 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 				} else {
 					dehighlightTree(d, this);
 				}
-
-				
-				// var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
-				// 	.selectAll(".mainbar").filter(function(f,i){ 
-				// 	return (i== displayed.indexOf(d.key));}); //return sth element of main bar only
-
-
-				// var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
-				// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); }); //return sth element of main bar only
-				// selSubBar.style("opacity", 0.1);
-
-				// //selectedBar.select(".mainrect").style("stroke-opacity",0);			
-				// selectedBar.select(".barlabel").style('font-weight','normal')//.style("visibility", "hidden");
-
-				// var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-				// 	.filter(function(f,i){ return (f["key"+(m+1)]==displayed.indexOf(d.key)); });
-				// //console.log(selectedEdges.toSource());
-
-				// selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2);
-
-
 				});
 
 		nodeEnter.filter( function(d) { return (~d.values) }).append("rect")
