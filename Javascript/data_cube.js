@@ -601,9 +601,7 @@
         //.key(function(d) { return d.KO; })
         .entries(func_tree_data);
 
-        console.log(this.func_tree[0])
       /////////////////////////////////////////////////////////////////////// taxa_lookup /////////////////////////////////////////////////////////////////////////////////////////////
-      //figure out how to set up to sum over OTUs, etc
       // Create a lookup table to get the node in the taxa tree from the name
       // Accessed by taxa_lookup[TAXON_NAME], returns the object in the tree with key=TAXON_NAME, values=children objects, unless it is a leaf, in which case OTU_ID=TAXON_NAME
       curr_taxa = [];

@@ -496,19 +496,55 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	num_taxa_categories = data_cube.taxa_tree[0].values.length
 
 	//taxa colors
+	if(num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
+		console.log("Warning, too many taxa categories, colors will repeat")
+	}
+	if(num_taxa_categories <= d3.keys(colorbrewer["Set3"]).pop()){
+		taxa_palette = colorbrewer["Set3"][num_taxa_categories]
+		//taxa_palette = taxa_palette.reverse()
+	} else {
+		taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop()-1)].concat(colorbrewer["Dark2"][num_taxa_categories -  d3.keys(colorbrewer["Set3"]).pop()])
+	}
+	if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
+		console.log("Warning, too many function categories, colors will repeat")
+	}
+
+	if(num_function_categories <= d3.keys(colorbrewer["Set1"]).pop()){
+		func_palette = colorbrewer["Set1"][num_function_categories]
+		} else {
+			func_palette = colorbrewer["Set1"][(d3.keys(colorbrewer["Set1"]).pop()-1)].concat(colorbrewer["Dark2"][num_function_categories - d3.keys(colorbrewer["Set1"]).pop()])
+		}
+
 	var taxa_colors = d3.scale.ordinal()
-	taxa_colors.range((colorbrewer["Set3"][num_taxa_categories]).reverse())
+	taxa_colors.range(taxa_palette)
 	main_taxa = data_cube.taxa_tree[0].values.map(function(d){ return d.key;})
 	taxa_colors.domain(main_taxa)
 	taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
-	taxa_colors.range().push("black")
+
+/*	taxa_colors.range().push("black")
 	console.log(taxa_colors("Bacteria"))
+*/
+	kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
+	col1 = d3.hsl("black")
+	console.log(col1)
+	console.log(d3.hsl("black"))
+	for(j=0; j < kingdoms.length; j++){
+		taxa_colors.range().push(col1)
+		console.log(taxa_colors(kingdoms[j]))
+		col1["l"] +=  (j+1)/(kingdoms.length + 1)
+		console.log(col1)
+	}
+	//if(data_cube.taxa_tree.length > 1){ //if there are other kingdoms, shades of grey
+		console.log(kingdoms)
+		//taxa_colors.range().push("grey")
+
+	//}
 	taxa_colors.range().push("black")
 	console.log(taxa_colors("All Taxa"))
 
 	//func colors
 	var func_colors = d3.scale.ordinal()
-	func_colors.range(colorbrewer["Set1"][num_function_categories])
+	func_colors.range(func_palette)
 	main_funcs = data_cube.func_tree.map(function(d){ return d.key;})
 	func_colors.domain(main_funcs)
 	func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
