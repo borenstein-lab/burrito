@@ -172,8 +172,9 @@ var width = 1000 * aspecrat;
 var height = 1000;
 var margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
 var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+navDims.treewidth = navDims.width * 2/9;
 var bpdims = {height: (height / 2) - margin.top - (margin.btwbars/2)};
-var treewidth = width / 3;
 var i = 0,
     duration = 300,
     taxaroot,
@@ -182,11 +183,11 @@ var i = 0,
 
 var TaxaTree = d3.layout.tree()
     .children(function (d) { return d.values; })
-    .size([(height/2), treewidth*2/3]);
+    .size([(navDims.height), navDims.treewidth]);
 
 var FuncTree = d3.layout.tree()
     .children(function (d) { return d.values;})
-    .size([(height/2), treewidth*2/3]);
+    .size([(navDims.height), navDims.treewidth]);
 
 var trees = [];
 trees["taxa"] = TaxaTree;
@@ -290,9 +291,10 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	width = 1000 * aspecrat;
 	barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
 	bpdims = {height: (height / 2) - margin.top - (margin.btwbars/2)};
-	treewidth = width / 3;
-	TaxaTree.size([(height/2), treewidth*2/3]);
-	FuncTree.size([(height/2), treewidth*2/3]);
+	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+	navDims.treewidth = navDims.width * 2/9;
+	TaxaTree.size([(navDims.height), navDims.treewidth]);
+	FuncTree.size([(navDims.height), navDims.treewidth]);
 	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
 	
 	
@@ -811,7 +813,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 
 			} else {
 				//d.y = treewidth - (d.depth / maxDepth) * treewidth;
-				d.y = treewidth - d.y;
+				d.y = (navDims.treewidth) - d.y;
 				depthpos['func'][d.depth] = d.y;
 			}
 		}); 
@@ -928,7 +930,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 				}})
 			.attr("width", function(d) {
 				if (source.type == 'taxa') {
-					return "" + (treewidth + margin.left - d.y) + ""
+					return "" + (navDims.treewidth + margin.left - d.y) + ""
 				} else {
 					return 170+d.y;
 				}})
@@ -992,7 +994,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 				}})
 			.attr("width", function(d) {
 				if (source.type == 'taxa') {
-					return "" + (treewidth + margin.left - d.y) + ""
+					return "" + (navDims.treewidth + margin.left - d.y) + ""
 				} else {
 					return 170+d.y;
 				}})
