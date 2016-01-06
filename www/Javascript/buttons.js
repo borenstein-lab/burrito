@@ -75,13 +75,15 @@
 
 		var html_button = document.createElement("input")
 		html_button.id = html_button_id;
+		html_button.name = html_button_id;
 		html_button.type = "file";
 
 		document.getElementById(container).appendChild(html_button)
 		
 	}
 
-	button_maker.add_radio_button = function(element, id, x, y, r, other_radio_buttons, associated_buttons, unassociated_buttons){
+	button_maker.add_radio_button = function(element, container, id, x, y, r, other_radio_buttons, associated_buttons, unassociated_buttons, html_button_id){
+		
 		this.add_circle_button(element, id + this.radio_base, x, y, r, this.radio_base_color, "", function(){
 			this.setAttribute("selected", true);
 			document.getElementById(id + button_maker.radio_center).setAttribute("fill", button_maker.radio_center_on_color);
@@ -101,6 +103,7 @@
 				document.getElementById(unassociated_buttons[i]).setAttribute("on", false);
 			}
 
+			document.getElementById(html_button_id).click()
 		})
 
 		document.getElementById(id + this.radio_base).setAttribute("selected", false);
@@ -123,7 +126,15 @@
 				document.getElementById(unassociated_buttons[i]).setAttribute("fill", button_maker.button_off_color);
 				document.getElementById(unassociated_buttons[i]).setAttribute("on", false);
 			}
+
+			document.getElementById(html_button_id).click()
 		})
+
+		var html_button = document.createElement("button")
+		html_button.id = html_button_id;
+		html_button.class = "btn action-button btn-large btn-primary";
+
+		document.getElementById(container).appendChild(html_button)
 	}
 
 	this.button_maker = button_maker;
