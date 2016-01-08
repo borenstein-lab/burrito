@@ -105,12 +105,16 @@ path.link {
 	user-select: none;
 }
 
-.sidebutton:hover {
+.activebutton:hover {
 	opacity:0.5;
 }
 
-.sidebutton:active {
-	stroke-width:5;
+.activebutton:active {
+	stroke-width:3;
+}
+
+#sidebar_hide:hover {
+	opacity:0.8;
 }
 
 white-space: pre-line;
@@ -174,7 +178,7 @@ var margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
 var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
 var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
 navDims.treewidth = navDims.width * 2/9;
-var bpdims = {height: (height / 2) - margin.top - (margin.btwbars/2)};
+var bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
 var i = 0,
     duration = 300,
     taxaroot,
@@ -219,15 +223,15 @@ var sidebar_background = d3.select("#sidebar").append("rect")
 .attr("fill","#8B8386");
 
 button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, height, "url(#larrowspat)", "", function() {
-console.log("clicked")
+//console.log("clicked")
 	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	console.log(curpos)
 	if (curpos > -10) {
 		sidebarz.transition().attr("x","-450");
-		sidebarz.select("#sidebar_hide").transition().attr("fill","url(#rarrowspat)");
+		sidebarz.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
 	} else {
 		sidebarz.transition().attr("x","0");
-		sidebarz.select("#sidebar_hide").transition().attr("fill","url(#larrowspat)");
+		sidebarz.select("#sidebar_hide").select("rect").transition().attr("fill","url(#larrowspat)");
 	}
 })
 
@@ -272,17 +276,18 @@ d3.select("#sidebar").append("text")
 .text("Optional Files")
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", 20, 390, 140, 70, button_maker.button_on_color, "Taxonomic Hierarchy")
-document.getElementById("svg_tax_hierarchy_button").setAttribute("on", true)
+button_maker.activate(d3.select("#svg_tax_hierarchy_button"));
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_func_hierarchy_button", "function_hierarchy", 170, 390, 140, 70, button_maker.button_on_color, "Function Hierarchy")
-document.getElementById("svg_func_hierarchy_button").setAttribute("on", true)
+button_maker.activate(d3.select("#svg_func_hierarchy_button"));
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_map_button", "sample_map", 320, 390, 130, 70, button_maker.button_on_color, "Sample Mapping")
-document.getElementById("svg_samp_map_button").setAttribute("on", true)
+button_maker.activate(d3.select("#svg_samp_map_button"));
 
 button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 300, 500, 140, 70, "#0000FF", "Update Graphics", function(){
 	document.getElementById("update_button").click();
 	})
+d3.select("#svg_update_button").classed("activebutton",true);
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
 
@@ -290,9 +295,9 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
 	barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-	bpdims = {height: (height / 2) - margin.top - (margin.btwbars/2)};
 	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
 	navDims.treewidth = navDims.width * 2/9;
+	bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
 	TaxaTree.size([(navDims.height), navDims.treewidth]);
 	FuncTree.size([(navDims.height), navDims.treewidth]);
 	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
@@ -309,24 +314,24 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
 		.attr("id","navbar");
 
-	NavSVG.append("rect")
+/*	NavSVG.append("rect")   //rectangle around the navbar, to help figure out positioning
 		.attr("x",0)
 		.attr("y",0)
 		.attr("width",width - margin.left - margin.right)
 		.attr("height",(height/2) - margin.top - (margin.btwnavbar / 2))
 		.style("fill","none")
-		.style("stroke","green") 
+		.style("stroke","green") */
 		
 		
 	var bpG = NavSVG.append("g")
-		.attr("transform","translate("+ (width * 4.15/10) +","+ margin.top +")");
+		.attr("transform","translate("+ (width / 2) +","+ margin.top +")");
 		
 	var TaxaTreeG = NavSVG.append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    .attr("transform", "translate(" + 5 + "," + margin.top + ")");
 		
 
 	var FuncTreeG = NavSVG.append("g")
-	    .attr("transform", "translate(" + (width*2/3) +  "," + margin.top + ")");
+	    .attr("transform", "translate(" + (navDims.width - navDims.treewidth - 5) +  "," + margin.top + ")");
 
 
 
@@ -709,7 +714,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	getAvgs(roots["taxa"])
     update(roots["taxa"]);
 
-    d3.select(self.frameElement).style("height", "800px");
+    //d3.select(self.frameElement).style("height", "800px");
 
     var function_data = d3.nest()
         .key(function(d) { return d.Category; })
