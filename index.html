@@ -1440,7 +1440,11 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		data.thisandparents.append("text")
 				.text(function (d5) {
 				if (d5.values) {
-					return d5.key 
+					console.log(d5.key)
+					name_split = (d5.key.split('_')).pop()
+					console.log(name_split)
+					return name_split;
+					//return d5.key 
 				} else {
 					""
 				}

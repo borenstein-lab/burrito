@@ -162,7 +162,12 @@
 		mainbar.append("text").attr("class","barlabel")
 			.attr("x", c1[p])
 			.attr("y",function(d){ return d.middle+5;})
-			.text(function(d,i){ return data.keys[p][i];})
+			.text(function(d,i){ 
+				name_split = (data.keys[p][i].split('_')).pop()
+				console.log(name_split)
+				return name_split;
+				//return data.keys[p][i];
+				})
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.transition().duration(300);
 
