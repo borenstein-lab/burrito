@@ -131,9 +131,9 @@
 	
 	function drawPart(data, id, p, colors){
 		d3.select("#"+id).append("g").attr("class","part"+p).transition().duration(300)
-			.attr("transform","translate("+( p*(bb+b))+",0)");
+			.attr("transform","translate("+ (p==0 ? (-1*(bb+b)) : (bb)) +",0)");
 
-		d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
+		//d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
 		d3.select("#"+id).select(".part"+p).append("g").attr("class","mainbars");
 		
 		var mainbar = d3.select("#"+id).select(".part"+p).select(".mainbars")
@@ -197,7 +197,7 @@
 	// }
 	
 	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
-		d3.select("#"+id).append("g").attr("class","edges").transition().duration(300).attr("transform","translate("+ b+",0)");
+		d3.select("#"+id).append("g").attr("class","edges").transition().duration(300).attr("transform","translate(0,0)");
 
 		edgeBar = d3.select("#"+id).select(".edges").selectAll(".edge")
 			.data(data.edges).enter().append("polygon")
@@ -240,19 +240,24 @@
 	}
 	
 	bP.edgePolygon = function(d){
-		return [0, d.y1, bb, d.y2, bb, d.y2+d.h2, 0, d.y1+d.h1].join(" ");
+		return [-bb, d.y1, bb, d.y2, bb, d.y2+d.h2, -bb, d.y1+d.h1].join(" ");
 	}	
 
 	bP.edgePolygon2 = function(d){
 		if(d.wid===1){ //don't change
-			return [0, d.y1, bb, d.y2, bb, d.y2+d.h2, 0, d.y1+d.h1].join(" ");
+			return [-bb, d.y1, bb, d.y2, bb, d.y2+d.h2, -bb, d.y1+d.h1].join(" ");
 		} else{
-			return [0, d.y1-Math.sqrt(d.wid)/2, bb, d.y2-Math.sqrt(d.wid)/2, bb, d.y2+Math.sqrt(d.wid)/2, 0, d.y1+Math.sqrt(d.wid)].join(" ");
+			return [-bb, d.y1-Math.sqrt(d.wid)/2, bb, d.y2-Math.sqrt(d.wid)/2, bb, d.y2+Math.sqrt(d.wid)/2, -bb, d.y1+Math.sqrt(d.wid)].join(" ");
 		}
 		//
 	}	
 	
 	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
+		
+		bb = dims.width * .075;
+		b = dims.width / 50;
+		c1 = [-(5 + 0.005*dims.width), b + (5 + 0.005*dims.width)];
+		
 		svg.append("g")
 			.attr("id", bip.id);
 
@@ -281,7 +286,7 @@
 		// 	.selectAll('rect')
 		// 	.attr('height', height);
 
-		height = dims.height;
+		height = dims.height - dims.header;
 				//.attr("transform","translate("+ (550*s)+",0)");
 		//console.log(bip.data.data.toSource());		
 		var visData = visualize(bip.data);
@@ -320,8 +325,6 @@
 		svg.append("g")
 			.attr("id", bip.id);
 			
-		height = dims.height;
-
 // var svg = d3.select('#barChart')
 //        .append('svg')
 //        .attr('width', width + margins.left + margins.right)

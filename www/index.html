@@ -1,9 +1,11 @@
 	<!DOCTYPE html>
 <meta charset="utf-8">
-<style> /*
+<style> 
+/*
 body{ 
 	width:100%;
 	margin:100px auto;
+	overflow: hidden;
 }
 svg text{
 	font-size:8pt;
@@ -21,6 +23,7 @@ rect{
 body {
 /*	width:100%;
 	height:100%; */
+	overflow: hidden;
 	font-family: "Verdana", Verdana, sans-serif;
     font-size:12px;
 }
@@ -86,6 +89,34 @@ path.link {
 	z-index:5;
 }
 
+.sidebutton {
+	stroke:black;
+	stroke-width:1;
+	opacity:1;
+	cursor:default;
+}
+
+.noselect {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.activebutton:hover {
+	opacity:0.5;
+}
+
+.activebutton:active {
+	stroke-width:3;
+}
+
+#sidebar_hide:hover {
+	opacity:0.8;
+}
+
 white-space: pre-line;
 </style>
 <body>
@@ -109,6 +140,15 @@ white-space: pre-line;
       <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==" x="0" y="0" width="4" height="4">
       </image>
     </pattern>
+	
+	<pattern id="rarrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
+	    <rect x="0" y="0" width="30" height="30" fill="#D0D0D0" />
+		<path d="M 0 2 L 27 10 L 0 18" fill="none" stroke="green" stroke-width="4" />
+	</pattern>
+	<pattern id="larrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
+	    <rect x="0" y="0" width="30" height="30" fill="#D0D0D0" />
+		<path d="M 30 2 L 3 10 L 30 18" fill="none" stroke="green" stroke-width="4" />
+	</pattern>
   </defs>
 </svg>
 
@@ -132,16 +172,13 @@ white-space: pre-line;
 
 var aspecrat = window.innerWidth / window.innerHeight;
 
-//var width = Math.max(window.innerWidth, 800);
-//var height = Math.max(window.innerHeight, 600);
 var width = 1000 * aspecrat;
 var height = 1000;
-//var width = document.getElementById("mainplot").clientWidth;
-//var height = 400;
 var margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
 var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-var bpdims = {height: (height / 2)};
-var treewidth = width / 3;
+var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+navDims.treewidth = navDims.width * 2/9;
+var bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
 var i = 0,
     duration = 300,
     taxaroot,
@@ -150,11 +187,11 @@ var i = 0,
 
 var TaxaTree = d3.layout.tree()
     .children(function (d) { return d.values; })
-    .size([(height/2), treewidth*2/3]);
+    .size([(navDims.height), navDims.treewidth]);
 
 var FuncTree = d3.layout.tree()
     .children(function (d) { return d.values;})
-    .size([(height/2), treewidth*2/3]);
+    .size([(navDims.height), navDims.treewidth]);
 
 var trees = [];
 trees["taxa"] = TaxaTree;
@@ -175,24 +212,26 @@ var sidebarz = d3.select("#mainsvg").append("svg")
 .attr("x",0)
 .attr("y",0)
 .attr("width","480")
-.attr("height","600")
+.attr("height",height)
 
 var sidebar_background = d3.select("#sidebar").append("rect")
 .attr("id","sidebar_background")
 .attr("x",0)
 .attr("y",0)
 .attr("width","480")
-.attr("height","600")
+.attr("height",height)
 .attr("fill","#8B8386");
 
-button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, 30, "#000000", "", function() {
-console.log("clicked")
+button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, height, "url(#larrowspat)", "", function() {
+//console.log("clicked")
 	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	console.log(curpos)
 	if (curpos > -10) {
-		sidebarz.attr("x","-450");
+		sidebarz.transition().attr("x","-450");
+		sidebarz.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
 	} else {
-		sidebarz.attr("x","0");
+		sidebarz.transition().attr("x","0");
+		sidebarz.select("#sidebar_hide").select("rect").transition().attr("fill","url(#larrowspat)");
 	}
 })
 
@@ -237,19 +276,32 @@ d3.select("#sidebar").append("text")
 .text("Optional Files")
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", 20, 390, 140, 70, button_maker.button_on_color, "Taxonomic Hierarchy")
-document.getElementById("svg_tax_hierarchy_button").setAttribute("on", true)
+button_maker.activate(d3.select("#svg_tax_hierarchy_button"));
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_func_hierarchy_button", "function_hierarchy", 170, 390, 140, 70, button_maker.button_on_color, "Function Hierarchy")
-document.getElementById("svg_func_hierarchy_button").setAttribute("on", true)
+button_maker.activate(d3.select("#svg_func_hierarchy_button"));
 
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_map_button", "sample_map", 320, 390, 140, 70, button_maker.button_on_color, "Sample Mapping")
-document.getElementById("svg_samp_map_button").setAttribute("on", true)
+button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_map_button", "sample_map", 320, 390, 130, 70, button_maker.button_on_color, "Sample Mapping")
+button_maker.activate(d3.select("#svg_samp_map_button"));
 
-button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 330, 500, 140, 70, "#0000FF", "Update Graphics", function(){
+button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 300, 500, 140, 70, "#0000FF", "Update Graphics", function(){
 	document.getElementById("update_button").click();
 	})
+d3.select("#svg_update_button").classed("activebutton",true);
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
+
+	// Find the new window size, adjust the aspect ratio
+	aspecrat = window.innerWidth / window.innerHeight;
+	width = 1000 * aspecrat;
+	barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+	navDims.treewidth = navDims.width * 2/9;
+	bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
+	TaxaTree.size([(navDims.height), navDims.treewidth]);
+	FuncTree.size([(navDims.height), navDims.treewidth]);
+	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
+	
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
@@ -261,16 +313,24 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
 		.attr("id","navbar");
 
-
+/*	NavSVG.append("rect")   //rectangle around the navbar, to help figure out positioning
+		.attr("x",0)
+		.attr("y",0)
+		.attr("width",width - margin.left - margin.right)
+		.attr("height",(height/2) - margin.top - (margin.btwnavbar / 2))
+		.style("fill","none")
+		.style("stroke","green") */
+		
+		
 	var bpG = NavSVG.append("g")
-		.attr("transform","translate("+ (width * 4.15/10) +","+ margin.top +")");
+		.attr("transform","translate("+ (width / 2) +","+ margin.top +")");
 		
 	var TaxaTreeG = NavSVG.append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    .attr("transform", "translate(" + 5 + "," + margin.top + ")");
 		
 
 	var FuncTreeG = NavSVG.append("g")
-	    .attr("transform", "translate(" + (width*2/3) +  "," + margin.top + ")");
+	    .attr("transform", "translate(" + (navDims.width - navDims.treewidth - 5) +  "," + margin.top + ")");
 
 
 
@@ -286,13 +346,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		//.attr("preserveAspectRatio","none");
 		//.attr("transform","scale(2.0)");
 
-	/*MainSVG.append("rect")
-		.attr("x",margin.left)
-		.attr("y",(height/2) + (margin.btwnavbar/2))
-		.attr("width",(width/2) - margin.left - (margin.btwbars/2))
-		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
-		.style("fill","none")
-		.style("stroke","green") */
+
 		
 		
 	var FunctionBar = MainSVG.insert("svg", "#sidebar")
@@ -770,7 +824,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	getAvgs(roots["taxa"])
     update(roots["taxa"]);
 
-    d3.select(self.frameElement).style("height", "800px");
+    //d3.select(self.frameElement).style("height", "800px");
 
 
     var function_data = d3.nest()
@@ -816,10 +870,6 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	getAvgs(roots["func"])
     update(roots['func']);
 
-
-
-
-    d3.select(self.frameElement).style("height", "800px");
 	click(roots['taxa'].values[0])
 
 							
@@ -883,7 +933,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 
 			} else {
 				//d.y = treewidth - (d.depth / maxDepth) * treewidth;
-				d.y = treewidth - d.y;
+				d.y = (navDims.treewidth) - d.y;
 				depthpos['func'][d.depth] = d.y;
 			}
 		}); 
@@ -979,7 +1029,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 				}})
 			.attr("width", function(d) {
 				if (source.type == 'taxa') {
-					return "" + (treewidth + margin.left - d.y) + ""
+					return "" + (navDims.treewidth + margin.left - d.y) + ""
 				} else {
 					return 170+d.y;
 				}})
@@ -1043,7 +1093,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 				}})
 			.attr("width", function(d) {
 				if (source.type == 'taxa') {
-					return "" + (treewidth + margin.left - d.y) + ""
+					return "" + (navDims.treewidth + margin.left - d.y) + ""
 				} else {
 					return 170+d.y;
 				}})
@@ -1176,7 +1226,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		var newdepthlabels = depthlabels.enter().append("g")
 			.attr("class","depthlabel")
 			.attr("transform", function(d) {
-				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")" ;
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(" + (source.type == 'taxa' ? -15 : 15) + ")" ;
 			});
 			
 		newdepthlabels.append("text")
@@ -1191,7 +1241,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 			.duration(duration)
 			.style("font-weight","bold")
 			.attr("transform", function(d) {
-				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
+				return "translate(" + depthpos[source.type][d.depth+1] + "," + 0 + ") rotate(" + (source.type == 'taxa' ? -15 : 15) + ")";
 			});
 			
 		upddepthlabels.select("text")
@@ -1445,17 +1495,13 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	}
 }
 
-/* #commented because I removed the header for now -CM
-function hideheader () {
-	window.location = '#navsvg';
-} */
-
 var uploader = uploader_wrapper.make_uploader(draw_everything);
 document.getElementById("update_button").onclick = (function(){
 	uploader.update_plots();
 })
 document.getElementById("svg_contribution_select_button_base").setAttribute("selected", true);
 uploader.load_default_data();
+
 	
 </script>
 </body>
