@@ -504,7 +504,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	for(j=0; j < data_cube.taxa_tree.length; j++){
 		main_taxa = main_taxa.concat(data_cube.taxa_tree[j].values.map(function(d){ return d.key;}))
 	}
-	console.log(main_taxa)
+	//console.log(main_taxa)
 	taxa_colors.domain(main_taxa)
 	taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
 
@@ -513,15 +513,15 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 */
 	kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
 	col1 = d3.hsl("black")
-	console.log(col1)
+	//console.log(col1)
 	//if there are other kingdoms besides Bacteria, shades of grey
 	for(j=0; j < kingdoms.length; j++){
 		taxa_colors.range().push(col1)
-		console.log(taxa_colors(kingdoms[j]))
+		taxa_colors(kingdoms[j])
 		col1["l"] +=  (j+1)/(kingdoms.length + 1)
 	}
 	taxa_colors.range().push("black")
-	console.log(taxa_colors("All Taxa"))
+	taxa_colors("All Taxa")
 
 	//func colors
 	var func_colors = d3.scale.ordinal()
@@ -1440,9 +1440,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		data.thisandparents.append("text")
 				.text(function (d5) {
 				if (d5.values) {
-					console.log(d5.key)
 					name_split = (d5.key.split('_')).pop()
-					console.log(name_split)
 					return name_split;
 					//return d5.key 
 				} else {

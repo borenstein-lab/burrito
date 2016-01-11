@@ -164,7 +164,6 @@
 			.attr("y",function(d){ return d.middle+5;})
 			.text(function(d,i){ 
 				name_split = (data.keys[p][i].split('_')).pop()
-				console.log(name_split)
 				return name_split;
 				//return data.keys[p][i];
 				})
