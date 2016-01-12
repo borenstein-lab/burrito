@@ -59,6 +59,25 @@
       return leaves;
     }
 
+    data_cube.get_descendents = function(parent, lookup){
+      var descendents = []
+
+      var curr_nodes = [];
+      curr_nodes.push(lookup[parent]);
+      for (; curr_nodes.length > 0;){
+        curr_node = curr_nodes.shift();
+        if(curr_node.key != parent){
+          descendents.push(curr_node.key);
+        }
+        if (this.is_leaf(curr_node) == false){
+          for (var i = 0; i < curr_node.values.length; i++){
+            curr_nodes.push(curr_node.values[i]);
+          }
+        }
+      }
+      return descendents;
+    }
+
     // /////////////////////////////////////////////////////////////////////// no_cube_calculate_new_contribution /////////////////////////////////////////////////////////////////////////////////////////////
 
     // // Returns the contribution of the given taxon to the given function relative to the total functional abundance in the given sample
@@ -602,7 +621,6 @@
         .entries(func_tree_data);
 
       /////////////////////////////////////////////////////////////////////// taxa_lookup /////////////////////////////////////////////////////////////////////////////////////////////
-      //figure out how to set up to sum over OTUs, etc
       // Create a lookup table to get the node in the taxa tree from the name
       // Accessed by taxa_lookup[TAXON_NAME], returns the object in the tree with key=TAXON_NAME, values=children objects, unless it is a leaf, in which case OTU_ID=TAXON_NAME
       curr_taxa = [];
@@ -614,11 +632,19 @@
       for (; curr_taxa.length > 0;){
         curr_taxon = curr_taxa.shift();
         this.taxa_lookup[curr_taxon.key] = curr_taxon;
+        level = 0
+        //assign how far up from children this is
         if (!this.is_leaf(curr_taxon)){
           for (var i = 0; i < curr_taxon.values.length; i++){
             curr_taxa.push(curr_taxon.values[i]);
           }
+          curr_taxon_level_count = curr_taxon
+          while(!this.is_leaf(curr_taxon_level_count)){
+            level += 1
+            curr_taxon_level_count = curr_taxon_level_count.values[0]
+          }
         }
+        this.taxa_lookup[curr_taxon.key].level = level 
       }
 
       this.taxa_lookup_full = {};
@@ -652,11 +678,18 @@
       for (; curr_funcs.length > 0;){
         curr_func = curr_funcs.shift();
         this.func_lookup[curr_func.key] = curr_func;
+        level = 0
         if (!this.is_leaf(curr_func)){
           for (var i = 0; i < curr_func.values.length; i++){
             curr_funcs.push(curr_func.values[i]);
           }
+          curr_func_level_count = curr_func
+          while(!this.is_leaf(curr_func_level_count)){
+            level += 1
+            curr_func_level_count = curr_func_level_count.values[0]
+          }
         }
+        this.func_lookup[curr_func.key].level = level 
       }
 
       func_lookup_full = {};
