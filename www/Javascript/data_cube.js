@@ -738,7 +738,7 @@
         func_display_leaves = func_display_leaves.concat(this.get_leaves(this.func_tree[k].key, this.func_lookup));
       }
 
-      /*
+
       get_aggregated_contribution = function(sample, taxon, func, taxa_lookup_full, func_lookup_full, norm_factors){
         tax_leaves = data_cube.get_leaves(taxon, taxa_lookup_full)
         func_leaves = data_cube.get_leaves(func, func_lookup_full)
@@ -768,7 +768,7 @@
           }
         }
       }
-      */
+
       // for (sample in contribution_table){
       //   this.original_contribution_cube[sample] = {};
       //   for (otu in contribution_table[sample]){

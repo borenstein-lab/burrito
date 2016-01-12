@@ -398,10 +398,9 @@ var NavSVG = MainSVG.insert("svg", "#sidebar")
 				new_otu_data[j][new_key] = +otu_data[k][samples[j]]
 			}
 
-		}
+		}	
+		return new_otu_data;
 	}
-	return new_otu_data;
-}
 
 otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
 
@@ -855,7 +854,7 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 	countchildren(roots["taxa"]);
 	//get means for all OTUs, then for all the way up the tree
 	get_taxa_sample_means(genus_abundance_data, data_cube)
-	//getAvgs(roots["taxa"])
+	getAvgs(roots["taxa"])
     update(roots["taxa"]);
 
     //d3.select(self.frameElement).style("height", "800px");
@@ -901,7 +900,7 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 	
 	roots["func"] = funcroot;
 	countchildren(roots["func"]);
-	//getAvgs(roots["func"])
+	getAvgs(roots["func"])
     update(roots['func']);
 
 	click(roots['taxa'].values[0])
@@ -1142,13 +1141,12 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 		
 		nodeUpdate.select("circle")
 			.attr("r", function (d) {
-				/*if(d.sampleAvg && d._values){
+				if(d.sampleAvg && d._values){
 					return 25 * Math.sqrt(d.sampleAvg)
 					//return (4 * Math.sqrt(d.Ndescendents))
 				}else{
 					return 4;
-				}*/
-				return 4;
+				}
 			})
 			.style("fill", function (d) { 
 				if(source.type==="taxa"){
