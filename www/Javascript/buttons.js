@@ -83,7 +83,7 @@
 	}
 
 	button_maker.add_radio_button = function(element, container, id, x, y, r, other_radio_buttons, associated_buttons, unassociated_buttons, html_button_id){
-		
+
 		this.add_circle_button(element, id + this.radio_base, x, y, r, this.radio_base_color, "", function(){
 			this.setAttribute("selected", true);
 			document.getElementById(id + button_maker.radio_center).setAttribute("fill", button_maker.radio_center_on_color);

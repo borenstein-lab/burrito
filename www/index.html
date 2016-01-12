@@ -123,7 +123,6 @@ white-space: pre-line;
 
 </div>
 
-
 <script src="Javascript/textures.js"></script>
 <script src="Javascript/d3.v3.min.js"></script>
 <script src="Javascript/data_cube.js"></script>
@@ -152,32 +151,32 @@ var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height
 var bpdims = {height: (height / 2)};
 var treewidth = width / 3;
 var i = 0,
-    duration = 300,
-    taxaroot,
-	funcroot,
-	roots = {};
+duration = 300,
+taxaroot,
+funcroot,
+roots = {};
 
 var TaxaTree = d3.layout.tree()
-    .children(function (d) { return d.values; })
-    .size([(height/2), treewidth*2/3]);
+.children(function (d) { return d.values; })
+.size([(height/2), treewidth*2/3]);
 
 var FuncTree = d3.layout.tree()
-    .children(function (d) { return d.values;})
-    .size([(height/2), treewidth*2/3]);
+.children(function (d) { return d.values;})
+.size([(height/2), treewidth*2/3]);
 
 var trees = [];
 trees["taxa"] = TaxaTree;
 trees["func"] = FuncTree;
 
 var diagonal = d3.svg.diagonal()
-    .projection(function (d) {
-    return [d.y, d.x];
+.projection(function (d) {
+return [d.y, d.x];
 });
 
 var MainSVG = d3.select("#mainplot").append("svg")
-	.attr("id","mainsvg")
-	.attr("viewBox","0 0 " + width + " " + height + "")
-	.attr("preserveAspectRatio","none");
+.attr("id","mainsvg")
+.attr("viewBox","0 0 " + width + " " + height + "")
+.attr("preserveAspectRatio","none");
 
 var sidebarz = d3.select("#mainsvg").append("svg")
 .attr("id","sidebar")
@@ -196,13 +195,13 @@ var sidebar_background = d3.select("#sidebar").append("rect")
 
 button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, 30, "#000000", "", function() {
 console.log("clicked")
-	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
-	console.log(curpos)
-	if (curpos > -10) {
-		sidebarz.attr("x","-450");
-	} else {
-		sidebarz.attr("x","0");
-	}
+var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
+console.log(curpos)
+if (curpos > -10) {
+	sidebarz.attr("x","-450");
+} else {
+	sidebarz.attr("x","0");
+}
 })
 
 d3.select("#sidebar").append("text")
@@ -211,7 +210,7 @@ d3.select("#sidebar").append("text")
 .attr("font-size", "20px")
 .text("Genome Annotations")
 
-button_maker.add_radio_button(d3.select("#sidebar"), "svg_genome_annotation_select_button", "button_holder", 25, 90, 15, ["svg_16S_select_button", "svg_contribution_select_button"], ["svg_tax_abund_button", "svg_genome_annotation_button"], ["svg_16S_button", "svg_tax_abund_button_2", "svg_func_contrib_button"], "genome_annotation_select_button")
+button_maker.add_radio_button(d3.select("#sidebar"), "button_holder", "svg_genome_annotation_select_button", 25, 90, 15, ["svg_16S_select_button", "svg_contribution_select_button"], ["svg_tax_abund_button", "svg_genome_annotation_button"], ["svg_16S_button", "svg_tax_abund_button_2", "svg_func_contrib_button"], "genome_annotation_select_button")
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_abund_button", "taxonomic_abundances_1", 70, 55, 140, 70, button_maker.button_off_color, "Taxonomic Abundances")
 
@@ -223,7 +222,7 @@ d3.select("#sidebar").append("text")
 .attr("font-size", "20px")
 .text("16S Reads")
 
-button_maker.add_radio_button(d3.select("#sidebar"), "svg_16S_select_button", "button_holder", 25, 200, 15, ["svg_genome_annotation_select_button", "svg_contribution_select_button"], ["svg_16S_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_tax_abund_button_2", "svg_func_contrib_button"], "16S_select_button")
+button_maker.add_radio_button(d3.select("#sidebar"), "button_holder", "svg_16S_select_button", 25, 200, 15, ["svg_genome_annotation_select_button", "svg_contribution_select_button"], ["svg_16S_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_tax_abund_button_2", "svg_func_contrib_button"], "16S_select_button")
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_16S_button", "16S_counts", 70, 165, 140, 70, button_maker.button_off_color, "16S Read Counts")
 
@@ -233,7 +232,7 @@ d3.select("#sidebar").append("text")
 .attr("font-size", "20px")
 .text("Function Contributions")
 
-button_maker.add_radio_button(d3.select("#sidebar"), "svg_contribution_select_button", "button_holder", 25, 310, 15, ["svg_genome_annotation_select_button", "svg_16S_select_button"], ["svg_tax_abund_button_2", "svg_func_contrib_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_16S_button"], "contribution_select_button")
+button_maker.add_radio_button(d3.select("#sidebar"), "button_holder", "svg_contribution_select_button", 25, 310, 15, ["svg_genome_annotation_select_button", "svg_16S_select_button"], ["svg_tax_abund_button_2", "svg_func_contrib_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_16S_button"], "contribution_select_button")
 
 button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_abund_button_2", "taxonomic_abundances_2", 70, 275, 140, 70, button_maker.button_off_color, "Taxonomic Abundances")
 
@@ -255,102 +254,106 @@ button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_
 document.getElementById("svg_samp_map_button").setAttribute("on", true)
 
 button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 330, 500, 140, 70, "#0000FF", "Update Graphics", function(){
-	document.getElementById("update_button").click();
-	})
+document.getElementById("update_button").click();
+})
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
-	d3.select("#navbar").remove()
-	d3.select("#taxa_bars").remove()
-	d3.select("#func_bars").remove()
 
-	var NavSVG = MainSVG.insert("svg", "#sidebar")
-	    .attr("x",margin.left)
-		.attr("y",margin.top)
-		.attr("width", width - margin.left - margin.right)
-		.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
-		.attr("id","navbar");
+d3.select("#navbar").remove()
+d3.select("#taxa_bars").remove()
+d3.select("#func_bars").remove()
 
-
-	var bpG = NavSVG.append("g")
-		.attr("transform","translate("+ (width * 4.15/10) +","+ margin.top +")");
-		
-	var TaxaTreeG = NavSVG.append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-		
-
-	var FuncTreeG = NavSVG.append("g")
-	    .attr("transform", "translate(" + (width*2/3) +  "," + margin.top + ")");
+var NavSVG = MainSVG.insert("svg", "#sidebar")
+    .attr("x",margin.left)
+	.attr("y",margin.top)
+	.attr("width", width - margin.left - margin.right)
+	.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
+	.attr("id","navbar");
 
 
+var bpG = NavSVG.append("g")
+	.attr("transform","translate("+ (width * 4.15/10) +","+ margin.top +")");
+	
+var TaxaTreeG = NavSVG.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
 
-	var TaxaBar = MainSVG.insert("svg", "#sidebar")
-		.attr("x",margin.left)
-		.attr("y",(height/2) + (margin.btwnavbar/2))
-		.attr("width",(width/2) - margin.left - (margin.btwbars/2))
-		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
-		//.attr("width",100)
-		//.attr("height",100)
-		//.attr("viewBox","0 0 100 100")
-		.attr("id", "taxa_bars")
-		//.attr("preserveAspectRatio","none");
-		//.attr("transform","scale(2.0)");
+var FuncTreeG = NavSVG.append("g")
+    .attr("transform", "translate(" + (width*2/3) +  "," + margin.top + ")");
 
-	/*MainSVG.append("rect")
-		.attr("x",margin.left)
-		.attr("y",(height/2) + (margin.btwnavbar/2))
-		.attr("width",(width/2) - margin.left - (margin.btwbars/2))
-		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
-		.style("fill","none")
-		.style("stroke","green") */
-		
-		
-	var FunctionBar = MainSVG.insert("svg", "#sidebar")
-		.attr("x",(width/2) + (margin.btwbars/2))
-		.attr("y",(height/2) + (margin.btwnavbar/2))
-		.attr("width",(width/2) - margin.right - (margin.btwbars/2))
-		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
-		//.attr("viewBox","0 0 100 100")
-		.attr("id", "func_bars");
-		
-		
-	var bpvisdata;
 
-	var SVGs = {};
-	SVGs["taxa"] = TaxaTreeG;
-	SVGs["func"] = FuncTreeG;
 
-	var levelNames = {};
-	var curlevelNames = {};
-	levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus"];
-	levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
-	curlevelNames['taxa'] = levelNames['taxa'];
-	curlevelNames['func'] = levelNames['func'];
+var TaxaBar = MainSVG.insert("svg", "#sidebar")
+	.attr("x",margin.left)
+	.attr("y",(height/2) + (margin.btwnavbar/2))
+	.attr("width",(width/2) - margin.left - (margin.btwbars/2))
+	.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+	//.attr("width",100)
+	//.attr("height",100)
+	//.attr("viewBox","0 0 100 100")
+	.attr("id", "taxa_bars")
+	//.attr("preserveAspectRatio","none");
+	//.attr("transform","scale(2.0)");
 
-	taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
-	func_tree_data = d3.tsv.parse(func_hierarchy_text);
-	samplemap = d3.tsv.parse(samp_map_text);
-	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
-	var fix_otus = function(otu_data, samples){
-		new_otu_data = []
-		for(j=0; j < samples.length; j++){
-			new_otu_data[j] = {}
-			new_otu_data[j]["Sample"] = samples[j]
-			for(k=0; k < otu_data.length; k++){
-				new_key = otu_data[k]["OTU_ID"]
-				new_otu_data[j][new_key] = +otu_data[k][samples[j]]
-			}
+/*MainSVG.append("rect")
+	.attr("x",margin.left)
+	.attr("y",(height/2) + (margin.btwnavbar/2))
+	.attr("width",(width/2) - margin.left - (margin.btwbars/2))
+	.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+	.style("fill","none")
+	.style("stroke","green") */
+	
+	
+var FunctionBar = MainSVG.insert("svg", "#sidebar")
+	.attr("x",(width/2) + (margin.btwbars/2))
+	.attr("y",(height/2) + (margin.btwnavbar/2))
+	.attr("width",(width/2) - margin.right - (margin.btwbars/2))
+	.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
+	//.attr("viewBox","0 0 100 100")
+	.attr("id", "func_bars");
+	
+	
+var bpvisdata;
+
+var SVGs = {};
+SVGs["taxa"] = TaxaTreeG;
+SVGs["func"] = FuncTreeG;
+
+var levelNames = {};
+var curlevelNames = {};
+levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus"];
+levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+curlevelNames['taxa'] = levelNames['taxa'];
+curlevelNames['func'] = levelNames['func'];
+
+
+taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
+func_tree_data = d3.tsv.parse(func_hierarchy_text);
+
+
+samplemap = d3.tsv.parse(samp_map_text);
+otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
+var fix_otus = function(otu_data, samples){
+	new_otu_data = []
+	for(j=0; j < samples.length; j++){
+		new_otu_data[j] = {}
+		new_otu_data[j]["Sample"] = samples[j]
+		for(k=0; k < otu_data.length; k++){
+			new_key = otu_data[k]["OTU_ID"]
+			new_otu_data[j][new_key] = +otu_data[k][samples[j]]
 		}
-		return new_otu_data;
 	}
+	return new_otu_data;
+}
 
-	otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
+otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
 
-	//filter out things in mapping files but not in input data
+//filter out things in mapping files but not in input data
 
-	taxa_tree_data = taxa_tree_data.filter(function(d){
-		return d3.keys(otu_abundance_data[0]).indexOf(d.OTU_ID) != -1
-		})
-
+taxa_tree_data = taxa_tree_data.filter(function(d){
+	return d3.keys(otu_abundance_data[0]).indexOf(d.OTU_ID) != -1
+	})
+/*
     all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
     all_kos = all_kos.filter(function(d){
         count = 0
@@ -370,8 +373,8 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
       func_tree_data = func_tree_data.filter(function(d){
         return all_kos.indexOf(d.KO) != -1
       })
-
-
+      console.log(func_tree_data)
+*/	
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data);
@@ -389,7 +392,6 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 			} else {
 				var leaves = data_cube.get_leaves(main_list[j], data_cube.func_lookup)
 			}
-
 	      	sub_colors = []
 	      	for(k=0; k < leaves.length; k++){
 	      		new_color = d3.hcl(color_scale(main_list[j]))
@@ -511,9 +513,9 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	taxa_colors.domain(main_taxa)
 	taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
 	taxa_colors.range().push("black")
-	console.log(taxa_colors("Bacteria"))
+
 	taxa_colors.range().push("black")
-	console.log(taxa_colors("All Taxa"))
+
 
 	//func colors
 	var func_colors = d3.scale.ordinal()
@@ -776,7 +778,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	countchildren(roots["taxa"]);
 	//get means for all OTUs, then for all the way up the tree
 	get_taxa_sample_means(genus_abundance_data, data_cube)
-	getAvgs(roots["taxa"])
+	//getAvgs(roots["taxa"])
     update(roots["taxa"]);
 
     d3.select(self.frameElement).style("height", "800px");
@@ -822,7 +824,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	
 	roots["func"] = funcroot;
 	countchildren(roots["func"]);
-	getAvgs(roots["func"])
+	//getAvgs(roots["func"])
     update(roots['func']);
 
 
@@ -1067,12 +1069,13 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		
 		nodeUpdate.select("circle")
 			.attr("r", function (d) {
-				if(d.sampleAvg && d._values){
+				/*if(d.sampleAvg && d._values){
 					return 25 * Math.sqrt(d.sampleAvg)
 					//return (4 * Math.sqrt(d.Ndescendents))
 				}else{
 					return 4;
-				}
+				}*/
+				return 4;
 			})
 			.style("fill", function (d) { 
 				if(source.type==="taxa"){
@@ -1459,11 +1462,15 @@ function hideheader () {
 	window.location = '#navsvg';
 } */
 
+
 var uploader = uploader_wrapper.make_uploader(draw_everything);
+
 document.getElementById("update_button").onclick = (function(){
 	uploader.update_plots();
 })
+
 document.getElementById("svg_contribution_select_button_base").setAttribute("selected", true);
+
 uploader.load_default_data();
 	
 </script>

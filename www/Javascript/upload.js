@@ -6,10 +6,15 @@
 		var uploader = {};
 
 		// Constants for parsing
-		uploader.otu_col = 2;
-		uploader.sample_col = 1;
-		uploader.ko_col = 0;
-		uploader.read_count_col = 5;
+		uploader.otu_col = 1;
+		uploader.sample_col = 0;
+		uploader.ko_col = 2;
+		uploader.read_count_col = 3;
+
+		uploader.default_otu_col = 2;
+		uploader.default_sample_col = 1;
+		uploader.default_ko_col = 0;
+		uploader.default_read_count_col = 5;
 
 		// These variables keep track of when files are loaded
 		uploader.tax_abund_1_loaded = false;
@@ -17,6 +22,7 @@
 		uploader.reads_loaded = false;
 		uploader.genome_annotation_loaded = false;
 		uploader.func_contrib_loaded = false;
+		uploader.contribution_table_loaded = false;
 		uploader.tax_hierarchy_loaded = false;
 		uploader.func_hierarchy_loaded = false;
 		uploader.samp_map_loaded = false;
@@ -43,9 +49,7 @@
 
 		// These are the default data readers
 		uploader.default_tax_abund_file = new XMLHttpRequest();
-		uploader.default_func_contrib_file = new XMLHttpRequest();
 		uploader.default_tax_hierarchy_file = new XMLHttpRequest();
-		uploader.default_func_hierarchy_file = new XMLHttpRequest();
 		uploader.default_samp_map_file = new XMLHttpRequest();
 
 		// This is the parsed contribution data object
@@ -60,23 +64,15 @@
 
 			// Add listeners for when the default files have successfully loaded
 			this.default_tax_abund_file.addEventListener("load", this.execute_on_default_tax_abund_load);
-			this.default_func_contrib_file.addEventListener("load", this.execute_on_default_func_contrib_load);
 			this.default_tax_hierarchy_file.addEventListener("load", this.execute_on_default_tax_hierarchy_load);
-			this.default_func_hierarchy_file.addEventListener("load", this.execute_on_default_func_hierarchy_load);
 			this.default_samp_map_file.addEventListener("load", this.execute_on_default_samp_map_load);
 
 			this.default_tax_abund_file.open("GET", "Data/otu_table_even_2.txt", true);
 			//this.default_tax_abund_file.open("GET", "Data/reduced_genus_taxa_transpose.txt", true);
 			this.default_tax_abund_file.send();
-			this.default_func_contrib_file.open("GET", "Data/mice_metagenome_contributions.txt", true);
-			//this.default_func_contrib_file.open("GET", "Data/reduced_genus_pathway_metagenome_contributions_fixed.txt", true);
-			this.default_func_contrib_file.send();
 			this.default_tax_hierarchy_file.open("GET", "Data/full_gg_taxa_mapping_parsed.txt", true);
 			//this.default_tax_hierarchy_file.open("GET", "Data/taxa_mapping2.txt", true);
 			this.default_tax_hierarchy_file.send();
-			//this.default_func_hierarchy_file.open("GET", "Data/function_mapping2.txt", true);
-			this.default_func_hierarchy_file.open("GET", "Data/classes_parsed2.tsv", true);
-			this.default_func_hierarchy_file.send();
 			this.default_samp_map_file.open("GET", "Data/mice_samplemap.txt", true);
 			this.default_samp_map_file.send();
 		}
@@ -154,7 +150,6 @@
 				if (document.getElementById("svg_genome_annotation_select_button_base").getAttribute("selected") == "true" && tax_abund_1 && genome_annotation){
 
 					to_load.push(this.tax_abund_1_loaded);
-					to_load.push(this.genome_annotation_loaded);
 					load_ready = true;
 
 				} else if (document.getElementById("svg_16S_select_button_base").getAttribute("selected") == "true" && reads){
@@ -165,7 +160,6 @@
 				} else if (document.getElementById("svg_contribution_select_button_base").getAttribute("selected") == "true" && tax_abund_2 && func_contrib){
 
 					to_load.push(this.tax_abund_2_loaded);
-					to_load.push(this.func_contrib_loaded);
 					load_ready = true;
 				}
 
@@ -196,7 +190,8 @@
 		check_loaded()
 		Checks to see if the indicate files have been loaded. If so, redraw the graphics.
 		*/
-		uploader.check_loaded = function(load_flags) {
+		uploader.check_loaded = function(load_flags, draw_everything) {
+				
 			var all_loaded = true;
 
 			// Check each flag to see if the file has been loaded
@@ -207,23 +202,7 @@
 			}
 
 			// If all of the flags are true, redraw the graphics
-			if (all_loaded){
-
-				// Check which option is chosen so we know what and how to parse
-				if (document.getElementById("svg_genome_annotation_select_button_base").getAttribute("selected") == "true"){
-
-					this.contribution_table = this.parse_genome_annotation(this.tax_abund_text, this.genome_annotation_text)
-
-				} else if (document.getElementById("svg_16S_select_button_base").getAttribute("selected") == "true"){
-
-					this.contribution_table = this.parse_16S_contributions(this.reads_text);
-					this.tax_abund_text = this.parse_16S_tax_abund(this.reads_text);
-
-				} else if (document.getElementById("svg_contribution_select_button_base").getAttribute("selected") == "true"){
-
-					this.contribution_table = this.parse_contribution(this.func_contrib_text);
-
-				}
+			if (all_loaded ){
 
 				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text);
 				
@@ -249,97 +228,13 @@
 
 				}
 
+				this.contribution_table_loaded = false;
 				this.tax_hierarchy_loaded = false;
 				this.func_hierarchy_loaded = false;
 				this.samp_map_loaded = false;
 				document.getElementById("taxonomic_hierarchy").value = "";
-				document.getElementById("function_hierarchy").value = "";
 				document.getElementById("sample_map").value = "";
 			}
-		}
-
-		uploader.parse_contribution = function(func_contrib_text){
-			var output = [];
-
-			var lines = func_contrib_text.split('\n');
-			for (i = 1; i < lines.length; i++){
-				if (lines[i] != ''){
-					fields = lines[i].split('\t');
-					sample = fields[this.sample_col];
-					otu = fields[this.otu_col]; 
-					ko = fields[this.ko_col];
-					read_counts = fields[this.read_count_col];
-
-					// Make empty entries to add to if necessary
-					//needs to be object to avoid issues with OTU ID indices
-					if (!output.hasOwnProperty(sample)){
-						output[sample] = {};
-					}
-					if (!output[sample].hasOwnProperty(otu.toString())){
-						output[sample][otu.toString()] = [];
-					}
-					output[sample][otu][ko] = parseFloat(read_counts);
-				}
-			}
-
-			return output;
-		}
-
-		uploader.parse_genome_annotation = function(tax_abund, annotations){
-			tax_table = this.matrix_parser(tax_abund);
-			annotation_map = this.long_table_parser(annotations);
-			output = [];
-			for (sample in tax_table){
-				output[sample] = [];
-				for (otu in tax_table[sample]){
-					output[sample][otu] = [];
-					for (ko in annotation_map[otu]){
-						output[sample][otu][ko] = parseFloat(tax_table[sample][otu]) * parseFloat(annotation_map[otu][ko]);
-					}
-				}
-			}
-
-			return(output);
-		}
-
-		uploader.matrix_parser = function(matrix_text){
-			var output = [];
-
-			var lines = matrix_text.split('\n');
-			for (i = 1; i < lines.length; i++){
-				if (lines[i] != ''){
-					fields = lines[i].split('\t');
-					row = fields[0];
-					output[row] = [];
-					for (j = 1; j < fields.length; j++){
-						col = lines[0].split('\t')[j];
-						output[row][col] = fields[j];
-					}
-				}
-			}
-
-			return(output);
-		}
-
-		uploader.long_table_parser = function(long_table_text){
-			var output = [];
-
-			var lines = long_table_text.split('\n');
-			for (i = 0; i < lines.length - 1; i++){
-				if (lines[i] != ''){
-					fields = lines[i].split('\t')
-					curr_table = output;
-					for (j = 0; j < fields.length - 2; j++){
-						if (!output.hasOwnProperty(fields[j])){
-							curr_table[fields[j]] = [];
-						}
-						curr_table = curr_table[fields[j]];
-					}
-					curr_table[fields[fields.length - 2]] = fields[fields.length - 1];
-				}
-			}
-
-			return(output);
 		}
 
 		uploader.execute_on_tax_abund_1_load = function() {
@@ -352,20 +247,9 @@
 			uploader.tax_abund_2_loaded = true;
 		}
 
-		uploader.execute_on_genome_annotation_load = function() {
-			uploader.genome_annotation_text = this.result;
-			uploader.genome_annotation_loaded = true;
-		}
-
 		uploader.execute_on_reads_load = function() {
 			uploader.reads_text = this.result;
 			uploader.reads_loaded = true;
-		}
-
-		uploader.execute_on_func_contrib_load = function() {
-			uploader.func_contrib_text = this.result;
-			uploader.func_contrib_loaded = true;
-
 		}
 
 		uploader.execute_on_tax_hierarchy_load = function() {
@@ -386,44 +270,51 @@
 
 		}
 
+		Shiny.addCustomMessageHandler("contribution_table", function(contribution_table){
+			this.contribution_table = contribution_table;
+			this.contribution_table_loaded = true;
+		});
+
+		Shiny.addCustomMessageHandler("function_hierarchy", function(func_hierarchy){
+			this.func_hierarchy_text = func_hierarchy;
+			this.func_hierarchy_loaded = true;
+		});
+
 		uploader.execute_on_default_tax_abund_load = function() {
 			uploader.tax_abund_text = this.responseText;
 			uploader.tax_abund_1_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
-		}
-
-		uploader.execute_on_default_func_contrib_load = function() {
-			uploader.func_contrib_text = this.responseText;
-			uploader.func_contrib_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
 		}
 
 		uploader.execute_on_default_tax_hierarchy_load = function() {
 			uploader.tax_hierarchy_text = this.responseText;
 			uploader.tax_hierarchy_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
-		}
-
-		uploader.execute_on_default_func_hierarchy_load = function() {
-			uploader.func_hierarchy_text = this.responseText;
-			uploader.func_hierarchy_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
 		}
 
 		uploader.execute_on_default_samp_map_load = function() {
 			uploader.samp_map_text = this.responseText;
 			uploader.samp_map_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.func_contrib_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
 		}
+
+		Shiny.addCustomMessageHandler("default_contribution_table", function(contribution_table){
+			uploader.contribution_table = contribution_table;
+			uploader.contribution_table_loaded = true;
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+		});
+
+		Shiny.addCustomMessageHandler("default_function_hierarchy", function(func_hierarchy){
+			uploader.func_hierarchy_text = func_hierarchy;
+			uploader.func_hierarchy_loaded = true;
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+		});
 
 		// Add listeners for when files have successfully loaded
 		uploader.tax_abund_1_reader.addEventListener('load', uploader.execute_on_tax_abund_1_load);
 		uploader.tax_abund_2_reader.addEventListener('load', uploader.execute_on_tax_abund_2_load);
-		uploader.genome_annotation_reader.addEventListener('load', uploader.execute_on_genome_annotation_load);
 		uploader.reads_reader.addEventListener('load', uploader.execute_on_reads_load);
-		uploader.func_contrib_reader.addEventListener('load', uploader.execute_on_func_contrib_load);
 		uploader.tax_hierarchy_reader.addEventListener('load', uploader.execute_on_tax_hierarchy_load);
-		uploader.func_hierarchy_reader.addEventListener('load', uploader.execute_on_func_hierarchy_load);
 		uploader.samp_map_reader.addEventListener('load', uploader.execute_on_samp_map_load);
 
 		// Set up the event handlers for loading files when they get chosen for upload
@@ -433,20 +324,11 @@
 		document.getElementById("taxonomic_abundances_2").addEventListener('change', function(e) {
 			uploader.tax_abund_2_reader.readAsText(this.files[0]);
 			});
-		document.getElementById("genome_annotations").addEventListener('change', function(e) {
-			uploader.genome_annotation_reader.readAsText(this.files[0]);
-			});
 		document.getElementById("16S_counts").addEventListener('change', function(e) {
 			uploader.reads_reader.readAsText(this.files[0]);
 			});
-		document.getElementById("function_contributions").addEventListener('change', function(e) {
-			uploader.func_contrib_reader.readAsText(this.files[0]);
-			});
 		document.getElementById("taxonomic_hierarchy").addEventListener('change', function(e) {
 			uploader.tax_hierarchy_reader.readAsText(this.files[0]);
-			});
-		document.getElementById("function_hierarchy").addEventListener('change', function(e) {
-			uploader.func_hierarchy_reader.readAsText(this.files[0]);
 			});
 		document.getElementById("sample_map").addEventListener('change', function(e) {
 			uploader.samp_map_reader.readAsText(this.files[0]);

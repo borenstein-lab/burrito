@@ -570,8 +570,8 @@
         .sortKeys(d3.descending)
         .key(function(d) { return d.Genus; })
         .sortKeys(d3.descending)
-        //.key(function(d) { return d.Species; })
-        //.key(function(d) { return d.OTU_ID})
+        .key(function(d) { return d.Species; })
+        .key(function(d) { return d.OTU_ID})
         .entries(taxa_tree_data);
 
 
@@ -586,8 +586,8 @@
         .sortKeys(d3.ascending)        
         .key(function(d) { return d.SubPathway; })
         .sortKeys(d3.ascending)
-        .key(function(d) { return d.KO; })
-        .sortKeys(d3.ascending)
+        //.key(function(d) { return d.KO; })
+        //.sortKeys(d3.ascending)
         .entries(func_tree_data);
 
       // Read the func tree
@@ -601,7 +601,6 @@
         //.key(function(d) { return d.KO; })
         .entries(func_tree_data);
 
-        console.log(this.func_tree[0])
       /////////////////////////////////////////////////////////////////////// taxa_lookup /////////////////////////////////////////////////////////////////////////////////////////////
       //figure out how to set up to sum over OTUs, etc
       // Create a lookup table to get the node in the taxa tree from the name
@@ -706,7 +705,7 @@
         func_display_leaves = func_display_leaves.concat(this.get_leaves(this.func_tree[k].key, this.func_lookup));
       }
 
-
+      /*
       get_aggregated_contribution = function(sample, taxon, func, taxa_lookup_full, func_lookup_full, norm_factors){
         tax_leaves = data_cube.get_leaves(taxon, taxa_lookup_full)
         func_leaves = data_cube.get_leaves(func, func_lookup_full)
@@ -736,7 +735,7 @@
           }
         }
       }
-
+      */
       // for (sample in contribution_table){
       //   this.original_contribution_cube[sample] = {};
       //   for (otu in contribution_table[sample]){
@@ -746,6 +745,7 @@
       //     }
       //   }
       // }
+      this.original_contribution_cube = contribution_table
 
       /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -777,7 +777,7 @@
         this.displayed_funcs.push(this.func_tree[i].key);
       }
 
-
+/*
                ////get mean abundances over all samples, this is slow
       var all_taxa = this.get_leaves(this.taxa_tree[0].key, this.taxa_lookup)
       all_funcs = []
@@ -808,8 +808,7 @@
           this.funcMeans[func] = this.funcMeans[func] + this.meansOverSamples[all_taxa[k]][func]
         }
       }
-
-
+*/
     }
 
     /////////////////////////////////////////////////////////////////////// reduce_to_genus //////////////////////////////////////////////////////////////
