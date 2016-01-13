@@ -1,0 +1,224 @@
+body.disconnected {
+  /*background-color: #999;
+  opacity: 0.5; */
+}
+
+table.data {
+  width: auto;
+}
+table.data td[align=right] {
+  font-family: monospace;
+  text-align: right;
+}
+
+.shiny-output-error {
+  color: red;
+  white-space: pre-wrap;
+}
+.shiny-output-error:before {
+  content: 'Error: ';
+  font-weight: bold;
+}
+.shiny-output-error-validation {
+  color: #888;
+}
+.shiny-output-error-validation:before {
+  content: '';
+  font-weight: inherit;
+}
+
+.recalculating {
+  opacity: 0.3;
+  transition: opacity 250ms ease 500ms;
+  -moz-transition: opacity 250ms ease 500ms;
+  -webkit-transition: opacity 250ms ease 500ms;
+  -o-transition: opacity 250ms ease 500ms;
+}
+
+.slider-animate-container {
+  text-align: right;
+  margin-top: -9px;
+}
+.slider-animate-button {
+  opacity: 0.5;
+}
+.slider-animate-button .pause {
+  display: none;
+}
+.slider-animate-button.playing .pause {
+  display: inline;
+}
+.slider-animate-button .play {
+  display: inline;
+}
+.slider-animate-button.playing .play {
+  display: none;
+}
+
+.progress.shiny-file-input-progress {
+  visibility: hidden;
+}
+.progress.shiny-file-input-progress .progress-bar.bar-danger {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  transition: none;
+}
+/* Make sure the filename doesn't extend past the bounds of the container */
+.shiny-input-container input[type=file] {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.shiny-progress-container {
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  /* Make sure it draws above all Bootstrap components */
+  z-index: 2000;
+}
+
+.shiny-progress .progress {
+  position: absolute;
+  width: 100%;
+  top: 0px;
+  height: 3px;
+  margin: 0px;
+}
+
+.shiny-progress .bar {
+  opacity: 0.6;
+  transition-duration: 250ms;
+}
+
+.shiny-progress .progress-text {
+  position: absolute;
+  right: 10px;
+  height: 24px;
+  width: 240px;
+  background-color: #eef8ff;
+  margin: 0px;
+  padding: 2px 3px;
+  opacity: 0.85;
+}
+
+.shiny-progress .progress-text .progress-message {
+  padding: 0px 3px;
+  font-weight: bold;
+  font-size: 90%;
+}
+
+.shiny-progress .progress-text .progress-detail {
+  padding: 0px 3px;
+  font-size: 80%;
+}
+
+.crosshair {
+  cursor: crosshair;
+}
+
+.grabbable {
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+.grabbing {
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+}
+
+.ns-resize {
+  cursor: ns-resize;
+}
+
+.ew-resize {
+  cursor: ew-resize;
+}
+
+.nesw-resize {
+  cursor: nesw-resize;
+}
+
+.nwse-resize {
+  cursor: nwse-resize;
+}
+
+
+/* Workaround for Qt, which doesn't use font fallbacks */
+.qt pre, .qt code {
+  font-family: monospace !important;
+}
+
+/* Workaround for Qt 5, which draws its own margins around checks and radios;
+   overrides the top margin on these elements set by Bootstrap */
+.qt5 .radio input[type="radio"],
+.qt5 .checkbox input[type="checkbox"] {
+  margin-top: 0px;
+}
+
+/* consistency with bootstrap.css for selectize.js */
+.selectize-control {
+  margin-bottom: 10px;
+}
+
+.shiny-frame {
+  border: none;
+}
+
+.shiny-flow-layout>div {
+  display: inline-block;
+  vertical-align: top;
+  padding-right: 12px;
+  width: 220px;
+}
+.shiny-split-layout {
+  width: 100%;
+  white-space: nowrap;
+}
+.shiny-split-layout>div {
+  display: inline-block;
+  vertical-align: top;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.shiny-input-panel {
+  padding: 6px 8px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  border-radius: 2px;
+}
+
+/* For checkbox groups and radio buttons, bring the options closer to label,
+   if label is present. */
+.shiny-input-checkboxgroup label ~ .shiny-options-group,
+.shiny-input-radiogroup label ~ .shiny-options-group {
+  margin-top: -10px;
+}
+
+/* Checkbox groups and radios that are inline need less negative margin to
+   separate from label. */
+.shiny-input-checkboxgroup.shiny-input-container-inline label ~ .shiny-options-group,
+.shiny-input-radiogroup.shiny-input-container-inline label ~ .shiny-options-group {
+  margin-top: -1px;
+}
+
+/* Limit the width of inputs in the general case. */
+.shiny-input-container:not(.shiny-input-container-inline) {
+  width: 300px;
+  max-width: 100%;
+}
+
+/* Don't limit the width of inputs in a sidebar. */
+.well .shiny-input-container {
+  width: auto;
+}
+
+/* Width of non-selectize select inputs */
+.shiny-input-container > div > select:not(.selectized) {
+  width: 100%;
+}
