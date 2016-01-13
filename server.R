@@ -62,10 +62,9 @@ shinyServer(function(input, output, session) {
 	} else {
 		tracked_data$function_status = "We are loading the default file"
 		func_hierarchy = read.csv(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-		tracked_data$function_status = "We are removing KOs from the user file"
 		func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2]]
 		output = unique(func_hierarchy)
-		session$sendCustomMessage(type='default_function_hierarchy', paste(paste(colnames(output), collapse="\t"), sapply(1:dim(output)[1], function(row){return(paste(output[row,], collapse="\t"))}), collapse="\n", sep="\n"))
+		session$sendCustomMessage(type='default_function_hierarchy', paste(paste(colnames(output), collapse="\t"), paste(sapply(1:dim(output)[1], function(row){return(paste(output[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
 	}
 	}, ignoreNULL = FALSE)
 
