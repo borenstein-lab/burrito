@@ -300,6 +300,7 @@ d3.select("#svg_update_button").classed("activebutton",true);
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text){
 
+	console.log("Redrawing")
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -315,12 +316,12 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
 
-d3.select("#navbar").remove()
-d3.select("#taxa_bars").remove()
-d3.select("#func_bars").remove()
+	d3.select("#navbar").remove()
+	d3.select("#taxa_bars").remove()
+	d3.select("#func_bars").remove()
 
-var NavSVG = MainSVG.insert("svg", "#sidebar")
-    .attr("x",margin.left)
+	var NavSVG = MainSVG.insert("svg", "#sidebar")
+    	.attr("x",margin.left)
 	.attr("y",margin.top)
 	.attr("width", width - margin.left - margin.right)
 	.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
@@ -385,6 +386,7 @@ var NavSVG = MainSVG.insert("svg", "#sidebar")
 	curlevelNames['func'] = levelNames['func'];
 
 	taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
+
 	func_tree_data = d3.tsv.parse(func_hierarchy_text);
 	samplemap = d3.tsv.parse(samp_map_text);
 	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
