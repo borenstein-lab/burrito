@@ -45,31 +45,10 @@ shinyServer(function(input, output, session) {
 	return(output)
 	})
 
-    observeEvent(input$update_button, {
-	output = NULL
-	
-	tracked_data$function_status = "Starting"
-	if (!is.null(input$func_hierarchy)){
-		tracked_data$function_status = "We are loading a user file"
-		func_hierarchy_file = input$function_hierarchy
-		func_hierarchy_file_path = func_hierarchy_file$datapath
-		func_hierarchy = read.csv(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-		tracked_data$function_status = "We are removing KOs from the user file"
-		func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2]]
-		output = unique(func_hierarchy)
-		session$sendCustomMessage(type='function_hierarchy', paste(paste(colnames(output), collapse="\t"), sapply(1:dim(output)[1], function(row){return(paste(output[row], collapse="\t"))}), collapse="\n", sep="\n"))
-
-	} else {
-		tracked_data$function_status = "We are loading the default file"
-		func_hierarchy = read.csv(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-		func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2]]
-		output = unique(func_hierarchy)
-		session$sendCustomMessage(type='default_function_hierarchy', paste(paste(colnames(output), collapse="\t"), paste(sapply(1:dim(output)[1], function(row){return(paste(output[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
-	}
-	}, ignoreNULL = FALSE)
 
     observeEvent(input$update_button, {
 	output = NULL
+	output2 = NULL
 	
 	tracked_data$contribution_status = "Starting"
 	if (is.null(tracked_data$input_type)){
@@ -77,7 +56,7 @@ shinyServer(function(input, output, session) {
 		tracked_data$contribution_status = "Loading default data"
 		output = fread(default_contribution_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
-		tracked_data$contriubtion_status = "Filtering and ordering columns"
+		tracked_data$contribution_status = "Filtering and ordering columns"
 		output = output[,c(2,3,1,6), with=FALSE]
 	} else if (tracked_data$input_type == "genome_annotation"){
 
@@ -165,15 +144,52 @@ shinyServer(function(input, output, session) {
 		output = expanded_table[,sum(normalized_contributions), by=eval(colnames(expanded_table)[c(2,3,5)])]
 	}
 
-	tracked_data$contribution_status = "Returning"
+	##Moving functional hierarchy to be dealt with after the contribution table is set
+	if (!is.null(input$func_hierarchy)){
+		tracked_data$function_status = "We are loading a user file"
+		func_hierarchy_file = input$function_hierarchy
+		func_hierarchy_file_path = func_hierarchy_file$datapath
+		func_hierarchy = read.csv(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+		tracked_data$function_status = "We are removing KOs from the user file"
+		func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2]]
+		output2 = unique(func_hierarchy)
+		session$sendCustomMessage(type='function_hierarchy', paste(paste(colnames(output2), collapse="\t"), sapply(1:dim(output2)[1], function(row){return(paste(output2[row], collapse="\t"))}), collapse="\n", sep="\n"))
 
-	output=dcast(output, Sample + OTU ~ SubPathway, value.var=colnames(output)[4])
-	output=data.table(Sample = output$Sample, OTU = output$OTU, SubPathways = apply(output[,3:dim(output)[2], with=FALSE], 1, function(row){return(as.list(row[!is.na(row)]))}))
+	} else {
+		tracked_data$function_status = "We are loading the default file"
+		func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+		func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2],with=F]
+		func_hierarchy = func_hierarchy[SubPathway %in% unique(output[,SubPathway])]
+		output2 = unique(func_hierarchy)
+		session$sendCustomMessage(type='default_function_hierarchy', paste(paste(colnames(output2), collapse="\t"), paste(sapply(1:dim(output2)[1], function(row){return(paste(output2[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
+	}
+	
+	#sum over taxa
+	count_name = names(output)[!names(output) %in% c("Sample", "OTU", "SubPathway")]
+	total_funcs = output[,lapply(.SD, sum), by=list(SubPathway, Sample), .SDcols=count_name] #whatever the count name is
+	total_funcs[,V1:=V1/sum(V1),by=Sample] #Switch to relative abundance from read counts
+	#combine with func_hierarchy
+	total_funcs = merge(total_funcs, output2, by="SubPathway")
+	#get average for every level of functions
+	func_means = data.table()
+	for(j in 1:ncol(output2)){
+		total_funcs_sum = total_funcs[,sum(V1), by=c("Sample", names(func_hierarchy)[j])] #sum over this category, will not change SubPathway
+		func_means_lev =  total_funcs_sum[, mean(V1), by=eval(names(func_hierarchy)[j])]
+		setnames(func_means_lev, c("Function", "Mean"))
+		if(ncol(func_means_lev)==2) func_means = rbind(func_means, func_means_lev)
+	}
+	output3 = func_means
+	session$sendCustomMessage(type="func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
+
+	output = dcast(output, Sample + OTU ~ SubPathway, value.var=colnames(output)[4])
+	output = data.table(Sample = output$Sample, OTU = output$OTU, SubPathways = apply(output[,3:dim(output)[2], with=FALSE], 1, function(row){return(as.list(row[!is.na(row)]))}))
 	output = dcast(output, Sample ~ OTU, value.var=colnames(output)[3])
 	output = data.table(Sample = output$Sample, OTUs = apply(output[,2:dim(output)[2], with=FALSE], 1, function(row){return(as.list(row[sapply(row, function(el){!is.null(el[[1]])})]))}))
 	output = dcast(output, . ~ Sample, value.var="OTUs")
 	output = output[,2:dim(output)[2],with=FALSE]
 	output = lapply(output, function(el){return(el[[1]])})
+
+	tracked_data$contribution_status = "Returning"
 
 	if (is.null(tracked_data$input_type)){
 		session$sendCustomMessage(type="default_contribution_table", output)

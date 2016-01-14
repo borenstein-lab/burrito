@@ -25,6 +25,7 @@
 		uploader.contribution_table_loaded = false;
 		uploader.tax_hierarchy_loaded = false;
 		uploader.func_hierarchy_loaded = false;
+		uploader.func_averages_loaded = false;
 		uploader.samp_map_loaded = false;
 
 		// These variables thold the results of file loading
@@ -91,6 +92,7 @@
 			var tax_hierarchy = false;
 			var func_hierarchy = false;
 			var samp_map = false;
+			var func_averages = false;
 
 			// Check to see which upload type has been chosen
 			if (document.getElementById("svg_genome_annotation_select_button_base").getAttribute("selected") == "true"){
@@ -134,6 +136,9 @@
 			// Check to see if we have a file describing the functional hierarchy
 			if (document.getElementById("function_hierarchy").value != ""){
 				func_hierarchy = true;
+			}
+			if (document.getElementById("func_averages").value != ""){
+				func_averages = true;
 			}
 
 			// Check to see if we have a file describing the samples
@@ -182,7 +187,7 @@
 				
 				// If no files have been uploaded, then we can just reset 
 			} else if (!tax_abund_1 && !tax_abund_2 && !reads && !genome_annotation && !func_contrib && !tax_hierarchy && !func_hierarchy && !samp_map){
-				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text);
+				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
 			}
 		}
 		
@@ -204,7 +209,7 @@
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded ){
 
-				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text);
+				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
 				
 				// Reset the upload buttons and flags so if new files are uploaded, we wait for them
 				if (document.getElementById("svg_genome_annotation_select_button_base").getAttribute("selected") == "true"){
@@ -231,6 +236,7 @@
 				this.contribution_table_loaded = false;
 				this.tax_hierarchy_loaded = false;
 				this.func_hierarchy_loaded = false;
+				this.func_averages_loaded = false;
 				this.samp_map_loaded = false;
 				document.getElementById("taxonomic_hierarchy").value = "";
 				document.getElementById("sample_map").value = "";
@@ -283,31 +289,37 @@
 		uploader.execute_on_default_tax_abund_load = function() {
 			uploader.tax_abund_text = this.responseText;
 			uploader.tax_abund_1_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		}
 
 		uploader.execute_on_default_tax_hierarchy_load = function() {
 			uploader.tax_hierarchy_text = this.responseText;
 			uploader.tax_hierarchy_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		}
 
 		uploader.execute_on_default_samp_map_load = function() {
 			uploader.samp_map_text = this.responseText;
 			uploader.samp_map_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		}
 
 		Shiny.addCustomMessageHandler("default_contribution_table", function(contribution_table){
 			uploader.contribution_table = contribution_table;
 			uploader.contribution_table_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		});
 
 		Shiny.addCustomMessageHandler("default_function_hierarchy", function(func_hierarchy){
 			uploader.func_hierarchy_text = func_hierarchy;
 			uploader.func_hierarchy_loaded = true;
-			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded], draw_everything);
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
+		});
+
+		Shiny.addCustomMessageHandler("func_averages", function(func_averages){
+			uploader.func_averages_text = func_averages;
+			uploader.func_averages_loaded = true;
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		});
 
 		// Add listeners for when files have successfully loaded

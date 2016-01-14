@@ -541,7 +541,7 @@
 
     /////////////////////////////////////////////////////////////////////// initialize_cube /////////////////////////////////////////////////////////////////////////////////////////////
 
-    data_cube.initialize_cube = function(contribution_table, taxa_tree_data, func_tree_data){
+    data_cube.initialize_cube = function(contribution_table, taxa_tree_data, func_tree_data, func_averages){
 
       /////////////////////////////////////////////////////////////////////// samples /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -598,16 +598,16 @@
       ///list of all kos in data (need to do similar for taxa)
 
 
-      func_tree_full = d3.nest()
-        .key(function(d) { return d.Category; })
-        .sortKeys(d3.ascending)
-        .key(function(d) { return d.SuperPathway; })
-        .sortKeys(d3.ascending)        
-        .key(function(d) { return d.SubPathway; })
-        .sortKeys(d3.ascending)
-        //.key(function(d) { return d.KO; })
-        //.sortKeys(d3.ascending)
-        .entries(func_tree_data);
+//       func_tree_full = d3.nest()
+//         .key(function(d) { return d.Category; })
+//         .sortKeys(d3.ascending)
+//         .key(function(d) { return d.SuperPathway; })
+//         .sortKeys(d3.ascending)        
+//         .key(function(d) { return d.SubPathway; })
+//         .sortKeys(d3.ascending)
+//         //.key(function(d) { return d.KO; })
+//         //.sortKeys(d3.ascending)
+//         .entries(func_tree_data);
 
       // Read the func tree
       this.func_tree = d3.nest()
@@ -692,92 +692,96 @@
         this.func_lookup[curr_func.key].level = level 
       }
 
-      func_lookup_full = {};
-      curr_funcs = [];
-
-      // Use a BFS to add all taxa
-      for (var i = 0; i < func_tree_full.length; i++){
-        curr_funcs.push(func_tree_full[i]);
-      }
-      for (; curr_funcs.length > 0;){
-        curr_func = curr_funcs.shift();
-        func_lookup_full[curr_func.key] = curr_func;
-        if (!this.is_leaf(curr_func)){
-          for (var i = 0; i < curr_func.values.length; i++){
-            curr_funcs.push(curr_func.values[i]);
-          }
-        }
-      }
-
-      all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
-      norm_factors = []
-      for(k=0; k < all_kos.length; k++){
-        sub_data = func_tree_data.filter(function(d){ return d.KO===all_kos[k]})
-        norm_factors[all_kos[k]] = sub_data.length
-      }
-      /////////////////////////////////////////////////////////////////////// original_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
-
-      // For each row in the original TSV, make an entry in the original_contribution_cube
-      // Accessed by original_contribution_cube[sample][taxon][func], returns the contribution of the given taxon to the given func relative to the total functional abundance in the given sample
-      var totals = {};
-      for (sample in contribution_table){
-        totals[sample] = 0;
-        for (otu in contribution_table[sample]){
-          for(ko in contribution_table[sample][otu]){
-            totals[sample] += contribution_table[sample][otu][ko]
-          }
-        }
-      }
-      //original_contribution_cube needs to be summed up to subpathway and potentially genus levels
-      taxa_display_leaves = []
-      for(j=0; j < (this.taxa_tree).length; j++){
-        taxa_display_leaves = taxa_display_leaves.concat(this.get_leaves(this.taxa_tree[j].key, this.taxa_lookup)); //taxa_tree_leaves//keep working here 
-      }     
-      func_display_leaves = []
-      for(k=0; k < (this.func_tree).length; k++){
-        func_display_leaves = func_display_leaves.concat(this.get_leaves(this.func_tree[k].key, this.func_lookup));
-      }
-
-
-      get_aggregated_contribution = function(sample, taxon, func, taxa_lookup_full, func_lookup_full, norm_factors){
-        tax_leaves = data_cube.get_leaves(taxon, taxa_lookup_full)
-        func_leaves = data_cube.get_leaves(func, func_lookup_full)
-        contrib = 0
-        for(a=0; a< tax_leaves.length; a++){
-          for(b=0; b < func_leaves.length; b++){
-            if(contribution_table[sample].hasOwnProperty(tax_leaves[a])){
-              if(contribution_table[sample][tax_leaves[a]].hasOwnProperty(func_leaves[b])){
-                contrib += contribution_table[sample][tax_leaves[a]][func_leaves[b]]/norm_factors[func_leaves[b]]
-              }
-            }
-          }
-        }
-        contrib /= totals[sample]
-        return contrib;
-      }
-
-      for (sample in contribution_table){
-        this.original_contribution_cube[sample] = {};
-        for (j=0; j < taxa_display_leaves.length; j++){
-          taxon = taxa_display_leaves[j]
-          this.original_contribution_cube[sample][taxon] = {};
-          for (k=0; k < func_display_leaves.length; k++){
-            func = func_display_leaves[k]
-            //here is where we do this calculation of aggregating over OTUs and getting partial pathway contributions
-            this.original_contribution_cube[sample][taxon][func] = get_aggregated_contribution(sample, taxon, func, this.taxa_lookup_full, func_lookup_full, norm_factors)
-          }
-        }
-      }
-
-      // for (sample in contribution_table){
-      //   this.original_contribution_cube[sample] = {};
-      //   for (otu in contribution_table[sample]){
-      //     this.original_contribution_cube[sample][otu] = {};
-      //     for (ko in contribution_table[sample][otu]){
-      //       this.original_contribution_cube[sample][otu][ko] = contribution_table[sample][otu][ko]/totals[sample];
-      //     }
-      //   }
-      // }
+//       func_lookup_full = {};
+//       curr_funcs = [];
+// 
+//       // Use a BFS to add all taxa
+//       for (var i = 0; i < func_tree_full.length; i++){
+//         curr_funcs.push(func_tree_full[i]);
+//       }
+//       for (; curr_funcs.length > 0;){
+//         curr_func = curr_funcs.shift();
+//         func_lookup_full[curr_func.key] = curr_func;
+//         if (!this.is_leaf(curr_func)){
+//           for (var i = 0; i < curr_func.values.length; i++){
+//             curr_funcs.push(curr_func.values[i]);
+//           }
+//         }
+//       }
+// 
+//       all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
+//       norm_factors = []
+//       console.log(all_kos.length)
+//       for(k=0; k < all_kos.length; k++){
+//         sub_data = func_tree_data.filter(function(d){ return d.KO===all_kos[k]})
+//         norm_factors[all_kos[k]] = sub_data.length
+//         console.log("Calculating KO normalization factors??")
+//         console.log(sub_data)
+//       }
+//       /////////////////////////////////////////////////////////////////////// original_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
+// 
+//       // For each row in the original TSV, make an entry in the original_contribution_cube
+//       // Accessed by original_contribution_cube[sample][taxon][func], returns the contribution of the given taxon to the given func relative to the total functional abundance in the given sample
+//       var totals = {};
+//       for (sample in contribution_table){
+//         totals[sample] = 0;
+//         for (otu in contribution_table[sample]){
+//           for(ko in contribution_table[sample][otu]){
+//             totals[sample] += contribution_table[sample][otu][ko]
+//           }
+//         }
+//       }
+//       //original_contribution_cube needs to be summed up to subpathway and potentially genus levels
+//       taxa_display_leaves = []
+//       for(j=0; j < (this.taxa_tree).length; j++){
+//         taxa_display_leaves = taxa_display_leaves.concat(this.get_leaves(this.taxa_tree[j].key, this.taxa_lookup)); //taxa_tree_leaves//keep working here 
+//       }     
+//       func_display_leaves = []
+//       for(k=0; k < (this.func_tree).length; k++){
+//         func_display_leaves = func_display_leaves.concat(this.get_leaves(this.func_tree[k].key, this.func_lookup));
+//       }
+// 
+// 
+//       get_aggregated_contribution = function(sample, taxon, func, taxa_lookup_full, func_lookup_full, norm_factors){
+//         tax_leaves = data_cube.get_leaves(taxon, taxa_lookup_full)
+//         func_leaves = data_cube.get_leaves(func, func_lookup_full)
+//         contrib = 0
+//         for(a=0; a< tax_leaves.length; a++){
+//           for(b=0; b < func_leaves.length; b++){
+//             if(contribution_table[sample].hasOwnProperty(tax_leaves[a])){
+//               if(contribution_table[sample][tax_leaves[a]].hasOwnProperty(func_leaves[b])){
+//                 contrib += contribution_table[sample][tax_leaves[a]][func_leaves[b]]/norm_factors[func_leaves[b]]
+//               }
+//             }
+//           }
+//         }
+//         contrib /= totals[sample]
+//         return contrib;
+//       }
+// 
+//       for (sample in contribution_table){
+//         this.original_contribution_cube[sample] = {};
+//         for (j=0; j < taxa_display_leaves.length; j++){
+//           taxon = taxa_display_leaves[j]
+//           this.original_contribution_cube[sample][taxon] = {};
+//           for (k=0; k < func_display_leaves.length; k++){
+//             func = func_display_leaves[k]
+//             //here is where we do this calculation of aggregating over OTUs and getting partial pathway contributions
+//             this.original_contribution_cube[sample][taxon][func] = get_aggregated_contribution(sample, taxon, func, this.taxa_lookup_full, func_lookup_full, norm_factors)
+//           }
+//         }
+//       }
+//       console.log(this.original_contribution_cube)
+// 
+//       // for (sample in contribution_table){
+//       //   this.original_contribution_cube[sample] = {};
+//       //   for (otu in contribution_table[sample]){
+//       //     this.original_contribution_cube[sample][otu] = {};
+//       //     for (ko in contribution_table[sample][otu]){
+//       //       this.original_contribution_cube[sample][otu][ko] = contribution_table[sample][otu][ko]/totals[sample];
+//       //     }
+//       //   }
+//       // }
       this.original_contribution_cube = contribution_table
 
       /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
@@ -833,15 +837,13 @@
           this.meansOverSamples[taxon][func] = this.meansOverSamples[taxon][func]/this.samples.length; //mean
         }
       }
-      for(var j = 0; j < all_funcs.length; j++){
-        func = all_funcs[j]
-        this.funcMeans[func] = 0
-        //sum over all OTUs
-        for(k = 0; k < all_taxa.length; k++){
-          this.funcMeans[func] = this.funcMeans[func] + this.meansOverSamples[all_taxa[k]][func]
-        }
+      */
+      
+      for(var j = 0; j < func_averages.length; j++){
+        func = func_averages[j].Function
+        this.funcMeans[func] = func_averages[j].Mean
       }
-*/
+
     }
 
     /////////////////////////////////////////////////////////////////////// reduce_to_genus //////////////////////////////////////////////////////////////
