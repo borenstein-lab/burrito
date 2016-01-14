@@ -6,7 +6,7 @@
 
 <script src="shared/jquery.js" type="text/javascript"></script>
 <script src="shared/shiny.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="shared/shiny.css"/>
+<link rel="stylesheet" type="text/css" href="CSS/shiny-alt.css"/>
 <script src="__assets__/shiny-server.js"></script>
 
 </head>
@@ -743,6 +743,8 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
         .key(function(d) { return d.Order; })
         .key(function(d) { return d.Family; })
         .key(function(d) { return d.Genus; })
+	.key(function(d) { return d.Species; })
+	.key(function(d) { return d.OTU_ID; })
         .entries(taxa_tree_data);    
 
     var curr_taxa = [];
