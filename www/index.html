@@ -6,7 +6,7 @@
 
 <script src="shared/jquery.js" type="text/javascript"></script>
 <script src="shared/shiny.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="CSS/shiny-alt.css"/>
+<link rel="stylesheet" type="text/css" href="shared/shiny.css"/>
 <script src="__assets__/shiny-server.js"></script>
 
 </head>
@@ -390,7 +390,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 
 	func_tree_data = d3.tsv.parse(func_hierarchy_text);
 	func_averages = d3.tsv.parse(func_averages)
-	console.log(func_averages)
+//	console.log(func_averages)
 	samplemap = d3.tsv.parse(samp_map_text);
 	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
 	var fix_otus = function(otu_data, samples){
@@ -743,8 +743,6 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
         .key(function(d) { return d.Order; })
         .key(function(d) { return d.Family; })
         .key(function(d) { return d.Genus; })
-	.key(function(d) { return d.Species; })
-	.key(function(d) { return d.OTU_ID; })
         .entries(taxa_tree_data);    
 
     var curr_taxa = [];
