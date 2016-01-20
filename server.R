@@ -4,6 +4,7 @@ library(shiny)
 library(data.table)
 
 # Defining important files
+default_tax_hierarchy_table = "www/Data/full_gg_taxa_mapping_parsed.txt"
 default_func_hierarchy_table = "www/Data/classes_parsed2.tsv"
 default_contribution_table = "www/Data/mice_metagenome_contributions.txt"
 picrust_normalization_file = "www/Data/precalculated.tab.gz"
@@ -202,6 +203,21 @@ shinyServer(function(input, output, session) {
 	output3 = func_means
 	session$sendCustomMessage(type="func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
 
+  if(!is.null(input$taxonomic_hierarchy)){
+        taxa_hierarchy_file = input$taxonomic_hierarchy
+        taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
+        taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
+        output4 = unique(taxa_hierarchy)
+        session$sendCustomMessage(type='tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n", sep="\n"))
+
+    } else { # Read in default
+        taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+        # Filter OTUs not in contribution table
+        taxa_hierarchy = taxa_hierarchy[OTU_ID %in% unique(output[,OTU])]
+        output4 = unique(taxa_hierarchy)
+        session$sendCustomMessage(type='default_tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n", sep="\n"))
+
+    }
 	# Format the contribution table to match the expected javascript array
 
 	# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings

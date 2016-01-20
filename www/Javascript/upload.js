@@ -65,15 +65,15 @@
 
 			// Add listeners for when the default files have successfully loaded
 			this.default_tax_abund_file.addEventListener("load", this.execute_on_default_tax_abund_load);
-			this.default_tax_hierarchy_file.addEventListener("load", this.execute_on_default_tax_hierarchy_load);
+			//this.default_tax_hierarchy_file.addEventListener("load", this.execute_on_default_tax_hierarchy_load);
 			this.default_samp_map_file.addEventListener("load", this.execute_on_default_samp_map_load);
 
 			this.default_tax_abund_file.open("GET", "Data/otu_table_even_2.txt", true);
 			//this.default_tax_abund_file.open("GET", "Data/reduced_genus_taxa_transpose.txt", true);
 			this.default_tax_abund_file.send();
-			this.default_tax_hierarchy_file.open("GET", "Data/full_gg_taxa_mapping_parsed.txt", true);
+			//this.default_tax_hierarchy_file.open("GET", "Data/full_gg_taxa_mapping_parsed.txt", true);
 			//this.default_tax_hierarchy_file.open("GET", "Data/taxa_mapping2.txt", true);
-			this.default_tax_hierarchy_file.send();
+			//this.default_tax_hierarchy_file.send();
 			this.default_samp_map_file.open("GET", "Data/mice_samplemap.txt", true);
 			this.default_samp_map_file.send();
 		}
@@ -258,11 +258,11 @@
 			uploader.reads_loaded = true;
 		}
 
-		uploader.execute_on_tax_hierarchy_load = function() {
-			uploader.tax_hierarchy_text = this.result;
-			uploader.tax_hierarchy_loaded = true;
-
-		}
+// 		uploader.execute_on_tax_hierarchy_load = function() {
+// 			uploader.tax_hierarchy_text = this.result;
+// 			uploader.tax_hierarchy_loaded = true;
+// 
+// 		}
 
 		uploader.execute_on_func_hierarchy_load = function() {
 			uploader.func_hierarchy_text = this.result;
@@ -276,6 +276,12 @@
 
 		}
 
+		Shiny.addCustomMessageHandler("tax_hierarchy", function(taxa_hierarchy){
+			uploader.tax_hierarchy_text = taxa_hierarchy;
+			uploader.tax_hierarchy_loaded = true;
+		});
+		
+		
 		Shiny.addCustomMessageHandler("contribution_table", function(contribution_table){
 			this.contribution_table = contribution_table;
 			this.contribution_table_loaded = true;
@@ -316,6 +322,13 @@
 			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		});
 
+		Shiny.addCustomMessageHandler("default_tax_hierarchy", function(taxa_hierarchy){
+			uploader.tax_hierarchy_text = taxa_hierarchy;
+			uploader.tax_hierarchy_loaded = true;
+			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
+		});
+		console.log(uploader.tax_hierarchy_text)
+
 		Shiny.addCustomMessageHandler("func_averages", function(func_averages){
 			uploader.func_averages_text = func_averages;
 			uploader.func_averages_loaded = true;
@@ -326,7 +339,7 @@
 		uploader.tax_abund_1_reader.addEventListener('load', uploader.execute_on_tax_abund_1_load);
 		uploader.tax_abund_2_reader.addEventListener('load', uploader.execute_on_tax_abund_2_load);
 		uploader.reads_reader.addEventListener('load', uploader.execute_on_reads_load);
-		uploader.tax_hierarchy_reader.addEventListener('load', uploader.execute_on_tax_hierarchy_load);
+		//uploader.tax_hierarchy_reader.addEventListener('load', uploader.execute_on_tax_hierarchy_load);
 		uploader.samp_map_reader.addEventListener('load', uploader.execute_on_samp_map_load);
 
 		// Set up the event handlers for loading files when they get chosen for upload
@@ -339,9 +352,9 @@
 		document.getElementById("16S_counts").addEventListener('change', function(e) {
 			uploader.reads_reader.readAsText(this.files[0]);
 			});
-		document.getElementById("taxonomic_hierarchy").addEventListener('change', function(e) {
-			uploader.tax_hierarchy_reader.readAsText(this.files[0]);
-			});
+// 		document.getElementById("taxonomic_hierarchy").addEventListener('change', function(e) {
+// 			uploader.tax_hierarchy_reader.readAsText(this.files[0]);
+// 			});
 		document.getElementById("sample_map").addEventListener('change', function(e) {
 			uploader.samp_map_reader.readAsText(this.files[0]);
 			});
