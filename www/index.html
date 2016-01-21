@@ -743,6 +743,8 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
         .key(function(d) { return d.Order; })
         .key(function(d) { return d.Family; })
         .key(function(d) { return d.Genus; })
+	.key(function(d) { return d.Species; })
+	.key(function(d) { return d.OTU_ID; })
         .entries(taxa_tree_data);    
 
     var curr_taxa = [];
