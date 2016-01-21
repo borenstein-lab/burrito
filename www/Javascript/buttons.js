@@ -50,8 +50,6 @@
 			.attr("font-size", "20px")
 			.attr("text-anchor", "middle")
 			.text(text_components[i])
-
-			document.getElementById(id + this.text_tag + "_" + i).addEventListener("click", on_click)
 		}
 	}
 
