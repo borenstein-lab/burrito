@@ -106,6 +106,28 @@ path.link {
 	cursor:default;
 }
 
+g.switchb rect {
+	fill:white;
+}
+
+g.switchb.selectedbutton rect {
+	fill:green;
+	stroke:#005000;
+	stroke-width:4;
+}
+
+g.uploadb rect {
+	fill: orange;
+}
+
+g.uploadb.activebutton:hover rect {
+	fill:#ffc000;
+}
+
+/*g.uploadb:not(activebutton) {
+	pointer-events:none;
+}*/
+
 .noselect {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -113,10 +135,15 @@ path.link {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+	cursor:default;
 }
 
-.activebutton:hover {
+.activebutton:hover text {
 	opacity:0.5;
+}
+
+.activebutton.switchb:hover rect {
+	fill:#d4ffd4;
 }
 
 .activebutton:active {
@@ -124,8 +151,19 @@ path.link {
 }
 
 #sidebar_hide:hover {
-	opacity:0.8;
+	opacity:1;
 }
+
+#sidebar_hide {
+	stroke:none;
+}
+.nullfilesymb {
+	fill:none;
+	stroke:black;
+	stroke-width:3;
+	stroke-linejoin:round;
+	
+} 
 
 white-space: pre-line;
 </style>
@@ -152,12 +190,12 @@ white-space: pre-line;
     </pattern>
 	
 	<pattern id="rarrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
-	    <rect x="0" y="0" width="30" height="30" fill="#D0D0D0" />
-		<path d="M 0 2 L 27 10 L 0 18" fill="none" stroke="green" stroke-width="4" />
+	    <rect x="0" y="0" width="30" height="30" fill="white" />
+		<path d="M 0 2 L 27 10 L 0 18 z" fill="#D7764A" stroke="#D7764A" stroke-width="4" />
 	</pattern>
 	<pattern id="larrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
-	    <rect x="0" y="0" width="30" height="30" fill="#D0D0D0" />
-		<path d="M 30 2 L 3 10 L 30 18" fill="none" stroke="green" stroke-width="4" />
+	    <rect x="0" y="0" width="30" height="30" fill="white" />
+		<path d="M 30 2 L 3 10 L 30 18 z" fill="#D7764A" stroke="#D7764A" stroke-width="4" />
 	</pattern>
   </defs>
 </svg>
@@ -174,6 +212,7 @@ white-space: pre-line;
 <script src="Javascript/upload.js"></script>
 <script src="Javascript/buttons.js"></script>
 <script src="Javascript/input_parsing.js"></script>
+<script src="Javascript/mainui.js"></script>
 
 <script>
 
@@ -183,7 +222,8 @@ var aspecrat = window.innerWidth / window.innerHeight;
 
 var width = 1000 * aspecrat;
 var height = 1000;
-var margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
+var hidewidth = 30;
+var margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
 var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
 var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
 navDims.treewidth = navDims.width * 2/9;
@@ -213,90 +253,41 @@ return [d.y, d.x];
 
 var MainSVG = d3.select("#mainplot").append("svg")
 .attr("id","mainsvg")
-.attr("viewBox","0 0 " + width + " " + height + "")
+.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
 .attr("preserveAspectRatio","none");
 
 var sidebarz = d3.select("#mainsvg").append("svg")
 .attr("id","sidebar")
-.attr("x",0)
+.attr("x",hidewidth)
 .attr("y",0)
-.attr("width","480")
+.attr("width",width)
 .attr("height",height)
 
 var sidebar_background = d3.select("#sidebar").append("rect")
 .attr("id","sidebar_background")
 .attr("x",0)
 .attr("y",0)
-.attr("width","480")
+.attr("width",width)
 .attr("height",height)
-.attr("fill","#8B8386");
+.attr("fill","#e0e0eb");
 
-button_maker.add_rect_button(d3.select("#sidebar"), "sidebar_hide", 450, 0, 30, height, "url(#larrowspat)", "", function() {
+button_maker.add_rect_button(d3.select("#mainsvg"), "sidebar_hide", 0, 0, hidewidth, height,"","url(#larrowspat)", "", function() {
 //console.log("clicked")
 	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	console.log(curpos)
 	if (curpos > -10) {
-		sidebarz.transition().attr("x","-450");
-		sidebarz.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
+		sidebarz.transition().attr("x",-1 * width).duration(500);
+		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
 	} else {
-		sidebarz.transition().attr("x","0");
-		sidebarz.select("#sidebar_hide").select("rect").transition().attr("fill","url(#larrowspat)");
+		sidebarz.transition().attr("x",hidewidth).duration(500);
+		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#larrowspat)");
 	}
 })
 
-d3.select("#sidebar").append("text")
-.attr("x", 10)
-.attr("y", 40)
-.attr("font-size", "20px")
-.text("Genome Annotations")
 
-button_maker.add_radio_button(d3.select("#sidebar"), "button_holder", "svg_genome_annotation_select_button", 25, 90, 15, ["svg_16S_select_button", "svg_contribution_select_button"], ["svg_tax_abund_button", "svg_genome_annotation_button"], ["svg_16S_button", "svg_tax_abund_button_2", "svg_func_contrib_button"], "genome_annotation_select_button")
 
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_abund_button", "taxonomic_abundances_1", 70, 55, 140, 70, button_maker.button_off_color, "Taxonomic Abundances")
+mainui.createUI(d3.select("#sidebar"));
 
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_genome_annotation_button", "genome_annotations", 220, 55, 140, 70, button_maker.button_off_color, "Genome Annotations")
-
-d3.select("#sidebar").append("text")
-.attr("x", 10)
-.attr("y", 150)
-.attr("font-size", "20px")
-.text("16S Reads")
-
-button_maker.add_radio_button(d3.select("#sidebar"), "button_holder", "svg_16S_select_button", 25, 200, 15, ["svg_genome_annotation_select_button", "svg_contribution_select_button"], ["svg_16S_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_tax_abund_button_2", "svg_func_contrib_button"], "16S_select_button")
-
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_16S_button", "16S_counts", 70, 165, 140, 70, button_maker.button_off_color, "16S Read Counts")
-
-d3.select("#sidebar").append("text")
-.attr("x", 10)
-.attr("y", 260)
-.attr("font-size", "20px")
-.text("Function Contributions")
-
-button_maker.add_radio_button(d3.select("#sidebar"), "button_holder", "svg_contribution_select_button", 25, 310, 15, ["svg_genome_annotation_select_button", "svg_16S_select_button"], ["svg_tax_abund_button_2", "svg_func_contrib_button"], ["svg_tax_abund_button", "svg_genome_annotation_button", "svg_16S_button"], "contribution_select_button")
-
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_abund_button_2", "taxonomic_abundances_2", 70, 275, 140, 70, button_maker.button_off_color, "Taxonomic Abundances")
-
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_func_contrib_button", "function_contributions", 220, 275, 140, 70, button_maker.button_off_color, "Function Contributions")
-
-d3.select("#sidebar").append("text")
-.attr("x", 10)
-.attr("y", 370)
-.attr("font-size", "20px")
-.text("Optional Files")
-
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", 20, 390, 140, 70, button_maker.button_on_color, "Taxonomic Hierarchy")
-button_maker.activate(d3.select("#svg_tax_hierarchy_button"));
-
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_func_hierarchy_button", "function_hierarchy", 170, 390, 140, 70, button_maker.button_on_color, "Function Hierarchy")
-button_maker.activate(d3.select("#svg_func_hierarchy_button"));
-
-button_maker.add_input_button(d3.select("#sidebar"), "button_holder", "svg_samp_map_button", "sample_map", 320, 390, 130, 70, button_maker.button_on_color, "Sample Mapping")
-button_maker.activate(d3.select("#svg_samp_map_button"));
-
-button_maker.add_rect_button(d3.select("#sidebar"), "svg_update_button", 300, 500, 140, 70, "#0000FF", "Update Graphics", function(){
-	document.getElementById("update_button").click();
-	})
-d3.select("#svg_update_button").classed("activebutton",true);
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
 

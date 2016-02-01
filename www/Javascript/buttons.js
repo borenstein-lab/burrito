@@ -24,19 +24,21 @@
 		button.selectAll("text").attr("opacity",0.5);
 	}
 	
-	button_maker.add_rect_button = function(element, id, x, y, width, height, fill, text, on_click){
+	button_maker.add_rect_button = function(element, id, x, y, width, height, newclass, fill, text, on_click){
 
 		var thisg = element.append("g")
-			.attr("class","sidebutton noselect")
-			.attr("id", id)
-	
-		thisg.append("rect")
-		//.attr("class","sidebutton")
-		.attr("x", x)
-		.attr("y", y)
-		.attr("width", width)
-		.attr("height", height)
-		.attr("fill", fill)
+			.attr("id", id);
+			
+		if (newclass) { thisg.attr("class",newclass); }
+		thisg.classed("noselect",true);
+		
+		var thisrect = thisg.append("rect")
+			.attr("x", x)
+			.attr("y", y)
+			.attr("width", width)
+			.attr("height", height);
+		
+		if (fill) { thisrect.attr("fill",fill); }
 
 		document.getElementById(id).addEventListener("click", on_click)
 
@@ -50,8 +52,7 @@
 			.attr("font-size", "20px")
 			.attr("text-anchor", "middle")
 			.text(text_components[i])
-
-			document.getElementById(id + this.text_tag + "_" + i).addEventListener("click", on_click)
+			.classed("noselect",true);
 		}
 	}
 
@@ -83,14 +84,13 @@
 
 	button_maker.add_input_button = function(element, container, svg_button_id, html_button_id, x, y, width, height, fill, text){
 
-		this.add_rect_button(element, svg_button_id, x, y, width, height, fill, text, function(){
+		this.add_rect_button(element, svg_button_id, x, y, width, height, "uploadb",fill, text, function(){
 			if (document.getElementById(svg_button_id).getAttribute("on") == "true"){
 				document.getElementById(html_button_id).click();
 			}
 		})
 
-		d3.select("#"+svg_button_id).attr("on", false)
-			.selectAll("text").attr("opacity",.5);
+		d3.select("#"+svg_button_id).attr("on", false);
 		
 
 		var html_button = document.createElement("input")
@@ -102,9 +102,8 @@
 		
 	}
 
+	/*
 	button_maker.add_radio_button = function(element, container, id, x, y, r, other_radio_buttons, associated_buttons, unassociated_buttons, html_button_id){
-
-
 	//button_maker.add_radio_button = function(element, id, x, y, r, other_radio_buttons, associated_buttons, unassociated_buttons){
 		
 		this.add_circle_button(element, id + this.radio_base, x, y, r, this.radio_base_color, "", function(){
@@ -154,7 +153,7 @@
 		html_button.class = "btn action-button btn-large btn-primary";
 
 		document.getElementById(container).appendChild(html_button)
-	}
+	} */
 	
 
 

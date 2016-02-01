@@ -95,7 +95,7 @@
 			var func_averages = false;
 
 			// Check to see which upload type has been chosen
-			if (document.getElementById("svg_genome_annotation_select_button_base").getAttribute("selected") == "true"){
+			if (mainui.uploadMode == "Genome"){
 
 				// Check to see if we have a file of taxonomic abundances
 				if (document.getElementById("taxonomic_abundances_1").value != ""){
@@ -107,14 +107,14 @@
 					genome_annotation = true;
 				}
 
-			} else if (document.getElementById("svg_16S_select_button_base").getAttribute("selected") == "true"){
+			} else if (mainui.uploadMode == "Function"){
 
 				// Check to see if we have a 16S read count file
 				if (document.getElementById("16S_counts").value != ""){
 					reads = true;
 				}
 
-			} else if (document.getElementById("svg_contribution_select_button_base").getAttribute("selected") == "true"){
+			} else if (mainui.uploadMode == "16s"){
 
 				// Check to see if we have a file of taxonomic abundances
 				if (document.getElementById("taxonomic_abundances_2").value != "" && document.getElementById("svg_contribution_select_button").getAttribute("selected") == "true"){
@@ -152,17 +152,17 @@
 				// If all of the necessary files have been selected for the chosen option, then we can try to update
 				var to_load = [];
 				var load_ready = false;
-				if (document.getElementById("svg_genome_annotation_select_button_base").getAttribute("selected") == "true" && tax_abund_1 && genome_annotation){
+				if ( (mainui.uploadMode == "Genome") && tax_abund_1 && genome_annotation){
 
 					to_load.push(this.tax_abund_1_loaded);
 					load_ready = true;
 
-				} else if (document.getElementById("svg_16S_select_button_base").getAttribute("selected") == "true" && reads){
+				} else if ( (mainui.uploadMode == "16s") && reads){
 
 					to_load.push(this.reads_loaded);
 					load_ready = true;
 
-				} else if (document.getElementById("svg_contribution_select_button_base").getAttribute("selected") == "true" && tax_abund_2 && func_contrib){
+				} else if ( (mainui.uploadMode == "Function") && tax_abund_2 && func_contrib){
 
 					to_load.push(this.tax_abund_2_loaded);
 					load_ready = true;
@@ -212,19 +212,19 @@
 				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
 				
 				// Reset the upload buttons and flags so if new files are uploaded, we wait for them
-				if (document.getElementById("svg_genome_annotation_select_button_base").getAttribute("selected") == "true"){
+				if (mainui.uploadMode == "Genome"){
 
 					this.tax_abund_1_loaded = false;
 					this.genome_annotation_loaded = false;
 					document.getElementById("taxonomic_abundances_1").value = "";
 					document.getElementById("genome_annotations").value = "";
 
-				} else if (document.getElementById("svg_16S_select_button_base").getAttribute("selected") == "true"){
+				} else if (mainui.uploadMode == "16s"){
 
 					this.reads_loaded = false;
 					document.getElementById("16S_counts").value = "";
 
-				} else if (document.getElementById("svg_contribution_select_button_base").getAttribute("selected") == "true"){
+				} else if (mainui.uploadMode == "Function"){
 
 					this.tax_abund_2_loaded = false;
 					this.func_contrib_loaded = false;
