@@ -28,7 +28,7 @@
 		uploader.func_averages_loaded = false;
 		uploader.samp_map_loaded = false;
 
-		// These variables thold the results of file loading
+		// These variables hold the results of file loading
 		uploader.tax_abund_1_text = "";
 		uploader.tax_abund_2_text = "";
 		uploader.reads_text = "";
@@ -107,14 +107,14 @@
 					genome_annotation = true;
 				}
 
-			} else if (mainui.uploadMode == "Function"){
+			} else if (mainui.uploadMode == "16s"){
 
 				// Check to see if we have a 16S read count file
-				if (document.getElementById("16S_counts").value != ""){
+				if (document.getElementById("read_counts").value != ""){
 					reads = true;
 				}
 
-			} else if (mainui.uploadMode == "16s"){
+			} else if (mainui.uploadMode == "Function"){
 
 				// Check to see if we have a file of taxonomic abundances
 				if (document.getElementById("taxonomic_abundances_2").value != "" && document.getElementById("svg_contribution_select_button").getAttribute("selected") == "true"){
@@ -222,7 +222,7 @@
 				} else if (mainui.uploadMode == "16s"){
 
 					this.reads_loaded = false;
-					document.getElementById("16S_counts").value = "";
+					document.getElementById("read_counts").value = "";
 
 				} else if (mainui.uploadMode == "Function"){
 
@@ -246,34 +246,49 @@
 		uploader.execute_on_tax_abund_1_load = function() {
 			uploader.tax_abund_text = this.result;
 			uploader.tax_abund_1_loaded = true;
+			mainui.fileloaded("taxonomic_abundances_1");
 		}
 
 		uploader.execute_on_tax_abund_2_load = function() {
 			uploader.tax_abund_text = this.result;
 			uploader.tax_abund_2_loaded = true;
+			mainui.fileloaded("taxonomic_abundances_2");
 		}
 
 		uploader.execute_on_reads_load = function() {
 			uploader.reads_text = this.result;
 			uploader.reads_loaded = true;
+			mainui.fileloaded("read_counts");
 		}
 
-// 		uploader.execute_on_tax_hierarchy_load = function() {
-// 			uploader.tax_hierarchy_text = this.result;
-// 			uploader.tax_hierarchy_loaded = true;
-// 
-// 		}
+ 		uploader.execute_on_tax_hierarchy_load = function() {
+ 			uploader.tax_hierarchy_text = this.result;
+ 			uploader.tax_hierarchy_loaded = true;
+			mainui.fileloaded("taxonomic_hierarchy");
+ 		}
 
 		uploader.execute_on_func_hierarchy_load = function() {
 			uploader.func_hierarchy_text = this.result;
 			uploader.func_hierarchy_loaded = true;
-
+			mainui.fileloaded("function_hierarchy");
 		}
 
 		uploader.execute_on_samp_map_load = function() {
 			uploader.samp_map_text = this.result;
 			uploader.samp_map_loaded = true;
+			mainui.fileloaded("sample_map");
+		}
 
+		uploader.execute_on_func_contrib_load = function() {
+		    uploader.func_contrib_text = this.result;
+		    uploader.func_contrib_loaded = true;
+		    mainui.fileloaded("function_contributions");
+		}
+
+		uploader.execute_on_genome_annotation_load = function() {
+		    uploader.genome_annotation_text = this.result;
+		    uploader.genome_annotation_loaded = true;
+		    mainui.fileloaded("genome_annotations");
 		}
 
 		Shiny.addCustomMessageHandler("tax_hierarchy", function(taxa_hierarchy){
@@ -339,25 +354,46 @@
 		uploader.tax_abund_1_reader.addEventListener('load', uploader.execute_on_tax_abund_1_load);
 		uploader.tax_abund_2_reader.addEventListener('load', uploader.execute_on_tax_abund_2_load);
 		uploader.reads_reader.addEventListener('load', uploader.execute_on_reads_load);
-		//uploader.tax_hierarchy_reader.addEventListener('load', uploader.execute_on_tax_hierarchy_load);
+		uploader.tax_hierarchy_reader.addEventListener('load', uploader.execute_on_tax_hierarchy_load);
 		uploader.samp_map_reader.addEventListener('load', uploader.execute_on_samp_map_load);
+		uploader.func_contrib_reader.addEventListener('load', uploader.execute_on_func_contrib_load);
+		uploader.genome_annotation_reader.addEventListener('load', uploader.execute_on_genome_annotation_load);
+		uploader.func_hierarchy_reader.addEventListener('load', uploader.execute_on_func_hierarchy_load);
 
 		// Set up the event handlers for loading files when they get chosen for upload
 		document.getElementById("taxonomic_abundances_1").addEventListener('change', function(e) {
 			uploader.tax_abund_1_reader.readAsText(this.files[0]);
+			mainui.fileloading("taxonomic_abundances_1",this.files[0].name);
 			});
 		document.getElementById("taxonomic_abundances_2").addEventListener('change', function(e) {
 			uploader.tax_abund_2_reader.readAsText(this.files[0]);
+			mainui.fileloading("taxonomic_abundances_2",this.files[0].name);
 			});
-		document.getElementById("16S_counts").addEventListener('change', function(e) {
+		document.getElementById("read_counts").addEventListener('change', function(e) {
 			uploader.reads_reader.readAsText(this.files[0]);
+			mainui.fileloading("read_counts",this.files[0].name);
 			});
-// 		document.getElementById("taxonomic_hierarchy").addEventListener('change', function(e) {
-// 			uploader.tax_hierarchy_reader.readAsText(this.files[0]);
-// 			});
+ 		document.getElementById("taxonomic_hierarchy").addEventListener('change', function(e) {
+ 			uploader.tax_hierarchy_reader.readAsText(this.files[0]);
+			mainui.fileloading("taxonomic_hierarchy",this.files[0].name);
+ 			});
 		document.getElementById("sample_map").addEventListener('change', function(e) {
 			uploader.samp_map_reader.readAsText(this.files[0]);
+			mainui.fileloading("sample_map",this.files[0].name);
 			});
+		document.getElementById("function_contributions").addEventListener('change', function(e) {
+			uploader.func_contrib_reader.readAsText(this.files[0]);
+			mainui.fileloading("function_contributions",this.files[0].name);
+		    });
+		document.getElementById("genome_annotations").addEventListener('change', function(e) {
+			uploader.genome_annotation_reader.readAsText(this.files[0]);
+			mainui.fileloading("genome_annotations",this.files[0].name);
+		    });
+		document.getElementById("function_hierarchy").addEventListener('change', function(e) {
+			uploader.func_hierarchy_reader.readAsText(this.files[0]);
+			mainui.fileloading("function_hierarchy",this.files[0].name);
+		    });
+
 
 		return(uploader);
 	}

@@ -273,8 +273,7 @@ var sidebar_background = d3.select("#sidebar").append("rect")
 
 button_maker.add_rect_button(d3.select("#mainsvg"), "sidebar_hide", 0, 0, hidewidth, height,"","url(#larrowspat)", "", function() {
 //console.log("clicked")
-	var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
-	console.log(curpos)
+        var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	if (curpos > -10) {
 		sidebarz.transition().attr("x",-1 * width).duration(500);
 		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
@@ -1534,7 +1533,7 @@ document.getElementById("update_button").onclick = (function(){
 	uploader.update_plots();
 })
 
-document.getElementById("svg_contribution_select_button_base").setAttribute("selected", true);
+mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 
 uploader.load_default_data();
 

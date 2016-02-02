@@ -7,7 +7,8 @@
 		var FSG = element.append("g")
 			.attr("class","nullfilesymb")
 			.attr("transform","translate(" + x + "," + y + ") scale(.6,.6)");
-		FSG.append("path").attr("d","m 0,0 46,0 0,-61 -16,-14 -30,0 z").attr("fill","white");
+		FSG.append("path").attr("d","m 0,0 46,0 0,-61 -16,-14 -30,0 z")
+		    .attr("fill","white").classed("outline",true);
 		FSG.append("path").attr("d","m 29.546589,-75.5 0,14.774839 16.953411,0");
 		FSG.append("path").attr("d","m 6,-55 18.5,0");
 		FSG.append("path").attr("d","m 6,-41 33,0");
@@ -28,7 +29,7 @@
 			.attr("x",80)
 			.attr("y",100)
 			.attr("font-size","15px")
-			.text("Some information about what it is that this site does and maybe a link to the paper and to the manual")
+		.text("Some information about what it is that this site does and maybe a link to the paper and to the manual");
 			
 		element.append("text")
 			.attr("x",100)
@@ -62,7 +63,7 @@
 			
 			
 		var sixinp = element.append("g")
-			.attr("id","sixinp")
+			.attr("id","read_counts_g")
 			.attr("transform","translate(100,330)");
 		sixinp.append("text")
 			.attr("font-size","18px")
@@ -71,11 +72,12 @@
 		sixinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
+		.attr("class","filenamelabel")
 			.text("No file uploaded");
-		button_maker.add_input_button(sixinp, "button_holder", "svg_16S_button", "16s_counts", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(sixinp, "button_holder", "svg_16S_button", "read_counts", 10,90,80,50,"","Upload");
 		
 		var taxa2binp = element.append("g")
-			.attr("id","taxa2binp")
+			.attr("id","taxonomic_abundances_2_g")
 			.attr("transform","translate(100,330)");
 		taxa2binp.append("text")
 			.attr("font-size","18px")
@@ -84,11 +86,12 @@
 		taxa2binp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
+		.attr("class","filenamelabel")
 			.text("No file uploaded");
 		button_maker.add_input_button(taxa2binp, "button_holder", "svg_tax_abund_button_2", "taxonomic_abundances_2", 10,90,80,50,"","Upload");
 
 		var funccinp = element.append("g")
-			.attr("id","funccinp")
+			.attr("id","function_contributions_g")
 			.attr("transform","translate(400,330)");
 		funccinp.append("text")
 			.attr("font-size","18px")
@@ -97,11 +100,12 @@
 		funccinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
+		.attr("class","filenamelabel")
 			.text("No file uploaded");
 		button_maker.add_input_button(funccinp, "button_holder", "svg_func_contrib_button", "function_contributions", 10,90,80,50,"","Upload");
 
 		var taxabinp = element.append("g")
-			.attr("id","taxabinp")
+			.attr("id","taxonomic_abundances_1_g")
 			.attr("transform","translate(100,330)");
 		taxabinp.append("text")
 			.attr("font-size","18px")
@@ -110,11 +114,12 @@
 		taxabinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
+		.attr("class","filenamelabel")
 			.text("No file uploaded");
 		button_maker.add_input_button(taxabinp, "button_holder", "svg_tax_abund_button", "taxonomic_abundances_1", 10,90,80,50,"","Upload");
 
 		var geneainp = element.append("g")
-			.attr("id","geneainp")
+			.attr("id","genome_annotations_g")
 			.attr("transform","translate(400,330)");
 		geneainp.append("text")
 			.attr("font-size","18px")
@@ -123,6 +128,7 @@
 		geneainp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
+		.attr("class","filenamelabel")
 			.text("No file uploaded");
 		button_maker.add_input_button(geneainp, "button_holder", "svg_genome_annotation_button", "genome_annotations", 10,90,80,50,"","Upload");
 
@@ -145,10 +151,10 @@
 		.attr("x", 110)
 		.attr("y", 570)
 		.attr("font-size", "20px")
-		.text("Optional Files")
+		.text("Optional Files");
 
 		var taxhinp = element.append("g")
-			.attr("id","taxhinp")
+			.attr("id","taxonomic_hierarchy_g")
 			.attr("transform","translate(100,630)");
 		taxhinp.append("text")
 			.attr("font-size","18px")
@@ -157,12 +163,13 @@
 		taxhinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-			.text("Default: BRITE");
+		.attr("class","filenamelabel")
+			.text("Default: KEGG BRITE");
 		button_maker.add_input_button(taxhinp, "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", 10,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_tax_hierarchy_button"));
 
 		var funhinp = element.append("g")
-			.attr("id","funhinp")
+			.attr("id","function_hierarchy_g")
 			.attr("transform","translate(300,630)");
 		funhinp.append("text")
 			.attr("font-size","18px")
@@ -171,12 +178,13 @@
 		funhinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
+		.attr("class","filenamelabel")
 			.text("Default: Greengenes");
 		button_maker.add_input_button(funhinp, "button_holder", "svg_func_hierarchy_button", "function_hierarchy", 10,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_func_hierarchy_button"));
 
 		var sampminp = element.append("g")
-			.attr("id","sampminp")
+			.attr("id","sample_map_g")
 			.attr("transform","translate(500,630)");
 		sampminp.append("text")
 			.attr("font-size","18px")
@@ -185,6 +193,7 @@
 		sampminp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
+		.attr("class","filenamelabel")
 			.text("No file uploaded");
 		button_maker.add_input_button(sampminp, "button_holder", "svg_samp_map_button", "sample_map", 10,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_samp_map_button"));
@@ -224,7 +233,7 @@
 		mainui.Deac_FuncCont();
 		mainui.Deac_GenAno();
 		
-		d3.select("#sixinp").attr("visibility","visible");
+		d3.select("#read_counts_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_16S_button"));
 	}
 	
@@ -239,8 +248,8 @@
 		mainui.Deac_16s();
 		mainui.Deac_GenAno();
 		
-		d3.select("#taxa2binp").attr("visibility","visible");
-		d3.select("#funccinp").attr("visibility","visible");
+		d3.select("#taxonomic_abundances_2_g").attr("visibility","visible");
+		d3.select("#function_contributions_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button_2"));
 		button_maker.activate(d3.select("#svg_func_contrib_button"));
 	}
@@ -256,29 +265,39 @@
 		mainui.Deac_16s();
 		mainui.Deac_FuncCont();
 		
-		d3.select("#taxabinp").attr("visibility","visible");
-		d3.select("#geneainp").attr("visibility","visible");
+		d3.select("#taxonomic_abundances_1_g").attr("visibility","visible");
+		d3.select("#genome_annotations_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button"));
 		button_maker.activate(d3.select("#svg_genome_annotation_button"));
 	}
 	
 	mainui.Deac_16s = function() {
-		d3.select("#sixinp").attr("visibility","hidden");
+		d3.select("#read_counts_g").attr("visibility","hidden");
 		button_maker.deactivate(d3.select("#svg_16S_button"));
 	}
 	
 	mainui.Deac_FuncCont = function() {
-		d3.select("#taxa2binp").attr("visibility","hidden");
-		d3.select("#funccinp").attr("visibility","hidden");
+		d3.select("#taxonomic_abundances_2_g").attr("visibility","hidden");
+		d3.select("#function_contributions_g").attr("visibility","hidden");
 		button_maker.deactivate(d3.select("#svg_tax_abund_button_2"));
 		button_maker.deactivate(d3.select("#svg_func_contrib_button"));
 	}
 	
 	mainui.Deac_GenAno = function() {
-		d3.select("#taxabinp").attr("visibility","hidden");
-		d3.select("#geneainp").attr("visibility","hidden");
+		d3.select("#taxonomic_abundances_1_g").attr("visibility","hidden");
+		d3.select("#genome_annotations_g").attr("visibility","hidden");
 		button_maker.deactivate(d3.select("#svg_tax_abund_button"));
 		button_maker.deactivate(d3.select("#svg_genome_annotation_button"));
+	}
+
+	mainui.fileloading = function(buttonname, filename) {
+	    var thisg = d3.select("#" + buttonname + "_g");
+	    thisg.select(".outline").attr("fill","yellow");
+	    thisg.select(".filenamelabel").text(filename);
+	}
+
+	mainui.fileloaded = function(buttonname) {
+	    d3.select("#" + buttonname + "_g").select(".outline").attr("fill","green");
 	}
 
 	this.mainui = mainui;
