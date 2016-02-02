@@ -295,12 +295,6 @@
 			uploader.tax_hierarchy_text = taxa_hierarchy;
 			uploader.tax_hierarchy_loaded = true;
 		});
-		
-		
-		Shiny.addCustomMessageHandler("contribution_table", function(contribution_table){
-			this.contribution_table = contribution_table;
-			this.contribution_table_loaded = true;
-		});
 
 		Shiny.addCustomMessageHandler("function_hierarchy", function(func_hierarchy){
 			this.func_hierarchy_text = func_hierarchy;
@@ -324,12 +318,34 @@
 			uploader.samp_map_loaded = true;
 			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		}
-
+/*
 		Shiny.addCustomMessageHandler("default_contribution_table", function(contribution_table){
 			uploader.contribution_table = contribution_table;
 			uploader.contribution_table_loaded = true;
 			uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);
 		});
+*/
+		Shiny.addCustomMessageHandler("default_contribution_table_ready", function(size){
+			uploader.contribution_table = {};
+			uploader.contribution_table_length = size;
+			uploader.current_sample_index = 0;
+			Shiny.onInputChange("sample_request", 0);
+		})
+
+		Shiny.addCustomMessageHandler("default_sample_return", function(sample){	
+			sample_name = Object.keys(sample)[0]
+                        uploader.contribution_table[sample_name] = sample[sample_name];
+			++uploader.current_sample_index;
+			setTimeout(function(){ // Fixes the disconnect issue, no idea why (Alex)
+				if (uploader.current_sample_index < uploader.contribution_table_length){
+		                        Shiny.onInputChange("sample_request", uploader.current_sample_index);
+				} else {
+					Shiny.onInputChange("sample_request", -1);
+					uploader.contribution_table_loaded = true;
+	                        	uploader.check_loaded([uploader.tax_abund_1_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded], draw_everything);	
+				}
+			}, 2);
+                })
 
 		Shiny.addCustomMessageHandler("default_function_hierarchy", function(func_hierarchy){
 			uploader.func_hierarchy_text = func_hierarchy;
