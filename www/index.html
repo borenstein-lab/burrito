@@ -168,7 +168,8 @@ g.uploadb.activebutton:hover rect {
 white-space: pre-line;
 </style>
 <body>
-<div style="float:left" id="button_holder">
+<div style="float:left" id="button_holder"></div>
+<div>
 <h2>Exploring microbial community taxa and functions</h2>
 <h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
 <p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
@@ -178,6 +179,7 @@ white-space: pre-line;
 <span class="error" id="upload_message"></span>
 </div>
 <button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
+
 <div id="mainplot">
 
 
@@ -382,6 +384,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	func_averages = d3.tsv.parse(func_averages)
 //	console.log(func_averages)
 	samplemap = d3.tsv.parse(samp_map_text);
+
 	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
 	var fix_otus = function(otu_data, samples){
 		new_otu_data = []
@@ -389,7 +392,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 			new_otu_data[j] = {}
 			new_otu_data[j]["Sample"] = samples[j]
 			for(k=0; k < otu_data.length; k++){
-				new_key = otu_data[k]["OTU_ID"]
+				new_key = otu_data[k]["OTU_ID"] // Can we key anonymously? Maybe set name of column ourselves so it always matches
 				new_otu_data[j][new_key] = +otu_data[k][samples[j]]
 			}
 
@@ -397,13 +400,16 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		return new_otu_data;
 	}
 
+	//console.log(otu_abundance_data_transpose)
+
 otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
 
 //filter out things in mapping files but not in input data
-
+//console.log(otu_abundance_data)
 taxa_tree_data = taxa_tree_data.filter(function(d){
 	return d3.keys(otu_abundance_data[0]).indexOf(d.OTU_ID) != -1
 	})
+	//console.log(taxa_tree_data);
 /*
     all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
     all_kos = all_kos.filter(function(d){
@@ -1529,14 +1535,11 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 
 var uploader = uploader_wrapper.make_uploader(draw_everything);
 
-document.getElementById("update_button").onclick = (function(){
-	uploader.update_plots();
-})
-
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 
 uploader.load_default_data();
 
+//Shiny.addCustomMessageHandler("picrust_status", function(message){console.log(message)})
 	
 </script>
 </body>

@@ -235,6 +235,8 @@
 		
 		d3.select("#read_counts_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_16S_button"));
+
+		Shiny.onInputChange("input_type", "16S");
 	}
 	
 	mainui.Select_Func = function() {
@@ -252,6 +254,8 @@
 		d3.select("#function_contributions_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button_2"));
 		button_maker.activate(d3.select("#svg_func_contrib_button"));
+
+		Shiny.onInputChange("input_type", "contribution");
 	}
 	
 	mainui.Select_Genomes = function() {
@@ -269,6 +273,8 @@
 		d3.select("#genome_annotations_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button"));
 		button_maker.activate(d3.select("#svg_genome_annotation_button"));
+
+		Shiny.onInputChange("input_type", "genome_annotation");
 	}
 	
 	mainui.Deac_16s = function() {
