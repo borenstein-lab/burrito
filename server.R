@@ -148,6 +148,10 @@ shinyServer(function(input, output, session) {
 
 			# Sum normalized contributions for rows that match in Sample, KO, and SubPathway
 			output = expanded_table[,sum(normalized_contributions), by=eval(colnames(expanded_table)[c(2,3,5)])]
+
+			# Convert subpathway counts to relative abundances
+			output[,relative_contributions := V1/sum(V1), by=Sample]
+
 		}
 
 		# Load the function hierarchy table so we can filter it
@@ -242,7 +246,7 @@ shinyServer(function(input, output, session) {
 		# Format the contribution table to match the expected javascript array
 
 		# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings
-		output = dcast(output, Sample + OTU ~ SubPathway, value.var=colnames(output)[4])
+		output = dcast(output, Sample + OTU ~ SubPathway, value.var="relative_contributions")
 
 		# Create a single column for SubPathways that contains a list of the SubPathways for that row's Sample and OTU, remove empty elements from those lists
 		output = data.table(Sample = output$Sample, OTU = output$OTU, SubPathways = apply(output[,3:dim(output)[2], with=FALSE], 1, function(row){return(as.list(row[!is.na(row)]))}))

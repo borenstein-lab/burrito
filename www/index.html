@@ -435,6 +435,7 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data, func_averages);
+	//console.log(data_cube)
 
 	//if( not expand to OTU level
 	genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)
@@ -1539,7 +1540,7 @@ mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate 
 
 uploader.load_default_data();
 
-//Shiny.addCustomMessageHandler("picrust_status", function(message){console.log(message)})
+//Shiny.addCustomMessageHandler("shiny_test", function(message){console.log(message)})
 	
 </script>
 </body>
