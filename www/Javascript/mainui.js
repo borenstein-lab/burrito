@@ -1,7 +1,11 @@
 (function(){
 	var mainui={};
+	
+	mainui.selement;
 
 	mainui.uploadMode = "";
+	
+	mainui.sampleSelected = "";
 	
 	function insertFileSymb(element, x, y) {
 		var FSG = element.append("g")
@@ -18,6 +22,8 @@
 	
 	
 	mainui.createUI = function(element) {
+		
+		mainui.selement = element;
 		
 		element.append("text")
 			.attr("x",50)
@@ -52,6 +58,7 @@
 		button_maker.add_rect_button(element, "sixteen_selector", 100,200,140,70,"switchb activebutton","","16s Reads", function() {
 				mainui.Select_16s();
 			});
+		
 			
 		button_maker.add_rect_button(element, "func_contr_selector", 250,200,140,70,"switchb activebutton","","Functional Contributions", function() {
 				mainui.Select_Func();
@@ -64,73 +71,83 @@
 			
 		var sixinp = element.append("g")
 			.attr("id","read_counts_g")
-			.attr("transform","translate(100,330)");
+			.attr("transform","translate(160,330)");
 		sixinp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("16s counts");
-		insertFileSymb(sixinp,40,60);
+		insertFileSymb(sixinp,-14,60);
 		sixinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("No file uploaded");
-		button_maker.add_input_button(sixinp, "button_holder", "svg_16S_button", "read_counts", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(sixinp, "button_holder", "svg_16S_button", "read_counts", -40,90,80,50,"","Upload");
 		
 		var taxa2binp = element.append("g")
 			.attr("id","taxonomic_abundances_2_g")
-			.attr("transform","translate(100,330)");
+			.attr("transform","translate(200,330)");
 		taxa2binp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("Taxanomic Abundances");
-		insertFileSymb(taxa2binp,40,60);
+		insertFileSymb(taxa2binp,-14,60);
 		taxa2binp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("No file uploaded");
-		button_maker.add_input_button(taxa2binp, "button_holder", "svg_tax_abund_button_2", "taxonomic_abundances_2", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(taxa2binp, "button_holder", "svg_tax_abund_button_2", "taxonomic_abundances_2", -40,90,80,50,"","Upload");
 
 		var funccinp = element.append("g")
 			.attr("id","function_contributions_g")
-			.attr("transform","translate(400,330)");
+			.attr("transform","translate(430,330)");
 		funccinp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("Function Contributions");
-		insertFileSymb(funccinp,40,60);
+		insertFileSymb(funccinp,-14,60);
 		funccinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("No file uploaded");
-		button_maker.add_input_button(funccinp, "button_holder", "svg_func_contrib_button", "function_contributions", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(funccinp, "button_holder", "svg_func_contrib_button", "function_contributions", -40,90,80,50,"","Upload");
 
 		var taxabinp = element.append("g")
 			.attr("id","taxonomic_abundances_1_g")
-			.attr("transform","translate(100,330)");
+			.attr("transform","translate(280,330)");
 		taxabinp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("Genome Abundances");
-		insertFileSymb(taxabinp,40,60);
+		insertFileSymb(taxabinp,-14,60);
 		taxabinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("No file uploaded");
-		button_maker.add_input_button(taxabinp, "button_holder", "svg_tax_abund_button", "taxonomic_abundances_1", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(taxabinp, "button_holder", "svg_tax_abund_button", "taxonomic_abundances_1", -40,90,80,50,"","Upload");
 
 		var geneainp = element.append("g")
 			.attr("id","genome_annotations_g")
-			.attr("transform","translate(400,330)");
+			.attr("transform","translate(510,330)");
 		geneainp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("Genome Annotations");
-		insertFileSymb(geneainp,40,60);
+		insertFileSymb(geneainp,-14,60);
 		geneainp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("No file uploaded");
-		button_maker.add_input_button(geneainp, "button_holder", "svg_genome_annotation_button", "genome_annotations", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(geneainp, "button_holder", "svg_genome_annotation_button", "genome_annotations", -40,90,80,50,"","Upload");
 
 		mainui.Deac_16s();
 		mainui.Deac_FuncCont();
@@ -155,65 +172,83 @@
 
 		var taxhinp = element.append("g")
 			.attr("id","taxonomic_hierarchy_g")
-			.attr("transform","translate(100,630)");
+			.attr("transform","translate(170,630)");
 		taxhinp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("Taxonomic Hierarchy");
-		insertFileSymb(taxhinp,40,60);
+		insertFileSymb(taxhinp,-14,60);
 		taxhinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("Default: KEGG BRITE");
-		button_maker.add_input_button(taxhinp, "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(taxhinp, "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", -40,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_tax_hierarchy_button"));
 
 		var funhinp = element.append("g")
 			.attr("id","function_hierarchy_g")
-			.attr("transform","translate(300,630)");
+			.attr("transform","translate(370,630)");
 		funhinp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("Function Hierarchy");
-		insertFileSymb(funhinp,40,60);
+		insertFileSymb(funhinp,-14,60);
 		funhinp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("Default: Greengenes");
-		button_maker.add_input_button(funhinp, "button_holder", "svg_func_hierarchy_button", "function_hierarchy", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(funhinp, "button_holder", "svg_func_hierarchy_button", "function_hierarchy", -40,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_func_hierarchy_button"));
 
 		var sampminp = element.append("g")
 			.attr("id","sample_map_g")
-			.attr("transform","translate(500,630)");
+			.attr("transform","translate(570,630)");
 		sampminp.append("text")
 			.attr("font-size","18px")
+			.attr("text-anchor","middle")
 			.text("Sample Mapping");
-		insertFileSymb(sampminp,40,60);
+		insertFileSymb(sampminp,-14,60);
 		sampminp.append("text")
 			.attr("y",80)
 			.attr("font-size","15px")
-		.attr("class","filenamelabel")
+			.attr("text-anchor","middle")
+			.attr("class","filenamelabel")
 			.text("No file uploaded");
-		button_maker.add_input_button(sampminp, "button_holder", "svg_samp_map_button", "sample_map", 10,90,80,50,"","Upload");
+		button_maker.add_input_button(sampminp, "button_holder", "svg_samp_map_button", "sample_map", -40,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_samp_map_button"));
 
-		button_maker.add_rect_button(element, "svg_update_button", 200, 800, 140, 70,"", "#0000FF", "Update Graphics", function(){
+		button_maker.add_rect_button(element, "svg_update_button", 200, 800, 140, 70,"updateb", "", "Upload User Data", function(){
 			document.getElementById("update_button").click();
+			mainui.minimizeUI();
 			})
-		d3.select("#svg_update_button").classed("activebutton",true);
-
+		button_maker.deactivate(d3.select("#svg_update_button"));
 
 		/// Sample data
 		
 		button_maker.add_rect_button(element, "samp_data_1", 800,300,140,90,"switchb activebutton","","Theriot et. al 2014", function() {
 				d3.select("#samp_data_1").classed("selectedbutton",true).classed("activebutton",false);
+				mainui.sampleSelected = "Theriot";
+				mainui.updateSampleSel();
 			});
 
-		button_maker.add_rect_button(element, "svg_sample_update_button", 800, 800, 140, 70,"", "#0000FF", "Display Sample Data", function(){
+		button_maker.add_rect_button(element, "svg_sample_update_button", 800, 800, 140, 70,"updateb", "", "Display Sample Data", function(){
 			document.getElementById("update_button").click();
+			mainui.minimizeUI();
 			})
-		d3.select("#svg_sample_update_button").classed("activebutton",true);
+		button_maker.deactivate(d3.select("#svg_sample_update_button"));
+		//d3.select("#svg_sample_update_button").classed("activebutton",true);
+	}
+	
+	mainui.updateSampleSel = function() {
+		if (mainui.sampleSelected != "") {
+			button_maker.activate(d3.select("#svg_sample_update_button"));
+
+		}
+		
 	}
 	
 	mainui.refreshUI = function() {
@@ -304,6 +339,12 @@
 
 	mainui.fileloaded = function(buttonname) {
 	    d3.select("#" + buttonname + "_g").select(".outline").attr("fill","green");
+	}
+	
+	mainui.minimizeUI = function() {
+		mainui.selement.transition().attr("x",-1 * width).duration(500);
+		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
+		d3.select("#sidebar_hide").attr("visibility","visible");
 	}
 
 	this.mainui = mainui;

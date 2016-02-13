@@ -12,16 +12,16 @@
 
 	button_maker.activate = function(button) {
 		button.attr("on",true);
-		button.select("rect").attr("fill", button_maker.button_on_color);
+		//button.select("rect").attr("fill", button_maker.button_on_color);
 		button.classed("activebutton", true);
-		button.selectAll("text").attr("opacity",1);
+		//button.selectAll("text").attr("opacity",1);
 	}
 	
 	button_maker.deactivate = function(button) {
 		button.attr("on",false);
-		button.select("rect").attr("fill", button_maker.button_off_color);
+		//button.select("rect").attr("fill", button_maker.button_off_color);
 		button.classed("activebutton", false);
-		button.selectAll("text").attr("opacity",0.5);
+		//button.selectAll("text").attr("opacity",0.5);
 	}
 	
 	button_maker.add_rect_button = function(element, id, x, y, width, height, newclass, fill, text, on_click){
@@ -40,8 +40,12 @@
 		
 		if (fill) { thisrect.attr("fill",fill); }
 
-		document.getElementById(id).addEventListener("click", on_click)
-
+		document.getElementById(id).addEventListener("click", function() {
+			if (document.getElementById(id).getAttribute("on") == "true") {
+				on_click();
+			}
+		})
+	
 		var text_components = text.split(" ");
 
 		for (i = 0; i < text_components.length; i++){
@@ -54,6 +58,8 @@
 			.text(text_components[i])
 			.classed("noselect",true);
 		}
+		
+		button_maker.activate(thisg);
 	}
 
 	button_maker.add_circle_button = function(element, id, x, y, r, fill, text, on_click){

@@ -124,6 +124,30 @@ g.uploadb.activebutton:hover rect {
 	fill:#ffc000;
 }
 
+
+g.updateb rect {
+	fill:#b3ffff;
+	stroke-width:1;
+	stroke:#000066;
+}
+
+g.updateb text {
+	opacity:0.5;
+}
+
+g.updateb.activebutton rect {
+	fill:#00ffff;
+	stroke-width:4;
+}
+
+g.updateb.activebutton text {
+	opacity:1;
+}
+
+g.updateb.activebutton:hover rect {
+	fill:#008080;
+}
+
 /*g.uploadb:not(activebutton) {
 	pointer-events:none;
 }*/
@@ -192,12 +216,12 @@ white-space: pre-line;
     </pattern>
 	
 	<pattern id="rarrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
-	    <rect x="0" y="0" width="30" height="30" fill="white" />
-		<path d="M 0 2 L 27 10 L 0 18 z" fill="#D7764A" stroke="#D7764A" stroke-width="4" />
+	    <rect x="0" y="0" width="20" height="20" fill="none" />
+		<path d="M 0 10 L 17 10 L 10 17 L 17 10 L 10 3" fill="none" stroke="#D7764A" stroke-width="4" />
 	</pattern>
 	<pattern id="larrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
-	    <rect x="0" y="0" width="30" height="30" fill="white" />
-		<path d="M 30 2 L 3 10 L 30 18 z" fill="#D7764A" stroke="#D7764A" stroke-width="4" />
+	    <rect x="0" y="0" width="30" height="30" fill="none" />
+		<path d="M 20 10 L 3 10 L 10 17 L 3 10 L 10 3" fill="none" stroke="#D7764A" stroke-width="4" />
 	</pattern>
   </defs>
 </svg>
@@ -224,7 +248,7 @@ var aspecrat = window.innerWidth / window.innerHeight;
 
 var width = 1000 * aspecrat;
 var height = 1000;
-var hidewidth = 30;
+var hidewidth = 0;
 var margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
 var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
 var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
@@ -273,17 +297,18 @@ var sidebar_background = d3.select("#sidebar").append("rect")
 .attr("height",height)
 .attr("fill","#e0e0eb");
 
-button_maker.add_rect_button(d3.select("#mainsvg"), "sidebar_hide", 0, 0, hidewidth, height,"","url(#larrowspat)", "", function() {
-//console.log("clicked")
-        var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
+
+button_maker.add_rect_button(d3.select("#mainsvg"), "sidebar_hide", 0, 0, 20, 20,"","url(#larrowspat)", "", function() {
+    var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
 	if (curpos > -10) {
-		sidebarz.transition().attr("x",-1 * width).duration(500);
+		mainui.minimizeUI();
 		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
 	} else {
 		sidebarz.transition().attr("x",hidewidth).duration(500);
 		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#larrowspat)");
 	}
 })
+d3.select("#sidebar_hide").attr("visibility","hidden");
 
 
 
