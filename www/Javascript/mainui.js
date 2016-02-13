@@ -270,6 +270,7 @@
 		
 		d3.select("#read_counts_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_16S_button"));
+		button_maker.activate(d3.select("#svg_update_button"));
 
 		Shiny.onInputChange("input_type", "16S");
 	}
@@ -289,6 +290,7 @@
 		d3.select("#function_contributions_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button_2"));
 		button_maker.activate(d3.select("#svg_func_contrib_button"));
+		button_maker.activate(d3.select("#svg_update_button"));
 
 		Shiny.onInputChange("input_type", "contribution");
 	}
@@ -308,6 +310,7 @@
 		d3.select("#genome_annotations_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button"));
 		button_maker.activate(d3.select("#svg_genome_annotation_button"));
+		button_maker.activate(d3.select("#svg_update_button"));
 
 		Shiny.onInputChange("input_type", "genome_annotation");
 	}
@@ -339,6 +342,27 @@
 
 	mainui.fileloaded = function(buttonname) {
 	    d3.select("#" + buttonname + "_g").select(".outline").attr("fill","green");
+	}
+	
+	mainui.RefreshUploadReady = function() {
+		var readytogo = false;
+		if (mainui.uploadMode == "Genome") {
+			if (uploader.tax_abund_loaded && uploader.genome_annotations_loaded) {
+				readytogo = true;
+			}
+		}
+		if (mainui.uploadMode == "16s") {
+			if (uploader.reads_loaded) {
+				readytogo = true;
+			}
+		}
+		
+		if (readytogo)
+			button_maker.activate(d3.select("#svg_update_button"));
+		else
+			button_maker.deactivate(d3.select("#svg_update_button"));
+		end
+		
 	}
 	
 	mainui.minimizeUI = function() {
