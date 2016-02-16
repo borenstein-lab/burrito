@@ -7,6 +7,15 @@
 	
 	mainui.sampleSelected = "";
 	
+	mainui.read_counts_changed = 0;
+	mainui.taxonomic_abundances_2_changed = 0;
+	mainui.function_contributions_changed = 0;
+	mainui.taxonomic_abundances_1_changed = 0;
+	mainui.genome_annotations_changed = 0;
+	mainui.taxonomic_hierarchy_changed = 0;
+	mainui.function_hierarchy_changed = 0;
+	mainui.sample_map_changed = 0;
+
 	function insertFileSymb(element, x, y) {
 		var FSG = element.append("g")
 			.attr("class","nullfilesymb")
@@ -270,7 +279,7 @@
 		
 		d3.select("#read_counts_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_16S_button"));
-		button_maker.activate(d3.select("#svg_update_button"));
+		mainui.RefreshUploadReady();
 
 		Shiny.onInputChange("input_type", "16S");
 	}
@@ -290,7 +299,7 @@
 		d3.select("#function_contributions_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button_2"));
 		button_maker.activate(d3.select("#svg_func_contrib_button"));
-		button_maker.activate(d3.select("#svg_update_button"));
+		mainui.RefreshUploadReady();
 
 		Shiny.onInputChange("input_type", "contribution");
 	}
@@ -310,7 +319,7 @@
 		d3.select("#genome_annotations_g").attr("visibility","visible");
 		button_maker.activate(d3.select("#svg_tax_abund_button"));
 		button_maker.activate(d3.select("#svg_genome_annotation_button"));
-		button_maker.activate(d3.select("#svg_update_button"));
+		mainui.RefreshUploadReady();
 
 		Shiny.onInputChange("input_type", "genome_annotation");
 	}
@@ -335,28 +344,35 @@
 	}
 
 	mainui.fileloading = function(buttonname, filename) {
-	    var thisg = d3.select("#" + buttonname + "_g");
-	    thisg.select(".outline").attr("fill","yellow");
-	    thisg.select(".filenamelabel").text(filename);
+	    	var thisg = d3.select("#" + buttonname + "_g");
+		thisg.select(".outline").attr("fill","green");
+		thisg.select(".filenamelabel").text(filename);
+		eval("mainui." + buttonname + "_changed = 1;");
+		mainui.RefreshUploadReady();
 	}
 
 	mainui.fileloaded = function(buttonname) {
-	    d3.select("#" + buttonname + "_g").select(".outline").attr("fill","green");
+	    /*d3.select("#" + buttonname + "_g").select(".outline").attr("fill","green");*/
 	}
 	
 	mainui.RefreshUploadReady = function() {
 		var readytogo = false;
 		if (mainui.uploadMode == "Genome") {
-			if (uploader.tax_abund_loaded && uploader.genome_annotations_loaded) {
+			if (mainui.taxonomic_abundances_1_changed == 1 && mainui.genome_annotations_changed == 1) {
 				readytogo = true;
 			}
 		}
 		if (mainui.uploadMode == "16s") {
-			if (uploader.reads_loaded) {
+			if (mainui.read_counts_changed == 1) {
 				readytogo = true;
 			}
 		}
-		
+		if (mainui.uploadMode == "Function") {
+			if (mainui.taxonomic_abundances_2_changed == 1 && mainui.function_contributions_changed == 1) {
+				readytogo = true;
+			}
+		}
+
 		if (readytogo)
 			button_maker.activate(d3.select("#svg_update_button"));
 		else

@@ -268,7 +268,27 @@
 			uploader.samp_map_reader.readAsText(this.files[0]);
 			mainui.fileloading("sample_map",this.files[0].name);
 			});
-
+			
+		// Set up event handlers for selecting other files, only for UI
+		document.getElementById("function_contributions").addEventListener('change', function(e) {
+			mainui.fileloading("function_contributions",this.files[0].name);
+			});
+		document.getElementById("genome_annotations").addEventListener('change', function(e) {
+			mainui.fileloading("genome_annotations",this.files[0].name);
+			});
+		document.getElementById("taxonomic_hierarchy").addEventListener('change', function(e) {
+			mainui.fileloading("taxonomic_hierarchy",this.files[0].name);
+			});
+		document.getElementById("function_hierarchy").addEventListener('change', function(e) {
+			mainui.fileloading("function_hierarchy",this.files[0].name);
+			});
+			
+			
+			
+			
+			
+			
+			
 		return(uploader);
 	}
 
