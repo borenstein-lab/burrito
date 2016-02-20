@@ -382,7 +382,7 @@
 	}
 	
 	mainui.minimizeUI = function() {
-		mainui.selement.transition().attr("x",-1 * width).duration(500);
+		mainui.selement.transition().attr("x",-1 * d3.select("#sidebar").attr("width")).duration(500);
 		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
 		d3.select("#sidebar_hide").attr("visibility","visible");
 	}

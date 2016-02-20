@@ -130,7 +130,7 @@
 	}
 	
 	function drawPart(data, id, p, colors){
-		d3.select("#"+id).append("g").attr("class","part"+p).transition().duration(300)
+		d3.select("#"+id).append("g").attr("class","part"+p)
 			.attr("transform","translate("+ (p==0 ? (-1*(bb+b)) : (bb)) +",0)");
 
 		//d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
