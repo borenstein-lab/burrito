@@ -192,7 +192,7 @@
 			.attr("font-size","15px")
 			.attr("text-anchor","middle")
 			.attr("class","filenamelabel")
-			.text("Default: KEGG BRITE");
+			.text("Default: Greengenes");
 		button_maker.add_input_button(taxhinp, "button_holder", "svg_tax_hierarchy_button", "taxonomic_hierarchy", -40,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_tax_hierarchy_button"));
 
@@ -209,7 +209,7 @@
 			.attr("font-size","15px")
 			.attr("text-anchor","middle")
 			.attr("class","filenamelabel")
-			.text("Default: Greengenes");
+			.text("Default: KEGG BRITE");
 		button_maker.add_input_button(funhinp, "button_holder", "svg_func_hierarchy_button", "function_hierarchy", -40,90,80,50,"","Upload");
 		button_maker.activate(d3.select("#svg_func_hierarchy_button"));
 

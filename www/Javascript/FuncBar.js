@@ -218,16 +218,19 @@ fB.select_bars = function(func, colors){
       return d.func == func;
     });
   current_color = selected.style("fill");
+  var trimstr = func.replace(/\W+/g,'') + "_tx";
+  if (d3.select("#" + trimstr)[0][0] == null) {
+     var t = textures.lines()
+       .thicker()
+       .background(colors(func))
+       .id(trimstr)
+       .stroke("white");
 
-  var t = textures.lines()
-    .thicker()
-    .background(colors(func))
-    .stroke("white");
-
-  d3.select("#func_bars").call(t);
-
+     d3.select("#patternsvg").call(t);
+  }
+ 
     selected.style("opacity", 1)
-        .style("fill", t.url());
+        .style("fill", "url(#" + trimstr + ")");
 
     // .style("stroke", "yellow")
     // .style("stroke-width",2);
@@ -254,15 +257,18 @@ fB.select_contribution = function(taxon, colors){
 
   selected.style("opacity", 1)
     .style("fill", function(d){
-      col = colors(d.func);
-      var t = textures.lines()
-        .thicker()
-        .background(col)
-        .stroke("white");
+      var trimstr = d.func.replace(/\W+/g,'') + "_tx";
+      if (d3.select("#" + trimstr)[0][0] == null) {
+        var t = textures.lines()
+          .thicker()
+          .background(colors(d.func))
+          .id(trimstr)
+          .stroke("white");
 
-      d3.select("#func_bars").call(t);
+        d3.select("#patternsvg").call(t);
+      }
 
-      return t.url();
+      return "url(#" + trimstr;
     });
 
 }
@@ -284,17 +290,19 @@ fB.select_single_contribution = function(taxon, func, colors){
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
     });
+  var trimstr = func.replace(/\W+/g,'') + "_tx";
+  if (d3.select("#" + trimstr)[0][0] == null) {
+     var t = textures.lines()
+       .thicker()
+       .background(colors(func))
+       .id(trimstr)
+       .stroke("white");
 
-  var t = textures.lines()
-    .thicker()
-    .background(colors(func))
-    .stroke("white");
-
-  d3.select("#func_bars").call(t);
-
-  selected.style("opacity", 1)
-    .style("fill", t.url());
-
+     d3.select("#patternsvg").call(t);
+  }
+    
+    selected.style("opacity", 1)
+        .style("fill", "url(#" + trimstr + ")");
 }
 
 fB.deselect_single_contribution = function(taxon, func, colors){

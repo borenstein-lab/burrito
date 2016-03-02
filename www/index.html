@@ -1390,16 +1390,17 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 			// Highlight BP graph
 			m = 0;
 			displayed = data_cube.displayed_taxa;
-			ind = displayed.indexOf(taxonName);
-			//console.log(ind);
-			bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+			ind = displayed.indexOf(taxonName);	
+			if (ind > -1) {
+				bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+			
+				// Highlight  Taxa Bar Chart
+				otu_bar.select_bars(taxonName);
 
-			// Highlight  Taxa Bar Chart
-			otu_bar.select_bars(taxonName);
-
-			// Highlight Function Bar Chart
-			//console.log(func_colors);
-			fB.select_contribution(taxonName, func_colors);
+				// Highlight Function Bar Chart
+				//console.log(func_colors);
+				fB.select_contribution(taxonName, func_colors);
+			}
 		}
 		
 		if (highlightwhat == 2) {
@@ -1416,10 +1417,12 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 			m = 1;
 			displayed = data_cube.displayed_funcs;
 			ind = displayed.indexOf(functionName);
-			bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+			if (ind > -1) {
+				bP.selectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
-			// Highlight Function Bar Chart
-			fB.select_bars(functionName, func_colors);
+				// Highlight Function Bar Chart
+				fB.select_bars(functionName, func_colors);
+			}
 		}
 		
 		if (highlightwhat == 3) {
@@ -1462,13 +1465,15 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 			m = 0;
 			displayed = data_cube.displayed_taxa;	
 			ind = displayed.indexOf(taxonName);
-			bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+			if (ind > -1) {
+				bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
-			// dehighlight Taxon Bar Chart
-			otu_bar.deselect_bars(taxonName, taxa_colors);
+				// dehighlight Taxon Bar Chart
+				otu_bar.deselect_bars(taxonName, taxa_colors);
 
-			// dehighligh Function Bar Chart
-			fB.deselect_contribution(taxonName, func_colors);
+				// dehighlight Function Bar Chart
+				fB.deselect_contribution(taxonName, func_colors);
+			}
 		}
 		
 		if (highlightwhat == 2) {
@@ -1481,10 +1486,12 @@ taxa_tree_data = taxa_tree_data.filter(function(d){
 			m = 1;
 			displayed = data_cube.displayed_funcs;
 			ind = displayed.indexOf(functionName);
-			bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
+			if (ind > -1) {
+				bP.deSelectSegment(m, ind, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs);
 
-			// dehighlight Function Bar Chart
-			fB.deselect_bars(functionName, func_colors);
+				// dehighlight Function Bar Chart
+				fB.deselect_bars(functionName, func_colors);
+			}
 		}
 		
 		if (highlightwhat == 3) {

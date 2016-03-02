@@ -234,17 +234,21 @@ otu_bar.select_bars = function(taxon){
     .filter(function(d) {
       return d.name == taxon;
     });
-current_color = selected.style("fill");
+	var trimstr = taxon.replace(/\W+/g,'') + "_tx";
+	current_color = selected.style("fill");
 
-  var t = textures.lines()
-    .thicker()
-    .background(current_color)
-    .stroke("white");
+	if (d3.select("#" + trimstr)[0][0] == null) {
+  		var t = textures.lines()
+    			.thicker()
+    			.background(current_color)
+			.id(trimstr)
+    			.stroke("white");
 
-  d3.select("#taxa_bars").call(t);
+  		d3.select("#patternsvg").call(t);
+	}
 
     selected.style("opacity", 1)
-        .style("fill", t.url());
+        .style("fill", "url(#" + trimstr + ")");
 
 }
 

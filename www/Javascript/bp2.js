@@ -390,20 +390,26 @@
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 
 			if(m==1){
-				current_color = func_colors(displayed_funcs[s]) } else {
-					current_color = taxa_colors(displayed_taxa[s]);
-				}
+				var trimstr = displayed_funcs[s].replace(/\W+/g,'') + "_tx";
+				current_color = func_colors(displayed_funcs[s]) 
+			} else {
+				var trimstr = displayed_taxa[s].replace(/\W+/g,'') + "_tx";
+				current_color = taxa_colors(displayed_taxa[s]);
+			}
 
-			var t = textures.lines()
-			    .thicker()
-			    .background(current_color)
-			    .stroke("white");
+			if (d3.select("#" + trimstr)[0][0] == null) {
+				var t = textures.lines()
+			    		.thicker()
+			    		.background(current_color)
+					.id(trimstr)
+			    		.stroke("white");
 
-			selectedBar.call(t);
+				d3.select("#patternsvg").call(t);
+			}
 
 			selectedBar.select(".mainrect")
 				.style('fill-opacity',1)
-				.style("fill", t.url());
+				.style("fill", "url(#" + trimstr + ")");
 
 			var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
@@ -464,20 +470,26 @@
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 
 			if(m==1){
-				current_color = func_colors(displayed_funcs[current_data["key"+(m+1)]]) } else {
+				var trimstr = displayed_funcs[current_data["key"+(m+1)]].replace(/\W+/g,'') + "_tx";
+				current_color = func_colors(displayed_funcs[current_data["key"+(m+1)]]) 
+			} else {
+				var trimstr = displayed_taxa[current_data["key"+(m+1)]].replace(/\W+/g,'') + "_tx";
 				current_color = taxa_colors(displayed_taxa[current_data["key"+(m+1)]]);
 			}
 
-			var t = textures.lines()
-			    .thicker()
-			    .background(current_color)
-			    .stroke("white");
+			if (d3.select("#" + trimstr)[0][0] == null) {
+				var t = textures.lines()
+			    		.thicker()
+			    		.background(current_color)
+					.id(trimstr)
+			    		.stroke("white");
 
-			selectedBar.call(t);
+				d3.select("#patternsvg").call(t);
+			}
 
 			selectedBar.select(".mainrect")
-				.style("fill-opacity",1)
-				.style("fill", t.url())
+				.style('fill-opacity',1)
+				.style("fill", "url(#" + trimstr + ")");
 
 			var selSubBar =  d3.select("#"+id).select(".part"+m).select(".subbars")
 				.selectAll(".subbar")
