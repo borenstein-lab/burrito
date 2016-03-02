@@ -246,6 +246,7 @@
 
 		button_maker.add_rect_button(element, "svg_sample_update_button", 800, 800, 140, 70,"updateb", "", "Display Sample Data", function(){
 			document.getElementById("update_button").click();
+			uploader.load_default_data();
 			mainui.minimizeUI();
 			})
 		button_maker.deactivate(d3.select("#svg_sample_update_button"));

@@ -272,7 +272,7 @@ shinyServer(function(input, output, session) {
 
 		tracked_data$contribution_table = output
 
-	}, ignoreNULL=FALSE) # Makes the function run on initial page load without a button click
+	})
 
 	# Listen for requests for sample data from the browser
 	observe({
