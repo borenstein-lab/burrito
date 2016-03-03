@@ -2,9 +2,10 @@
 
 library(shiny)
 library(data.table)
-
+options(stringsAsFactors = F)
 # Change the maximum file upload size
 options(shiny.maxRequestSize=300*1024^2)
+options(stringsAsFactors = F)
 
 # Defining important files
 default_tax_hierarchy_table = "www/Data/full_gg_taxa_mapping_parsed.txt"
@@ -121,7 +122,6 @@ shinyServer(function(input, output, session) {
 			output = contribution[,c(2,3,1,6),with=FALSE]
 		}
 		colnames(output) = c("Sample", "OTU", "Gene", "CountContributedByOTU")
-
 		if (!is.null(output)){ # If we have successfully generated a contribution table
 
 			func_hierarchy = NULL
@@ -132,6 +132,7 @@ shinyServer(function(input, output, session) {
 				func_hierarchy_file = input$function_hierarchy
 				func_hierarchy_file_path = func_hierarchy_file$datapath
 				func_hierarchy = fread(func_hierarchy_file_path, header=TRUE, sep="\t", stringsAsFactors=FALSE)
+
 			}
 
 			# Get a table matching KOs to the SubPathways they belong to
@@ -164,6 +165,10 @@ shinyServer(function(input, output, session) {
 			# Remove the KO column and resulting duplicate rows
 			func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2]]
 			output2 = unique(func_hierarchy)
+			id_levels = names(output2)
+			for(j in 1:length(id_levels)){
+				output2[[id_levels[j]]] = paste(id_levels[j],as.character(output2[[id_levels[j]]]), sep = "_")
+			}
 
 			# Send the resulting function hierarchy as a string, rows separated by newlines, elements separated by tabs
 			session$sendCustomMessage(type='function_hierarchy', paste(paste(colnames(output2), collapse="\t"), sapply(1:dim(output2)[1], function(row){return(paste(output2[row], collapse="\t"))}), collapse="\n", sep="\n"))
@@ -180,6 +185,10 @@ shinyServer(function(input, output, session) {
 
 			# Remove duplicate rows
 			output2 = unique(func_hierarchy)
+			id_levels = names(output2)
+			for(j in 1:length(id_levels)){
+				output2[[id_levels[j]]] = paste(id_levels[j],as.character(output2[[id_levels[j]]]), sep = "_")
+			}
 
 			# Send the resulting function hierarchy as a string, rows separated by newlines, elements separated by tabs
 			session$sendCustomMessage(type='function_hierarchy', paste(paste(colnames(output2), collapse="\t"), paste(sapply(1:dim(output2)[1], function(row){return(paste(output2[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
@@ -196,6 +205,10 @@ shinyServer(function(input, output, session) {
 
 			# Remove duplicate rows
 			output2 = unique(func_hierarchy)
+			id_levels = names(output2)
+			for(j in 1:length(id_levels)){
+				output2[[id_levels[j]]] = paste(id_levels[j],as.character(output2[[id_levels[j]]]), sep = "_")
+			}
 
 			# Send the resulting function hierarchy as a string, rows separated by newlines, elements separated by tabs
 			session$sendCustomMessage(type='default_function_hierarchy', paste(paste(colnames(output2), collapse="\t"), paste(sapply(1:dim(output2)[1], function(row){return(paste(output2[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
@@ -204,6 +217,7 @@ shinyServer(function(input, output, session) {
 		#sum over taxa
 		count_name = names(output)[!names(output) %in% c("Sample", "OTU", "SubPathway")]
 		total_funcs = output[,lapply(.SD, sum), by=list(SubPathway, Sample), .SDcols=count_name] #whatever the count name is
+		total_funcs[,SubPathway:=paste("SubPathway",SubPathway,sep="_")]
 		total_funcs[,V1:=V1/sum(V1),by=Sample] #Switch to relative abundance from read counts
 		#combine with func_hierarchy
 		total_funcs = merge(total_funcs, output2, by="SubPathway")
@@ -227,18 +241,36 @@ shinyServer(function(input, output, session) {
 			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
 			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
 			output4 = unique(taxa_hierarchy)
+			#add hierarchy level into node IDs
+			id_levels = names(output4)
+			for(j in 1:length(id_levels)){
+				output4[[id_levels[j]]] = paste(id_levels[j],as.character(output4[[id_levels[j]]]), sep = "_")
+			}
 			session$sendCustomMessage(type='tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), paste(sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n"), sep="\n"))
 		} else if (!is.null(input$input_type)){ # If they haven't uploaded a custom taxonomic hierarchy, but they are updating the graphics, then load the default and trigger the non-default taxonomic hierachy upload
 			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
 	        # Filter OTUs not in contribution table
 	        taxa_hierarchy = taxa_hierarchy[OTU_ID %in% unique(output[,OTU])]
 	        output4 = unique(taxa_hierarchy)
+	        #add hierarchy level into node IDs
+			id_levels = names(output4)
+			for(j in 1:length(id_levels)){
+				output4[[id_levels[j]]] = paste(id_levels[j],as.character(output4[[id_levels[j]]]), sep = "_")
+			}
 	        session$sendCustomMessage(type='tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), paste(sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n"), sep="\n"))
 	    } else { # Read in default
 	    	taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
 	        # Filter OTUs not in contribution table
 	        taxa_hierarchy = taxa_hierarchy[OTU_ID %in% unique(output[,OTU])]
 	        output4 = unique(taxa_hierarchy)
+	    	#add hierarchy level into node IDs
+			id_levels = names(output4)
+			print(id_levels)
+			for(j in 1:length(id_levels)){
+				output4[[id_levels[j]]] = paste(id_levels[j],as.character(output4[[id_levels[j]]]), sep = "_")
+			}
+	        output[,OTU:=paste("OTU_ID",as.character(OTU), sep = "_")]
+
 	        session$sendCustomMessage(type='default_tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), paste(sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n"), sep="\n"))
 
 	    }
@@ -246,6 +278,7 @@ shinyServer(function(input, output, session) {
 		# Format the contribution table to match the expected javascript array
 
 		# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings
+		output[,SubPathway:=paste("SubPathway",SubPathway,sep="_")]
 		output = dcast(output, Sample + OTU ~ SubPathway, value.var="relative_contributions")
 
 		# Create a single column for SubPathways that contains a list of the SubPathways for that row's Sample and OTU, remove empty elements from those lists
@@ -272,7 +305,7 @@ shinyServer(function(input, output, session) {
 
 		tracked_data$contribution_table = output
 
-	})
+	}, ignoreNULL=FALSE) # Makes the function run on initial page load without a button click
 
 	# Listen for requests for sample data from the browser
 	observe({
