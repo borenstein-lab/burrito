@@ -317,7 +317,6 @@ mainui.createUI(d3.select("#sidebar"));
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
 
-	
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -405,6 +404,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	taxa_tree_data = tax_hierarchy_text;
 
 	func_tree_data = func_hierarchy_text;
+
 	func_averages = d3.tsv.parse(func_averages)
 	samplemap = d3.tsv.parse(samp_map_text);
 
@@ -415,7 +415,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 			new_otu_data[j] = {}
 			new_otu_data[j]["Sample"] = samples[j]
 			for(k=0; k < otu_data.length; k++){
-				new_key = otu_data[k]["OTU_ID"] // Can we key anonymously? Maybe set name of column ourselves so it always matches
+				new_key = "OTU_ID_"+otu_data[k]["OTU_ID"] // Can we key anonymously? Maybe set name of column ourselves so it always matches
 				new_otu_data[j][new_key] = +otu_data[k][samples[j]]
 			}
 
@@ -433,6 +433,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	//if( not expand to OTU level
 	genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)
 
+	
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		//1st - divide up color space into number of leaves
 		//then assign each subgroup of leaves alternating extremes
@@ -590,7 +591,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
 	func_colors.range().push("black")
 	func_colors("All Functions")
-
 
 	//sample colors
 	groupValsAll = samplemap.map(function(d,i){ 
@@ -1505,8 +1505,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 var uploader = uploader_wrapper.make_uploader(draw_everything);
 
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
-
-//uploader.load_default_data();
 
 Shiny.addCustomMessageHandler("shiny_test", function(message){console.log(message)})
 	
