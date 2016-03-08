@@ -78,64 +78,6 @@
       return descendents;
     }
 
-    // /////////////////////////////////////////////////////////////////////// no_cube_calculate_new_contribution /////////////////////////////////////////////////////////////////////////////////////////////
-
-    // // Returns the contribution of the given taxon to the given function relative to the total functional abundance in the given sample
-    // // Uses the original tsv data
-    // data_cube.no_cube_calculate_new_contribution = function(sample, taxon, func){
-
-    //   // Get the leaf nodes under the give taxon and func
-    //   var leaf_taxa = [];
-    //   var leaf_funcs = [];
-
-    //   // Use a BFS to find the leaf otus
-    //   var curr_taxa = [];
-    //   curr_taxa.push(this.taxa_lookup[taxon]);
-    //   for (; curr_taxa.length > 0;){
-    //     curr_taxon = curr_taxa.shift();
-    //     if (this.is_leaf(curr_taxon)){
-    //       leaf_taxa.push(curr_taxon.key);
-    //     } else {
-    //       for (var i = 0; i < curr_taxon.values.length; i++){
-    //         curr_taxa.push(curr_taxon.values[i]);
-    //       }
-    //     }
-    //   }
-
-    //   // Use a BFS to find the leaf kos
-    //   var curr_funcs = [];
-    //   curr_funcs.push(this.func_lookup[func]);
-    //   for (; curr_funcs.length > 0;){
-    //     curr_func = curr_funcs.shift();
-    //     if (this.is_leaf(curr_func)){
-    //       leaf_funcs.push(curr_func.key);
-    //     } else {
-    //       for (var i = 0; i < curr_func.values.length; i++){
-    //         curr_funcs.push(curr_func.values[i]);
-    //       }
-    //     }
-    //   }
-
-    //   // Sum the relative contributions to each leaf ko by each leaf otu
-    //   var total = 0;
-    //   for (var i = 0; i < this.contribution_data.length; i++){
-    //     var curr_otu = this.contribution_data[i].Genus;
-    //     var curr_ko = this.contribution_data[i].SubPathway;
-    //     var curr_sample = this.contribution_data[i].Sample;
-    //     if (leaf_taxa.indexOf(curr_otu) != -1 && leaf_funcs.indexOf(curr_ko) != -1 && sample == curr_sample){
-    //       var contribution_fraction = 0;
-    //       for (var j = 0; j < this.func_rel_abundance_data.length; j++){
-    //         if (sample == this.func_rel_abundance_data[j].Sample){
-    //           contribution_fraction = parseFloat(this.func_rel_abundance_data[j][curr_ko]);
-    //         }
-    //       }
-    //       total += parseFloat(this.contribution_data[i].ContributionPercentOfSample) * contribution_fraction;
-    //     }
-    //   }
-
-    //   return(total);
-    // }
-
     /////////////////////////////////////////////////////////////////////// calculate_new_contribution /////////////////////////////////////////////////////////////////////////////////////////////
 
     // Returns the contribution of the given taxon to the given function relative to the total functional abundance in the given sample
@@ -555,70 +497,13 @@
 
       /////////////////////////////////////////////////////////////////////// taxa_tree /////////////////////////////////////////////////////////////////////////////////////////////
 
-      taxa_tree_full =  d3.nest()
-        .key(function(d) { return d.Kingdom; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Phylum; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Class; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Order; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Family; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Genus; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Species; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.OTU_ID})
-        .sortKeys(d3.descending)
-        .entries(taxa_tree_data);
-
-
-      // Read the taxa tree - this will have to change to allow user selection of expanding to lower levels
-      this.taxa_tree = d3.nest()
-        .key(function(d) { return d.Kingdom; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Phylum; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Class; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Order; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Family; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Genus; })
-        .sortKeys(d3.descending)
-        .key(function(d) { return d.Species; })
-        .key(function(d) { return d.OTU_ID})
-        .entries(taxa_tree_data);
-
+      taxa_tree_full = jQuery.extend(true, [], taxa_tree_data);
+      this.taxa_tree = jQuery.extend(true, [], taxa_tree_data);
 
       /////////////////////////////////////////////////////////////////////// func_tree /////////////////////////////////////////////////////////////////////////////////////////////
       ///list of all kos in data (need to do similar for taxa)
 
-
-//       func_tree_full = d3.nest()
-//         .key(function(d) { return d.Category; })
-//         .sortKeys(d3.ascending)
-//         .key(function(d) { return d.SuperPathway; })
-//         .sortKeys(d3.ascending)        
-//         .key(function(d) { return d.SubPathway; })
-//         .sortKeys(d3.ascending)
-//         //.key(function(d) { return d.KO; })
-//         //.sortKeys(d3.ascending)
-//         .entries(func_tree_data);
-
-      // Read the func tree
-      this.func_tree = d3.nest()
-        .key(function(d) { return d.Category; })
-        .sortKeys(d3.ascending)
-        .key(function(d) { return d.SuperPathway; })
-        .sortKeys(d3.ascending)
-        .key(function(d) { return d.SubPathway; })
-        .sortKeys(d3.ascending)
-        //.key(function(d) { return d.KO; })
-        .entries(func_tree_data);
+      this.func_tree = jQuery.extend(true, [], func_tree_data)
 
       /////////////////////////////////////////////////////////////////////// taxa_lookup /////////////////////////////////////////////////////////////////////////////////////////////
       // Create a lookup table to get the node in the taxa tree from the name
@@ -692,96 +577,6 @@
         this.func_lookup[curr_func.key].level = level 
       }
 
-//       func_lookup_full = {};
-//       curr_funcs = [];
-// 
-//       // Use a BFS to add all taxa
-//       for (var i = 0; i < func_tree_full.length; i++){
-//         curr_funcs.push(func_tree_full[i]);
-//       }
-//       for (; curr_funcs.length > 0;){
-//         curr_func = curr_funcs.shift();
-//         func_lookup_full[curr_func.key] = curr_func;
-//         if (!this.is_leaf(curr_func)){
-//           for (var i = 0; i < curr_func.values.length; i++){
-//             curr_funcs.push(curr_func.values[i]);
-//           }
-//         }
-//       }
-// 
-//       all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
-//       norm_factors = []
-//       console.log(all_kos.length)
-//       for(k=0; k < all_kos.length; k++){
-//         sub_data = func_tree_data.filter(function(d){ return d.KO===all_kos[k]})
-//         norm_factors[all_kos[k]] = sub_data.length
-//         console.log("Calculating KO normalization factors??")
-//         console.log(sub_data)
-//       }
-//       /////////////////////////////////////////////////////////////////////// original_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
-// 
-//       // For each row in the original TSV, make an entry in the original_contribution_cube
-//       // Accessed by original_contribution_cube[sample][taxon][func], returns the contribution of the given taxon to the given func relative to the total functional abundance in the given sample
-//       var totals = {};
-//       for (sample in contribution_table){
-//         totals[sample] = 0;
-//         for (otu in contribution_table[sample]){
-//           for(ko in contribution_table[sample][otu]){
-//             totals[sample] += contribution_table[sample][otu][ko]
-//           }
-//         }
-//       }
-//       //original_contribution_cube needs to be summed up to subpathway and potentially genus levels
-//       taxa_display_leaves = []
-//       for(j=0; j < (this.taxa_tree).length; j++){
-//         taxa_display_leaves = taxa_display_leaves.concat(this.get_leaves(this.taxa_tree[j].key, this.taxa_lookup)); //taxa_tree_leaves//keep working here 
-//       }     
-//       func_display_leaves = []
-//       for(k=0; k < (this.func_tree).length; k++){
-//         func_display_leaves = func_display_leaves.concat(this.get_leaves(this.func_tree[k].key, this.func_lookup));
-//       }
-// 
-// 
-//       get_aggregated_contribution = function(sample, taxon, func, taxa_lookup_full, func_lookup_full, norm_factors){
-//         tax_leaves = data_cube.get_leaves(taxon, taxa_lookup_full)
-//         func_leaves = data_cube.get_leaves(func, func_lookup_full)
-//         contrib = 0
-//         for(a=0; a< tax_leaves.length; a++){
-//           for(b=0; b < func_leaves.length; b++){
-//             if(contribution_table[sample].hasOwnProperty(tax_leaves[a])){
-//               if(contribution_table[sample][tax_leaves[a]].hasOwnProperty(func_leaves[b])){
-//                 contrib += contribution_table[sample][tax_leaves[a]][func_leaves[b]]/norm_factors[func_leaves[b]]
-//               }
-//             }
-//           }
-//         }
-//         contrib /= totals[sample]
-//         return contrib;
-//       }
-// 
-//       for (sample in contribution_table){
-//         this.original_contribution_cube[sample] = {};
-//         for (j=0; j < taxa_display_leaves.length; j++){
-//           taxon = taxa_display_leaves[j]
-//           this.original_contribution_cube[sample][taxon] = {};
-//           for (k=0; k < func_display_leaves.length; k++){
-//             func = func_display_leaves[k]
-//             //here is where we do this calculation of aggregating over OTUs and getting partial pathway contributions
-//             this.original_contribution_cube[sample][taxon][func] = get_aggregated_contribution(sample, taxon, func, this.taxa_lookup_full, func_lookup_full, norm_factors)
-//           }
-//         }
-//       }
-//       console.log(this.original_contribution_cube)
-// 
-//       // for (sample in contribution_table){
-//       //   this.original_contribution_cube[sample] = {};
-//       //   for (otu in contribution_table[sample]){
-//       //     this.original_contribution_cube[sample][otu] = {};
-//       //     for (ko in contribution_table[sample][otu]){
-//       //       this.original_contribution_cube[sample][otu][ko] = contribution_table[sample][otu][ko]/totals[sample];
-//       //     }
-//       //   }
-//       // }
       this.original_contribution_cube = contribution_table
 
       /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
@@ -813,31 +608,6 @@
       for (var i = 0; i < this.func_tree.length; i++){
         this.displayed_funcs.push(this.func_tree[i].key);
       }
-
-/*
-               ////get mean abundances over all samples, this is slow
-      var all_taxa = this.get_leaves(this.taxa_tree[0].key, this.taxa_lookup)
-      all_funcs = []
-      for(j = 0; j < this.func_tree.length; j++){
-        all_funcs = all_funcs.concat(all_funcs, this.get_leaves(this.func_tree[j].key, this.func_lookup))
-      }
-      for(var i = 0; i < all_taxa.length; i++){ //for all OTUs
-        taxon = all_taxa[i]
-        this.meansOverSamples[taxon] = {}
-        for(k = 0; k < all_funcs.length; k++){
-          func = all_funcs[k]
-          this.meansOverSamples[taxon][func] = 0
-          for (var j = 0; j < this.samples.length; j++){
-            if(this.original_contribution_cube[this.samples[j]].hasOwnProperty(taxon)){
-              if(this.original_contribution_cube[this.samples[j]][taxon].hasOwnProperty(func)){
-                this.meansOverSamples[taxon][func] = this.meansOverSamples[taxon][func] + this.original_contribution_cube[this.samples[j]][taxon][func]
-              }
-            } 
-          }
-          this.meansOverSamples[taxon][func] = this.meansOverSamples[taxon][func]/this.samples.length; //mean
-        }
-      }
-      */
       
       for(var j = 0; j < func_averages.length; j++){
         func = func_averages[j].Function

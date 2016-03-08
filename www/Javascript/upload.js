@@ -86,7 +86,6 @@
 		Checks to see if the indicate files have been loaded. If so, redraw the graphics.
 		*/
 		uploader.try_drawing_default = function() {
-				
 			var all_loaded = true;
 			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded];
 
@@ -99,7 +98,6 @@
 
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded){
-
 				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
 			}
 		}

@@ -434,7 +434,6 @@ draw_svg = function() {
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
 
-	console.log("Redrawing")
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -519,11 +518,11 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	curlevelNames['taxa'] = levelNames['taxa'];
 	curlevelNames['func'] = levelNames['func'];
 
-	taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
-	
-	func_tree_data = d3.tsv.parse(func_hierarchy_text);
+	taxa_tree_data = tax_hierarchy_text;
+
+	func_tree_data = func_hierarchy_text;
+
 	func_averages = d3.tsv.parse(func_averages)
-//	console.log(func_averages)
 	samplemap = d3.tsv.parse(samp_map_text);
 
 	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
@@ -541,43 +540,12 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		return new_otu_data;
 	}
 
-	//console.log(otu_abundance_data_transpose)
 
 otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
 
-//filter out things in mapping files but not in input data
-//this should no longer be necessary, happening on server
-//console.log(otu_abundance_data)
-// taxa_tree_data = taxa_tree_data.filter(function(d){
-// 	return d3.keys(otu_abundance_data[0]).indexOf(d.OTU_ID) != -1
-// 	})
-	//console.log(taxa_tree_data);
-/*
-    all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
-    all_kos = all_kos.filter(function(d){
-        count = 0
-        sample_count = 0
-        while(count == 0 & sample_count < (d3.keys(contribution_table)).length){
-          for(otu in contribution_table[d3.keys(contribution_table)[sample_count]]){
-            if(contribution_table[d3.keys(contribution_table)[sample_count]][otu].hasOwnProperty(d)){
-            	if(contribution_table[d3.keys(contribution_table)[sample_count]][otu][d] != 0){
-            		count += 1
-            	}
-            }
-          }
-          sample_count += 1
-        }
-        return count > 0
-      })
-      func_tree_data = func_tree_data.filter(function(d){
-        return all_kos.indexOf(d.KO) != -1
-      })
-      console.log(func_tree_data)
-*/	
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data, func_averages);
-	
 
 	//if( not expand to OTU level
 	genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)
@@ -603,7 +571,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 				new_color["l"] = core_color["l"] - 36*flip*(k + (k%2))/(color_range+1)
 	      		new_color["h"] = core_color["h"] - 8*flip*(k+ (k%2))/(color_range+1)
 	      		new_color["c"] = core_color["c"] - 4*flip*(k+ (k%2))/(color_range+1)
-	      		//console.log(new_color)
 	      		new_colors.push(new_color)
 	      		flip *= -1
 
@@ -721,9 +688,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	taxa_colors.domain(main_taxa)
 	taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
 
-/*	taxa_colors.range().push("black")
-	console.log(taxa_colors("Bacteria"))
-*/
 	kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
 	col1 = d3.hsl("black")
 	//if there are other kingdoms besides Bacteria, shades of grey
@@ -830,7 +794,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		}
 	}
 
-	//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
 	var taxLevels = d3.keys(taxa_tree_data[0]);
 	//data_cube.expand_taxon("Bacteria");
 
@@ -873,16 +836,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
 
-	var taxa_data = d3.nest()
-        .key(function(d) { return d.Kingdom; })
-        .key(function(d) { return d.Phylum; })
-        .key(function(d) { return d.Class; })
-        .key(function(d) { return d.Order; })
-        .key(function(d) { return d.Family; })
-        .key(function(d) { return d.Genus; })
-        .key(function(d) { return d.Species; })
-        .key(function(d) { return d.OTU_ID; })
-        .entries(taxa_tree_data);    
+	var taxa_data = jQuery.extend(true, [], taxa_tree_data);
 
     var curr_taxa = [];
     for (var i = 0; i < taxa_data.length; i++){
@@ -957,7 +911,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 
 	function getAvgs(rootnode){
     	if(rootnode.type=="func"){
-    		//console.log(rootnode)
     		if(rootnode.key != "All Functions"){
     			func_leaves = data_cube.get_leaves(rootnode.key, data_cube.func_lookup)
 				rootnode.sampleAvg = data_cube.funcMeans[rootnode.key]
@@ -1004,16 +957,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
     //d3.select(self.frameElement).style("height", "800px");
 
 
-    var function_data = d3.nest()
-        .key(function(d) { return d.Category; })
-        .key(function(d) { return d.SuperPathway; })
-        .key(function(d) { return d.SubPathway; })
-        .entries(func_tree_data);  
-
-    //var function_data2 = data_cube.func_tree
-
-	//console.log(function_data)
-	//console.log(function_data2)
+    var function_data = jQuery.extend(true, [], func_tree_data);
 
     var curr_funcs = [];
     for (var i = 0; i < function_data.length; i++){
@@ -1063,7 +1007,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 			nleaf = nleaf + (d.values ? 0 : 1);
 		})
 		/*
-		//console.log(nleaf);
 		
 		var leafC = 1;
 		*/
@@ -1382,8 +1325,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 
 		// Stash the old positions for transition.
 		nodes.forEach(function (d) {
-			//console.log(d.x);
-			//console.log(d.y);
 			d.x0 = d.x;
 			d.y0 = d.y;
 		});
@@ -1394,7 +1335,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
 			curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
 		}
-		//console.log(curlevelNames[source.type][source.type]);
 		
 		// Update the tree depth labels
 		var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
@@ -1448,7 +1388,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 					collapseTree(d);
 					d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
 					bpvisdata = updateBPgraph();
-					//console.log(bpvisdata.toSource());
 				}
 			} else { //expand
 				if (d._values[0].hasOwnProperty('key')) {
@@ -1513,7 +1452,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 				otu_bar.select_bars(taxonName);
 
 				// Highlight Function Bar Chart
-				//console.log(func_colors);
 				fB.select_contribution(taxonName, func_colors);
 			}
 		}
@@ -1685,9 +1623,7 @@ var uploader = uploader_wrapper.make_uploader(draw_everything);
 
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 
-uploader.load_default_data();
-//Shiny.addCustomMessageHandler("shiny_test", function(message){console.log(message)})
-
+Shiny.addCustomMessageHandler("shiny_test", function(message){console.log(message)})
 	
 </script>
 </body>
