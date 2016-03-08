@@ -378,6 +378,18 @@ white-space: pre-line;
 <script>
 mainui.createUI();
 
+var aspecrat, width, height, hidewidth, margin;
+var barDimensions, navDims, bpdims;
+var i,
+duration,
+taxaroot,
+funcroot,
+roots;
+
+var TaxaTree, FuncTree, trees, diagonal;
+
+var MainSVG;
+
 draw_svg = function() {
 
 	var aspecrat = window.innerWidth / window.innerHeight;
