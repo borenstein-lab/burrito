@@ -321,6 +321,7 @@ shinyServer(function(input, output, session) {
 		# Format the contribution table to match the expected javascript array
 
 		# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings
+		output[,OTU:=paste("OTU_ID",as.character(OTU), sep = "_")]
 		output[,SubPathway:=paste("SubPathway",SubPathway,sep="_")]
 		output = dcast(output, Sample + OTU ~ SubPathway, value.var="relative_contributions")
 
