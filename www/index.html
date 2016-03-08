@@ -189,20 +189,154 @@ g.updateb.activebutton:hover rect {
 	
 } 
 
+.hidexp {
+	display:none;
+}
+
+.hidbut {
+	visibility:hidden;
+}
+
 white-space: pre-line;
 </style>
 <body>
-<div style="float:left" id="button_holder"></div>
-<div>
-<h2>Exploring microbial community taxa and functions</h2>
-<h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
-<p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
-<p> data from <a href="http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html?message-global=remove" target="_blank">Theriot et al <i>Nature Communications</i> (2014)</a></p>
+<div id="mainthing" style="overflow-x:auto">
+
+
+<table width="900" align="center">
+	<tr>
+		<td colspan=2 align="center">
+			<img border="0" src="images/title_lab_800.jpg"></img>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2 align="center"> 
+			<h2>Burrito: A Marriage of Taxonomy and Function</h2> 
+			<img border="0" src="images/burrito.jpg"></img>
+		</td>
+	</tr>
+	
+	<tr>
+		<td colspan=2>
+			<p>This is a tool to visualize the relationship between taxonomy and function. You can view sample data or upload your own data.</p>
+			<p>Source code available <a href="https://github.com/borenstein-lab/burrito">here</a></p>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<table id="sampletable" width="400" height="200" frame="box">
+			<tr><td>
+				<input type="radio" name="whichinput" id="usesample" onchange="mainui.checkWhichInput()">
+				<h4 style="display:inline">Explore sample data</h4> 
+				
+			</td></tr>
+			<tr><td>
+				<select name="sampleset" id="sampleselector">
+					<option value="none" selected></option>
+					<option value="theriot">Theriot et. al. 2014</option>
+				</select>
+			</td></tr>
+			<tr><td id="samplesetinfo">
+				<div id="noneexp">
+					Information about the selected dataset.
+				</div>
+				<div id="theriotexp" class="hidexp">
+					<p>Antibiotic-induced shifts in the mouse gut microbiome and metabolome increase susceptibility to Clostridium difficile infection</p>
+					<a href=http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html target="_blank">Paper</a>
+				</div>
+			</td></tr>
+			</table>
+		</td>
+		<td>
+			<table id="uploadtable" width="500" height = "200" frame="box">
+				<tr><td colspan=3>
+					<input type="radio" name="whichinput" id="useupload" onchange="mainui.checkWhichInput()">
+					<h4 style="display:inline">Upload your own data</h4> 
+				</td></tr>
+				<tr><td colspan=3>
+						<input type="radio" name="inptype" id="sixteenradio" onchange="mainui.checkInpDataRadio()" value="16s">16s Reads
+						<input type="radio" name="inptype" id="funcradio" onchange="mainui.checkInpDataRadio()" value="func">Functional Contributions
+						<input type="radio" name="inptype" id="genomeradio" onchange="mainui.checkInpDataRadio()" value="genome">Genomic Annotations
+				</td></tr>
+				<tr>
+					<td>
+						<div id="taxonomic_abundances_1_g" class="hidbut">
+							Genome Abundances
+							<input type="file" name="taxonomic_abundances_1" id="taxonomic_abundances_1">
+						</div>
+						<div id="taxonomic_abundances_2_g" class="hidexp">
+							Taxonomic Abundances
+							<input type="file" name="taxonomic_abundances_2" id="taxonomic_abundances_2">
+						</div>
+						<div id="read_counts_g" class="hidexp">
+							16s Reads
+							<input type="file" name="read_counts" id="read_counts">
+						</div>
+					</td>
+					<td>
+						<div id="genome_annotations_g" class="hidbut">
+							Genome Annotations
+							<input type="file" name="genome_annotations" id="genome_annotations">
+						</div>
+						<div id="function_contributions_g" class="hidexp">
+							Function Contributions
+							<input type="file" name="function_contributions" id="function_contributions">
+						</div>
+					</td>
+					<td>
+						
+					</td>
+				</tr>
+				<tr> 
+					<td colspan=3> Optional Files:</td>
+				</tr>
+				<tr>
+					<td>
+						Taxonomic Hierarchy
+						<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
+					</td>
+					<td>
+						Function Hierarchy
+						<input type="file" name="function_hierarchy" id="function_hierarchy">
+					</td>
+					<td>
+						Sample Map
+						<input type="file" name="sample_map" id="sample_map">
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr> <td width="15" bgcolor="000000" colspan=2> 
+	</td></tr>
+	<tr>
+		<td colspan=2> <h4>Visualization Options</h4> 
+			<select name="levelofdetail" id="LODselector">
+				<option value="phylum">Phylum</option>
+				<option value="class">Class</option>
+				<option value="order">Order</option>
+				<option value="family">Family</option>
+				<option value="genus" selected>Genus</option>
+				<option value="species">Species</option>
+				<option value="otu">OTU</option>
+			</select>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan=2>
+			<h4>Draw the burrito</h4>
+			<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
+		</td>
+	</tr>
+</table>
+
+
 <br>
-<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Update Graphics</button>
 <span class="error" id="upload_message"></span>
 </div>
-<button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
+<div style="float:left" id="button_holder"><br><br><br><br><br><br><br><br></div>
 
 <div id="mainplot">
 
@@ -243,76 +377,48 @@ white-space: pre-line;
 <script>
 
 
+draw_svg = function() {
 
-var aspecrat = window.innerWidth / window.innerHeight;
+	var aspecrat = window.innerWidth / window.innerHeight;
 
-var width = 1000 * aspecrat;
-var height = 1000;
-var hidewidth = 0;
-var margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
-var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
-navDims.treewidth = navDims.width * 2/9;
-var bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
-var i = 0,
-duration = 300,
-taxaroot,
-funcroot,
-roots = {};
+	var width = 1000 * aspecrat;
+	var height = 1000;
+	var hidewidth = 0;
+	var margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
+	var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+	var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+	navDims.treewidth = navDims.width * 2/9;
+	var bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
+	var i = 0,
+	duration = 300,
+	taxaroot,
+	funcroot,
+	roots = {};
 
-var TaxaTree = d3.layout.tree()
-    .children(function (d) { return d.values; })
-    .size([(navDims.height), navDims.treewidth]);
+	var TaxaTree = d3.layout.tree()
+		.children(function (d) { return d.values; })
+		.size([(navDims.height), navDims.treewidth]);
 
-var FuncTree = d3.layout.tree()
-    .children(function (d) { return d.values;})
-    .size([(navDims.height), navDims.treewidth]);
+	var FuncTree = d3.layout.tree()
+		.children(function (d) { return d.values;})
+		.size([(navDims.height), navDims.treewidth]);
 
-var trees = [];
-trees["taxa"] = TaxaTree;
-trees["func"] = FuncTree;
+	var trees = [];
+	trees["taxa"] = TaxaTree;
+	trees["func"] = FuncTree;
 
-var diagonal = d3.svg.diagonal()
-.projection(function (d) {
-return [d.y, d.x];
-});
+	var diagonal = d3.svg.diagonal()
+		.projection(function (d) {
+		return [d.y, d.x];
+	});
 
-var MainSVG = d3.select("#mainplot").append("svg")
-.attr("id","mainsvg")
-.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
-.attr("preserveAspectRatio","none");
+	var MainSVG = d3.select("#mainplot").append("svg")
+		.attr("id","mainsvg")
+		.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
+		.attr("preserveAspectRatio","none");
 
-var sidebarz = d3.select("#mainsvg").append("svg")
-.attr("id","sidebar")
-.attr("x",hidewidth)
-.attr("y",0)
-.attr("width",width)
-.attr("height",height)
-
-var sidebar_background = d3.select("#sidebar").append("rect")
-.attr("id","sidebar_background")
-.attr("x",0)
-.attr("y",0)
-.attr("width",width)
-.attr("height",height)
-.attr("fill","#e0e0eb");
-
-
-button_maker.add_rect_button(d3.select("#mainsvg"), "sidebar_hide", 0, 0, 20, 20,"","url(#larrowspat)", "", function() {
-    var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
-	if (curpos > -10) {
-		mainui.minimizeUI();
-		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
-	} else {
-		sidebarz.transition().attr("x",hidewidth).duration(500);
-		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#larrowspat)");
-	}
-})
-d3.select("#sidebar_hide").attr("visibility","hidden");
-
-
-
-mainui.createUI(d3.select("#sidebar"));
+	mainui.createUI();
+}
 
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
