@@ -41,8 +41,7 @@ shinyServer(function(input, output, session) {
 
 	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
 		tracked_data$contribution_table = NULL
-		output = NULL
-		output2 = NULL	
+		output = NULL	
 
 		if (is.null(input$input_type)){ # If they haven't chosen an input method, we'll load the default contribution table
 			output = fread(default_contribution_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
@@ -66,11 +65,10 @@ shinyServer(function(input, output, session) {
 
 			# Melt the otu abundance table so we can merge with the annotations
 			melted_otu_abundance = melt(otu_abundance,id=colnames(otu_abundance)[1], na.rm=TRUE)
-			#session$sendCustomMessage("picrust_status", melted_otu_abundance)
 
 			# Merge the melted otu abundances and annotations to a get a column for every Sample, OTU, KO set
 			merged_table = merge(melted_otu_abundance, annotation, by.x=c(colnames(melted_otu_abundance)[1]), by.y=c(colnames(annotation)[1]), allow.cartesian=TRUE, sort=FALSE)
-			session$sendCustomMessage("picrust_status", merged_table)
+
 			# Make a contribution column by multiplying the OTU abundance by the KO count
 			merged_table$contribution = merged_table[,3,with=FALSE] * merged_table[,5,with=FALSE]
 
@@ -154,6 +152,7 @@ shinyServer(function(input, output, session) {
 
 		}
 
+		func_hierarchy = NULL
 		# Load the function hierarchy table so we can filter it
 		if (!is.null(input$func_hierarchy)){ # If they've loaded a function hierarchy, read that in
 
@@ -161,44 +160,66 @@ shinyServer(function(input, output, session) {
 			func_hierarchy_file_path = func_hierarchy_file$datapath
 			func_hierarchy = read.csv(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
-			# Remove the KO column and resulting duplicate rows
-			func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2]]
-			output2 = unique(func_hierarchy)
-
-			# Send the resulting function hierarchy as a string, rows separated by newlines, elements separated by tabs
-			session$sendCustomMessage(type='function_hierarchy', paste(paste(colnames(output2), collapse="\t"), sapply(1:dim(output2)[1], function(row){return(paste(output2[row], collapse="\t"))}), collapse="\n", sep="\n"))
-
-		} else if (!is.null(input$input_type)) { # If they haven't uploaded a custom hierarchy, use the default but trigger the non-default function hierarchy upload
+		} else { # Read in default
 
 			func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
-			# Remove the column of KOs
-			func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2],with=F]
+		}
+		
+		# Remove the column of KOs
+		func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2],with=F]
 
-			# Remove rows that correspond to SubPathways not in the contribution table data
-			func_hierarchy = func_hierarchy[SubPathway %in% unique(output[,SubPathway])]
+		# Remove rows that correspond to SubPathways not in the contribution table data
+		func_hierarchy = func_hierarchy[func_hierarchy[,3,with=F][[1]] %in% unique(output[,SubPathway])]
 
-			# Remove duplicate rows
-			output2 = unique(func_hierarchy)
+		# Remove duplicate rows
+		func_hierarchy = unique(func_hierarchy)
+		unique_func_hierarchy = func_hierarchy
 
-			# Send the resulting function hierarchy as a string, rows separated by newlines, elements separated by tabs
-			session$sendCustomMessage(type='function_hierarchy', paste(paste(colnames(output2), collapse="\t"), paste(sapply(1:dim(output2)[1], function(row){return(paste(output2[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
+		# Creating the javascript version of the function hierarchy
+        func_hierarchy = func_hierarchy[,lapply(.SD,as.character)]
 
-		} else { # If they haven't loaded a function hierarchy, use the default
+        # Create the base set of objects which are structured differently from the internal nodes. The leaves contain all information for each parent node of the leaf
+        base_objects = lapply(1:dim(func_hierarchy)[1], function(row){
+        	l = list("Ndescendents" = 0, "type" = "function")
+        	for (depth in 1:dim(func_hierarchy)[2]){
+        		l[colnames(func_hierarchy)[depth]] = func_hierarchy[row,depth,with=F]
+        	}
+        	return(list("key" = paste(l[colnames(func_hierarchy)[3]]), "level"=0, "values" = list(l)))
+        })
 
-			func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+        # Iteratively generate the next layer up in the tree, grouping the previous level of nodes by their parent
+        output_func_hierarchy = NULL
+        for (depth in (dim(func_hierarchy)[2] - 1):1){
 
-			# Remove the column of KOs
-			func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2],with=F]
+        	# Get the label for the depth of the tree we're creating a layer for
+        	depth_name = colnames(func_hierarchy)[depth][[1]]
 
-			# Remove rows that correspond to SubPathways not in the contribution table data
-			func_hierarchy = func_hierarchy[SubPathway %in% unique(output[,SubPathway])]
+        	# Get the labels for the nodes in the previous layer
+        	vals = sapply(base_objects, function(obj){return(obj[["key"]])})
 
-			# Remove duplicate rows
-			output2 = unique(func_hierarchy)
+        	# Get the mapping between parent nodes in the new layer and children nodes in the previous layer
+        	next_levels = sapply(vals, function(curr_level){
+        		prev_depth = depth + 1
+        		setkeyv(func_hierarchy, colnames(func_hierarchy)[prev_depth])
+        		return(unique(func_hierarchy[curr_level,depth,with=F][[1]]))
+        	})
 
-			# Send the resulting function hierarchy as a string, rows separated by newlines, elements separated by tabs
-			session$sendCustomMessage(type='default_function_hierarchy', paste(paste(colnames(output2), collapse="\t"), paste(sapply(1:dim(output2)[1], function(row){return(paste(output2[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
+        	# Create a new node for each parent node of the previous layer
+        	output_func_hierarchy = lapply(levels(factor(next_levels)), function(level){
+        		return(list("key" = level, "level" = dim(func_hierarchy)[2] - depth, "values" = base_objects[which(next_levels == level)]))
+        	})
+
+        	# Set the base objects list to the current state of the tree so we can group the current top layer in the next iteration
+        	base_objects = output_func_hierarchy
+        }
+
+
+		if (!is.null(input$input_type)) { # If they're uploading custom data, send to the appropriate upload trigger
+			session$sendCustomMessage(type='function_hierarchy', output_func_hierarchy)
+
+		} else { # Otherwise, send to the default upload trigger
+			session$sendCustomMessage(type='default_function_hierarchy', output_func_hierarchy)
 		}
 		
 		#sum over taxa
@@ -206,12 +227,12 @@ shinyServer(function(input, output, session) {
 		total_funcs = output[,lapply(.SD, sum), by=list(SubPathway, Sample), .SDcols=count_name] #whatever the count name is
 		total_funcs[,V1:=V1/sum(V1),by=Sample] #Switch to relative abundance from read counts
 		#combine with func_hierarchy
-		total_funcs = merge(total_funcs, output2, by="SubPathway")
+		total_funcs = merge(total_funcs, unique_func_hierarchy, by="SubPathway")
 		#get average for every level of functions
 		func_means = data.table()
-		for(j in 1:ncol(output2)){
-			total_funcs_sum = total_funcs[,sum(V1), by=c("Sample", names(func_hierarchy)[j])] #sum over this category, will not change SubPathway
-			func_means_lev =  total_funcs_sum[, mean(V1), by=eval(names(func_hierarchy)[j])]
+		for(j in 1:ncol(unique_func_hierarchy)){
+			total_funcs_sum = total_funcs[,sum(V1), by=c("Sample", names(unique_func_hierarchy)[j])] #sum over this category, will not change SubPathway
+			func_means_lev =  total_funcs_sum[, mean(V1), by=eval(names(unique_func_hierarchy)[j])]
 			setnames(func_means_lev, c("Function", "Mean"))
 			if(ncol(func_means_lev)==2) func_means = rbind(func_means, func_means_lev)
 		}
@@ -222,25 +243,69 @@ shinyServer(function(input, output, session) {
 			session$sendCustomMessage(type="func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
 		}
 
+		# Read in the taxonomic hierachy and format it
+		taxa_hierarchy = NULL
 		if(!is.null(input$taxonomic_hierarchy)){ # If they've uploaded a custom taxonomic hierarchy
 			taxa_hierarchy_file = input$taxonomic_hierarchy
 			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
 			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			output4 = unique(taxa_hierarchy)
-			session$sendCustomMessage(type='tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), paste(sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n"), sep="\n"))
-		} else if (!is.null(input$input_type)){ # If they haven't uploaded a custom taxonomic hierarchy, but they are updating the graphics, then load the default and trigger the non-default taxonomic hierachy upload
-			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
-	        # Filter OTUs not in contribution table
-	        taxa_hierarchy = taxa_hierarchy[OTU_ID %in% unique(output[,OTU])]
-	        output4 = unique(taxa_hierarchy)
-	        session$sendCustomMessage(type='tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), paste(sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n"), sep="\n"))
-	    } else { # Read in default
-	    	taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
-	        # Filter OTUs not in contribution table
-	        taxa_hierarchy = taxa_hierarchy[OTU_ID %in% unique(output[,OTU])]
-	        output4 = unique(taxa_hierarchy)
-	        session$sendCustomMessage(type='default_tax_hierarchy', paste(paste(colnames(output4), collapse="\t"), paste(sapply(1:dim(output4)[1], function(row){return(paste(output4[row], collapse="\t"))}), collapse="\n"), sep="\n"))
 
+		} else { # Read in default
+	    	taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+		}
+	    
+        # Filter OTUs not in contribution table
+        taxa_hierarchy = taxa_hierarchy[taxa_hierarchy[,1,with=F][[1]] %in% unique(output[,OTU])]
+        taxa_hierarchy = unique(taxa_hierarchy)
+
+        # Creating the javascript version of the taxonomic hierarchy
+        taxa_hierarchy = taxa_hierarchy[,lapply(.SD,as.character)]
+
+        # Create the base set of objects which are structured differently from the internal nodes. The leaves contain all information for each parent node of the leaf
+        base_objects = lapply(1:dim(taxa_hierarchy)[1], function(row){
+        	l = list("Ndescendents" = 0, "type" = "taxa")
+        	for (depth in 1:dim(taxa_hierarchy)[2]){
+        		l[colnames(taxa_hierarchy)[depth]] = taxa_hierarchy[row,depth,with=F]
+        	}
+        	return(list("key" = paste(l[colnames(taxa_hierarchy)[1]]), "level"=0, "values" = list(l)))
+        })
+
+        # Iteratively generate the next layer up in the tree, grouping the previous level of nodes by their parent
+        output_taxa_hierarchy = NULL
+        for (depth in dim(taxa_hierarchy)[2]:2){
+
+        	# Get the label for the depth of the tree we're creating a layer for
+        	depth_name = colnames(taxa_hierarchy)[depth][[1]]
+
+        	# Get the labels for the nodes in the previous layer
+        	vals = sapply(base_objects, function(obj){return(obj[["key"]])})
+
+        	# Get the mapping between parent nodes in the new layer and children nodes in the previous layer
+        	next_levels = sapply(vals, function(curr_level){
+        		prev_depth = NULL
+        		if (depth == dim(taxa_hierarchy)[2]){
+        			prev_depth = 1
+        		} else {
+        			prev_depth = depth + 1
+        		}
+        		setkeyv(taxa_hierarchy, colnames(taxa_hierarchy)[prev_depth])
+        		return(unique(taxa_hierarchy[curr_level,depth,with=F][[1]]))
+        	})
+
+        	# Create a new node for each parent node of the previous layer
+        	output_taxa_hierarchy = lapply(levels(factor(next_levels)), function(level){
+        		return(list("key" = level, "level" = dim(taxa_hierarchy)[2] - depth + 1, "values" = base_objects[which(next_levels == level)]))
+        	})
+
+        	# Set the base objects list to the current state of the tree so we can group the current top layer in the next iteration
+        	base_objects = output_taxa_hierarchy
+        }
+
+        if (!is.null(input$input_type)){ # If they're uploading custom data, send to the approriate upload trigger
+			session$sendCustomMessage(type='tax_hierarchy', output_taxa_hierarchy)
+
+		} else { # Otherwise, send to the default upload trigger		
+	        session$sendCustomMessage(type="default_tax_hierarchy", output_taxa_hierarchy)
 	    }
 
 		# Format the contribution table to match the expected javascript array
