@@ -20,7 +20,7 @@
 	
 	mainui.createUI = function() {
 		
-		
+		console.log("setting stuff up");
 		document.getElementById("sampleselector").addEventListener("change", function() {
 			mainui.checkSampleDataSelect();
 		});
@@ -30,12 +30,15 @@
 		mainui.checkWhichInput();
 		mainui.RefreshUploadReady();
 			
-			
-			
-
-		uploader.load_default_data();
-
-
+		document.getElementById("submit_button").addEventListener("click", function() {
+			if (mainui.datamode == "sample") {
+				draw_svg();
+				uploader.load_default_data();
+			} else if (mainui.datamode == "upload") {
+				draw_svg();
+				document.getElementById("update_button").click();
+			}
+		});
 	}
 		
 		
@@ -64,6 +67,7 @@
 		d3.select("#samplesetinfo").selectAll("div").classed("hidexp",true);
 		var sampsel = document.getElementById("sampleselector");
 		var dsel = d3.select("#samplesetinfo").select("#" + sampsel.options[sampsel.selectedIndex].value + "exp");
+		console.log(dsel);
 		dsel.classed("hidexp",false);
 		mainui.sampleSelected = sampsel.options[sampsel.selectedIndex].value;
 		mainui.RefreshUploadReady();

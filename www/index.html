@@ -327,7 +327,8 @@ white-space: pre-line;
 	<tr>
 		<td colspan=2>
 			<h4>Draw the burrito</h4>
-			<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
+			<button id="submit_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
+			<button id="update_button" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 		</td>
 	</tr>
 </table>
@@ -375,7 +376,7 @@ white-space: pre-line;
 <script src="Javascript/mainui.js"></script>
 
 <script>
-
+mainui.createUI();
 
 draw_svg = function() {
 
@@ -417,7 +418,7 @@ draw_svg = function() {
 		.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
 		.attr("preserveAspectRatio","none");
 
-	mainui.createUI();
+	
 }
 
 
