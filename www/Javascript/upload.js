@@ -12,6 +12,8 @@
 		uploader.func_hierarchy_loaded = false;
 		uploader.func_averages_loaded = false;
 		uploader.samp_map_loaded = false;
+		
+		uploader.svgCreated = false;
 
 		// These variables hold the results of file loading
 		uploader.tax_abund_text = "";
@@ -59,7 +61,7 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded];
+			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded, uploader.svgCreated];
 
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < load_flags.length; i++){

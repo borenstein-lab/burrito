@@ -392,45 +392,43 @@ var MainSVG;
 
 draw_svg = function() {
 
-	var aspecrat = window.innerWidth / window.innerHeight;
+	aspecrat = window.innerWidth / window.innerHeight;
 
-	var width = 1000 * aspecrat;
-	var height = 1000;
-	var hidewidth = 0;
-	var margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
-	var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-	var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+	width = 1000 * aspecrat;
+	height = 1000;
+	hidewidth = 0;
+	margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
+	barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
 	navDims.treewidth = navDims.width * 2/9;
-	var bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
-	var i = 0,
-	duration = 300,
-	taxaroot,
-	funcroot,
+	bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
+	i = 0;
+	duration = 300;
 	roots = {};
 
-	var TaxaTree = d3.layout.tree()
+	TaxaTree = d3.layout.tree()
 		.children(function (d) { return d.values; })
 		.size([(navDims.height), navDims.treewidth]);
 
-	var FuncTree = d3.layout.tree()
+	FuncTree = d3.layout.tree()
 		.children(function (d) { return d.values;})
 		.size([(navDims.height), navDims.treewidth]);
 
-	var trees = [];
+	trees = [];
 	trees["taxa"] = TaxaTree;
 	trees["func"] = FuncTree;
 
-	var diagonal = d3.svg.diagonal()
+	diagonal = d3.svg.diagonal()
 		.projection(function (d) {
 		return [d.y, d.x];
 	});
 
-	var MainSVG = d3.select("#mainplot").append("svg")
+	MainSVG = d3.select("#mainplot").append("svg")
 		.attr("id","mainsvg")
 		.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
 		.attr("preserveAspectRatio","none");
 
-	
+	uploader.svgCreated = true;	
 }
 
 

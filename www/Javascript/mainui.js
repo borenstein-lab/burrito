@@ -20,7 +20,7 @@
 	
 	mainui.createUI = function() {
 		
-		console.log("setting stuff up");
+		//console.log("setting stuff up");
 		document.getElementById("sampleselector").addEventListener("change", function() {
 			mainui.checkSampleDataSelect();
 		});
@@ -135,9 +135,9 @@
 		}
 
 		if (readytogo) {
-			document.getElementById("update_button").disabled = false;
+			document.getElementById("submit_button").disabled = false;
 		} else {
-			document.getElementById("update_button").disabled = true;
+			document.getElementById("submit_button").disabled = true;
 		}
 	}
 
