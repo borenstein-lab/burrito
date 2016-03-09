@@ -43,6 +43,7 @@
 		*/
 		uploader.load_default_data = function(){
 
+			//console.log("loading default data");
 			// Add listeners for when the default files have successfully loaded
 			this.default_tax_abund_file.addEventListener("load", this.execute_on_default_tax_abund_load);
 			this.default_samp_map_file.addEventListener("load", this.execute_on_default_samp_map_load);
@@ -62,7 +63,7 @@
 		uploader.update_plots = function(){
 			var all_loaded = true;
 			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded, uploader.svgCreated];
-
+			//console.log(load_flags);
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < load_flags.length; i++){
 				if (!load_flags[i]){
@@ -76,7 +77,7 @@
 				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
 			} else {
 				setTimeout(function(){
-					update_plots();
+					uploader.update_plots();
 				}, 1000)
 			}
 		}
@@ -120,15 +121,15 @@
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
 			uploader.tax_abund_loaded = true;
-			mainui.fileloaded("read_counts");
+			//mainui.fileloaded("read_counts");
 		}
 
  		uploader.execute_on_tax_hierarchy_load = function() {
-			mainui.fileloaded("taxonomic_hierarchy");
+			//mainui.fileloaded("taxonomic_hierarchy");
  		}
 
 		uploader.execute_on_func_hierarchy_load = function() {
-			mainui.fileloaded("function_hierarchy");
+			//mainui.fileloaded("function_hierarchy");
 		}
 
 		uploader.execute_on_samp_map_load = function() {
@@ -139,11 +140,11 @@
 		}
 
 		uploader.execute_on_func_contrib_load = function() {
-		    mainui.fileloaded("function_contributions");
+		    //mainui.fileloaded("function_contributions");
 		}
 
 		uploader.execute_on_genome_annotation_load = function() {
-		    mainui.fileloaded("genome_annotations");
+		    //mainui.fileloaded("genome_annotations");
 		}
 
 		Shiny.addCustomMessageHandler("contribution_table_ready", function(size){

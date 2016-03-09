@@ -30,18 +30,21 @@
 		mainui.checkWhichInput();
 		mainui.RefreshUploadReady();
 			
-		document.getElementById("submit_button").addEventListener("click", function() {
+		document.getElementById("update_button").addEventListener("click", function() {
 			if (mainui.datamode == "sample") {
 				draw_svg();
 				uploader.load_default_data();
+				//document.getElementById("update_button").click();
 			} else if (mainui.datamode == "upload") {
 				draw_svg();
-				document.getElementById("update_button").click();
+				//document.getElementById("update_button").click();
 			}
 		});
 	}
 		
-		
+		/*document.getElementById("update_button").addEventListener("click", function() {
+			console.log("update button clicked");
+		}); */	
 
 
 	mainui.checkWhichInput = function() {
@@ -66,8 +69,7 @@
 	mainui.checkSampleDataSelect = function() {
 		d3.select("#samplesetinfo").selectAll("div").classed("hidexp",true);
 		var sampsel = document.getElementById("sampleselector");
-		var dsel = d3.select("#samplesetinfo").select("#" + sampsel.options[sampsel.selectedIndex].value + "exp");
-		console.log(dsel);
+		var dsel = d3.select("#samplesetinfo").select("#" + sampsel.options[sampsel.selectedIndex].value + "exp");	
 		dsel.classed("hidexp",false);
 		mainui.sampleSelected = sampsel.options[sampsel.selectedIndex].value;
 		mainui.RefreshUploadReady();
@@ -135,9 +137,9 @@
 		}
 
 		if (readytogo) {
-			document.getElementById("submit_button").disabled = false;
+			document.getElementById("update_button").disabled = false;
 		} else {
-			document.getElementById("submit_button").disabled = true;
+			document.getElementById("update_button").disabled = true;
 		}
 	}
 

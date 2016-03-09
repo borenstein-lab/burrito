@@ -6,7 +6,7 @@
 
 <script src="shared/jquery.js" type="text/javascript"></script>
 <script src="shared/shiny.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="CSS/shiny-alt.css"/>
+<link rel="stylesheet" type="text/css" href="shared/shiny.css"/>
 <script src="__assets__/shiny-server.js"></script>
 
 </head>
@@ -197,6 +197,21 @@ g.updateb.activebutton:hover rect {
 	visibility:hidden;
 }
 
+@keyframes loadcircanim {
+	0% {fill:red; cx:40%; cy:50%}
+	25% {fill:blue; cx:50%; cy:40%;}
+	50% {fill:green; cx:60%; cy:50%;}
+	75% {fill:orange; cx:50%; cy:60%;}
+	100% {fill:red; cx:40%; cy:50%;}
+}
+
+#loadcirc {
+	position: relative;
+	animation-name: loadcircanim;
+	animation-duration:4s;
+	animation-iteration-count: infinite;
+}
+
 white-space: pre-line;
 </style>
 <body>
@@ -327,8 +342,8 @@ white-space: pre-line;
 	<tr>
 		<td colspan=2>
 			<h4>Draw the burrito</h4>
-			<button id="submit_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
-			<button id="update_button" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
+			<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
+			<button id="update_button5000" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 		</td>
 	</tr>
 </table>
@@ -429,11 +444,31 @@ draw_svg = function() {
 		.attr("preserveAspectRatio","none");
 
 	uploader.svgCreated = true;	
+	draw_loading();
 }
 
+draw_loading = function() {
+	var loadg = MainSVG.append("g")
+		.attr("id","loadingG");
+	
+	loadg.append("text")
+		.attr("x",width / 2)
+		.attr("y", height / 2)
+		.text("Loading");
+
+	var loadspin = loadg.append("circle")
+		.attr("id","loadcirc")
+		.attr("cx",(width / 2) - 100)
+		.attr("cy",height / 2)
+		.attr("r", 30)
+		.attr("fill","red")
+		.attr("stroke","none");
+}
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
 
+	
+	//console.log(uploader.tax_abund_text);
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -448,7 +483,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
-
+	d3.select("#loadingG").remove()	
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
