@@ -198,11 +198,11 @@ g.updateb.activebutton:hover rect {
 }
 
 @keyframes loadcircanim {
-	0% {fill:red; cx:40%; cy:50%}
-	25% {fill:blue; cx:50%; cy:40%;}
-	50% {fill:green; cx:60%; cy:50%;}
-	75% {fill:orange; cx:50%; cy:60%;}
-	100% {fill:red; cx:40%; cy:50%;}
+	0% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
+	25% {fill:blue; cx:50%; cy:40%; rx:40; ry:20;}
+	50% {fill:green; cx:60%; cy:50%; rx:20; ry:40;}
+	75% {fill:orange; cx:50%; cy:60%; rx:40; ry:20;}
+	100% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
 }
 
 #loadcirc {
@@ -454,13 +454,15 @@ draw_loading = function() {
 	loadg.append("text")
 		.attr("x",width / 2)
 		.attr("y", height / 2)
+		.attr("text-anchor","middle")
 		.text("Loading");
 
-	var loadspin = loadg.append("circle")
+	var loadspin = loadg.append("ellipse")
 		.attr("id","loadcirc")
 		.attr("cx",(width / 2) - 100)
 		.attr("cy",height / 2)
-		.attr("r", 30)
+		.attr("rx", 30)
+		.attr("ry", 30)
 		.attr("fill","red")
 		.attr("stroke","none");
 }
