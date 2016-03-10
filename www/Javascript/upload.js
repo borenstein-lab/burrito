@@ -62,8 +62,8 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded, uploader.svgCreated];
-			//console.log(load_flags);
+			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated];
+			console.log(load_flags);
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < load_flags.length; i++){
 				if (!load_flags[i]){
@@ -74,32 +74,7 @@
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded){
 
-				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
-			} else {
-				setTimeout(function(){
-					uploader.update_plots();
-				}, 1000)
-			}
-		}
-		
-		/*
-		try_drawing_default()
-		Checks to see if the indicate files have been loaded. If so, redraw the graphics.
-		*/
-		uploader.try_drawing_default = function() {
-			var all_loaded = true;
-			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded];
-
-			// Check each flag to see if the file has been loaded
-			for (var i = 0; i < load_flags.length; i++){
-				if (!load_flags[i]){
-					all_loaded = false;
-				}
-			}
-
-			// If all of the flags are true, redraw the graphics
-			if (all_loaded){
-				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
+				draw_everything(uploader.tax_abund_text, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text);
 			}
 		}
 
@@ -177,10 +152,9 @@
 		});
 
 		Shiny.addCustomMessageHandler("function_hierarchy", function(func_hierarchy){
-			this.func_hierarchy_loaded = false;
-			this.func_hierarchy_text = func_hierarchy;
-			this.func_hierarchy_loaded = true;
-		});
+			uploader.func_hierarchy_loaded = false;
+			uploader.func_hierarchy_text = func_hierarchy;
+			uploader.func_hierarchy_loaded = true;		});
 
 		Shiny.addCustomMessageHandler("func_averages", function(func_averages){
 			uploader.func_averages_loaded = false;
@@ -192,14 +166,14 @@
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.responseText;
 			uploader.tax_abund_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		}
 
 		uploader.execute_on_default_samp_map_load = function() {
 			uploader.samp_map_loaded = false;
 			uploader.samp_map_text = this.responseText;
 			uploader.samp_map_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		}
 
 		Shiny.addCustomMessageHandler("default_contribution_table_ready", function(size){
@@ -220,7 +194,7 @@
 				} else {
 					Shiny.onInputChange("sample_request", -1);
 					uploader.contribution_table_loaded = true;
-	                uploader.try_drawing_default();	
+	                uploader.update_plots();	
 				}
 			}, 2);
         });
@@ -229,21 +203,21 @@
 			uploader.func_hierarchy_loaded = false;
 			uploader.func_hierarchy_text = func_hierarchy;
 			uploader.func_hierarchy_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		});
 
 		Shiny.addCustomMessageHandler("default_tax_hierarchy", function(taxa_hierarchy){
 			uploader.tax_hierarchy_loaded = false;
 			uploader.tax_hierarchy_text = taxa_hierarchy;
 			uploader.tax_hierarchy_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		});
 
 		Shiny.addCustomMessageHandler("default_func_averages", function(func_averages){
 			uploader.func_averages_loaded = false;
 			uploader.func_averages_text = func_averages;
 			uploader.func_averages_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		});
 
 		// Add listeners for when files have successfully loaded
@@ -271,7 +245,7 @@
 			});
 			
 		// Set up event handlers for selecting other files, only for UI
-		document.getElementById("function_contributions").addEventListener('change', function(e) {
+		document.getElementById("function_contributions").addEventListener('input', function(e) {
 			mainui.fileloading("function_contributions",this.files[0].name);
 			});
 		document.getElementById("genome_annotations").addEventListener('change', function(e) {
