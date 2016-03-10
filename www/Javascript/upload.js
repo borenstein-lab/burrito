@@ -107,14 +107,14 @@
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
 			uploader.tax_abund_loaded = true;
-			mainui.fileloaded("taxonomic_abundances_1");
+			//mainui.fileloaded("taxonomic_abundances_1");
 		}
 
 		uploader.execute_on_tax_abund_2_load = function() {
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
 			uploader.tax_abund_loaded = true;
-			mainui.fileloaded("taxonomic_abundances_2");
+			//mainui.fileloaded("taxonomic_abundances_2");
 		}
 
 		uploader.execute_on_reads_load = function() {
@@ -136,7 +136,7 @@
 			uploader.samp_map_loaded = false;
 			uploader.samp_map_text = this.result;
 			uploader.samp_map_loaded = true;
-			mainui.fileloaded("sample_map");
+			//mainui.fileloaded("sample_map");
 		}
 
 		uploader.execute_on_func_contrib_load = function() {
