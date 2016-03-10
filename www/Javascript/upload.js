@@ -220,6 +220,14 @@
 			uploader.update_plots();
 		});
 
+		Shiny.addCustomMessageHandler("retry_upload", function(message){
+			console.log("retrying")
+			setTimeout(function(){
+				document.getElementById("update_button").click()
+			}, 2000)
+			console.log("retried")
+		})
+
 		// Add listeners for when files have successfully loaded
 		uploader.tax_abund_1_reader.addEventListener('load', uploader.execute_on_tax_abund_1_load);
 		uploader.tax_abund_2_reader.addEventListener('load', uploader.execute_on_tax_abund_2_load);
@@ -245,7 +253,7 @@
 			});
 			
 		// Set up event handlers for selecting other files, only for UI
-		document.getElementById("function_contributions").addEventListener('input', function(e) {
+		document.getElementById("function_contributions").addEventListener('change', function(e) {
 			mainui.fileloading("function_contributions",this.files[0].name);
 			});
 		document.getElementById("genome_annotations").addEventListener('change', function(e) {
@@ -257,12 +265,6 @@
 		document.getElementById("function_hierarchy").addEventListener('change', function(e) {
 			mainui.fileloading("function_hierarchy",this.files[0].name);
 			});
-			
-			
-			
-			
-			
-			
 			
 		return(uploader);
 	}
