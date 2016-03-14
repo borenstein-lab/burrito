@@ -12,6 +12,8 @@
 		uploader.func_hierarchy_loaded = false;
 		uploader.func_averages_loaded = false;
 		uploader.samp_map_loaded = false;
+		
+		uploader.svgCreated = false;
 
 		// These variables hold the results of file loading
 		uploader.tax_abund_text = "";
@@ -41,6 +43,7 @@
 		*/
 		uploader.load_default_data = function(){
 
+			//console.log("loading default data");
 			// Add listeners for when the default files have successfully loaded
 			this.default_tax_abund_file.addEventListener("load", this.execute_on_default_tax_abund_load);
 			this.default_samp_map_file.addEventListener("load", this.execute_on_default_samp_map_load);
@@ -59,8 +62,8 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded];
-
+			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated];
+			console.log(load_flags);
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < load_flags.length; i++){
 				if (!load_flags[i]){
@@ -71,34 +74,7 @@
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded){
 
-				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
-			} else {
-				setTimeout(function(){
-					update_plots();
-				}, 1000)
-			}
-		}
-		
-		/*
-		try_drawing_default()
-		Checks to see if the indicate files have been loaded. If so, redraw the graphics.
-		*/
-		uploader.try_drawing_default = function() {
-				
-			var all_loaded = true;
-			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.samp_map_loaded, uploader.func_averages_loaded];
-
-			// Check each flag to see if the file has been loaded
-			for (var i = 0; i < load_flags.length; i++){
-				if (!load_flags[i]){
-					all_loaded = false;
-				}
-			}
-
-			// If all of the flags are true, redraw the graphics
-			if (all_loaded){
-
-				draw_everything(this.tax_abund_text, this.contribution_table, this.tax_hierarchy_text, this.func_hierarchy_text, this.samp_map_text, this.func_averages_text);
+				draw_everything(uploader.tax_abund_text, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text);
 			}
 		}
 
@@ -106,44 +82,44 @@
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
 			uploader.tax_abund_loaded = true;
-			mainui.fileloaded("taxonomic_abundances_1");
+			//mainui.fileloaded("taxonomic_abundances_1");
 		}
 
 		uploader.execute_on_tax_abund_2_load = function() {
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
 			uploader.tax_abund_loaded = true;
-			mainui.fileloaded("taxonomic_abundances_2");
+			//mainui.fileloaded("taxonomic_abundances_2");
 		}
 
 		uploader.execute_on_reads_load = function() {
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
 			uploader.tax_abund_loaded = true;
-			mainui.fileloaded("read_counts");
+			//mainui.fileloaded("read_counts");
 		}
 
  		uploader.execute_on_tax_hierarchy_load = function() {
-			mainui.fileloaded("taxonomic_hierarchy");
+			//mainui.fileloaded("taxonomic_hierarchy");
  		}
 
 		uploader.execute_on_func_hierarchy_load = function() {
-			mainui.fileloaded("function_hierarchy");
+			//mainui.fileloaded("function_hierarchy");
 		}
 
 		uploader.execute_on_samp_map_load = function() {
 			uploader.samp_map_loaded = false;
 			uploader.samp_map_text = this.result;
 			uploader.samp_map_loaded = true;
-			mainui.fileloaded("sample_map");
+			//mainui.fileloaded("sample_map");
 		}
 
 		uploader.execute_on_func_contrib_load = function() {
-		    mainui.fileloaded("function_contributions");
+		    //mainui.fileloaded("function_contributions");
 		}
 
 		uploader.execute_on_genome_annotation_load = function() {
-		    mainui.fileloaded("genome_annotations");
+		    //mainui.fileloaded("genome_annotations");
 		}
 
 		Shiny.addCustomMessageHandler("contribution_table_ready", function(size){
@@ -176,10 +152,9 @@
 		});
 
 		Shiny.addCustomMessageHandler("function_hierarchy", function(func_hierarchy){
-			this.func_hierarchy_loaded = false;
-			this.func_hierarchy_text = func_hierarchy;
-			this.func_hierarchy_loaded = true;
-		});
+			uploader.func_hierarchy_loaded = false;
+			uploader.func_hierarchy_text = func_hierarchy;
+			uploader.func_hierarchy_loaded = true;		});
 
 		Shiny.addCustomMessageHandler("func_averages", function(func_averages){
 			uploader.func_averages_loaded = false;
@@ -191,14 +166,14 @@
 			uploader.tax_abund_loaded = false;
 			uploader.tax_abund_text = this.responseText;
 			uploader.tax_abund_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		}
 
 		uploader.execute_on_default_samp_map_load = function() {
 			uploader.samp_map_loaded = false;
 			uploader.samp_map_text = this.responseText;
 			uploader.samp_map_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		}
 
 		Shiny.addCustomMessageHandler("default_contribution_table_ready", function(size){
@@ -219,7 +194,7 @@
 				} else {
 					Shiny.onInputChange("sample_request", -1);
 					uploader.contribution_table_loaded = true;
-	                uploader.try_drawing_default();	
+	                uploader.update_plots();	
 				}
 			}, 2);
         });
@@ -228,22 +203,30 @@
 			uploader.func_hierarchy_loaded = false;
 			uploader.func_hierarchy_text = func_hierarchy;
 			uploader.func_hierarchy_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		});
 
 		Shiny.addCustomMessageHandler("default_tax_hierarchy", function(taxa_hierarchy){
 			uploader.tax_hierarchy_loaded = false;
 			uploader.tax_hierarchy_text = taxa_hierarchy;
 			uploader.tax_hierarchy_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		});
 
 		Shiny.addCustomMessageHandler("default_func_averages", function(func_averages){
 			uploader.func_averages_loaded = false;
 			uploader.func_averages_text = func_averages;
 			uploader.func_averages_loaded = true;
-			uploader.try_drawing_default();
+			uploader.update_plots();
 		});
+
+		Shiny.addCustomMessageHandler("retry_upload", function(message){
+			console.log("retrying")
+			setTimeout(function(){
+				document.getElementById("update_button").click()
+			}, 2000)
+			console.log("retried")
+		})
 
 		// Add listeners for when files have successfully loaded
 		uploader.tax_abund_1_reader.addEventListener('load', uploader.execute_on_tax_abund_1_load);
@@ -282,12 +265,6 @@
 		document.getElementById("function_hierarchy").addEventListener('change', function(e) {
 			mainui.fileloading("function_hierarchy",this.files[0].name);
 			});
-			
-			
-			
-			
-			
-			
 			
 		return(uploader);
 	}

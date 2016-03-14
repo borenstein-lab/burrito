@@ -24,7 +24,7 @@
 		//button.selectAll("text").attr("opacity",0.5);
 	}
 	
-	button_maker.add_rect_button = function(element, id, x, y, width, height, newclass, fill, text, on_click){
+	button_maker.add_rect_button = function(element, id, x, y, width, height, newclass, fill, fontsize, text, on_click){
 
 		var thisg = element.append("g")
 			.attr("id", id);
@@ -38,9 +38,11 @@
 			.attr("width", width)
 			.attr("height", height);
 		
-		if (fill) { thisrect.attr("fill",fill); }
+		if (fill) { thisrect.style("fill",fill); }
+		if (fontsize) { thisrect.style("font-size", fontsize) }
 
 		document.getElementById(id).addEventListener("click", function() {
+			
 			if (document.getElementById(id).getAttribute("on") == "true") {
 				on_click();
 			}
@@ -53,7 +55,7 @@
 			.attr("id", id + this.text_tag + "_" + i)
 			.attr("x", x + (width / 2))
 			.attr("y", y + 6 + (height * (i + 1)/ (text_components.length + 1)))
-			.attr("font-size", "20px")
+			//.attr("font-size", "20px")
 			.attr("text-anchor", "middle")
 			.text(text_components[i])
 			.classed("noselect",true);

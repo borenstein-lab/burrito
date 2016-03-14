@@ -6,7 +6,7 @@
 
 <script src="shared/jquery.js" type="text/javascript"></script>
 <script src="shared/shiny.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="CSS/shiny-alt.css"/>
+<link rel="stylesheet" type="text/css" href="shared/shiny.css"/>
 <script src="__assets__/shiny-server.js"></script>
 
 </head>
@@ -86,6 +86,8 @@ path.link {
 	width:100%;
 	height:100%;
 	vertical-align:top;
+	font-family: "Verdana", Verdana, sans-serif;
+
 }
 #mainsvg {
 	position:fixed;
@@ -94,6 +96,24 @@ path.link {
 	height:100%;
 	width:100%;
 	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
+}
+#plots_svg {
+	position:fixed;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
+}
+#taxa_bar {
+	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
+}
+#func_bar {
+	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
 }
 #sidebar {
 	z-index:5;
@@ -189,20 +209,171 @@ g.updateb.activebutton:hover rect {
 	
 } 
 
+.hidexp {
+	display:none;
+}
+
+.hidbut {
+	visibility:hidden;
+}
+
+@keyframes loadcircanim {
+	0% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
+	25% {fill:blue; cx:50%; cy:40%; rx:40; ry:20;}
+	50% {fill:green; cx:60%; cy:50%; rx:20; ry:40;}
+	75% {fill:orange; cx:50%; cy:60%; rx:40; ry:20;}
+	100% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
+}
+
+#loadcirc {
+	position: relative;
+	animation-name: loadcircanim;
+	animation-duration:4s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear:
+}
+
 white-space: pre-line;
 </style>
 <body>
-<div style="float:left" id="button_holder"></div>
-<div>
-<h2>Exploring microbial community taxa and functions</h2>
-<h4>Click on nodes of the tree to see more details about a taxon or function. Mouse over any taxon or function to see its relationships and contributions across samples. </h4>
-<p>Alex Eng, Will Gagne-Maynard, Colin McNally, Cecilia Noecker</p>
-<p> data from <a href="http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html?message-global=remove" target="_blank">Theriot et al <i>Nature Communications</i> (2014)</a></p>
+<div id="mainthing" style="overflow-x:auto">
+
+
+<table width="900" align="center">
+	<tr>
+		<td colspan=2 align="center">
+			<img border="0" src="images/title_lab_800.jpg"></img>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=2 align="center"> 
+			<h2>Burrito: A Marriage of Taxonomy and Function</h2> 
+			<img border="0" src="images/burrito.jpg"></img>
+		</td>
+	</tr>
+	
+	<tr>
+		<td colspan=2>
+			<p>This is a tool to visualize the relationship between taxonomy and function. You can view sample data or upload your own data.</p>
+			<p>Source code available <a href="https://github.com/borenstein-lab/burrito">here</a></p>
+		</td>
+	</tr>
+	
+	<tr>
+		<td>
+			<table id="sampletable" width="400" height="200" frame="box">
+			<tr><td>
+				<input type="radio" name="whichinput" id="usesample" onchange="mainui.checkWhichInput()">
+				<h4 style="display:inline">Explore sample data</h4> 
+				
+			</td></tr>
+			<tr><td>
+				<select name="sampleset" id="sampleselector">
+					<option value="none" selected></option>
+					<option value="theriot">Theriot et. al. 2014</option>
+				</select>
+			</td></tr>
+			<tr><td id="samplesetinfo">
+				<div id="noneexp">
+					Information about the selected dataset.
+				</div>
+				<div id="theriotexp" class="hidexp">
+					<p>Antibiotic-induced shifts in the mouse gut microbiome and metabolome increase susceptibility to Clostridium difficile infection</p>
+					<a href=http://www.nature.com/ncomms/2014/140120/ncomms4114/abs/ncomms4114.html target="_blank">Paper</a>
+				</div>
+			</td></tr>
+			</table>
+		</td>
+		<td>
+			<table id="uploadtable" width="500" height = "200" frame="box">
+				<tr><td colspan=3>
+					<input type="radio" name="whichinput" id="useupload" onchange="mainui.checkWhichInput()">
+					<h4 style="display:inline">Upload your own data</h4> 
+				</td></tr>
+				<tr><td colspan=3>
+						<input type="radio" name="inptype" id="sixteenradio" onchange="mainui.checkInpDataRadio()" value="16s">16s Reads
+						<input type="radio" name="inptype" id="funcradio" onchange="mainui.checkInpDataRadio()" value="func">Functional Contributions
+						<input type="radio" name="inptype" id="genomeradio" onchange="mainui.checkInpDataRadio()" value="genome">Genomic Annotations
+				</td></tr>
+				<tr>
+					<td>
+						<div id="taxonomic_abundances_1_g" class="hidbut">
+							Genome Abundances
+							<input type="file" name="taxonomic_abundances_1" id="taxonomic_abundances_1">
+						</div>
+						<div id="taxonomic_abundances_2_g" class="hidexp">
+							Taxonomic Abundances
+							<input type="file" name="taxonomic_abundances_2" id="taxonomic_abundances_2">
+						</div>
+						<div id="read_counts_g" class="hidexp">
+							16s Reads
+							<input type="file" name="read_counts" id="read_counts">
+						</div>
+					</td>
+					<td>
+						<div id="genome_annotations_g" class="hidbut">
+							Genome Annotations
+							<input type="file" name="genome_annotations" id="genome_annotations">
+						</div>
+						<div id="function_contributions_g" class="hidexp">
+							Function Contributions
+							<input type="file" name="function_contributions" id="function_contributions">
+						</div>
+					</td>
+					<td>
+						
+					</td>
+				</tr>
+				<tr> 
+					<td colspan=3> Optional Files:</td>
+				</tr>
+				<tr>
+					<td>
+						Taxonomic Hierarchy
+						<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
+					</td>
+					<td>
+						Function Hierarchy
+						<input type="file" name="function_hierarchy" id="function_hierarchy">
+					</td>
+					<td>
+						Sample Map
+						<input type="file" name="sample_map" id="sample_map">
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr> <td width="15" bgcolor="000000" colspan=2> 
+	</td></tr>
+	<tr>
+		<td colspan=2> <h4>Visualization Options</h4> 
+			<select name="levelofdetail" id="LODselector">
+				<option value="phylum">Phylum</option>
+				<option value="class">Class</option>
+				<option value="order">Order</option>
+				<option value="family">Family</option>
+				<option value="genus" selected>Genus</option>
+				<option value="species">Species</option>
+				<option value="otu">OTU</option>
+			</select>
+		</td>
+	</tr>
+
+	<tr>
+		<td colspan=2>
+			<h4>Draw the burrito</h4>
+			<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
+			<button id="update_button5000" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
+		</td>
+	</tr>
+</table>
+
+
 <br>
-<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Update Graphics</button>
 <span class="error" id="upload_message"></span>
 </div>
-<button type="button" onclick = "hideheader()" style="float:right">Hide Header</button>
+<div style="float:left" id="button_holder"><br><br><br><br><br><br><br><br></div>
 
 <div id="mainplot">
 
@@ -242,100 +413,104 @@ white-space: pre-line;
 <script src="Javascript/saveSvgAsPng.js"></script>
 
 <script>
+mainui.createUI();
 
-
-
-var aspecrat = window.innerWidth / window.innerHeight;
-
-var width = 1000 * aspecrat;
-var height = 1000;
-var hidewidth = 0;
-var margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
-var barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-var navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
-navDims.treewidth = navDims.width * 2/9;
-var bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
-var i = 0,
-duration = 300,
+var aspecrat, width, height, hidewidth, margin;
+var barDimensions, navDims, bpdims;
+var i,
+duration,
 taxaroot,
 funcroot,
-roots = {};
+roots;
 
-var TaxaTree = d3.layout.tree()
-    .children(function (d) { return d.values; })
-    .size([(navDims.height), navDims.treewidth]);
+var TaxaTree, FuncTree, trees, diagonal;
 
-var FuncTree = d3.layout.tree()
-    .children(function (d) { return d.values;})
-    .size([(navDims.height), navDims.treewidth]);
+var MainSVG, plotSVG;
 
-var trees = [];
-trees["taxa"] = TaxaTree;
-trees["func"] = FuncTree;
+draw_svg = function() {
+	if (d3.select("#mainsvg")[0][0] === null) {
+		aspecrat = window.innerWidth / window.innerHeight;
 
-var diagonal = d3.svg.diagonal()
-.projection(function (d) {
-return [d.y, d.x];
-});
+		width = 1000 * aspecrat;
+		height = 1000;
+		hidewidth = 0;
+		margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
+		barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+		navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+		navDims.treewidth = navDims.width * 2/9;
+		bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
+		i = 0;
+		duration = 300;
+		roots = {};
 
-var MainSVG = d3.select("#mainplot").append("svg")
-.attr("id","mainsvg")
-.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
-.attr("preserveAspectRatio","none");
+		TaxaTree = d3.layout.tree()
+			.children(function (d) { return d.values; })
+			.size([(navDims.height), navDims.treewidth]);
 
-var sidebarz = d3.select("#mainsvg").append("svg")
-.attr("id","sidebar")
-.attr("x",hidewidth)
-.attr("y",0)
-.attr("width",width)
-.attr("height",height)
+		FuncTree = d3.layout.tree()
+			.children(function (d) { return d.values;})
+			.size([(navDims.height), navDims.treewidth]);
 
-var sidebar_background = d3.select("#sidebar").append("rect")
-.attr("id","sidebar_background")
-.attr("x",0)
-.attr("y",0)
-.attr("width",width)
-.attr("height",height)
-.attr("fill","#e0e0eb");
+		trees = [];
+		trees["taxa"] = TaxaTree;
+		trees["func"] = FuncTree;
 
-var plotSVG = d3.select("#mainsvg").append("svg")
-	.attr("id","plots_svg")
-	.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
-	.attr("preserveAspectRatio","none");
+		diagonal = d3.svg.diagonal()
+			.projection(function (d) {
+			return [d.y, d.x];
+		});
+
+		MainSVG = d3.select("#mainplot").append("svg")
+			.attr("id","mainsvg")
+			.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
+			.attr("preserveAspectRatio","none");
+
+		uploader.svgCreated = true;	
+		plotSVG = d3.select("#mainsvg").append("svg")
+			.attr("id","plots_svg")
+			.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
+			.attr("preserveAspectRatio","none")
+			.style("font-family", "Verdana");
 	
-	
-	
-button_maker.add_rect_button(d3.select("#mainsvg"), "sidebar_hide", 0, 0, 20, 20,"","url(#larrowspat)", "", function() {
-    var curpos = parseFloat(d3.select("#sidebar")[0][0].attributes.x.value);
-	if (curpos > -10) {
-		mainui.minimizeUI();
-		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#rarrowspat)");
-	} else {
-		sidebarz.transition().attr("x",hidewidth).duration(500);
-		MainSVG.select("#sidebar_hide").select("rect").transition().attr("fill","url(#larrowspat)");
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
+			saveSvgAsPng(document.getElementById("plots_svg"), "test.png", { backgroundColor : "white", scale: 1.5})
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 120, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
+			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 230, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
+			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
+		});
+
+		draw_loading();
+
+		}
 	}
-})
 
-button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 0, 0, 100, 100, "switchb activebutton", "", "Save screenshot as png", function(){
-			saveSvgAsPng(document.getElementById("plots_svg"), "test.png")//, selectorRemap = "CSS/shiny_alt.css")
-		});
-button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_bars", 0, 100, 100, 100, "switchb activebutton", "", "Save taxonomic area plot as png", function(){
-			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png")//, selectorRemap = "CSS/shiny_alt.css")
-		});
-button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_bars", 0, 200, 100, 100, "switchb activebutton", "", "Save functional area plot as png", function(){
-			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png")//, selectorRemap = "CSS/shiny_alt.css")
-		});
+draw_loading = function() {
+	var loadg = MainSVG.append("g")
+		.attr("id","loadingG");
+	
+	loadg.append("text")
+		.attr("x",width / 2)
+		.attr("y", height / 2)
+		.attr("text-anchor","middle")
+		.text("Loading");
 
-d3.select("#sidebar_hide").attr("visibility","hidden");
-
-
-
-mainui.createUI(d3.select("#sidebar"));
-
+	var loadspin = loadg.append("ellipse")
+		.attr("id","loadcirc")
+		.attr("cx",(width / 2) - 100)
+		.attr("cy",height / 2)
+		.attr("rx", 30)
+		.attr("ry", 30)
+		.attr("fill","red")
+		.attr("stroke","none");
+}
 
 draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
 
-	console.log("Redrawing")
+	
+	//console.log(uploader.tax_abund_text);
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -351,7 +526,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
-
+	d3.select("#loadingG").remove()	
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
@@ -361,7 +536,8 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	.attr("y",margin.top)
 	.attr("width", width - margin.left - margin.right)
 	.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
-	.attr("id","navbar");	
+	.attr("id","navbar")
+	.style("font-family", "Verdana");
 	
 /*	NavSVG.append("rect")   //rectangle around the navbar, to help figure out positioning
 		.attr("x",0)
@@ -393,6 +569,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		//.attr("height",100)
 		//.attr("viewBox","0 0 100 100")
 		.attr("id", "taxa_bars")
+		.style("font-family", "Verdana");
 		//.attr("preserveAspectRatio","none");
 		//.attr("transform","scale(2.0)");
 
@@ -405,7 +582,8 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		.attr("width",(width/2) - margin.right - (margin.btwbars/2))
 		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
 		//.attr("viewBox","0 0 100 100")
-		.attr("id", "func_bars");
+		.attr("id", "func_bars")
+		.style("font-family", "Verdana");
 		
 		
 	var bpvisdata;
@@ -421,11 +599,11 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	curlevelNames['taxa'] = levelNames['taxa'];
 	curlevelNames['func'] = levelNames['func'];
 
-	taxa_tree_data = d3.tsv.parse(tax_hierarchy_text);
-	
-	func_tree_data = d3.tsv.parse(func_hierarchy_text);
+	taxa_tree_data = tax_hierarchy_text;
+
+	func_tree_data = func_hierarchy_text;
+
 	func_averages = d3.tsv.parse(func_averages)
-//	console.log(func_averages)
 	samplemap = d3.tsv.parse(samp_map_text);
 
 	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
@@ -443,43 +621,12 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		return new_otu_data;
 	}
 
-	//console.log(otu_abundance_data_transpose)
 
 otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
 
-//filter out things in mapping files but not in input data
-//this should no longer be necessary, happening on server
-//console.log(otu_abundance_data)
-// taxa_tree_data = taxa_tree_data.filter(function(d){
-// 	return d3.keys(otu_abundance_data[0]).indexOf(d.OTU_ID) != -1
-// 	})
-	//console.log(taxa_tree_data);
-/*
-    all_kos = d3.set(func_tree_data.map(function(d){ return d.KO})).values()
-    all_kos = all_kos.filter(function(d){
-        count = 0
-        sample_count = 0
-        while(count == 0 & sample_count < (d3.keys(contribution_table)).length){
-          for(otu in contribution_table[d3.keys(contribution_table)[sample_count]]){
-            if(contribution_table[d3.keys(contribution_table)[sample_count]][otu].hasOwnProperty(d)){
-            	if(contribution_table[d3.keys(contribution_table)[sample_count]][otu][d] != 0){
-            		count += 1
-            	}
-            }
-          }
-          sample_count += 1
-        }
-        return count > 0
-      })
-      func_tree_data = func_tree_data.filter(function(d){
-        return all_kos.indexOf(d.KO) != -1
-      })
-      console.log(func_tree_data)
-*/	
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data, func_averages);
-	
 
 	//if( not expand to OTU level
 	genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)
@@ -507,7 +654,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 				new_color["l"] = core_color["l"] - 36*flip*(k + (k%2))/(color_range+1)
 	      		new_color["h"] = core_color["h"] - 8*flip*(k+ (k%2))/(color_range+1)
 	      		new_color["c"] = core_color["c"] - 4*flip*(k+ (k%2))/(color_range+1)
-	      		//console.log(new_color)
 	      		new_colors.push(new_color)
 	      		flip *= -1
 
@@ -618,45 +764,45 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 			func_palette = colorbrewer["Set1"][(d3.keys(colorbrewer["Set1"]).pop()-1)].concat(colorbrewer["Dark2"][num_function_categories - d3.keys(colorbrewer["Set1"]).pop()])
 		}
 
-		var taxa_colors = d3.scale.ordinal()
-		taxa_colors.range(taxa_palette)
-		main_taxa = []
-		for(j=0; j < data_cube.taxa_tree.length; j++){
-			main_taxa = main_taxa.concat(data_cube.taxa_tree[j].values.map(function(d){ return d.key;}))
-		}
-		taxa_colors.domain(main_taxa)
-		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
+	var taxa_colors = d3.scale.ordinal()
+	taxa_colors.range(taxa_palette)
+	main_taxa = []
+	for(j=0; j < data_cube.taxa_tree.length; j++){
+		main_taxa = main_taxa.concat(data_cube.taxa_tree[j].values.map(function(d){ return d.key;}))
+	}
+	taxa_colors.domain(main_taxa)
+	taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
 
-	/*	taxa_colors.range().push("black")
-		console.log(taxa_colors("Bacteria"))
-	*/
-		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
-		col1 = d3.hsl("black")
-		//if there are other kingdoms besides Bacteria, shades of grey
-		for(j=0; j < kingdoms.length; j++){
-			taxa_colors.range().push(col1)
-			taxa_colors(kingdoms[j])
-			col1["l"] +=  (j+1)/(kingdoms.length + 1)
-		}
-		taxa_colors.range().push("black")
-		taxa_colors("All Taxa")
+	kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
+	col1 = d3.hsl("black")
+	//if there are other kingdoms besides Bacteria, shades of grey
+	for(j=0; j < kingdoms.length; j++){
+		taxa_colors.range().push(col1)
+		taxa_colors(kingdoms[j])
+		col1["l"] +=  (j+1)/(kingdoms.length + 1)
+	}
+	taxa_colors.range().push("black")
+	taxa_colors("All Taxa")
 
 
-		//func colors
-		var func_colors = d3.scale.ordinal()
-		func_colors.range(func_palette)
-		main_funcs = data_cube.func_tree.map(function(d){ return d.key;})
-		func_colors.domain(main_funcs)
-		func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
-		func_colors.range().push("black")
-		func_colors("All Functions")
-		} else if(color_option == "Random"){
-			taxa_colors = d3.scale.category20()
-			taxa_colors.domain(d3.keys(data_cube.taxa_tree_lookup))
-			func_colors = d3.scale.ordinal()
-			func_colors.range(colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"]))
-			func_colors.domain(d3.keys(data_cube.func_tree_lookup))
-		}
+	//func colors
+	var func_colors = d3.scale.ordinal()
+	func_colors.range(func_palette)
+	main_funcs = data_cube.func_tree.map(function(d){ return d.key;})
+	func_colors.domain(main_funcs)
+	func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
+	func_colors.range().push("black")
+	func_colors("All Functions")
+	
+	
+	} else if(color_option == "Random"){
+		taxa_colors = d3.scale.category20()
+		taxa_colors.domain(d3.keys(data_cube.taxa_tree_lookup))
+		func_colors = d3.scale.ordinal()
+		func_colors.range(colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"]))
+		func_colors.domain(d3.keys(data_cube.func_tree_lookup))
+	}
+
 
 	//sample colors
 	groupValsAll = samplemap.map(function(d,i){ 
@@ -743,7 +889,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		}
 	}
 
-	//console.log(data_cube.displayed_contribution_cube[d3.keys(data_cube.displayed_contribution_cube)[0]].toSource());
 	var taxLevels = d3.keys(taxa_tree_data[0]);
 	//data_cube.expand_taxon("Bacteria");
 
@@ -786,16 +931,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
 
-	var taxa_data = d3.nest()
-        .key(function(d) { return d.Kingdom; })
-        .key(function(d) { return d.Phylum; })
-        .key(function(d) { return d.Class; })
-        .key(function(d) { return d.Order; })
-        .key(function(d) { return d.Family; })
-        .key(function(d) { return d.Genus; })
-        .key(function(d) { return d.Species; })
-        .key(function(d) { return d.OTU_ID; })
-        .entries(taxa_tree_data);    
+	var taxa_data = jQuery.extend(true, [], taxa_tree_data);
 
     var curr_taxa = [];
     for (var i = 0; i < taxa_data.length; i++){
@@ -870,7 +1006,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 
 	function getAvgs(rootnode){
     	if(rootnode.type=="func"){
-    		//console.log(rootnode)
     		if(rootnode.key != "All Functions"){
     			func_leaves = data_cube.get_leaves(rootnode.key, data_cube.func_lookup)
 				rootnode.sampleAvg = data_cube.funcMeans[rootnode.key]
@@ -917,16 +1052,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
     //d3.select(self.frameElement).style("height", "800px");
 
 
-    var function_data = d3.nest()
-        .key(function(d) { return d.Category; })
-        .key(function(d) { return d.SuperPathway; })
-        .key(function(d) { return d.SubPathway; })
-        .entries(func_tree_data);  
-
-    //var function_data2 = data_cube.func_tree
-
-	//console.log(function_data)
-	//console.log(function_data2)
+    var function_data = jQuery.extend(true, [], func_tree_data);
 
     var curr_funcs = [];
     for (var i = 0; i < function_data.length; i++){
@@ -976,7 +1102,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 			nleaf = nleaf + (d.values ? 0 : 1);
 		})
 		/*
-		//console.log(nleaf);
 		
 		var leafC = 1;
 		*/
@@ -1295,8 +1420,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 
 		// Stash the old positions for transition.
 		nodes.forEach(function (d) {
-			//console.log(d.x);
-			//console.log(d.y);
 			d.x0 = d.x;
 			d.y0 = d.y;
 		});
@@ -1307,7 +1430,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
 			curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
 		}
-		//console.log(curlevelNames[source.type][source.type]);
 		
 		// Update the tree depth labels
 		var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
@@ -1361,7 +1483,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 					collapseTree(d);
 					d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
 					bpvisdata = updateBPgraph();
-					//console.log(bpvisdata.toSource());
 				}
 			} else { //expand
 				if (d._values[0].hasOwnProperty('key')) {
@@ -1426,7 +1547,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 				otu_bar.select_bars(taxonName);
 
 				// Highlight Function Bar Chart
-				//console.log(func_colors);
 				fB.select_contribution(taxonName, func_colors);
 			}
 		}
@@ -1598,9 +1718,7 @@ var uploader = uploader_wrapper.make_uploader(draw_everything);
 
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 
-uploader.load_default_data();
-//Shiny.addCustomMessageHandler("shiny_test", function(message){console.log(message)})
-
+Shiny.addCustomMessageHandler("shiny_test", function(message){console.log(message)})
 	
 </script>
 </body>
