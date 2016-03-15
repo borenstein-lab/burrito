@@ -358,6 +358,14 @@ white-space: pre-line;
 				<option value="otu">OTU</option>
 			</select>
 		</td>
+		</tr>
+		<tr>
+		<td>
+			<select name="color_option_selector" id="color_option_selector">
+			<option value="Categories">Hierarchical color scale</option>
+			<option value="Random">Random color scale</option>
+		`	</select>
+		</td>
 	</tr>
 
 	<tr>
@@ -632,7 +640,9 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)
 
 	////////////////////////// Colors
-	color_option = "Categories" //Categories or Random
+	//color_option = "Categories" //Categories or Random
+	color_option = d3.select("#color_option_selector").property("value")
+	console.log(color_option)
 	
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		//1st - divide up color space into number of leaves
