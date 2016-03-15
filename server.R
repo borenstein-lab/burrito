@@ -282,13 +282,11 @@ shinyServer(function(input, output, session) {
 	        taxa_hierarchy[,(colnames(taxa_hierarchy)[2:dim(taxa_hierarchy)[2]]):=lapply(.SD, function(col){
 	        	return(gsub("^$", "unknown", gsub("^.__", "", gsub(";$", "", col))))
 	        }), .SDcols=2:dim(taxa_hierarchy)[2]]
-	        session$sendCustomMessage("shiny_test", taxa_hierarchy)
 			taxa_hierarchy[,(colnames(taxa_hierarchy)[2:dim(taxa_hierarchy)[2]]):=lapply(2:dim(taxa_hierarchy)[2], function(col){
 				sapply(1:dim(taxa_hierarchy)[1], function(row){
 					return(paste(taxa_hierarchy[row,2:col,with=F], collapse="_"))
 				})
 			})]
-			session$sendCustomMessage("shiny_test", taxa_hierarchy)
 	        output[,OTU:=as.character(OTU)]
 
 	        # Summarize contribution table to the correct taxonomic level
