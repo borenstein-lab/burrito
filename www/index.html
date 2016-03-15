@@ -86,6 +86,8 @@ path.link {
 	width:100%;
 	height:100%;
 	vertical-align:top;
+	font-family: "Verdana", Verdana, sans-serif;
+
 }
 #mainsvg {
 	position:fixed;
@@ -94,6 +96,24 @@ path.link {
 	height:100%;
 	width:100%;
 	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
+}
+#plots_svg {
+	position:fixed;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
+}
+#taxa_bar {
+	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
+}
+#func_bar {
+	background-color:white;
+	font-family: "Verdana", Verdana, sans-serif;
 }
 #sidebar {
 	z-index:5;
@@ -331,6 +351,14 @@ white-space: pre-line;
 			<select name="taxlevelofdetail" id="taxLODselector">
 			</select>
 		</td>
+		</tr>
+		<tr>
+		<td>
+			<select name="color_option_selector" id="color_option_selector">
+			<option value="Categories">Hierarchical color scale</option>
+			<option value="Random">Random color scale</option>
+		`	</select>
+		</td>
 	</tr>
 
 	<tr>
@@ -383,6 +411,7 @@ white-space: pre-line;
 <script src="Javascript/buttons.js"></script>
 <script src="Javascript/input_parsing.js"></script>
 <script src="Javascript/mainui.js"></script>
+<script src="Javascript/saveSvgAsPng.js"></script>
 
 <script>
 mainui.createUI();
@@ -397,7 +426,7 @@ roots;
 
 var TaxaTree, FuncTree, trees, diagonal;
 
-var MainSVG;
+var MainSVG, plotSVG;
 
 draw_svg = function() {
 	if (d3.select("#mainsvg")[0][0] === null) {
@@ -438,10 +467,26 @@ draw_svg = function() {
 			.attr("preserveAspectRatio","none");
 
 		uploader.svgCreated = true;	
+		plotSVG = d3.select("#mainsvg").append("svg")
+			.attr("id","plots_svg")
+			.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
+			.attr("preserveAspectRatio","none")
+			.style("font-family", "Verdana");
+	
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
+			saveSvgAsPng(document.getElementById("plots_svg"), "test.png", { backgroundColor : "white", scale: 1.5})
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 120, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
+			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 230, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
+			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
+		});
+
 		draw_loading();
 
+		}
 	}
-}
 
 draw_loading = function() {
 	var loadg = MainSVG.append("g")
@@ -476,6 +521,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	TaxaTree.size([(navDims.height), navDims.treewidth]);
 	FuncTree.size([(navDims.height), navDims.treewidth]);
 	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
+	plotSVG.attr("viewBox","0 0 " + width + " " + height + "")
 	
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
@@ -485,12 +531,13 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
 
-	var NavSVG = MainSVG.insert("svg", "#sidebar")
+	var NavSVG = plotSVG.insert("svg", "#sidebar")
     	.attr("x",margin.left)
 	.attr("y",margin.top)
 	.attr("width", width - margin.left - margin.right)
 	.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
-	.attr("id","navbar");	
+	.attr("id","navbar")
+	.style("font-family", "Verdana");
 	
 /*	NavSVG.append("rect")   //rectangle around the navbar, to help figure out positioning
 		.attr("x",0)
@@ -513,7 +560,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 
 
-	var TaxaBar = MainSVG.insert("svg", "#sidebar")
+	var TaxaBar = plotSVG.insert("svg", "#sidebar")
 		.attr("x",margin.left)
 		.attr("y",(height/2) + (margin.btwnavbar/2))
 		.attr("width",(width/2) - margin.left - (margin.btwbars/2))
@@ -522,19 +569,21 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		//.attr("height",100)
 		//.attr("viewBox","0 0 100 100")
 		.attr("id", "taxa_bars")
+		.style("font-family", "Verdana");
 		//.attr("preserveAspectRatio","none");
 		//.attr("transform","scale(2.0)");
 
 
 		
 		
-	var FunctionBar = MainSVG.insert("svg", "#sidebar")
+	var FunctionBar = plotSVG.insert("svg", "#sidebar")
 		.attr("x",(width/2) + (margin.btwbars/2))
 		.attr("y",(height/2) + (margin.btwnavbar/2))
 		.attr("width",(width/2) - margin.right - (margin.btwbars/2))
 		.attr("height",(height/2) - margin.bottom - (margin.btwnavbar/2))
 		//.attr("viewBox","0 0 100 100")
-		.attr("id", "func_bars");
+		.attr("id", "func_bars")
+		.style("font-family", "Verdana");
 		
 		
 	var bpvisdata;
@@ -583,6 +632,10 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	//if( not expand to OTU level
 	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
 
+	////////////////////////// Colors
+	//color_option = "Categories" //Categories or Random
+	color_option = d3.select("#color_option_selector").property("value")
+	console.log(color_option)
 	
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		//1st - divide up color space into number of leaves
@@ -683,31 +736,33 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		return color_scale;
 	}
 
-	//set up colors using data cube
-	//colors	
-	//start one level in for bacteria but at the 0th level for functions
-	num_function_categories = data_cube.func_tree.length
-	num_taxa_categories = 0
-	for(j=0; j < data_cube.taxa_tree.length; j++){
-		num_taxa_categories += data_cube.taxa_tree[j].values.length
-	}
+	if(color_option == "Categories"){
+	
+		//set up colors using data cube
+		//colors	
+		//start one level in for bacteria but at the 0th level for functions
+		num_function_categories = data_cube.func_tree.length
+		num_taxa_categories = 0
+		for(j=0; j < data_cube.taxa_tree.length; j++){
+			num_taxa_categories += data_cube.taxa_tree[j].values.length
+		}
 
-	//taxa colors
-	if(num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
-		console.log("too many taxa categories, colors will repeat")
-	}
-	if(num_taxa_categories <= d3.keys(colorbrewer["Set3"]).pop()){
-		taxa_palette = colorbrewer["Set3"][num_taxa_categories]
-		//taxa_palette = taxa_palette.reverse()
-	} else {
-		taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop()-1)].concat(colorbrewer["Dark2"][num_taxa_categories -  d3.keys(colorbrewer["Set3"]).pop()])
-	}
-	if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
-		console.log("too many function categories, colors will repeat")
-	}
+		//taxa colors
+		if(num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
+			console.log("too many taxa categories, colors will repeat")
+		}
+		if(num_taxa_categories <= d3.keys(colorbrewer["Set3"]).pop()){
+			taxa_palette = colorbrewer["Set3"][num_taxa_categories]
+			//taxa_palette = taxa_palette.reverse()
+		} else {
+			taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop()-1)].concat(colorbrewer["Dark2"][num_taxa_categories -  d3.keys(colorbrewer["Set3"]).pop()])
+		}
+		if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
+			console.log("too many function categories, colors will repeat")
+		}
 
-	if(num_function_categories <= d3.keys(colorbrewer["Set1"]).pop()){
-		func_palette = colorbrewer["Set1"][num_function_categories]
+		if(num_function_categories <= d3.keys(colorbrewer["Set1"]).pop()){
+			func_palette = colorbrewer["Set1"][num_function_categories]
 		} else {
 			func_palette = colorbrewer["Set1"][(d3.keys(colorbrewer["Set1"]).pop()-1)].concat(colorbrewer["Dark2"][num_function_categories - d3.keys(colorbrewer["Set1"]).pop()])
 		}
@@ -741,6 +796,16 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
 	func_colors.range().push("black")
 	func_colors("All Functions")
+	
+	
+	} else if(color_option == "Random"){
+		taxa_colors = d3.scale.category20()
+		taxa_colors.domain(d3.keys(data_cube.taxa_tree_lookup))
+		func_colors = d3.scale.ordinal()
+		func_colors.range(colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"]))
+		func_colors.domain(d3.keys(data_cube.func_tree_lookup))
+	}
+
 
 	//sample colors
 	groupValsAll = samplemap.map(function(d,i){ 
