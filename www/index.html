@@ -328,14 +328,7 @@ white-space: pre-line;
 	</td></tr>
 	<tr>
 		<td colspan=2> <h4>Visualization Options</h4> 
-			<select name="levelofdetail" id="LODselector">
-				<option value="phylum">Phylum</option>
-				<option value="class">Class</option>
-				<option value="order">Order</option>
-				<option value="family">Family</option>
-				<option value="genus" selected>Genus</option>
-				<option value="species">Species</option>
-				<option value="otu">OTU</option>
+			<select name="taxlevelofdetail" id="taxLODselector">
 			</select>
 		</td>
 	</tr>
@@ -470,10 +463,9 @@ draw_loading = function() {
 		.attr("stroke","none");
 }
 
-draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
+draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
 
 	
-	//console.log(uploader.tax_abund_text);
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -565,7 +557,7 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 	func_averages = d3.tsv.parse(func_averages)
 	samplemap = d3.tsv.parse(samp_map_text);
 
-	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
+/*	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
 	var fix_otus = function(otu_data, samples){
 		new_otu_data = []
 		for(j=0; j < samples.length; j++){
@@ -580,15 +572,16 @@ draw_everything = function(tax_abund_text, contribution_table, tax_hierarchy_tex
 		return new_otu_data;
 	}
 
-
-otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently
+otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently*/
+	
+	otu_abundance_data = otu_table
 
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, taxa_tree_data, func_tree_data, func_averages);
 
 	//if( not expand to OTU level
-	genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)
+	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
 
 	
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
@@ -848,7 +841,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 
-	var otu_bar_data = otu_bar.make_data(genus_abundance_data, data_cube);
+	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
 	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
@@ -859,7 +852,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	function update_otu_bar(){
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
-		otu_bar_data = otu_bar.make_data(genus_abundance_data, data_cube);
+		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 	}
 
@@ -990,7 +983,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	roots["taxa"] = taxaroot;
 	countchildren(roots["taxa"]);
 	//get means for all OTUs, then for all the way up the tree
-	get_taxa_sample_means(genus_abundance_data, data_cube)
+	get_taxa_sample_means(otu_abundance_data, data_cube)
 	getAvgs(roots["taxa"])
     update(roots["taxa"]);
 

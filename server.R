@@ -8,9 +8,10 @@ options(shiny.maxRequestSize=300*1024^2)
 options(stringsAsFactors = F)
 
 # Defining important files
-default_tax_hierarchy_table = "www/Data/full_gg_taxa_mapping_parsed.txt"
+default_tax_hierarchy_table = "www/Data/97_otu_taxonomy_split_with_header.txt"
 default_func_hierarchy_table = "www/Data/classes_parsed2.tsv"
 default_contribution_table = "www/Data/mice_metagenome_contributions.txt"
+default_otu_table = "www/Data/otu_table_even_2.txt"
 picrust_normalization_file = "www/Data/16S_13_5_precalculated.tab.gz"
 picrust_ko_file = "www/Data/melted_picrust_ko_table.txt"
 
@@ -43,8 +44,13 @@ shinyServer(function(input, output, session) {
 	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
 		tracked_data$contribution_table = NULL
 		output = NULL
+		tax_summary_level = input$taxLODselector
+		otu_table = NULL
 
+		################################# Loading/calculating contribution table #################################
 		if (is.null(input$input_type)){ # If they haven't chosen an input method, we'll load the default contribution table
+
+			otu_table = fread(default_otu_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 			output = fread(default_contribution_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
 			# Remove the unnecessary columns (keep Sample, OTU, KO, and contribution)
@@ -52,27 +58,27 @@ shinyServer(function(input, output, session) {
 
 		} else if (input$input_type == "genome_annotation"){ # If they've chosen the genome annotation option
 	
-			otu_abundance_file = input$taxonomic_abundances_1
+			otu_table_file = input$taxonomic_abundances_1
 			annotation_file = input$genome_annotations
-			if (is.null(otu_abundance_file) | is.null(annotation_file)){
+			if (is.null(otu_table_file) | is.null(annotation_file)){
 				session$sendCustomMessage("retry_upload", "retry")
 			} else {
 
-				otu_abundance_file_path = otu_abundance_file$datapath
-				otu_abundance = fread(otu_abundance_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+				otu_table_file_path = otu_table_file$datapath
+				otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
 				annotation_file_path = annotation_file$datapath
 				annotation = fread(annotation_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 				colnames(annotation) = c("OTU", "Gene", "CopyNumber")
 
 				# Change zeros in abundance matrix to NAs so we can remove them when melting
-				otu_abundance[otu_abundance == 0] = NA
+				otu_table[otu_table == 0] = NA
 
 				# Melt the otu abundance table so we can merge with the annotations
-				melted_otu_abundance = melt(otu_abundance,id=colnames(otu_abundance)[1], na.rm=TRUE)
+				melted_otu_table = melt(otu_table,id=colnames(otu_table)[1], na.rm=TRUE)
 
 				# Merge the melted otu abundances and annotations to a get a column for every Sample, OTU, KO set
-				merged_table = merge(melted_otu_abundance, annotation, by.x=c(colnames(melted_otu_abundance)[1]), by.y=c(colnames(annotation)[1]), allow.cartesian=TRUE, sort=FALSE)
+				merged_table = merge(melted_otu_table, annotation, by.x=c(colnames(melted_otu_table)[1]), by.y=c(colnames(annotation)[1]), allow.cartesian=TRUE, sort=FALSE)
 
 				# Make a contribution column by multiplying the OTU abundance by the KO count
 				merged_table$contribution = merged_table[,3,with=FALSE] * merged_table[,5,with=FALSE]
@@ -83,27 +89,27 @@ shinyServer(function(input, output, session) {
 
 		} else if (input$input_type == "16S"){ # If they've chosen the PICRUSt option
 
-			reads_file = input$read_counts
-			if (is.null(reads_file)){
+			otu_table_file = input$read_counts
+			if (is.null(otu_table_file)){
 				session$sendCustomMessage("retry_upload", "retry")
 			} else {
-				reads_file_path = reads_file$datapath
-				reads = fread(reads_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+				otu_table_file_path = otu_table_file$datapath
+				otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
 				# Get the PICRUSt normalization table
 				normalization = data.table(read.csv(gzfile(picrust_normalization_file), sep="\t", header=TRUE, stringsAsFactors=FALSE))
 
 				# Change zeros in reads matrix to NAs so we can remove them when melting
-				reads[reads == 0] = NA
+				otu_table[otu_table == 0] = NA
 
 				# Melt the read count table so we can merge with the normalization table and ko table
-				melted_reads = melt(reads, id=colnames(reads)[1], na.rm=TRUE)
+				melted_otu_table = melt(otu_table, id=colnames(otu_table)[1], na.rm=TRUE)
 
 				# Merge the column of normalization factors
-				reads_with_normalization = merge(melted_reads, normalization, by.x=c(colnames(reads)[1]), by.y=c(colnames(normalization)[1]), allow.cartesian=TRUE, sort=FALSE)
+				otu_table_with_normalization = merge(melted_otu_table, normalization, by.x=c(colnames(otu_table)[1]), by.y=c(colnames(normalization)[1]), allow.cartesian=TRUE, sort=FALSE)
 				rm(normalization)
-				rm(reads)
-				rm(melted_reads)
+				rm(otu_table)
+				rm(melted_otu_table)
 
 				# Get the PICRUSt ko table
 				melted_ko_counts = fread(picrust_ko_file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
@@ -123,23 +129,29 @@ shinyServer(function(input, output, session) {
 
 		} else if (input$input_type == "contribution"){ # If they've chosen the contribution table option
 
+			otu_table_file = input$taxonomic_abundances_2
 			contribution_file = input$function_contributions
-			if (is.null(contribution_file)){
+			if (is.null(otu_table_file) | is.null(contribution_file)){
 				session$sendCustomMessage("retry_upload", "retry")
 			} else {
+				otu_table_file_path = otu_table_file$datapath
+				otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+
 				contribution_file_path = contribution_file$datapath
 				contribution = fread(contribution_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
 				output = contribution[,c(2,3,1,6),with=FALSE]
 			}
 		}
+
 		if (!is.null(output)){ # If we have successfully generated a contribution table and there were no errors
 
+			################################# Assigning partial KO Contributions to subpathways #################################
 			colnames(output) = c("Sample", "OTU", "Gene", "CountContributedByOTU")
 
 			func_hierarchy = NULL
 			if (is.null(input$function_hierarchy)){ # If they haven't uploaded a function hierarchy, we use the default
-			func_hierarchy = fread(default_func_hierarchy_table, header=TRUE, sep="\t", stringsAsFactors=FALSE)
+				func_hierarchy = fread(default_func_hierarchy_table, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
 			} else { # Othwerwise, we load theirs
 				func_hierarchy_file = input$function_hierarchy
@@ -166,20 +178,7 @@ shinyServer(function(input, output, session) {
 			# Convert subpathway counts to relative abundances
 			output[,relative_contributions := V1/sum(V1), by=Sample]
 
-			func_hierarchy = NULL
-			# Load the function hierarchy table so we can filter it
-			if (!is.null(input$func_hierarchy)){ # If they've loaded a function hierarchy, read that in
-
-				func_hierarchy_file = input$function_hierarchy
-				func_hierarchy_file_path = func_hierarchy_file$datapath
-				func_hierarchy = read.csv(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-			} else { # Read in default
-
-				func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-			}
-			
+			################################# Formatting and returning the function hierarchy #################################
 			# Remove the column of KOs
 			func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2],with=F]
 
@@ -240,6 +239,7 @@ shinyServer(function(input, output, session) {
 				session$sendCustomMessage(type='default_function_hierarchy', output_func_hierarchy)
 			}
 			
+			################################# Formatting and returning the function averages #################################
 			#sum over taxa
 			count_name = names(output)[!names(output) %in% c("Sample", "OTU", "SubPathway")]
 			total_funcs = output[,lapply(.SD, sum), by=list(SubPathway, Sample), .SDcols=count_name] #whatever the count name is
@@ -262,6 +262,7 @@ shinyServer(function(input, output, session) {
 				session$sendCustomMessage(type="func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
 			}
 
+			################################# Summarizing the contribution table to the desired taxonomic level #################################
 			# Read in the taxonomic hierachy and format it
 			taxa_hierarchy = NULL
 			if(!is.null(input$taxonomic_hierarchy)){ # If they've uploaded a custom taxonomic hierarchy
@@ -276,48 +277,93 @@ shinyServer(function(input, output, session) {
 	        # Filter OTUs not in contribution table
 	        taxa_hierarchy = taxa_hierarchy[taxa_hierarchy[,1,with=F][[1]] %in% unique(output[,OTU])]
 	        taxa_hierarchy = unique(taxa_hierarchy)
+	        taxa_hierarchy = taxa_hierarchy[,lapply(.SD,as.character)]
+
+	        taxa_hierarchy[,(colnames(taxa_hierarchy)[2:dim(taxa_hierarchy)[2]]):=lapply(.SD, function(col){
+	        	return(gsub("^$", "unknown", gsub("^.__", "", gsub(";$", "", col))))
+	        }), .SDcols=2:dim(taxa_hierarchy)[2]]
+	        session$sendCustomMessage("shiny_test", taxa_hierarchy)
+			taxa_hierarchy[,(colnames(taxa_hierarchy)[2:dim(taxa_hierarchy)[2]]):=lapply(2:dim(taxa_hierarchy)[2], function(col){
+				sapply(1:dim(taxa_hierarchy)[1], function(row){
+					return(paste(taxa_hierarchy[row,2:col,with=F], collapse="_"))
+				})
+			})]
+			session$sendCustomMessage("shiny_test", taxa_hierarchy)
+	        output[,OTU:=as.character(OTU)]
+
+	        # Summarize contribution table to the correct taxonomic level
+	        level_match_taxa_hierarchy = taxa_hierarchy[,c(1,which(colnames(taxa_hierarchy) == tax_summary_level)),with=F]
+	        colnames(level_match_taxa_hierarchy) = c(colnames(level_match_taxa_hierarchy)[1], "new_summary_level")
+	        expanded_table = merge(output, level_match_taxa_hierarchy, by.x = c(colnames(output)[2]), by.y=c(colnames(level_match_taxa_hierarchy)[1]), all.y=F, allow.cartesian=T)
+	        output = expanded_table[,sum(relative_contributions), by=eval(colnames(expanded_table)[c(2,6,3)])]
+	        colnames(output) = c("Sample", "OTU", "SubPathway", "relative_contributions")
+
+	        ################################# Summarizing the OTU table to the desired taxonomic level #################################
+	        otu_table[is.na(otu_table)] = 0
+	        colnames(otu_table)[1] = "OTU"
+	        otu_table[,OTU:=as.character(OTU)]
+	        expanded_table = merge(otu_table, level_match_taxa_hierarchy, by.x = c(colnames(otu_table)[1]), by.y = c(colnames(level_match_taxa_hierarchy)[1]), all.y=F, allow.cartesian=T)
+	        summarized_otu_table = expanded_table[,lapply(.SD[,2:dim(.SD)[2],with=F], sum), by=new_summary_level]
+	        summarized_otu_table_col_names = colnames(summarized_otu_table)
+	        summarized_otu_table[,(colnames(summarized_otu_table)[2:dim(summarized_otu_table)[2]]):=lapply(.SD, function(col){
+	        	return(col/sum(col))
+	        }), .SDcols=2:dim(summarized_otu_table)[2]]
+	        colnames(summarized_otu_table) = summarized_otu_table_col_names
+	        setkeyv(summarized_otu_table, colnames(summarized_otu_table)[1])
+	        otu_table_objects = lapply(2:dim(summarized_otu_table)[2], function(col){
+	        	l = setNames(split(unname(unlist(summarized_otu_table[,col,with=F])), seq(nrow(summarized_otu_table[,col,with=F]))), paste(tax_summary_level, unlist(summarized_otu_table[,1,with=F]), sep="_"))
+	        	l["Sample"] = colnames(summarized_otu_table)[col]
+	        	return(l)
+	        })
+	        if (!is.null(input$input_type)){ # If they're uploading custom data, send to the approriate upload trigger
+				session$sendCustomMessage(type='otu_table', otu_table_objects)
+
+			} else { # Otherwise, send to the default upload trigger		
+		        session$sendCustomMessage(type="default_otu_table", otu_table_objects)
+		    }
+
 	        id_levels = names(taxa_hierarchy)
 			for(j in 1:length(id_levels)){
 				taxa_hierarchy[[id_levels[j]]] = paste(id_levels[j],as.character(taxa_hierarchy[[id_levels[j]]]), sep = "_")
 			}
 
-	        # Creating the javascript version of the taxonomic hierarchy
-	        taxa_hierarchy = taxa_hierarchy[,lapply(.SD,as.character)]
+	        output[,OTU:=paste(tax_summary_level,as.character(OTU), sep = "_")]
+
+	        ################################# Formatting and returning the taxonomic hierarchy #################################
+	        summarized_taxa_hierarchy = taxa_hierarchy[,c(2:dim(taxa_hierarchy)[2], 1),with=F]
+	        cutoff = which(colnames(summarized_taxa_hierarchy) == tax_summary_level)
+	        summarized_taxa_hierarchy = summarized_taxa_hierarchy[,1:cutoff,with=F]
+	        summarized_taxa_hierarchy = unique(summarized_taxa_hierarchy)
 
 	        # Create the base set of objects which are structured differently from the internal nodes. The leaves contain all information for each parent node of the leaf
-	        base_objects = lapply(1:dim(taxa_hierarchy)[1], function(row){
+	        base_objects = lapply(1:dim(summarized_taxa_hierarchy)[1], function(row){
 	        	l = list("Ndescendents" = 0, "type" = "taxa")
-	        	for (depth in 1:dim(taxa_hierarchy)[2]){
-	        		l[colnames(taxa_hierarchy)[depth]] = taxa_hierarchy[row,depth,with=F]
+	        	for (depth in 1:dim(summarized_taxa_hierarchy)[2]){
+	        		l[colnames(summarized_taxa_hierarchy)[depth]] = summarized_taxa_hierarchy[row,depth,with=F]
 	        	}
-	        	return(list("key" = paste(l[colnames(taxa_hierarchy)[1]]), "level"=0, "values" = list(l)))
+	        	return(list("key" = paste(l[colnames(summarized_taxa_hierarchy)[dim(summarized_taxa_hierarchy)[2]]]), "level"=0, "values" = list(l)))
 	        })
 
 	        # Iteratively generate the next layer up in the tree, grouping the previous level of nodes by their parent
 	        output_taxa_hierarchy = NULL
-	        for (depth in dim(taxa_hierarchy)[2]:2){
+	        for (depth in (dim(summarized_taxa_hierarchy)[2] - 1):1){
 
 	        	# Get the label for the depth of the tree we're creating a layer for
-	        	depth_name = colnames(taxa_hierarchy)[depth][[1]]
+	        	depth_name = colnames(summarized_taxa_hierarchy)[depth][[1]]
 
 	        	# Get the labels for the nodes in the previous layer
 	        	vals = sapply(base_objects, function(obj){return(obj[["key"]])})
 
 	        	# Get the mapping between parent nodes in the new layer and children nodes in the previous layer
 	        	next_levels = sapply(vals, function(curr_level){
-	        		prev_depth = NULL
-	        		if (depth == dim(taxa_hierarchy)[2]){
-	        			prev_depth = 1
-	        		} else {
-	        			prev_depth = depth + 1
-	        		}
-	        		setkeyv(taxa_hierarchy, colnames(taxa_hierarchy)[prev_depth])
-	        		return(unique(taxa_hierarchy[curr_level,depth,with=F][[1]]))
+        			prev_depth = depth + 1
+	        		setkeyv(summarized_taxa_hierarchy, colnames(summarized_taxa_hierarchy)[prev_depth])
+	        		return(unique(summarized_taxa_hierarchy[curr_level,depth,with=F][[1]]))
 	        	})
 
 	        	# Create a new node for each parent node of the previous layer
 	        	output_taxa_hierarchy = lapply(levels(factor(next_levels)), function(level){
-	        		return(list("key" = level, "level" = dim(taxa_hierarchy)[2] - depth + 1, "values" = base_objects[which(next_levels == level)]))
+	        		return(list("key" = level, "level" = dim(summarized_taxa_hierarchy)[2] - depth + 1, "values" = base_objects[which(next_levels == level)]))
 	        	})
 
 	        	# Set the base objects list to the current state of the tree so we can group the current top layer in the next iteration
@@ -331,10 +377,9 @@ shinyServer(function(input, output, session) {
 		        session$sendCustomMessage(type="default_tax_hierarchy", output_taxa_hierarchy)
 		    }
 
+		    ################################# Formatting and returning the contribution table #################################
 			# Format the contribution table to match the expected javascript array
-
 			# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings
-			output[,OTU:=paste("OTU_ID",as.character(OTU), sep = "_")]
 			output[,SubPathway:=paste("SubPathway",SubPathway,sep="_")]
 			output = dcast(output, Sample + OTU ~ SubPathway, value.var="relative_contributions")
 
@@ -379,6 +424,19 @@ shinyServer(function(input, output, session) {
 					}
 				}
 			}
+		}
+	})
+
+	# Listen for requests for sample data from the browser
+	observe({
+		if (!is.null(input$taxonomic_hierarchy)){
+			taxa_hierarchy_file = input$taxonomic_hierarchy
+			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
+			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy))
+		} else {
+			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy))
 		}
 	})
 

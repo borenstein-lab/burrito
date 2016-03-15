@@ -6,31 +6,33 @@
 		var uploader = {};
 
 		// These variables keep track of when files are loaded
-		uploader.tax_abund_loaded = false;
+		// uploader.tax_abund_loaded = false;
 		uploader.contribution_table_loaded = false;
 		uploader.tax_hierarchy_loaded = false;
 		uploader.func_hierarchy_loaded = false;
 		uploader.func_averages_loaded = false;
 		uploader.samp_map_loaded = false;
+		uploader.otu_table_loaded = false;
 		
 		uploader.svgCreated = false;
 
 		// These variables hold the results of file loading
-		uploader.tax_abund_text = "";
+		// uploader.tax_abund_text = "";
 		uploader.tax_hierarchy_text = "";
 		uploader.func_hierarchy_text = "";
 		uploader.samp_map_text = "";
+		uploader.otu_table = [];
 
 		// These are the file readers
-		uploader.tax_abund_1_reader = new FileReader();
-		uploader.tax_abund_2_reader = new FileReader();
-		uploader.reads_reader = new FileReader();
-		uploader.tax_hierarchy_reader = new FileReader();
-		uploader.func_hierarchy_reader = new FileReader();
+		// uploader.tax_abund_1_reader = new FileReader();
+		// uploader.tax_abund_2_reader = new FileReader();
+		// uploader.reads_reader = new FileReader();
+		// uploader.tax_hierarchy_reader = new FileReader();
+		// uploader.func_hierarchy_reader = new FileReader();
 		uploader.samp_map_reader = new FileReader();
 
 		// These are the default data readers
-		uploader.default_tax_abund_file = new XMLHttpRequest();
+		// uploader.default_tax_abund_file = new XMLHttpRequest();
 		uploader.default_samp_map_file = new XMLHttpRequest();
 
 		// This is the parsed contribution data object
@@ -43,13 +45,12 @@
 		*/
 		uploader.load_default_data = function(){
 
-			//console.log("loading default data");
 			// Add listeners for when the default files have successfully loaded
-			this.default_tax_abund_file.addEventListener("load", this.execute_on_default_tax_abund_load);
+			// this.default_tax_abund_file.addEventListener("load", this.execute_on_default_tax_abund_load);
 			this.default_samp_map_file.addEventListener("load", this.execute_on_default_samp_map_load);
 
-			this.default_tax_abund_file.open("GET", "Data/otu_table_even_2.txt", true);
-			this.default_tax_abund_file.send();
+			// this.default_tax_abund_file.open("GET", "Data/otu_table_even_2.txt", true);
+			// this.default_tax_abund_file.send();
 
 			this.default_samp_map_file.open("GET", "Data/mice_samplemap.txt", true);
 			this.default_samp_map_file.send();
@@ -62,8 +63,8 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			var load_flags = [uploader.tax_abund_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated];
-			console.log(load_flags);
+			var load_flags = [uploader.otu_table_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated];
+
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < load_flags.length; i++){
 				if (!load_flags[i]){
@@ -74,30 +75,35 @@
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded){
 
-				draw_everything(uploader.tax_abund_text, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text);
+				draw_everything(uploader.otu_table, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text);
 			}
 		}
 
-		uploader.execute_on_tax_abund_1_load = function() {
-			uploader.tax_abund_loaded = false;
-			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
-			uploader.tax_abund_loaded = true;
-			//mainui.fileloaded("taxonomic_abundances_1");
-		}
+		// uploader.execute_on_tax_abund_1_load = function() {
+		// 	uploader.tax_abund_loaded = false;
+		// 	uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
+		// 	uploader.tax_abund_loaded = true;
+		// 	//mainui.fileloaded("taxonomic_abundances_1");
+		// }
 
-		uploader.execute_on_tax_abund_2_load = function() {
-			uploader.tax_abund_loaded = false;
-			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
-			uploader.tax_abund_loaded = true;
-			//mainui.fileloaded("taxonomic_abundances_2");
-		}
+		// uploader.execute_on_tax_abund_2_load = function() {
+		// 	uploader.tax_abund_loaded = false;
+		// 	uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
+		// 	uploader.tax_abund_loaded = true;
+		// 	//mainui.fileloaded("taxonomic_abundances_2");
+		// }
 
-		uploader.execute_on_reads_load = function() {
-			uploader.tax_abund_loaded = false;
-			uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
-			uploader.tax_abund_loaded = true;
-			//mainui.fileloaded("read_counts");
-		}
+		// uploader.execute_on_reads_load = function() {
+		// 	uploader.tax_abund_loaded = false;
+		// 	uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
+		// 	uploader.tax_abund_loaded = true;
+		// 	//mainui.fileloaded("read_counts");
+		// }
+		Shiny.addCustomMessageHandler("otu_table", function(otu_table){
+			uploader.otu_table_loaded = false;
+			uploader.otu_table = otu_table;
+			uploader.otu_table_loaded = true;
+		})
 
  		uploader.execute_on_tax_hierarchy_load = function() {
 			//mainui.fileloaded("taxonomic_hierarchy");
@@ -151,6 +157,24 @@
 			uploader.tax_hierarchy_loaded = true;
 		});
 
+		Shiny.addCustomMessageHandler("tax_hierarchy_labels", function(labels){
+			tax_dropdown = document.getElementById("taxLODselector")
+			var old_options = jQuery.extend(true, [], tax_dropdown.options)
+			for (var i = 0; i < old_options.length; i++){
+				tax_dropdown.remove(old_options[i])
+			}
+			var blank_option = document.createElement("option");
+			blank_option.text="";
+			blank_option.value="";
+			tax_dropdown.add(blank_option);
+			for (var i = 0; i < labels.length; i++){
+				var option = document.createElement("option");
+				option.text = labels[i];
+				option.value = labels[i];
+				tax_dropdown.add(option);
+			}
+		});
+
 		Shiny.addCustomMessageHandler("function_hierarchy", function(func_hierarchy){
 			uploader.func_hierarchy_loaded = false;
 			uploader.func_hierarchy_text = func_hierarchy;
@@ -162,12 +186,18 @@
 			uploader.func_averages_loaded = true;
 		});
 
-		uploader.execute_on_default_tax_abund_load = function() {
-			uploader.tax_abund_loaded = false;
-			uploader.tax_abund_text = this.responseText;
-			uploader.tax_abund_loaded = true;
+		// uploader.execute_on_default_tax_abund_load = function() {
+		// 	uploader.tax_abund_loaded = false;
+		// 	uploader.tax_abund_text = this.responseText;
+		// 	uploader.tax_abund_loaded = true;
+		// 	uploader.update_plots();
+		// }
+		Shiny.addCustomMessageHandler("default_otu_table", function(otu_table){
+			uploader.otu_table_loaded = false;
+			uploader.otu_table = otu_table;
+			uploader.otu_table_loaded = true;
 			uploader.update_plots();
-		}
+		})
 
 		uploader.execute_on_default_samp_map_load = function() {
 			uploader.samp_map_loaded = false;
@@ -221,30 +251,28 @@
 		});
 
 		Shiny.addCustomMessageHandler("retry_upload", function(message){
-			console.log("retrying")
 			setTimeout(function(){
 				document.getElementById("update_button").click()
 			}, 2000)
-			console.log("retried")
 		})
 
 		// Add listeners for when files have successfully loaded
-		uploader.tax_abund_1_reader.addEventListener('load', uploader.execute_on_tax_abund_1_load);
-		uploader.tax_abund_2_reader.addEventListener('load', uploader.execute_on_tax_abund_2_load);
-		uploader.reads_reader.addEventListener('load', uploader.execute_on_reads_load);
+		// uploader.tax_abund_1_reader.addEventListener('load', uploader.execute_on_tax_abund_1_load);
+		// uploader.tax_abund_2_reader.addEventListener('load', uploader.execute_on_tax_abund_2_load);
+		// uploader.reads_reader.addEventListener('load', uploader.execute_on_reads_load);
 		uploader.samp_map_reader.addEventListener('load', uploader.execute_on_samp_map_load);
 
 		// Set up the event handlers for loading files when they get chosen for upload
 		document.getElementById("taxonomic_abundances_1").addEventListener('change', function(e) {
-			uploader.tax_abund_1_reader.readAsText(this.files[0]);
+			// uploader.tax_abund_1_reader.readAsText(this.files[0]);
 			mainui.fileloading("taxonomic_abundances_1",this.files[0].name);
 			});
 		document.getElementById("taxonomic_abundances_2").addEventListener('change', function(e) {
-			uploader.tax_abund_2_reader.readAsText(this.files[0]);
+			// uploader.tax_abund_2_reader.readAsText(this.files[0]);
 			mainui.fileloading("taxonomic_abundances_2",this.files[0].name);
 			});
 		document.getElementById("read_counts").addEventListener('change', function(e) {
-			uploader.reads_reader.readAsText(this.files[0]);
+			// uploader.reads_reader.readAsText(this.files[0]);
 			mainui.fileloading("read_counts",this.files[0].name);
 			});
 		document.getElementById("sample_map").addEventListener('change', function(e) {
