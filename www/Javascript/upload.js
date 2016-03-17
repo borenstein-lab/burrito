@@ -21,7 +21,6 @@
 		uploader.tax_hierarchy_text = "";
 		uploader.func_hierarchy_text = "";
 		uploader.samp_map_text = "";
-		uploader.otu_table = [];
 
 		// These are the file readers
 		// uploader.tax_abund_1_reader = new FileReader();
@@ -36,7 +35,10 @@
 		uploader.default_samp_map_file = new XMLHttpRequest();
 
 		// This is the parsed contribution data object
-		uploader.contribution_table = [];
+		uploader.contribution_table = {};
+		uploader.otu_table = [];
+		uploader.current_contribution_sample_index = 0;
+		uploader.current_otu_sample_index = 0;
 
 		/*
 		load_default_data()
@@ -54,6 +56,20 @@
 
 			this.default_samp_map_file.open("GET", "Data/mice_samplemap.txt", true);
 			this.default_samp_map_file.send();
+		}
+
+		/*
+		reset_load_flags()
+
+		Sets the load flags to false for data that needs to be received from the server
+		*/
+		uploader.reset_load_flags = function(){
+			var load_flags = [uploader.otu_table_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded];
+
+			// Check each flag to see if the file has been loaded
+			for (var i = 0; i < load_flags.length; i++){
+				load_flags[i] = false
+			}
 		}
 
 		/*
@@ -79,39 +95,27 @@
 			}
 		}
 
-		// uploader.execute_on_tax_abund_1_load = function() {
-		// 	uploader.tax_abund_loaded = false;
-		// 	uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
-		// 	uploader.tax_abund_loaded = true;
-		// 	//mainui.fileloaded("taxonomic_abundances_1");
-		// }
-
-		// uploader.execute_on_tax_abund_2_load = function() {
-		// 	uploader.tax_abund_loaded = false;
-		// 	uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
-		// 	uploader.tax_abund_loaded = true;
-		// 	//mainui.fileloaded("taxonomic_abundances_2");
-		// }
-
-		// uploader.execute_on_reads_load = function() {
-		// 	uploader.tax_abund_loaded = false;
-		// 	uploader.tax_abund_text = this.result.replace(/^[^\t]*\t/, "OTU_ID\t");
-		// 	uploader.tax_abund_loaded = true;
-		// 	//mainui.fileloaded("read_counts");
-		// }
-		Shiny.addCustomMessageHandler("otu_table", function(otu_table){
+		Shiny.addCustomMessageHandler("otu_table_ready", function(size){
 			uploader.otu_table_loaded = false;
-			uploader.otu_table = otu_table;
-			uploader.otu_table_loaded = true;
+			uploader.otu_table = [];
+			uploader.otu_table_length = size;
+			uploader.current_otu_sample_index = 0;
+			Shiny.onInputChange("otu_sample_request", 0);
 		})
 
- 		uploader.execute_on_tax_hierarchy_load = function() {
-			//mainui.fileloaded("taxonomic_hierarchy");
- 		}
-
-		uploader.execute_on_func_hierarchy_load = function() {
-			//mainui.fileloaded("function_hierarchy");
-		}
+		Shiny.addCustomMessageHandler("otu_sample_return", function(otu_sample){
+            uploader.otu_table.push(otu_sample[0]);
+			++uploader.current_otu_sample_index;
+			setTimeout(function(){ // Fixes the disconnect issue, no idea why (Alex)
+				if (uploader.current_otu_sample_index < uploader.otu_table_length){
+		            Shiny.onInputChange("otu_sample_request", uploader.current_otu_sample_index);
+				} else {
+					Shiny.onInputChange("otu_sample_request", -1);
+					uploader.otu_table_loaded = true;
+					uploader.update_plots();
+				}
+			}, 2);
+        });
 
 		uploader.execute_on_samp_map_load = function() {
 			uploader.samp_map_loaded = false;
@@ -120,31 +124,23 @@
 			//mainui.fileloaded("sample_map");
 		}
 
-		uploader.execute_on_func_contrib_load = function() {
-		    //mainui.fileloaded("function_contributions");
-		}
-
-		uploader.execute_on_genome_annotation_load = function() {
-		    //mainui.fileloaded("genome_annotations");
-		}
-
 		Shiny.addCustomMessageHandler("contribution_table_ready", function(size){
 			uploader.contribution_table_loaded = false;
 			uploader.contribution_table = {};
 			uploader.contribution_table_length = size;
-			uploader.current_sample_index = 0;
-			Shiny.onInputChange("sample_request", 0);
+			uploader.current_contribution_sample_index = 0;
+			Shiny.onInputChange("contribution_sample_request", 0);
 		})
 
-		Shiny.addCustomMessageHandler("sample_return", function(sample){	
-			sample_name = Object.keys(sample)[0]
-            uploader.contribution_table[sample_name] = sample[sample_name];
-			++uploader.current_sample_index;
+		Shiny.addCustomMessageHandler("contribution_sample_return", function(contribution_sample){	
+			contribution_sample_name = Object.keys(contribution_sample)[0]
+            uploader.contribution_table[contribution_sample_name] = contribution_sample[contribution_sample_name];
+			++uploader.current_contribution_sample_index;
 			setTimeout(function(){ // Fixes the disconnect issue, no idea why (Alex)
-				if (uploader.current_sample_index < uploader.contribution_table_length){
-		            Shiny.onInputChange("sample_request", uploader.current_sample_index);
+				if (uploader.current_contribution_sample_index < uploader.contribution_table_length){
+		            Shiny.onInputChange("contribution_sample_request", uploader.current_contribution_sample_index);
 				} else {
-					Shiny.onInputChange("sample_request", -1);
+					Shiny.onInputChange("contribution_sample_request", -1);
 					uploader.contribution_table_loaded = true;
 					uploader.update_plots();
 				}
@@ -155,6 +151,7 @@
 			uploader.tax_hierarchy_loaded = false;
 			uploader.tax_hierarchy_text = taxa_hierarchy;
 			uploader.tax_hierarchy_loaded = true;
+			uploader.update_plots();
 		});
 
 		Shiny.addCustomMessageHandler("tax_hierarchy_labels", function(labels){
@@ -178,26 +175,16 @@
 		Shiny.addCustomMessageHandler("function_hierarchy", function(func_hierarchy){
 			uploader.func_hierarchy_loaded = false;
 			uploader.func_hierarchy_text = func_hierarchy;
-			uploader.func_hierarchy_loaded = true;		});
+			uploader.func_hierarchy_loaded = true;		
+			uploader.update_plots();
+		});
 
 		Shiny.addCustomMessageHandler("func_averages", function(func_averages){
 			uploader.func_averages_loaded = false;
 			uploader.func_averages_text = func_averages;
 			uploader.func_averages_loaded = true;
-		});
-
-		// uploader.execute_on_default_tax_abund_load = function() {
-		// 	uploader.tax_abund_loaded = false;
-		// 	uploader.tax_abund_text = this.responseText;
-		// 	uploader.tax_abund_loaded = true;
-		// 	uploader.update_plots();
-		// }
-		Shiny.addCustomMessageHandler("default_otu_table", function(otu_table){
-			uploader.otu_table_loaded = false;
-			uploader.otu_table = otu_table;
-			uploader.otu_table_loaded = true;
 			uploader.update_plots();
-		})
+		});
 
 		uploader.execute_on_default_samp_map_load = function() {
 			uploader.samp_map_loaded = false;
@@ -205,50 +192,6 @@
 			uploader.samp_map_loaded = true;
 			uploader.update_plots();
 		}
-
-		Shiny.addCustomMessageHandler("default_contribution_table_ready", function(size){
-			uploader.contribution_table_loaded = false;
-			uploader.contribution_table = {};
-			uploader.contribution_table_length = size;
-			uploader.current_sample_index = 0;
-			Shiny.onInputChange("sample_request", 0);
-		})
-
-		Shiny.addCustomMessageHandler("default_sample_return", function(sample){	
-			sample_name = Object.keys(sample)[0]
-            uploader.contribution_table[sample_name] = sample[sample_name];
-			++uploader.current_sample_index;
-			setTimeout(function(){ // Fixes the disconnect issue, no idea why (Alex)
-				if (uploader.current_sample_index < uploader.contribution_table_length){
-		                        Shiny.onInputChange("sample_request", uploader.current_sample_index);
-				} else {
-					Shiny.onInputChange("sample_request", -1);
-					uploader.contribution_table_loaded = true;
-	                uploader.update_plots();	
-				}
-			}, 2);
-        });
-
-		Shiny.addCustomMessageHandler("default_function_hierarchy", function(func_hierarchy){
-			uploader.func_hierarchy_loaded = false;
-			uploader.func_hierarchy_text = func_hierarchy;
-			uploader.func_hierarchy_loaded = true;
-			uploader.update_plots();
-		});
-
-		Shiny.addCustomMessageHandler("default_tax_hierarchy", function(taxa_hierarchy){
-			uploader.tax_hierarchy_loaded = false;
-			uploader.tax_hierarchy_text = taxa_hierarchy;
-			uploader.tax_hierarchy_loaded = true;
-			uploader.update_plots();
-		});
-
-		Shiny.addCustomMessageHandler("default_func_averages", function(func_averages){
-			uploader.func_averages_loaded = false;
-			uploader.func_averages_text = func_averages;
-			uploader.func_averages_loaded = true;
-			uploader.update_plots();
-		});
 
 		Shiny.addCustomMessageHandler("retry_upload", function(message){
 			setTimeout(function(){
@@ -264,15 +207,12 @@
 
 		// Set up the event handlers for loading files when they get chosen for upload
 		document.getElementById("taxonomic_abundances_1").addEventListener('change', function(e) {
-			// uploader.tax_abund_1_reader.readAsText(this.files[0]);
 			mainui.fileloading("taxonomic_abundances_1",this.files[0].name);
 			});
 		document.getElementById("taxonomic_abundances_2").addEventListener('change', function(e) {
-			// uploader.tax_abund_2_reader.readAsText(this.files[0]);
 			mainui.fileloading("taxonomic_abundances_2",this.files[0].name);
 			});
 		document.getElementById("read_counts").addEventListener('change', function(e) {
-			// uploader.reads_reader.readAsText(this.files[0]);
 			mainui.fileloading("read_counts",this.files[0].name);
 			});
 		document.getElementById("sample_map").addEventListener('change', function(e) {

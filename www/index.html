@@ -509,7 +509,6 @@ draw_loading = function() {
 }
 
 draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
-
 	
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
@@ -636,7 +635,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	//color_option = "Categories" //Categories or Random
 	color_option = d3.select("#color_option_selector").property("value")
 	console.log(color_option)
-	
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		//1st - divide up color space into number of leaves
 		//then assign each subgroup of leaves alternating extremes

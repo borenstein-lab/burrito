@@ -4,7 +4,7 @@ library(shiny)
 library(data.table)
 options(stringsAsFactors = F)
 # Change the maximum file upload size
-options(shiny.maxRequestSize=300*1024^2)
+options(shiny.maxRequestSize=1000*1024^3)
 options(stringsAsFactors = F)
 
 # Defining important files
@@ -22,7 +22,7 @@ summary_level_index = 4
 shinyServer(function(input, output, session) {
 
     # Variables that the server keeps track of but doesn't need to run functions to calculate
-    tracked_data = reactiveValues(previous_sample = -1, contribution_table = NULL) 
+    tracked_data = reactiveValues(previous_contribution_sample = -1, previous_otu_sample = -1, otu_table = NULL, contribution_table = NULL) 
 
     # Functional to calculate the normalization factors for partial KO contributions
     ko_normalization_table = reactive({ # Reactive, when called only recalculates output if variables it depends on change
@@ -108,16 +108,15 @@ shinyServer(function(input, output, session) {
 				# Merge the column of normalization factors
 				otu_table_with_normalization = merge(melted_otu_table, normalization, by.x=c(colnames(otu_table)[1]), by.y=c(colnames(normalization)[1]), allow.cartesian=TRUE, sort=FALSE)
 				rm(normalization)
-				rm(otu_table)
 				rm(melted_otu_table)
 
 				# Get the PICRUSt ko table
 				melted_ko_counts = fread(picrust_ko_file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
 				# Merge the column of ko counts
-				reads_norms_kos = merge(reads_with_normalization, melted_ko_counts, by.x=c(colnames(reads_with_normalization)[1]), by.y=c(colnames(melted_ko_counts)[1]), allow.cartesian=TRUE, sort=FALSE)
+				reads_norms_kos = merge(otu_table_with_normalization, melted_ko_counts, by.x=c(colnames(otu_table_with_normalization)[1]), by.y=c(colnames(melted_ko_counts)[1]), allow.cartesian=TRUE, sort=FALSE)
 				rm(melted_ko_counts)
-				rm(reads_with_normalization)
+				rm(otu_table_with_normalization)
 				
 				# Make a contribution column by multiplying the read counts with normalization factors with ko counts
 				reads_norms_kos$contribution = reads_norms_kos[,3,with=FALSE] * reads_norms_kos[,6,with=FALSE] / reads_norms_kos[,4,with=FALSE]
@@ -232,12 +231,7 @@ shinyServer(function(input, output, session) {
 	        	base_objects = output_func_hierarchy
 	        }
 
-			if (!is.null(input$input_type)) { # If they're uploading custom data, send to the appropriate upload trigger
-				session$sendCustomMessage(type='function_hierarchy', output_func_hierarchy)
-
-			} else { # Otherwise, send to the default upload trigger
-				session$sendCustomMessage(type='default_function_hierarchy', output_func_hierarchy)
-			}
+			session$sendCustomMessage(type='function_hierarchy', output_func_hierarchy)
 			
 			################################# Formatting and returning the function averages #################################
 			#sum over taxa
@@ -256,11 +250,8 @@ shinyServer(function(input, output, session) {
 				if(ncol(func_means_lev)==2) func_means = rbind(func_means, func_means_lev)
 			}
 			output3 = func_means
-			if (is.null(input$input_type)){ # If they haven't uploaded data
-				session$sendCustomMessage(type="default_func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
-			} else { # If they've uploaded data
-				session$sendCustomMessage(type="func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
-			}
+
+			session$sendCustomMessage(type="func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
 
 			################################# Summarizing the contribution table to the desired taxonomic level #################################
 			# Read in the taxonomic hierachy and format it
@@ -288,7 +279,6 @@ shinyServer(function(input, output, session) {
 				})
 			})]
 	        output[,OTU:=as.character(OTU)]
-
 	        # Summarize contribution table to the correct taxonomic level
 	        level_match_taxa_hierarchy = taxa_hierarchy[,c(1,which(colnames(taxa_hierarchy) == tax_summary_level)),with=F]
 	        colnames(level_match_taxa_hierarchy) = c(colnames(level_match_taxa_hierarchy)[1], "new_summary_level")
@@ -313,12 +303,11 @@ shinyServer(function(input, output, session) {
 	        	l["Sample"] = colnames(summarized_otu_table)[col]
 	        	return(l)
 	        })
-	        if (!is.null(input$input_type)){ # If they're uploading custom data, send to the approriate upload trigger
-				session$sendCustomMessage(type='otu_table', otu_table_objects)
 
-			} else { # Otherwise, send to the default upload trigger		
-		        session$sendCustomMessage(type="default_otu_table", otu_table_objects)
-		    }
+	        tracked_data$otu_table = otu_table_objects
+
+	        # Tell the browser we're ready to start sending otu table data
+			session$sendCustomMessage(type="otu_table_ready", length(otu_table_objects))
 
 	        id_levels = names(taxa_hierarchy)
 			for(j in 1:length(id_levels)){
@@ -368,12 +357,7 @@ shinyServer(function(input, output, session) {
 	        	base_objects = output_taxa_hierarchy
 	        }
 
-	        if (!is.null(input$input_type)){ # If they're uploading custom data, send to the approriate upload trigger
-				session$sendCustomMessage(type='tax_hierarchy', output_taxa_hierarchy)
-
-			} else { # Otherwise, send to the default upload trigger		
-		        session$sendCustomMessage(type="default_tax_hierarchy", output_taxa_hierarchy)
-		    }
+			session$sendCustomMessage(type='tax_hierarchy', output_taxa_hierarchy)
 
 		    ################################# Formatting and returning the contribution table #################################
 			# Format the contribution table to match the expected javascript array
@@ -397,29 +381,34 @@ shinyServer(function(input, output, session) {
 			# Format so that the top level Sample lists are nested properly
 			output = lapply(output, function(el){return(el[[1]])})
 
-			if (is.null(input$input_type)){ # If they haven't uploaded data
-				session$sendCustomMessage(type="default_contribution_table_ready", length(output))
-			} else { # If they've uploaded data
-				session$sendCustomMessage(type="contribution_table_ready", length(output))
-			}
-
 			tracked_data$contribution_table = output
+
+			session$sendCustomMessage(type="contribution_table_ready", length(output))
 		}
 
 	}) # Makes the function run on initial page load without a button click
 
-	# Listen for requests for sample data from the browser
+	# Listen for requests for contribution sample data from the browser
 	observe({
-		if (!is.null(input$sample_request)){
-			sample = input$sample_request
-			if (sample != tracked_data$previous_sample){
-				tracked_data$previous_sample = sample
-				if (sample >= 0 & sample < length(tracked_data$contribution_table)){
-					if (is.null(input$input_type)){ # If they haven't uploaded data
-						session$sendCustomMessage(type="default_sample_return", tracked_data$contribution_table[sample + 1])
-					} else { # If they've uploaded data
-						session$sendCustomMessage(type="sample_return", tracked_data$contribution_table[sample + 1])
-					}
+		if (!is.null(input$contribution_sample_request)){
+			contribution_sample = input$contribution_sample_request
+			if (contribution_sample != tracked_data$previous_contribution_sample){
+				tracked_data$previous_contribution_sample = contribution_sample
+				if (contribution_sample >= 0 & contribution_sample < length(tracked_data$contribution_table)){
+					session$sendCustomMessage(type="contribution_sample_return", tracked_data$contribution_table[contribution_sample + 1])
+				}
+			}
+		}
+	})
+
+	# Listen for requests for otu sample data from the browser
+	observe({
+		if (!is.null(input$otu_sample_request)){
+			otu_sample = input$otu_sample_request
+			if (otu_sample != tracked_data$previous_otu_sample){
+				tracked_data$previous_otu_sample = otu_sample
+				if (otu_sample >= 0 & otu_sample < length(tracked_data$otu_table)){
+					session$sendCustomMessage(type="otu_sample_return", tracked_data$otu_table[otu_sample + 1])
 				}
 			}
 		}
