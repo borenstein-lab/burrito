@@ -124,8 +124,12 @@
       });
 
     Sample.selectAll("rect")
-      .data(function(d) { 
-        return d.taxa; 
+      .data(function(d) {
+      	d["taxa"] = d.taxa.map(function(dat){ 
+      		dat_plusSamp = dat
+      		dat_plusSamp["Sample"] = d.Sample
+      		return dat_plusSamp; })
+        return d.taxa;
       })
       .enter().append("rect")
       .attr("taxon", function(d){ return d.name; })
@@ -144,7 +148,7 @@
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
         name_split = (current_rectangle_data.name.split('_')).pop()
-        tooltip.html("<strong>Taxa</strong>: " + name_split + "<br>" + "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+        tooltip.html("<strong>Taxa</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
         return tooltip.style("visibility", "visible");
       })
       .on("mousemove", function(){ 
