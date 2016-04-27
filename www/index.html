@@ -235,7 +235,11 @@ g.updateb.activebutton:hover rect {
 
 .tt { 
 	position:relative;
-	z-index: 24;
+
+}
+
+.tt img {
+	z-index:2;
 }
 
 .tt span{ display:none; }
@@ -251,6 +255,7 @@ g.updateb.activebutton:hover rect {
 	KHTMLOpacity: 0.90;
 	MozOpacity: 0.90;
 	opacity: 0.90;
+	z-index: 10;
 }
 
 .tt:hover span.blank{
@@ -266,6 +271,7 @@ g.updateb.activebutton:hover rect {
 	border-width: 1px;
 	border-color: #000000;
 	margin-left: -20px;
+	z-index: 10;
 }
 
 white-space: pre-line;
@@ -284,6 +290,8 @@ white-space: pre-line;
 		<td colspan=2 align="center"> 
 			<h2>Burrito: A Marriage of Taxonomy and Function</h2> 
 			<img border="0" src="images/burrito.jpg"></img>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A tasty burrito.</span></span></span>
+			
 		</td>
 	</tr>
 	
@@ -300,13 +308,15 @@ white-space: pre-line;
 			<tr><td>
 				<input type="radio" name="whichinput" id="usesample" onchange="mainui.checkWhichInput()">
 				<h4 style="display:inline">Explore sample data</h4> 
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="blank"></span><span class="content"> Select this option to use the tool to explore sample data.</span></span></span>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select this option to use the tool to explore sample data.</span></span></span>
 			</td></tr>
 			<tr><td>
 				<select name="sampleset" id="sampleselector">
 					<option value="none" selected></option>
 					<option value="theriot">Theriot et. al. 2014</option>
 				</select>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Choose which data set to use. After selecting one a description of it will be shown below.</span></span></span>
+				
 			</td></tr>
 			<tr><td id="samplesetinfo">
 				<div id="noneexp">
@@ -323,35 +333,48 @@ white-space: pre-line;
 			<table id="uploadtable" width="500" height = "200" frame="box">
 				<tr><td colspan=3>
 					<input type="radio" name="whichinput" id="useupload" onchange="mainui.checkWhichInput()">
-					<h4 style="display:inline">Upload your own data</h4> 
+					<h4 style="display:inline">Upload your own data</h4>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select this option if you have your own data to upload and visualize.</span></span></span>
+					 
 				</td></tr>
 				<tr><td colspan=3>
 						<input type="radio" name="inptype" id="sixteenradio" onchange="mainui.checkInpDataRadio()" value="16s">16s Reads
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You only have 16s reads.</span></span></span>
+						
 						<input type="radio" name="inptype" id="funcradio" onchange="mainui.checkInpDataRadio()" value="func">Functional Contributions
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have run PICRUST yourself and have reads and contributions.</span></span></span>
+						
 						<input type="radio" name="inptype" id="genomeradio" onchange="mainui.checkInpDataRadio()" value="genome">Genomic Annotations
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have the genome content of each taxa and their abundances.</span></span></span>
+				
 				</td></tr>
 				<tr>
 					<td>
 						<div id="taxonomic_abundances_1_g" class="hidbut">
 							Genome Abundances
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each genome in each sample. See documentation for an example.</span></span></span>
 							<input type="file" name="taxonomic_abundances_1" id="taxonomic_abundances_1">
 						</div>
 						<div id="taxonomic_abundances_2_g" class="hidexp">
 							Taxonomic Abundances
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each taxa in each sample. See documentation for an example.</span></span></span>
 							<input type="file" name="taxonomic_abundances_2" id="taxonomic_abundances_2">
 						</div>
 						<div id="read_counts_g" class="hidexp">
 							16s Reads
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundaces of each taxa in each sample. See documentation for an example.</span></span></span>
 							<input type="file" name="read_counts" id="read_counts">
 						</div>
 					</td>
 					<td>
 						<div id="genome_annotations_g" class="hidbut">
 							Genome Annotations
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional content of each genome. See documentation for an example.</span></span></span>
 							<input type="file" name="genome_annotations" id="genome_annotations">
 						</div>
 						<div id="function_contributions_g" class="hidexp">
 							Function Contributions
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional contribution of each taxa. See documentation for an example.</span></span></span>
 							<input type="file" name="function_contributions" id="function_contributions">
 						</div>
 					</td>
@@ -365,14 +388,17 @@ white-space: pre-line;
 				<tr>
 					<td>
 						Taxonomic Hierarchy
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.</span></span></span>
 						<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
 					</td>
 					<td>
 						Function Hierarchy
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.</span></span></span>
 						<input type="file" name="function_hierarchy" id="function_hierarchy">
 					</td>
 					<td>
 						Sample Map
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file describing the relationship between samples, i.e. which ones are the same treatment condition.</span></span></span>
 						<input type="file" name="sample_map" id="sample_map">
 					</td>
 				</tr>
@@ -385,6 +411,8 @@ white-space: pre-line;
 		<td colspan=2> <h4>Visualization Options</h4> 
 			<select name="taxlevelofdetail" id="taxLODselector">
 			</select>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.</span></span></span>
+			
 		</td>
 		</tr>
 		<tr>
@@ -392,7 +420,9 @@ white-space: pre-line;
 			<select name="color_option_selector" id="color_option_selector">
 			<option value="Categories">Hierarchical color scale</option>
 			<option value="Random">Random color scale</option>
-		`	</select>
+			</select>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.</span></span></span>
+			
 		</td>
 	</tr>
 
