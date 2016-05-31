@@ -734,7 +734,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	      	if(list_type=="taxa"){
 	      		layer1 = data_cube.taxa_lookup[main_list[j]]
 	      		descendents = data_cube.get_descendents(main_list[j], data_cube.taxa_lookup)
-	      		first_level = descendents.filter(function(d){ return data_cube.taxa_lookup[d].level == 1})
+	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.taxa_lookup[d].level == 1 } else { return data_cube.taxa_lookup[d].level == 0 }})
 	      	} else {
 	      		layer1 = data_cube.func_lookup[main_list[j]]
 	      		descendents = data_cube.get_descendents(main_list[j], data_cube.func_lookup)
@@ -759,7 +759,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	      				} else {
 	      					color_scale.range().push(color_slice[desc_leaves.length-m])
 	      				}
-	      				color_scale(desc_leaves[m])
 	      			}
 	      		}
 	      	}

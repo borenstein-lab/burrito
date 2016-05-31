@@ -170,17 +170,13 @@
 			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
 			.attr("width",b)
 			.attr("height",function(d){ 
-				console.log(d.height)
+				//console.log(d.height)
 				return (d.height - padding); })
 			.style("shape-rendering","auto")
 			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
 			.style("fill-opacity",.75).style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
-
-		//keep playing with this
-		console.log(mainbar.attr("width"))
-		console.log(b) //should be 20?
  
 		mainbar.append("text").attr("class","barlabel")
 			.attr("x", p == 0 ? c1[p] + (extra_width-10) : c1[p])
@@ -285,12 +281,10 @@
 	
 	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
 		
-		console.log(dims)
 		bb = dims.width * .075;
 		b = dims.width / 50;
 		c1 = [-(5 + 0.005*dims.width), b + (5 + 0.005*dims.width)];
 		extra_width = dims.width /11
-		console.log(extra_width)
 		//add parameters here once I figure out ideal
 		
 		svg.append("g")
