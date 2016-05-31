@@ -476,13 +476,18 @@ draw_svg = function() {
 	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
 			saveSvgAsPng(document.getElementById("plots_svg"), "test.png", { backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 120, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 100, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
 			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 230, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg", 10, 190, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
+			saveSvgAsPng(document.getElementById("saveLegBar0"), "taxonomy_legend.png",{ backgroundColor : "white", scale: 1.5})
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 250, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
 			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg", 10, 340, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
+			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5})
+		});
 		draw_loading();
 
 		}

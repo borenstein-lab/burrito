@@ -95,7 +95,7 @@
     .attr("font-size",18)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
-    .text("Relative Contribution %");
+    .text("Relative Abundance (%)");
 
   //x-axis label
     svglink.append("text")
@@ -148,7 +148,7 @@
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
         name_split = (current_rectangle_data.name.split('_')).pop()
-        tooltip.html("<strong>Taxa</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+        tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
         return tooltip.style("visibility", "visible");
       })
       .on("mousemove", function(){ 

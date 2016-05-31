@@ -29,8 +29,7 @@
 				
 		return sData;
 	}
-	
-	function visualize(data){
+		function visualize(data){
 		var vis ={};
 		function calculatePosition(a, s, e, b, m){
 			// console.log("a"+a);
@@ -130,37 +129,61 @@
 	}
 	
 	function drawPart(data, id, p, colors){
-		d3.select("#"+id).append("g").attr("class","part"+p)
+		d3.select("#"+id).append("g")
+			.attr("class","part"+p)
+			.attr("id","part"+p)
+			.attr("font-family","Verdana") //for legend to save with correct fonts
 			.attr("transform","translate("+ (p==0 ? (-1*(bb+b)) : (bb)) +",0)");
-
-		//d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
-		d3.select("#"+id).select(".part"+p).append("g").attr("class","mainbars");
-		
-		var mainbar = d3.select("#"+id).select(".part"+p).select(".mainbars")
-			.selectAll(".mainbar").data(data.mainBars[p])
-			.enter().append("g").attr("class","mainbar");
 
 		var padding = 0;
 		var nbar = data.mainBars[p].length;
-
 		if ( nbar < 5) { padding = 20;
 		}else if (nbar < 11) {padding = 10;
 		}else if (nbar < 25) {padding = 5;
 		}else { nbar = 4;}
+// 		console.log(nbar)
+// 		console.log(padding)
+// 		console.log(nbar*10+padding*12)
+// 		console.log(b)
+		
+		saveLegBar = d3.select("#"+id).select(".part"+p).append("svg")
+			.attr("id","saveLegBar"+p)			
+			.attr("x", p == 0 ? -extra_width : 0)
+			.attr("width", p == 0 ? b + extra_width : b + 1.5*extra_width) //function legend is larger because longer names
+			.attr("height", height)
+			.attr("font-family","Verdana");
+
+
+		//d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
+		d3.select("#"+id).select(".part"+p).select("#saveLegBar"+p).append("g")
+			.attr("class","mainbars");
+		//
+		
+		var mainbar = d3.select("#"+id).select(".part"+p).select("#saveLegBar"+p).select(".mainbars")
+			.selectAll(".mainbar").data(data.mainBars[p])
+			.enter().append("g").attr("class","mainbar");
+
+
 		
 		mainbar.append("rect").attr("class","mainrect")
-			.attr("x", 0)
+			.attr("x", p == 0 ? (extra_width-10) : 10)//0)
 			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
 			.attr("width",b)
-			.attr("height",function(d){ return (d.height - padding); })
+			.attr("height",function(d){ 
+				console.log(d.height)
+				return (d.height - padding); })
 			.style("shape-rendering","auto")
 			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
 			.style("fill-opacity",.75).style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
 
+		//keep playing with this
+		console.log(mainbar.attr("width"))
+		console.log(b) //should be 20?
+ 
 		mainbar.append("text").attr("class","barlabel")
-			.attr("x", c1[p])
+			.attr("x", p == 0 ? c1[p] + (extra_width-10) : c1[p])
 			.attr("y",function(d){ return d.middle+5;})
 			.text(function(d,i){ 
 				name_split = (data.keys[p][i].split('_')).pop()
@@ -169,13 +192,16 @@
 				})
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.transition().duration(300);
-
+			
+		
 		if(data.keys[p].length==1){
 			fontSize=24;	
 		}  else{
 			fontSize = 24/Math.log(data.keys[p].length) + 2;
 		}
 		mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
+		
+
 		/*
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
@@ -190,6 +216,7 @@
 			.transition().duration(300);
 		*/
 	}
+
 
 	// function updatePart(data, id, p){
 	// 	d3.select("#"+id).select(".part"+p).select(".mainbars").selectAll(".mainbar")
@@ -258,9 +285,13 @@
 	
 	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
 		
+		console.log(dims)
 		bb = dims.width * .075;
 		b = dims.width / 50;
 		c1 = [-(5 + 0.005*dims.width), b + (5 + 0.005*dims.width)];
+		extra_width = dims.width /11
+		console.log(extra_width)
+		//add parameters here once I figure out ideal
 		
 		svg.append("g")
 			.attr("id", bip.id);
@@ -320,7 +351,7 @@
 		});
 
 	}
-	
+		
 
 	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){ //bip id has to be the same
 
