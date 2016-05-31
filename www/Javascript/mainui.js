@@ -31,6 +31,7 @@
 		mainui.RefreshUploadReady();
 			
 		document.getElementById("update_button").addEventListener("click", function() {
+			uploader.reset_load_flags();
 			if (mainui.datamode == "sample") {
 				draw_svg();
 				uploader.load_default_data();
