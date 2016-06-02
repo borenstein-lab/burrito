@@ -200,6 +200,15 @@
     });
   }
 
+  out$.saveSvg = function(uri, name) {
+  	var link = document.createElement("a");
+  	link.download = name;
+	link.href = uri;
+    link.click();
+    document.body.removeChild(link);
+  	delete link;
+  }  
+
   // if define is defined create as an AMD module
   if (typeof define !== 'undefined') {
     define(function() {

@@ -539,19 +539,43 @@ draw_svg = function() {
 			.style("font-family", "Verdana");
 	
 	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
-			saveSvgAsPng(document.getElementById("plots_svg"), "test.png", { backgroundColor : "white", scale: 1.5})
+			saveSvgAsPng(document.getElementById("plots_svg"), "screenshot.png", { backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 100, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg", 10, 100, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
+			svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { //console.log(uri)
+			saveSvg(uri, "screenshot.svg")
+}); 
+	});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 190, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
 			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg", 10, 190, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_taxa_bar", 10, 280, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
+			svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) {
+			saveSvg(uri, "taxa_bar.svg")
+}); 
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg", 10, 370, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
 			saveSvgAsPng(document.getElementById("saveLegBar0"), "taxonomy_legend.png",{ backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 250, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
+			svgAsDataUri(document.getElementById("saveLegBar0"), {}, function(uri) {
+			saveSvg(uri, "taxonomy_legend.svg")
+}); 
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 490, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
 			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg", 10, 340, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
-			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5})
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_func_bar", 10, 580, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
+			svgAsDataUri(document.getElementById("func_bars"), {}, function(uri) {
+			saveSvg(uri, "function_bar.svg")
+		});
+		});
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg", 10, 670, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
+			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5}) });
+	button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg_svg", 10, 730, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
+			svgAsDataUri(document.getElementById("saveLegBar1"), {}, function(uri) {
+			saveSvg(uri, "function_legend.svg")
+		});
 		});
 		draw_loading();
 
