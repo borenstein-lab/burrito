@@ -243,7 +243,7 @@ draw_svg = function() {
 		duration = 300;
 		roots = {};
 
-		treez.SetUp
+		trees.SetUp(navDims);
 		
 
 /*		diagonal = d3.svg.diagonal()  DELETE IF BEING COMMENTED ISNT A PROBLEM
@@ -359,7 +359,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var bpG = NavSVG.append("g")
 		.attr("transform","translate("+ (width / 2) +","+ margin.top +")");
 		
-	treez.SetUp2("navbar", margin, navDims);
+	trees.SetUp2("navbar", margin, navDims);
 	
 	var TaxaBar = plotSVG.insert("svg", "#sidebar")
 		.attr("x",margin.left)
@@ -385,9 +385,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		
 	var bpvisdata;
 	
-	treez.SetUp3(tax_hierarchy_text, func_hierarchy_text, height);
-
-	func_averages = d3.tsv.parse(func_averages)
+	
+	func_averages = d3.tsv.parse(func_averages);
 	samplemap = d3.tsv.parse(samp_map_text);
 
 	/*	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
@@ -411,8 +410,12 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
-	data_cube.initialize_cube(contribution_table, treez.getTaxaTreeData(), treez.getFuncTreeData(), func_averages);
 
+	trees.SetUp3(tax_hierarchy_text, func_hierarchy_text, height, data_cube);
+
+	data_cube.initialize_cube(contribution_table, trees.getTaxaTreeData(), trees.getFuncTreeData(), func_averages);
+	
+		
 	//if( not expand to OTU level
 	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
 
@@ -755,7 +758,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	function highlightOverall(taxonName, functionName, highlightwhat) {
 		if (highlightwhat == 1) {
 			// Highlight taxa tree
-			treez.highlightTree(taxonName, 'taxa');
+			trees.highlightTree(taxonName, 'taxa');
 			
 			// Highlight BP graph
 			m = 0;
@@ -774,7 +777,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		
 		if (highlightwhat == 2) {
 			// Highlight function tree
-			treez.highlightTree(functionName, 'func');
+			trees.highlightTree(functionName, 'func');
 			
 			// Highlight BP graph
 			m = 1;
@@ -790,10 +793,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		
 		if (highlightwhat == 3) {
 			//highlight taxa tree
-			treez.highlightTree(taxonName, 'taxa');
+			trees.highlightTree(taxonName, 'taxa');
 			
 			//highlight function tree
-			treez.highlightTree(functionName, 'func');
+			trees.highlightTree(functionName, 'func');
 		
 			// Highlight Taxa Bar Chart
 			otu_bar.select_bars(taxonName);
@@ -807,7 +810,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 		if (highlightwhat == 1) {
 			// dehighlight tree
-			treez.dehighlightTree(taxonName, 'taxa');
+			trees.dehighlightTree(taxonName, 'taxa');
 			
 			// dehighlight BP graph
 			m = 0;
@@ -825,7 +828,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 		
 		if (highlightwhat == 2) {
-			treez.dehighlightTree(functionName, 'func');
+			trees.dehighlightTree(functionName, 'func');
 			
 			//dehighlight BP graph
 			m = 1;
@@ -841,10 +844,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		
 		if (highlightwhat == 3) {
 			// dehighlight taxa tree
-			treez.dehighlightTree(taxonName, 'taxa');
+			trees.dehighlightTree(taxonName, 'taxa');
 			
 			//dehighlight function tree
-			treez.dehighlightTree(functionName, 'func');
+			trees.dehighlightTree(functionName, 'func');
 			
 			// dehighlight Taxa Bar Chart
 			otu_bar.deselect_bars(taxonName, taxa_colors);

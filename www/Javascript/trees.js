@@ -1,9 +1,10 @@
-(function() {
+(function(){
 	var trees={};
-	var trees.trees;
-	var trees.SVGs = {};
-	var trees.taxa_tree_data, trees.func_tree_data;
-	var trees.roots
+	trees.trees = {};
+	trees.SVGs = {};
+	trees.taxa_tree_data, trees.func_tree_data;
+	trees.roots = {};
+	var data_cube;
 	
 	trees.SetUp = function(navDims) {
 		var TaxaTree = d3.layout.tree()
@@ -14,8 +15,8 @@
 			.children(function (d) { return d.values;})
 			.size([(navDims.height), navDims.treewidth]);
 
-		trees.trees["taxa"] = trees.TaxaTree;
-		trees.trees["func"] = trees.FuncTree;
+		trees.trees["taxa"] = TaxaTree;
+		trees.trees["func"] = FuncTree;
 		
 	}
 	
@@ -33,26 +34,14 @@
 		trees.SVGs["func"] = FuncTreeG;
 	}
 	
-	trees.SetUp3 = function(tax_hierarchy_t, func_hierarchy_t, height) {
-		/*var levelNames = {};
-		var curlevelNames = {};
-		levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "OTU"];
-		levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
-		curlevelNames['taxa'] = levelNames['taxa'];
-		curlevelNames['func'] = levelNames['func'];
+	trees.SetUp3 = function(tax_hierarchy_t, func_hierarchy_t, height, datcube) {
+		data_cube = datcube;
+		trees.taxa_tree_data = tax_hierarchy_t;
+		trees.func_tree_data = func_hierarchy_t;
 		
-		*/
+		var taxa_data = jQuery.extend(true, [], trees.taxa_tree_data);
 		
-		trees.taxa_tree_data = tax_hierarchy_text;
-		trees.func_tree_data = func_hierarchy_text;
-		
-		/*
-		var taxLevels = d3.keys(trees.taxa_tree_data[0]);
-		*/
-		
-		var taxa_data = jQuery.extend(true, [], taxa_tree_data);
-		
-		var curr_taxa = [];
+		/*var curr_taxa = [];
 		for (var i = 0; i < taxa_data.length; i++){
 			curr_taxa.push(taxa_data[i]);
 		}
@@ -65,7 +54,7 @@
 					curr_taxa.push(curr_taxon.values[i]);
 				}
 			}
-		}
+		} */
 
 		var newTaxaData = {
 			"key": "All Taxa",
@@ -97,8 +86,8 @@
 		countchildren(roots["taxa"]);
 		//get means for all OTUs, then for all the way up the tree
 		get_taxa_sample_means(otu_abundance_data, data_cube)
-		getAvgs(roots["taxa"])
-		update(roots["taxa"]);
+		trees.getAvgs(roots["taxa"])
+		trees.update(roots["taxa"]);
 		
 		var function_data = jQuery.extend(true, [], func_tree_data);
 
@@ -116,11 +105,11 @@
 		funcroot.type = settype;
 		
 		roots["func"] = funcroot;
-		countchildren(roots["func"]);
-		getAvgs(roots["func"])
-		update(roots['func']);
+		trees.countchildren(roots["func"]);
+		trees.getAvgs(roots["func"])
+		trees.update(roots['func']);
 
-		click(roots['taxa'].values[0])
+		trees.click(roots['taxa'].values[0])
 	}
 	
 	
@@ -131,8 +120,8 @@
 	// Expands or collapses the source node, depending on whether it is currently open or closed
 	trees.update = function(source) {
 		// Compute the new tree layout.
-		var nodes = trees.trees[source.type].nodes(roots[source.type]).reverse(),
-		var	links = trees.trees[source.type].links(nodes);
+		var nodes = trees.trees[source.type].nodes(roots[source.type]).reverse();
+		var links = trees.trees[source.type].links(nodes);
 			
 
 		var nleaf = 0;
@@ -653,25 +642,36 @@
 		}
 	}
 	
-	trees.countchildren = function(rootnode) {
+	function countchildren(rootnode) {
 			var totchildren = 0;
 			var addone = 1;
 			if (rootnode.values) {
 				rootnode.values.forEach( function(d) {
-					totchildren = totchildren + trees.countchildren(d);
+					totchildren = totchildren + countchildren(d);
 				})
 				addone = 0;
 			} 
 			if (rootnode._values) {
 				rootnode._values.forEach( function(d) {
-					totchildren = totchildren + trees.countchildren(d);
+					totchildren = totchildren + countchildren(d);
 				})
 				addone = 0;
 			}
 			rootnode.Ndescendents = totchildren;
 			return (totchildren + addone);
 		}
-	
+	var taxa_means = {}
+
+	function get_taxa_sample_means(otu_abundance_data, data_cube){
+		otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d != "Sample"})
+		for(j = 0; j < otus.length; j++){
+			taxa_means[otus[j]] = 0
+			for(k = 0; k < otu_abundance_data.length; k++){
+				taxa_means[otus[j]] += otu_abundance_data[k][otus[j]]*1
+			}
+			taxa_means[otus[j]] = taxa_means[otus[j]]/(otu_abundance_data.length)
+		}
+	}	
 	// Accessor functions
 	
 	trees.getTaxaTreeData = function() {
