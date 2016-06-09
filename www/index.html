@@ -359,7 +359,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var bpG = NavSVG.append("g")
 		.attr("transform","translate("+ (width / 2) +","+ margin.top +")");
 		
-	trees.SetUp2("navbar", margin, navDims);
+	trees.SetUp2("navbar", margin, navDims, tax_hierarchy_text, func_hierarchy_text);
 	
 	var TaxaBar = plotSVG.insert("svg", "#sidebar")
 		.attr("x",margin.left)
@@ -411,11 +411,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	//initialize display cube
 	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 
-	trees.SetUp3(tax_hierarchy_text, func_hierarchy_text, height, data_cube);
-
 	data_cube.initialize_cube(contribution_table, trees.getTaxaTreeData(), trees.getFuncTreeData(), func_averages);
-	
-		
+			
 	//if( not expand to OTU level
 	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
 
@@ -699,7 +696,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	function update_otu_bar(){
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
-		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+		var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 	}
 
@@ -716,25 +713,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
 
-	
-	
-	//get mean taxon abundances across samples
-	var taxa_means = {}
-
-	function get_taxa_sample_means(otu_abundance_data, data_cube){
-		otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d != "Sample"})
-		for(j = 0; j < otus.length; j++){
-			taxa_means[otus[j]] = 0
-			for(k = 0; k < otu_abundance_data.length; k++){
-				taxa_means[otus[j]] += otu_abundance_data[k][otus[j]]*1
-			}
-			taxa_means[otus[j]] = taxa_means[otus[j]]/(otu_abundance_data.length)
-		}
-	}
-
-	
 
     //d3.select(self.frameElement).style("height", "800px");
+
+	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall);
 
 
 

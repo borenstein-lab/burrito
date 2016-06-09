@@ -4,7 +4,13 @@
 	trees.SVGs = {};
 	trees.taxa_tree_data, trees.func_tree_data;
 	trees.roots = {};
+	var taxa_means = {}
 	var data_cube;
+	var bpvisdata;
+	var navDims;
+	var margin;
+	function highlightOverall;
+	function dehighlightOverall;
 	
 	trees.SetUp = function(navDims) {
 		var TaxaTree = d3.layout.tree()
@@ -20,7 +26,9 @@
 		
 	}
 	
-	trees.SetUp2 = function(navname, margins, navDims) {
+	trees.SetUp2 = function(navname, margins, navdim, tax_hierarchy_t, func_hierarchy_t) {
+		navDims = navdim;
+		margin = margins;
 		trees.trees["taxa"].size([(navDims.height), navDims.treewidth]);
 		trees.trees["func"].size([(navDims.height), navDims.treewidth]);
 		
@@ -34,8 +42,11 @@
 		trees.SVGs["func"] = FuncTreeG;
 	}
 	
-	trees.SetUp3 = function(tax_hierarchy_t, func_hierarchy_t, height, datcube) {
+	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall) {
 		data_cube = datcube;
+		bpvisdata = bpvd;
+		highlightOverall = highloverall;
+		dehighlightOverall = dehighloverall;
 		trees.taxa_tree_data = tax_hierarchy_t;
 		trees.func_tree_data = func_hierarchy_t;
 		
@@ -86,7 +97,7 @@
 		countchildren(roots["taxa"]);
 		//get means for all OTUs, then for all the way up the tree
 		get_taxa_sample_means(otu_abundance_data, data_cube)
-		trees.getAvgs(roots["taxa"])
+		getAvgs(roots["taxa"])
 		trees.update(roots["taxa"]);
 		
 		var function_data = jQuery.extend(true, [], func_tree_data);
@@ -105,8 +116,8 @@
 		funcroot.type = settype;
 		
 		roots["func"] = funcroot;
-		trees.countchildren(roots["func"]);
-		trees.getAvgs(roots["func"])
+		countchildren(roots["func"]);
+		getAvgs(roots["func"])
 		trees.update(roots['func']);
 
 		trees.click(roots['taxa'].values[0])
@@ -160,7 +171,7 @@
 		
 		
 		// Normalize for fixed-depth.
-		var maxDepth = getDepth(roots[source.type]);
+		var maxDepth = trees.getDepth(roots[source.type]);
 		
 		var depthpos = {};
 		depthpos['taxa'] = [];
@@ -180,8 +191,11 @@
 			}
 		}); 
 
+
+		//\¯\¯\Update hierarchical level labels¯\¯\¯\¯\¯\¯\¯\
+
 		// figure out which depth levels exist
-		curlevelNames[source.type] = [];
+		var curlevelNames[source.type] = [];
 		for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
 			curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
 		}
@@ -220,8 +234,8 @@
 			
 		labelexit.select("text")
 			.attr("visibility","hidden");
-			
 		
+		//\_/_/_/_/End level label update_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 			
 		
 		// Update the nodes…
@@ -451,7 +465,8 @@
 			d.y0 = d.y;
 		});
 		
-	/////////////////////// Do depth labels /////////////////////////////
+		//\¯\¯\Update hierarchical level labels¯\¯\¯\¯\¯\¯\¯\
+
 		// figure out which depth levels exist
 		curlevelNames[source.type] = [];
 		for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
@@ -492,6 +507,8 @@
 			
 		labelexit.select("text")
 			.attr("visibility","hidden");
+			
+		//\_/_/_/_/End level label update_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 	}
 	
 
@@ -603,7 +620,7 @@
 		data.thisandparents.selectAll("text").remove(); 
 	}
 	
-	trees.getAvgs = function(rootnode){
+	function getAvgs(rootnode){
 		if(rootnode.type=="func"){
 			if(rootnode.key != "All Functions"){
 				func_leaves = data_cube.get_leaves(rootnode.key, data_cube.func_lookup)
@@ -614,7 +631,7 @@
 //				rootnode.sampleAvg = funcAvg
 			} else {
 				rootnode.values.forEach(function(d){
-					trees.getAvgs(d)
+					getAvgs(d)
 				})
 				rootnode.sampleAvg = 0.1
 			}
@@ -629,41 +646,40 @@
 				rootnode.sampleAvg = taxaAvg
 			} else {
 				rootnode.values.forEach(function(d){
-					trees.getAvgs(d)
+					getAvgs(d)
 				})
 				rootnode.sampleAvg = 0.1
 			}
 		}
 		if(rootnode._values){
 			rootnode._values.forEach(function(d){
-				if(d._values){ trees.getAvgs(d)}
+				if(d._values){ getAvgs(d)}
 				
 			})
 		}
 	}
 	
 	function countchildren(rootnode) {
-			var totchildren = 0;
-			var addone = 1;
-			if (rootnode.values) {
-				rootnode.values.forEach( function(d) {
-					totchildren = totchildren + countchildren(d);
-				})
-				addone = 0;
-			} 
-			if (rootnode._values) {
-				rootnode._values.forEach( function(d) {
-					totchildren = totchildren + countchildren(d);
-				})
-				addone = 0;
-			}
-			rootnode.Ndescendents = totchildren;
-			return (totchildren + addone);
+		var totchildren = 0;
+		var addone = 1;
+		if (rootnode.values) {
+			rootnode.values.forEach( function(d) {
+				totchildren = totchildren + countchildren(d);
+			})
+			addone = 0;
+		} 
+		if (rootnode._values) {
+			rootnode._values.forEach( function(d) {
+				totchildren = totchildren + countchildren(d);
+			})
+			addone = 0;
 		}
-	var taxa_means = {}
+		rootnode.Ndescendents = totchildren;
+		return (totchildren + addone);
+	}
 
 	function get_taxa_sample_means(otu_abundance_data, data_cube){
-		otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d != "Sample"})
+		var otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d != "Sample"})
 		for(j = 0; j < otus.length; j++){
 			taxa_means[otus[j]] = 0
 			for(k = 0; k < otu_abundance_data.length; k++){
