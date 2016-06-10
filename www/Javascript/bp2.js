@@ -53,7 +53,6 @@
 					ret.push(v);
 				}
 			);
-			
 			var scaleFact=leftoverHeight/Math.max(neededHeight,1), sum=0;
 			ret.forEach(
 				function(d, i){ 
@@ -243,7 +242,8 @@
 				var current_data = this._current;
 				bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);
 			})
-			.transition().duration(300);
+			.transition().duration(300)
+			.attr("visibility","hidden");
 			//brush would go here
 	}	
 	
@@ -446,11 +446,17 @@
 				n = 0;
 			} 
 
-			selectedEdges.attr("points", bP.edgePolygon2).style("opacity", 1).style("fill", function(f){ if(n==1){
+			selectedEdges.attr("points", bP.edgePolygon2)
+				.style("opacity", 1)
+				.style("fill", function(f){ if(n==1){
 				return func_colors(displayed_funcs[f["key2"]]);	
 			} else{
 				return taxa_colors(displayed_taxa[f["key1"]]);
-			} });
+			} })
+				.attr("width", function(d){ 
+					return d.wid;
+					})
+				.attr("visibility", "visible");
 			//selectedEdges.select("_current").style("stroke-opacity", 1);
 			//selectedBar.select(".barvalue").style('font-weight','bold');
 			//selectedBar.select(".barpercent").style('font-weight','bold');
@@ -480,7 +486,10 @@
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
 
-		selectedEdges.attr("points", bP.edgePolygon).style("opacity", 0.2).style("fill", "grey");
+		selectedEdges.attr("points", bP.edgePolygon)
+			.style("opacity", 0.2)
+			.style("fill", "grey")
+			.attr("visibility", "hidden");
 
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');

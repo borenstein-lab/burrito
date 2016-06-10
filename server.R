@@ -177,6 +177,9 @@ shinyServer(function(input, output, session) {
 			# Convert subpathway counts to relative abundances
 			output[,relative_contributions := V1/sum(V1), by=Sample]
 
+			otu_ko_links = unique(expanded_table[,list(OTU, Gene)])
+			#session$sendCustomMessage(type="shiny_test", paste0(c(paste0(names(otu_ko_links), collapse="\t"), apply(otu_ko_links, 1, function(x){ return(paste0(x, collapse = "\t"))})), collapse = "\n"))
+			
 			################################# Formatting and returning the function hierarchy #################################
 			# Remove the column of KOs
 			func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2],with=F]
