@@ -716,10 +716,14 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
     //d3.select(self.frameElement).style("height", "800px");
 
-	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall);
+	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall, taxa_colors, func_colors, function() {
+		trees.updateBPvisdata( updateBPgraph() );
+		update_otu_bar();
+		update_func_bar();
+	});
 
 
-
+	/*
     var curr_funcs = [];
     for (var i = 0; i < function_data.length; i++){
 	    curr_funcs.push(function_data[i]);
@@ -732,7 +736,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
     			curr_funcs.push(curr_func.values[i]);
     		}
     	}
-    }  
+    } */  
 
     
 

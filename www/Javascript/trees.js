@@ -1,16 +1,22 @@
 (function(){
 	var trees={};
-	trees.trees = {};
+	trees.treestructure = {};
 	trees.SVGs = {};
 	trees.taxa_tree_data, trees.func_tree_data;
-	trees.roots = {};
+	var roots = {};
 	var taxa_means = {}
 	var data_cube;
 	var bpvisdata;
 	var navDims;
 	var margin;
-	function highlightOverall;
-	function dehighlightOverall;
+	var levelNames = {};
+	var curlevelNames = {};
+	var diagonal;
+	var taxa_colors;
+	var func_colors;
+	var highlightOverall = function(){};
+	var dehighlightOverall = function(){};
+	var updateOtherThings = function(){};
 	
 	trees.SetUp = function(navDims) {
 		var TaxaTree = d3.layout.tree()
@@ -21,16 +27,20 @@
 			.children(function (d) { return d.values;})
 			.size([(navDims.height), navDims.treewidth]);
 
-		trees.trees["taxa"] = TaxaTree;
-		trees.trees["func"] = FuncTree;
+		trees.treestructure["taxa"] = TaxaTree;
+		trees.treestructure["func"] = FuncTree;
 		
+		diagonal = d3.svg.diagonal()
+			.projection(function (d) {
+			return [d.y, d.x];
+		});
 	}
 	
 	trees.SetUp2 = function(navname, margins, navdim, tax_hierarchy_t, func_hierarchy_t) {
 		navDims = navdim;
 		margin = margins;
-		trees.trees["taxa"].size([(navDims.height), navDims.treewidth]);
-		trees.trees["func"].size([(navDims.height), navDims.treewidth]);
+		trees.treestructure["taxa"].size([(navDims.height), navDims.treewidth]);
+		trees.treestructure["func"].size([(navDims.height), navDims.treewidth]);
 		
 		var TaxaTreeG = d3.select("#" + navname).append("g")
 			.attr("transform", "translate(" + 5 + "," + margins.top + ")");
@@ -40,16 +50,26 @@
 
 		trees.SVGs["taxa"] = TaxaTreeG;
 		trees.SVGs["func"] = FuncTreeG;
+		trees.taxa_tree_data = tax_hierarchy_t;
+		trees.func_tree_data = func_hierarchy_t;
+		
 	}
 	
-	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall) {
+	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall, taxa_cols, func_cols, updateFunc) {
 		data_cube = datcube;
 		bpvisdata = bpvd;
 		highlightOverall = highloverall;
 		dehighlightOverall = dehighloverall;
-		trees.taxa_tree_data = tax_hierarchy_t;
-		trees.func_tree_data = func_hierarchy_t;
-		
+		taxa_colors = taxa_cols;
+		func_colors = func_cols;
+		updateOtherThings = updateFunc;
+
+		levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "OTU"];
+		levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+		curlevelNames['taxa'] = levelNames['taxa'];
+		curlevelNames['func'] = levelNames['func'];
+
+		console.log(bpvisdata);
 		var taxa_data = jQuery.extend(true, [], trees.taxa_tree_data);
 		
 		/*var curr_taxa = [];
@@ -100,7 +120,7 @@
 		getAvgs(roots["taxa"])
 		trees.update(roots["taxa"]);
 		
-		var function_data = jQuery.extend(true, [], func_tree_data);
+		var function_data = jQuery.extend(true, [], trees.func_tree_data);
 
 		newFunctionData = {
 			"key": "All Functions",
@@ -131,19 +151,23 @@
 	// Expands or collapses the source node, depending on whether it is currently open or closed
 	trees.update = function(source) {
 		// Compute the new tree layout.
-		var nodes = trees.trees[source.type].nodes(roots[source.type]).reverse();
-		var links = trees.trees[source.type].links(nodes);
+		var nodes = trees.treestructure[source.type].nodes(roots[source.type]).reverse();
+		var links = trees.treestructure[source.type].links(nodes);
 			
 
 		var nleaf = 0;
 		nodes.forEach(function (d) {
 			nleaf = nleaf + (d.values ? 0 : 1);
 		})
+
+		console.log(bpvisdata);
 		/*
 		
 		var leafC = 1;
 		*/
 		nodes.forEach(function (d) {
+			//console.log("in nodes.foreach");
+			//console.log(bpvisdata);
 			if (!(d.values)) { 
 				var dattype = d.type == "taxa" ? 0 : 1;
 				var thedat = -1;
@@ -154,6 +178,7 @@
 				}
 				
 				if (thedat >= 0) {
+					//console.log("dattype: " + dattype + ", and thedat: " + thedat);
 					d.x = bpvisdata.mainBars[dattype][thedat].y;	
 				} else { d.x = 0; 
 				}
@@ -195,13 +220,13 @@
 		//\¯\¯\Update hierarchical level labels¯\¯\¯\¯\¯\¯\¯\
 
 		// figure out which depth levels exist
-		var curlevelNames[source.type] = [];
+		curlevelNames[source.type] = [];
 		for (idxz = 0; idxz < (maxDepth - 1); idxz++) {
 			curlevelNames[source.type].push({name: levelNames[source.type][idxz], depth: idxz});
 		}
 		
 		// Update the tree depth labels
-		var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+		var depthlabels = trees.SVGs[source.type].selectAll("g.depthlabel")
 			.data(curlevelNames[source.type])
 			
 		var newdepthlabels = depthlabels.enter().append("g")
@@ -239,7 +264,7 @@
 			
 		
 		// Update the nodes…
-		var node = SVGs[source.type].selectAll("g.node")
+		var node = trees.SVGs[source.type].selectAll("g.node")
 			.data(nodes, function (d) {
 			return d.id || (d.id = ++i);
 		});
@@ -421,7 +446,7 @@
 
 		
 		// Update the links…
-		var link = SVGs[source.type].selectAll("path.link")
+		var link = trees.SVGs[source.type].selectAll("path.link")
 			.data(links, function (d) {
 			return d.target.id;
 		});
@@ -474,7 +499,7 @@
 		}
 		
 		// Update the tree depth labels
-		var depthlabels = SVGs[source.type].selectAll("g.depthlabel")
+		var depthlabels = trees.SVGs[source.type].selectAll("g.depthlabel")
 			.data(curlevelNames[source.type])
 			
 		var newdepthlabels = depthlabels.enter().append("g")
@@ -519,21 +544,17 @@
 				if (d.depth > 0) {//don't collapse the root
 					trees.collapseTree(d);
 					d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
-					bpvisdata = updateBPgraph();
 				}
 			} else { //expand
 				if (d._values[0].hasOwnProperty('key')) {
 					d.values = d._values;
 					d._values = null;
 					d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
-					bpvisdata = updateBPgraph();
 				} else {
-				}
-				
-		   }
-		update(d);
-		update_otu_bar();
-		update_func_bar();
+				}			
+			}
+		updateOtherThings();
+		trees.update(d);
 	}
 
 	// collapse all children of the collapsing node recursively
@@ -561,7 +582,7 @@
 
 
 	trees.highlightTree = function( name, type) {
-		var treedatainterest = trees.trees[type].nodes(trees.roots[type]).filter( function(d) {
+		var treedatainterest = trees.treestructure[type].nodes(roots[type]).filter( function(d) {
 			return d.key == name;
 		} );
 		var treedatainterestobj = trees.SVGs[type].selectAll("g.node").filter( function(d) {
@@ -609,7 +630,7 @@
 	}
 
 	trees.dehighlightTree = function(name, type) {
-		var treedatainterest = trees.trees[type].nodes(trees.roots[type]).filter( function(d) {
+		var treedatainterest = trees.treestructure[type].nodes(roots[type]).filter( function(d) {
 			return d.key == name;
 		} );
 		var data = treedatainterest[0];
@@ -698,6 +719,10 @@
 		return trees.func_tree_data;
 	}
 	
+	trees.updateBPvisdata = function(bpvd) {
+		bpvisdata = bpvd;
+	}
+
 	this.trees = trees;
 })();
 
