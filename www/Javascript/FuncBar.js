@@ -53,10 +53,10 @@
       d.data.map(function(e){
         h.push(e.Sample);
         return e.Sample;
-      })  });
+      })  
+    });
     x.domain(h);
     y.domain([0, 100]);
-
 
     return data;
   }
@@ -77,10 +77,10 @@
 
 
 
-  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
+  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, comparison_data){
 
-	var graphdims = {width: dims.width * 8/9, height: dims.height * 8/10, buffer:7}
-   x.rangeRoundBands([0, graphdims.width], .3);
+	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, buffer:7}
+   x.rangeRoundBands([0, graphdims.width], .2);
    y.rangeRound([graphdims.height, 0]);
 
    xAxis.scale(x);
@@ -155,6 +155,7 @@
   .data(viz)
   .enter().append("g")
   .attr("class", "g")
+  .attr("id", function(d){ return "func_"+d.Sample })
   .attr("transform", function(d) {return "translate(" + (dims.width-graphdims.width + x(d.Sample)) + "," + graphdims.buffer + ")"; });
 
 
@@ -162,7 +163,6 @@
 
   Sample.selectAll("rect")
   .data(function(d) { 
-
    return d.data;
  })
   .enter().append("rect")
@@ -175,10 +175,15 @@
   .style("opacity", 0.75)
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
+	selected = d3.select("#func_" + current_rectangle_data.Sample)
+		.selectAll("rect").data()
+		.filter(function(e){ 
+			return e.func == current_rectangle_data.func; })
+     total_abund = d3.sum(selected.map(function(e){ return e.contributions; }))
     highlight_overall("", current_rectangle_data.func, 2);
     	name_split = (current_rectangle_data.func.split('_')).pop()
-    	taxa_split = (current_rectangle_data.Taxa.split('_')).pop()
-        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Taxon: </strong>" + taxa_split + " <br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(current_rectangle_data.contributions*100*100)/100+ "%");
+    	//taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split 
+        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" +  "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
         })
   .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})

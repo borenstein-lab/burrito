@@ -75,7 +75,6 @@ path.link {
 	height:100%;
 	vertical-align:top;
 	font-family: "Verdana", Verdana, sans-serif;
-
 }
 #mainsvg {
 	position:fixed;
@@ -106,60 +105,47 @@ path.link {
 #sidebar {
 	z-index:5;
 }
-
 .sidebutton {
 	stroke:black;
 	stroke-width:1;
 	opacity:1;
 	cursor:default;
 }
-
 g.switchb rect {
 	fill:white;
 }
-
 g.switchb.selectedbutton rect {
 	fill:green;
 	stroke:#005000;
 	stroke-width:4;
 }
-
 g.uploadb rect {
 	fill: orange;
 }
-
 g.uploadb.activebutton:hover rect {
 	fill:#ffc000;
 }
-
-
 g.updateb rect {
 	fill:#b3ffff;
 	stroke-width:1;
 	stroke:#000066;
 }
-
 g.updateb text {
 	opacity:0.5;
 }
-
 g.updateb.activebutton rect {
 	fill:#00ffff;
 	stroke-width:4;
 }
-
 g.updateb.activebutton text {
 	opacity:1;
 }
-
 g.updateb.activebutton:hover rect {
 	fill:#008080;
 }
-
 /*g.uploadb:not(activebutton) {
 	pointer-events:none;
 }*/
-
 .noselect {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -169,23 +155,18 @@ g.updateb.activebutton:hover rect {
 	user-select: none;
 	cursor:default;
 }
-
 .activebutton:hover text {
 	opacity:0.5;
 }
-
 .activebutton.switchb:hover rect {
 	fill:#d4ffd4;
 }
-
 .activebutton:active {
 	stroke-width:3;
 }
-
 #sidebar_hide:hover {
 	opacity:1;
 }
-
 #sidebar_hide {
 	stroke:none;
 }
@@ -196,15 +177,12 @@ g.updateb.activebutton:hover rect {
 	stroke-linejoin:round;
 	
 } 
-
 .hidexp {
 	display:none;
 }
-
 .hidbut {
 	visibility:hidden;
 }
-
 @keyframes loadcircanim {
 	0% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
 	25% {fill:blue; cx:50%; cy:40%; rx:40; ry:20;}
@@ -212,7 +190,6 @@ g.updateb.activebutton:hover rect {
 	75% {fill:orange; cx:50%; cy:60%; rx:40; ry:20;}
 	100% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
 }
-
 #loadcirc {
 	position: relative;
 	animation-name: loadcircanim;
@@ -220,18 +197,15 @@ g.updateb.activebutton:hover rect {
 	animation-iteration-count: infinite;
 	animation-timing-function: linear:
 }
-
 .tt { 
 	position:relative;
-
 }
-
 .tt img {
 	z-index:2;
 }
-
-.tt span{ display:none; }
-
+.tt span{
+	display:none; 
+}
 .tt:hover span.tooltip{
 	display:block;
 	position:absolute;
@@ -245,12 +219,10 @@ g.updateb.activebutton:hover rect {
 	opacity: 0.90;
 	z-index: 10;
 }
-
 .tt:hover span.blank{
 	display:block;
 	padding: 5px 8px 0;
 }
-
 .tt:hover span.content{
 	display:block;
 	padding: 5 8px;
@@ -261,5 +233,4 @@ g.updateb.activebutton:hover rect {
 	margin-left: -20px;
 	z-index: 10;
 }
-
 white-space: pre-line;

@@ -35,7 +35,7 @@
 
   otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
 
-	var graphdims = {width: dims.width * 8/9, height: dims.height * 8/10, buffer:7}
+	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, buffer:7}
     var x = d3.scale.ordinal()
       .rangeRoundBands([0, graphdims.width], .3);
 

@@ -1,6 +1,7 @@
-Bacteroides	Glycolysis__Gluconeogenesis	2
-Bacteroides	Mismatch_repair	1
-Bacteroides	Vibrio_cholerae_pathogenic_cycle	1.5
-Coprococcus	Mismatch_repair	1.2
-Coprococcus	Flagellar_assembly	3
-Pseudomonas	Flagellar_assembly 2
+OTU	Gene	CopyNumber
+367523	K00007	2
+367523	K00525	1
+367523	K00830	1.5
+339472	K00007	1.2
+339472	K00830	3
+514182	K00830	2
