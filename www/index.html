@@ -87,7 +87,6 @@ path.link {
 	height:100%;
 	vertical-align:top;
 	font-family: "Verdana", Verdana, sans-serif;
-
 }
 #mainsvg {
 	position:fixed;
@@ -118,60 +117,47 @@ path.link {
 #sidebar {
 	z-index:5;
 }
-
 .sidebutton {
 	stroke:black;
 	stroke-width:1;
 	opacity:1;
 	cursor:default;
 }
-
 g.switchb rect {
 	fill:white;
 }
-
 g.switchb.selectedbutton rect {
 	fill:green;
 	stroke:#005000;
 	stroke-width:4;
 }
-
 g.uploadb rect {
 	fill: orange;
 }
-
 g.uploadb.activebutton:hover rect {
 	fill:#ffc000;
 }
-
-
 g.updateb rect {
 	fill:#b3ffff;
 	stroke-width:1;
 	stroke:#000066;
 }
-
 g.updateb text {
 	opacity:0.5;
 }
-
 g.updateb.activebutton rect {
 	fill:#00ffff;
 	stroke-width:4;
 }
-
 g.updateb.activebutton text {
 	opacity:1;
 }
-
 g.updateb.activebutton:hover rect {
 	fill:#008080;
 }
-
 /*g.uploadb:not(activebutton) {
 	pointer-events:none;
 }*/
-
 .noselect {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -181,23 +167,18 @@ g.updateb.activebutton:hover rect {
 	user-select: none;
 	cursor:default;
 }
-
 .activebutton:hover text {
 	opacity:0.5;
 }
-
 .activebutton.switchb:hover rect {
 	fill:#d4ffd4;
 }
-
 .activebutton:active {
 	stroke-width:3;
 }
-
 #sidebar_hide:hover {
 	opacity:1;
 }
-
 #sidebar_hide {
 	stroke:none;
 }
@@ -208,15 +189,12 @@ g.updateb.activebutton:hover rect {
 	stroke-linejoin:round;
 	
 } 
-
 .hidexp {
 	display:none;
 }
-
 .hidbut {
 	visibility:hidden;
 }
-
 @keyframes loadcircanim {
 	0% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
 	25% {fill:blue; cx:50%; cy:40%; rx:40; ry:20;}
@@ -224,7 +202,6 @@ g.updateb.activebutton:hover rect {
 	75% {fill:orange; cx:50%; cy:60%; rx:40; ry:20;}
 	100% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
 }
-
 #loadcirc {
 	position: relative;
 	animation-name: loadcircanim;
@@ -232,18 +209,15 @@ g.updateb.activebutton:hover rect {
 	animation-iteration-count: infinite;
 	animation-timing-function: linear:
 }
-
 .tt { 
 	position:relative;
-
 }
-
 .tt img {
 	z-index:2;
 }
-
-.tt span{ display:none; }
-
+.tt span{
+	display:none; 
+}
 .tt:hover span.tooltip{
 	display:block;
 	position:absolute;
@@ -257,12 +231,10 @@ g.updateb.activebutton:hover rect {
 	opacity: 0.90;
 	z-index: 10;
 }
-
 .tt:hover span.blank{
 	display:block;
 	padding: 5px 8px 0;
 }
-
 .tt:hover span.content{
 	display:block;
 	padding: 5 8px;
@@ -273,7 +245,6 @@ g.updateb.activebutton:hover rect {
 	margin-left: -20px;
 	z-index: 10;
 }
-
 white-space: pre-line;
 </style>
 <body>
@@ -291,7 +262,6 @@ white-space: pre-line;
 			<h2>Burrito: A Marriage of Taxonomy and Function</h2> 
 			<img border="0" src="images/burrito.jpg"></img>
 				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A tasty burrito.</span></span></span>
-			
 		</td>
 	</tr>
 	
@@ -316,7 +286,6 @@ white-space: pre-line;
 					<option value="theriot">Theriot et. al. 2014</option>
 				</select>
 				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Choose which data set to use. After selecting one a description of it will be shown below.</span></span></span>
-				
 			</td></tr>
 			<tr><td id="samplesetinfo">
 				<div id="noneexp">
@@ -334,47 +303,45 @@ white-space: pre-line;
 				<tr><td colspan=3>
 					<input type="radio" name="whichinput" id="useupload" onchange="mainui.checkWhichInput()">
 					<h4 style="display:inline">Upload your own data</h4>
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select this option if you have your own data to upload and visualize.</span></span></span>
-					 
+					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select this option if you have your own data to upload and visualize.</span></span></span> 
 				</td></tr>
 				<tr><td colspan=3>
-						<input type="radio" name="inptype" id="sixteenradio" onchange="mainui.checkInpDataRadio()" value="16s">16s Reads
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You only have 16s reads.</span></span></span>
+					<input type="radio" name="inptype" id="sixteenradio" onchange="mainui.checkInpDataRadio()" value="16s">16s Reads
+					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You only have 16s reads.</span></span></span>
 						
 						<input type="radio" name="inptype" id="funcradio" onchange="mainui.checkInpDataRadio()" value="func">Functional Contributions
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have run PICRUST yourself and have reads and contributions.</span></span></span>
+					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have run PICRUST yourself and have reads and contributions.</span></span></span>
 						
 						<input type="radio" name="inptype" id="genomeradio" onchange="mainui.checkInpDataRadio()" value="genome">Genomic Annotations
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have the genome content of each taxa and their abundances.</span></span></span>
-				
+					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have the genome content of each taxa and their abundances.</span></span></span>
 				</td></tr>
 				<tr>
 					<td>
 						<div id="taxonomic_abundances_1_g" class="hidbut">
 							Genome Abundances
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each genome in each sample. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each genome in each sample. See documentation for an example.</span></span></span>
 							<input type="file" name="taxonomic_abundances_1" id="taxonomic_abundances_1">
 						</div>
 						<div id="taxonomic_abundances_2_g" class="hidexp">
 							Taxonomic Abundances
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each taxa in each sample. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each taxa in each sample. See documentation for an example.</span></span></span>
 							<input type="file" name="taxonomic_abundances_2" id="taxonomic_abundances_2">
 						</div>
 						<div id="read_counts_g" class="hidexp">
 							16s Reads
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundaces of each taxa in each sample. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundaces of each taxa in each sample. See documentation for an example.</span></span></span>
 							<input type="file" name="read_counts" id="read_counts">
 						</div>
 					</td>
 					<td>
 						<div id="genome_annotations_g" class="hidbut">
 							Genome Annotations
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional content of each genome. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional content of each genome. See documentation for an example.</span></span></span>
 							<input type="file" name="genome_annotations" id="genome_annotations">
 						</div>
 						<div id="function_contributions_g" class="hidexp">
 							Function Contributions
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional contribution of each taxa. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional contribution of each taxa. See documentation for an example.</span></span></span>
 							<input type="file" name="function_contributions" id="function_contributions">
 						</div>
 					</td>
@@ -387,18 +354,23 @@ white-space: pre-line;
 				</tr>
 				<tr>
 					<td>
+						Function Abundances
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.</span></span></span>
+						<input type="file" name="function_abundances" id="function_abundances">
+					</td>
+					<td>
 						Taxonomic Hierarchy
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.</span></span></span>
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.</span></span></span>
 						<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
 					</td>
 					<td>
 						Function Hierarchy
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.</span></span></span>
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.</span></span></span>
 						<input type="file" name="function_hierarchy" id="function_hierarchy">
 					</td>
 					<td>
 						Sample Map
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file describing the relationship between samples, i.e. which ones are the same treatment condition.</span></span></span>
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file describing the relationship between samples, i.e. which ones are the same treatment condition.</span></span></span>
 						<input type="file" name="sample_map" id="sample_map">
 					</td>
 				</tr>
@@ -411,8 +383,7 @@ white-space: pre-line;
 		<td colspan=2> <h4>Visualization Options</h4> 
 			<select name="taxlevelofdetail" id="taxLODselector">
 			</select>
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.</span></span></span>
-			
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.</span></span></span>		
 		</td>
 		</tr>
 		<tr>
@@ -422,7 +393,6 @@ white-space: pre-line;
 			<option value="Random">Random color scale</option>
 			</select>
 				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.</span></span></span>
-			
 		</td>
 	</tr>
 
@@ -442,8 +412,6 @@ white-space: pre-line;
 <div style="float:left" id="button_holder"><br><br><br><br><br><br><br><br></div>
 
 <div id="mainplot">
-
-
 
 <svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
   <defs>
@@ -465,6 +433,7 @@ white-space: pre-line;
 
 </div>
 
+<script src="Javascript/constants.js"></script>
 <script src="Javascript/textures.js"></script>
 <script src="Javascript/d3.v3.min.js"></script>
 <script src="Javascript/data_cube.js"></script>
@@ -474,7 +443,6 @@ white-space: pre-line;
 <script src="Javascript/colorbrewer.js"></script>
 <script src="Javascript/upload.js"></script>
 <script src="Javascript/buttons.js"></script>
-<script src="Javascript/input_parsing.js"></script>
 <script src="Javascript/mainui.js"></script>
 <script src="Javascript/saveSvgAsPng.js"></script>
 
@@ -538,68 +506,102 @@ draw_svg = function() {
 			.attr("preserveAspectRatio","none")
 			.style("font-family", "Verdana");
 	
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
 			saveSvgAsPng(document.getElementById("plots_svg"), "screenshot.png", { backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg", 10, 100, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg", 10, 100, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
 			svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { //console.log(uri)
-			saveSvg(uri, "screenshot.svg")
-}); 
-	});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 190, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
+				saveSvg(uri, "screenshot.svg")
+			}); 
+		});
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 190, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
 			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_taxa_bar", 10, 280, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_taxa_bar", 10, 280, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
 			svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) {
-			saveSvg(uri, "taxa_bar.svg")
-}); 
+				saveSvg(uri, "taxa_bar.svg")
+			}); 
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg", 10, 370, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg", 10, 370, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
 			saveSvgAsPng(document.getElementById("saveLegBar0"), "taxonomy_legend.png",{ backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
 			svgAsDataUri(document.getElementById("saveLegBar0"), {}, function(uri) {
-			saveSvg(uri, "taxonomy_legend.svg")
-}); 
+				saveSvg(uri, "taxonomy_legend.svg")
+			}); 
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 490, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 490, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
 			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_func_bar", 10, 580, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_func_bar", 10, 580, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
 			svgAsDataUri(document.getElementById("func_bars"), {}, function(uri) {
-			saveSvg(uri, "function_bar.svg")
+				saveSvg(uri, "function_bar.svg")
+			});
 		});
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg", 10, 670, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
+			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5}) 
 		});
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg", 10, 670, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
-			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5}) });
-	button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg_svg", 10, 730, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
+		button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg_svg", 10, 730, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
 			svgAsDataUri(document.getElementById("saveLegBar1"), {}, function(uri) {
-			saveSvg(uri, "function_legend.svg")
-		});
+				saveSvg(uri, "function_legend.svg")
+			});
 		});
 		draw_loading();
-
-		}
 	}
+}
 
 draw_loading = function() {
 	var loadg = MainSVG.append("g")
 		.attr("id","loadingG");
 	
 	loadg.append("text")
+		.attr("id", "main_loading_text")
 		.attr("x",width / 2)
-		.attr("y", height / 2)
+		.attr("y", height / 3)
 		.attr("text-anchor","middle")
 		.text("Loading");
 
-	var loadspin = loadg.append("ellipse")
+	loadg.append("text")
+		.attr("id", "loading_sample_text")
+		.attr("x", width / 2)
+		.attr("y", height * 2 / 3)
+		.attr("text-anchor", "middle")
+		.text("Determining number of samples")
+
+/*	var loadspin = loadg.append("ellipse")
 		.attr("id","loadcirc")
 		.attr("cx",(width / 2) - 100)
 		.attr("cy",height / 2)
 		.attr("rx", 30)
 		.attr("ry", 30)
 		.attr("fill","red")
-		.attr("stroke","none");
+		.attr("stroke","none")*/
+
+	loadg.append("rect")
+		.attr("x", (width / 2) - (width / 8))
+		.attr("y", (height / 2) - (height / 20))
+		.attr("width", width / 4)
+		.attr("height", height / 10)
+		.attr("fill", "grey")
+
+	loadg.append("rect")
+		.attr("id", "progress_bar")
+		.attr("x", (width / 2) - (width / 9))
+		.attr("y", (height / 2) - (height / 22))
+		.attr("width", 0)
+		.attr("height", height / 11)
+		.attr("fill", "blue")
+}
+Shiny.addCustomMessageHandler("upload_status", function(message){
+	document.getElementById("loading_sample_text").innerHTML = message
+})
+Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples){
+	document.getElementById("loading_sample_text").innerHTML = "Formatting " + num_samples + " samples"
+})
+
+update_progress = function(curr_sample, total_samples){
+	document.getElementById("loading_sample_text").innerHTML = "Samples loaded " + curr_sample + "/" + total_samples
+	document.getElementById("progress_bar").setAttribute("width", (width / 4.5) * (curr_sample / total_samples))
 }
 
 draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
@@ -728,7 +730,6 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	////////////////////////// Colors
 	//color_option = "Categories" //Categories or Random
 	color_option = d3.select("#color_option_selector").property("value")
-	console.log(color_option)
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		//1st - divide up color space into number of leaves
 		//then assign each subgroup of leaves alternating extremes
@@ -909,6 +910,15 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	getLinkData = function(){
 		//get unique linked functions for each taxon
 		allSamples = d3.keys(data_cube.displayed_contribution_cube);
+		var fixed_allSamples = [];
+		// Remove samples without taxa links to functions
+		for (var i = 0; i < allSamples.length; i++){
+			sample = allSamples[i];
+			if (!(unlinked_taxon_name in data_cube.displayed_contribution_cube[sample])){
+				fixed_allSamples.push(sample);
+			}
+		}
+		allSamples = fixed_allSamples;
 		var all_taxa_links = []; //{Taxa:[], Functions:[]};
 		data_cube.displayed_taxa.map(function(t,i){
 			data_cube.displayed_funcs.map(function(f,i){
@@ -958,8 +968,14 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		samples.map(function(n){
 			funcs.map(function(m){
 
-				taxa.map(function(tt){	
-					contributions.push({func:m, Taxa:tt, Sample:n.sample, contributions:data_cube.get_contribution([n.sample],[tt],[m])});})
+				// Don't iterate over taxa if there are no taxa linked to the functions
+				if (!(unlinked_taxon_name in data_cube.displayed_contribution_cube[n.sample])){
+					taxa.map(function(tt){	
+						contributions.push({func:m, Taxa:tt, Sample:n.sample, contributions:data_cube.get_contribution([n.sample],[tt],[m])});
+					})
+				} else {
+					contributions.push({func:m, Taxa:unlinked_taxon_name, Sample:n.sample, contributions:data_cube.get_contribution([n.sample], [unlinked_taxon_name], [m])});
+				}
 			})
 		var temp = [];
 		contributions.map(function(q){
@@ -1808,7 +1824,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	}
 }
 
-var uploader = uploader_wrapper.make_uploader(draw_everything);
+var uploader = uploader_wrapper.make_uploader(draw_everything, update_progress);
 
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 

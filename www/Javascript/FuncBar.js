@@ -53,10 +53,10 @@
       d.data.map(function(e){
         h.push(e.Sample);
         return e.Sample;
-      })  });
+      })  
+    });
     x.domain(h);
     y.domain([0, 100]);
-
 
     return data;
   }
@@ -77,10 +77,10 @@
 
 
 
-  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
+  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, comparison_data){
 
-	var graphdims = {width: dims.width * 8/9, height: dims.height * 8/10, buffer:7}
-   x.rangeRoundBands([0, graphdims.width], .3);
+	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, buffer:7}
+   x.rangeRoundBands([0, graphdims.width], .2);
    y.rangeRound([graphdims.height, 0]);
 
    xAxis.scale(x);

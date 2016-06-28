@@ -2,10 +2,6 @@
 
 library(shiny)
 library(data.table)
-options(stringsAsFactors = F)
-# Change the maximum file upload size
-options(shiny.maxRequestSize=1000*1024^3)
-options(stringsAsFactors = F)
 
 # Defining important files
 default_tax_hierarchy_table = "www/Data/97_otu_taxonomy_split_with_header.txt"
@@ -14,6 +10,13 @@ default_contribution_table = "www/Data/mice_metagenome_contributions.txt"
 default_otu_table = "www/Data/otu_table_even_2.txt"
 picrust_normalization_file = "www/Data/16S_13_5_precalculated.tab.gz"
 picrust_ko_file = "www/Data/melted_picrust_ko_table.txt"
+constants_file = "www/Javascript/constants.js"
+
+# Defining constants shared between javascript and R code
+constants_table = fread(constants_file, header=F)
+unlinked_taxon_name = unlist(constants_table[unlist(constants_table[,2,with=F]) == "unlinked_taxon_name",4,with=F])
+options(shiny.maxRequestSize = as.numeric(unlist(constants_table[unlist(constants_table[,2,with=F]) == "max_upload_size",4,with=F])))
+options(stringsAsFactors = F)
 
 # Column of the level we summarize to for the function hierarchy when we calculate partial KO contributions
 summary_level_index = 4
@@ -47,8 +50,12 @@ shinyServer(function(input, output, session) {
 		tax_summary_level = input$taxLODselector
 		otu_table = NULL
 
+		session$sendCustomMessage("upload_status", "Starting input processing")
+
 		################################# Loading/calculating contribution table #################################
 		if (is.null(input$input_type)){ # If they haven't chosen an input method, we'll load the default contribution table
+
+			session$sendCustomMessage("upload_status", "Loading default data")
 
 			otu_table = fread(default_otu_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 			output = fread(default_contribution_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
@@ -57,15 +64,19 @@ shinyServer(function(input, output, session) {
 			output = output[,c(2,3,1,6), with=FALSE]
 
 		} else if (input$input_type == "genome_annotation"){ # If they've chosen the genome annotation option
-	
+
 			otu_table_file = input$taxonomic_abundances_1
 			annotation_file = input$genome_annotations
 			if (is.null(otu_table_file) | is.null(annotation_file)){
 				session$sendCustomMessage("retry_upload", "retry")
 			} else {
 
+				session$sendCustomMessage("upload_status", "Reading OTU table")
+
 				otu_table_file_path = otu_table_file$datapath
 				otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+
+				session$sendCustomMessage("upload_status", "Reading annotation table")
 
 				annotation_file_path = annotation_file$datapath
 				annotation = fread(annotation_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
@@ -73,6 +84,8 @@ shinyServer(function(input, output, session) {
 
 				# Change zeros in abundance matrix to NAs so we can remove them when melting
 				otu_table[otu_table == 0] = NA
+
+				session$sendCustomMessage("upload_status", "Calculating function contributions from annotations")
 
 				# Melt the otu abundance table so we can merge with the annotations
 				melted_otu_table = melt(otu_table,id=colnames(otu_table)[1], na.rm=TRUE)
@@ -93,6 +106,9 @@ shinyServer(function(input, output, session) {
 			if (is.null(otu_table_file)){
 				session$sendCustomMessage("retry_upload", "retry")
 			} else {
+
+				session$sendCustomMessage("upload_status", "Reading OTU table")
+
 				otu_table_file_path = otu_table_file$datapath
 				otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
@@ -101,6 +117,8 @@ shinyServer(function(input, output, session) {
 
 				# Change zeros in reads matrix to NAs so we can remove them when melting
 				otu_table[otu_table == 0] = NA
+
+				session$sendCustomMessage("upload_status", "Normalizing OTU abundances")
 
 				# Melt the read count table so we can merge with the normalization table and ko table
 				melted_otu_table = melt(otu_table, id=colnames(otu_table)[1], na.rm=TRUE)
@@ -112,6 +130,8 @@ shinyServer(function(input, output, session) {
 
 				# Get the PICRUSt ko table
 				melted_ko_counts = fread(picrust_ko_file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+
+				session$sendCustomMessage("upload_status", "Calculating function contributions")
 
 				# Merge the column of ko counts
 				reads_norms_kos = merge(otu_table_with_normalization, melted_ko_counts, by.x=c(colnames(otu_table_with_normalization)[1]), by.y=c(colnames(melted_ko_counts)[1]), allow.cartesian=TRUE, sort=FALSE)
@@ -133,8 +153,13 @@ shinyServer(function(input, output, session) {
 			if (is.null(otu_table_file) | is.null(contribution_file)){
 				session$sendCustomMessage("retry_upload", "retry")
 			} else {
+
+				session$sendCustomMessage("upload_status", "Reading OTU table")
+
 				otu_table_file_path = otu_table_file$datapath
 				otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+
+				session$sendCustomMessage("upload_status", "Reading contribution table")
 
 				contribution_file_path = contribution_file$datapath
 				contribution = fread(contribution_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
@@ -145,19 +170,49 @@ shinyServer(function(input, output, session) {
 
 		if (!is.null(output)){ # If we have successfully generated a contribution table and there were no errors
 
-			################################# Assigning partial KO Contributions to subpathways #################################
 			colnames(output) = c("Sample", "OTU", "Gene", "CountContributedByOTU")
+
+			# If we have a table of function abundances for comparison, add that to the contribution table, tagging sample names as comparisons
+			if (!is.null(input$function_abundances)){
+
+				session$sendCustomMessage("upload_status", "Reading comparison KO table")
+
+				comparison_table_file = input$function_abundances
+				comparison_table_file_path = comparison_table_file$datapath
+				comparison_table = fread(comparison_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+
+				# Add comparison tag to sample names
+				colnames(comparison_table) = c(colnames(comparison_table)[1], paste(colnames(comparison_table)[2:ncol(comparison_table)], "_comparison", sep=""))
+
+				# Melt the comparison table, add a column with a dummy OTU, and rearrange to match the contribution table
+				melted_comparison_table = melt(comparison_table, id=colnames(comparison_table)[1], na.rm=TRUE)
+				melted_comparison_table$OTU = rep(unlinked_taxon_name, nrow(melted_comparison_table))
+				melted_comparison_table = melted_comparison_table[,c(2,4,1,3),with=FALSE]
+				colnames(melted_comparison_table) = c("Sample", "OTU", "Gene", "CountContributedByOTU")
+
+				output = rbind(output, melted_comparison_table)
+			}
+
+			################################# Assigning partial KO Contributions to subpathways #################################
 
 			func_hierarchy = NULL
 			if (is.null(input$function_hierarchy)){ # If they haven't uploaded a function hierarchy, we use the default
+
+				session$sendCustomMessage("upload_status", "Loading default function hierarchy")
+
 				func_hierarchy = fread(default_func_hierarchy_table, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
 			} else { # Othwerwise, we load theirs
+
+				session$sendCustomMessage("upload_status", "Reading function hierarchy")
+
 				func_hierarchy_file = input$function_hierarchy
 				func_hierarchy_file_path = func_hierarchy_file$datapath
 				func_hierarchy = fread(func_hierarchy_file_path, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 
 			}
+
+			session$sendCustomMessage("upload_status", "Summarizing function abundances to level above KO")
 
 			# Get a table matching KOs to the SubPathways they belong to
 			level_match_table = data.table(func_hierarchy[,c(1,summary_level_index), with=FALSE])
@@ -181,6 +236,9 @@ shinyServer(function(input, output, session) {
 			#session$sendCustomMessage(type="shiny_test", paste0(c(paste0(names(otu_ko_links), collapse="\t"), apply(otu_ko_links, 1, function(x){ return(paste0(x, collapse = "\t"))})), collapse = "\n"))
 			
 			################################# Formatting and returning the function hierarchy #################################
+
+			session$sendCustomMessage("upload_status", "Formatting the function hierarchy")
+
 			# Remove the column of KOs
 			func_hierarchy = func_hierarchy[,2:dim(func_hierarchy)[2],with=F]
 
@@ -237,9 +295,13 @@ shinyServer(function(input, output, session) {
 			session$sendCustomMessage(type='function_hierarchy', output_func_hierarchy)
 			
 			################################# Formatting and returning the function averages #################################
+
+			session$sendCustomMessage("upload_status", "Calculating average function abundances")
+
+			otu_matched_samples = grep(".*_comparison$", output$Sample, invert=TRUE)
 			#sum over taxa
 			count_name = names(output)[!names(output) %in% c("Sample", "OTU", "SubPathway")]
-			total_funcs = output[,lapply(.SD, sum), by=list(SubPathway, Sample), .SDcols=count_name] #whatever the count name is
+			total_funcs = output[otu_matched_samples,lapply(.SD, sum), by=list(SubPathway, Sample), .SDcols=count_name] #whatever the count name is
 			total_funcs[,SubPathway:=paste("SubPathway",SubPathway,sep="_")]
 			total_funcs[,V1:=V1/sum(V1),by=Sample] #Switch to relative abundance from read counts
 			#combine with func_hierarchy
@@ -258,6 +320,9 @@ shinyServer(function(input, output, session) {
 
 			################################# Summarizing the contribution table to the desired taxonomic level #################################
 			# Read in the taxonomic hierachy and format it
+
+			session$sendCustomMessage("upload_status", "Summarizing contribution table to desired taxonomic level")
+
 			taxa_hierarchy = NULL
 			if(!is.null(input$taxonomic_hierarchy)){ # If they've uploaded a custom taxonomic hierarchy
 				taxa_hierarchy_file = input$taxonomic_hierarchy
@@ -285,11 +350,16 @@ shinyServer(function(input, output, session) {
 	        # Summarize contribution table to the correct taxonomic level
 	        level_match_taxa_hierarchy = taxa_hierarchy[,c(1,which(colnames(taxa_hierarchy) == tax_summary_level)),with=F]
 	        colnames(level_match_taxa_hierarchy) = c(colnames(level_match_taxa_hierarchy)[1], "new_summary_level")
-	        expanded_table = merge(output, level_match_taxa_hierarchy, by.x = c(colnames(output)[2]), by.y=c(colnames(level_match_taxa_hierarchy)[1]), all.y=F, allow.cartesian=T)
+
+	        expanded_table = merge(output, level_match_taxa_hierarchy, by.x = c(colnames(output)[2]), by.y=c(colnames(level_match_taxa_hierarchy)[1]), all.x = T, all.y=F, allow.cartesian=T)
+	        expanded_table[,new_summary_level:=sapply(unlist(expanded_table[,ncol(expanded_table),with=F]), function(entry){if (is.na(entry)){return(unlinked_taxon_name)}else{return(entry)}})]
 	        output = expanded_table[,sum(relative_contributions), by=eval(colnames(expanded_table)[c(2,6,3)])]
 	        colnames(output) = c("Sample", "OTU", "SubPathway", "relative_contributions")
 
 	        ################################# Summarizing the OTU table to the desired taxonomic level #################################
+
+	        session$sendCustomMessage("upload_status", "Summarizing OTU table to desired taxonomic level")
+
 	        otu_table[is.na(otu_table)] = 0
 	        colnames(otu_table)[1] = "OTU"
 	        otu_table[,OTU:=as.character(OTU)]
@@ -317,9 +387,12 @@ shinyServer(function(input, output, session) {
 				taxa_hierarchy[[id_levels[j]]] = paste(id_levels[j],as.character(taxa_hierarchy[[id_levels[j]]]), sep = "_")
 			}
 
-	        output[,OTU:=paste(tax_summary_level,as.character(OTU), sep = "_")]
+	        output[,OTU:=sapply(unlist(output[,OTU]), function(otu){if (as.character(otu) != unlinked_taxon_name){return(paste(tax_summary_level,as.character(otu), sep = "_"))}else{return(unlinked_taxon_name)}})]
 
 	        ################################# Formatting and returning the taxonomic hierarchy #################################
+
+	        session$sendCustomMessage("upload_status", "Formatting the taxonomic hierarchy")
+
 	        summarized_taxa_hierarchy = taxa_hierarchy[,c(2:dim(taxa_hierarchy)[2], 1),with=F]
 	        cutoff = which(colnames(summarized_taxa_hierarchy) == tax_summary_level)
 	        summarized_taxa_hierarchy = summarized_taxa_hierarchy[,1:cutoff,with=F]
@@ -363,6 +436,9 @@ shinyServer(function(input, output, session) {
 			session$sendCustomMessage(type='tax_hierarchy', output_taxa_hierarchy)
 
 		    ################################# Formatting and returning the contribution table #################################
+
+		    session$sendCustomMessage("upload_status", "Formatting the contribution table")
+
 			# Format the contribution table to match the expected javascript array
 			# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings
 			output[,SubPathway:=paste("SubPathway",SubPathway,sep="_")]
@@ -385,6 +461,8 @@ shinyServer(function(input, output, session) {
 			output = lapply(output, function(el){return(el[[1]])})
 
 			tracked_data$contribution_table = output
+
+			session$sendCustomMessage("number_of_samples_message", length(output))
 
 			session$sendCustomMessage(type="contribution_table_ready", length(output))
 		}

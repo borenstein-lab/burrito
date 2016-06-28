@@ -1,7 +1,7 @@
 (function(){
 	var uploader_wrapper = {};
 
-	uploader_wrapper.make_uploader = function(draw_everything){
+	uploader_wrapper.make_uploader = function(draw_everything, update_progress){
 
 		var uploader = {};
 
@@ -129,6 +129,7 @@
 			uploader.contribution_table = {};
 			uploader.contribution_table_length = size;
 			uploader.current_contribution_sample_index = 0;
+			update_progress(uploader.current_contribution_sample_index, uploader.contribution_table_length);
 			Shiny.onInputChange("contribution_sample_request", 0);
 		})
 
@@ -136,6 +137,7 @@
 			contribution_sample_name = Object.keys(contribution_sample)[0]
             uploader.contribution_table[contribution_sample_name] = contribution_sample[contribution_sample_name];
 			++uploader.current_contribution_sample_index;
+			update_progress(uploader.current_contribution_sample_index, uploader.contribution_table_length);
 			setTimeout(function(){ // Fixes the disconnect issue, no idea why (Alex)
 				if (uploader.current_contribution_sample_index < uploader.contribution_table_length){
 		            Shiny.onInputChange("contribution_sample_request", uploader.current_contribution_sample_index);

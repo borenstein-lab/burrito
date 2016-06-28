@@ -32,14 +32,15 @@
 			
 		document.getElementById("update_button").addEventListener("click", function() {
 			uploader.reset_load_flags();
+			draw_svg();
 			if (mainui.datamode == "sample") {
-				draw_svg();
+				// draw_svg();
 				uploader.load_default_data();
 				//document.getElementById("update_button").click();
-			} else if (mainui.datamode == "upload") {
+			}/* else if (mainui.datamode == "upload") {
 				draw_svg();
 				//document.getElementById("update_button").click();
-			}
+			}*/
 		});
 	}
 		
@@ -110,6 +111,9 @@
 
 	mainui.fileloading = function(buttonname, filename) {
 		eval("mainui." + buttonname + "_changed = 1;");
+		if (document.getElementById(buttonname).files[0].size > max_upload_size){
+				alert("The file '" + document.getElementById(buttonname).files[0].name + "'' is too large to upload at this time. We apologize for the inconvienence.")
+		}
 		mainui.RefreshUploadReady();
 	}
 	

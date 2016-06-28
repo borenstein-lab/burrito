@@ -85,7 +85,13 @@
     data_cube.calculate_new_contribution = function(sample, taxon, func){
 
       // Get the leaf nodes under the give taxon and func
-      var leaf_taxa = this.get_leaves(taxon, this.taxa_lookup);
+      // Don't look for leaf taxa if the sample functions are not linked to taxa
+      var leaf_taxa;
+      if (taxon != unlinked_taxon_name){
+        leaf_taxa = this.get_leaves(taxon, this.taxa_lookup);
+      } else {
+        leaf_taxa = [unlinked_taxon_name];
+      }
       var leaf_funcs = this.get_leaves(func, this.func_lookup);
 
       // Now sum all the contributions across those leaf otus and leaf kos for the given sample
@@ -198,16 +204,20 @@
         // Go through each entry in the cube corresponding to the taxon
         for (var sample in this.displayed_contribution_cube){
 
-          // Remove the entry in the cube corresponding to the taxon
-          delete this.displayed_contribution_cube[sample][taxon];
+          // If the sample is linked to otus, modify it
+          if (!(unlinked_taxon_name in this.displayed_contribution_cube[sample])){
 
-          // Find the immediate children of the taxon and add their entries to the cube
-          for (var i = 0; i < curr_taxon.values.length; i++){
-            this.displayed_contribution_cube[sample][curr_taxon.values[i].key] = {}
+            // Remove the entry in the cube corresponding to the taxon
+            delete this.displayed_contribution_cube[sample][taxon];
 
-            // For each function currently displayed, add an entry for that function
-            for (var j = 0; j < this.displayed_funcs.length; j++){
-              this.displayed_contribution_cube[sample][curr_taxon.values[i].key][this.displayed_funcs[j]] = this.calculate_new_contribution(sample, curr_taxon.values[i].key, this.displayed_funcs[j]);
+            // Find the immediate children of the taxon and add their entries to the cube
+            for (var i = 0; i < curr_taxon.values.length; i++){
+              this.displayed_contribution_cube[sample][curr_taxon.values[i].key] = {}
+
+              // For each function currently displayed, add an entry for that function
+              for (var j = 0; j < this.displayed_funcs.length; j++){
+                this.displayed_contribution_cube[sample][curr_taxon.values[i].key][this.displayed_funcs[j]] = this.calculate_new_contribution(sample, curr_taxon.values[i].key, this.displayed_funcs[j]);
+              }
             }
           }
         }
@@ -255,32 +265,36 @@
 
         // For each descendent taxon that is currently displayed, remove its entry from the displayed_contribution_cube
         for (var sample in this.displayed_contribution_cube){
-          var contributions = {};
-          for (var i = 0; i < taxon_present_children.length; i++){
-            var child_taxon_name = taxon_present_children[i];
 
-            // Only need to account for contributions and remove child taxa if they are present in this sample
-            if (this.displayed_contribution_cube[sample].hasOwnProperty(child_taxon_name)){
+          // Only do this if the functions are linked to otu contributions
+          if (!(unlinked_taxon_name in this.displayed_contribution_cube[sample])){
+            var contributions = {};
+            for (var i = 0; i < taxon_present_children.length; i++){
+              var child_taxon_name = taxon_present_children[i];
 
-              // Sum the contributions of the displayed descendents to speed up adding the new taxon's entry to the cube
-              for (func in this.displayed_contribution_cube[sample][child_taxon_name]){
-                var contribution = this.displayed_contribution_cube[sample][child_taxon_name][func];
-                if (contributions.hasOwnProperty(func)){
-                  contributions[func] += contribution;
-                } else {
-                  contributions[func] = contribution;
+              // Only need to account for contributions and remove child taxa if they are present in this sample
+              if (this.displayed_contribution_cube[sample].hasOwnProperty(child_taxon_name)){
+
+                // Sum the contributions of the displayed descendents to speed up adding the new taxon's entry to the cube
+                for (func in this.displayed_contribution_cube[sample][child_taxon_name]){
+                  var contribution = this.displayed_contribution_cube[sample][child_taxon_name][func];
+                  if (contributions.hasOwnProperty(func)){
+                    contributions[func] += contribution;
+                  } else {
+                    contributions[func] = contribution;
+                  }
                 }
+                delete this.displayed_contribution_cube[sample][child_taxon_name];
               }
-              delete this.displayed_contribution_cube[sample][child_taxon_name];
             }
-          }
 
-          // Add in the new taxon, along with its function contributions
-          this.displayed_contribution_cube[sample][taxon] = {};
-          for (var j = 0; j < this.displayed_funcs.length; j++){
-            var func = this.displayed_funcs[j];
-            if (contributions.hasOwnProperty(func)){
-              this.displayed_contribution_cube[sample][taxon][func] = contributions[func];
+            // Add in the new taxon, along with its function contributions
+            this.displayed_contribution_cube[sample][taxon] = {};
+            for (var j = 0; j < this.displayed_funcs.length; j++){
+              var func = this.displayed_funcs[j];
+              if (contributions.hasOwnProperty(func)){
+                this.displayed_contribution_cube[sample][taxon][func] = contributions[func];
+              }
             }
           }
         }
@@ -580,17 +594,26 @@
       this.original_contribution_cube = contribution_table
 
       /////////////////////////////////////////////////////////////////////// displayed_contribution_cube /////////////////////////////////////////////////////////////////////////////////////////////
-
       // Create a cube of the currently displayed contribution data
       for (var i = 0; i < this.samples.length; i++){
         var sample = this.samples[i];
         this.displayed_contribution_cube[sample] = {};
-        for (var j = 0; j < this.taxa_tree.length; j++){
-          var taxon = this.taxa_tree[j].key;
-          this.displayed_contribution_cube[sample][taxon] = {};
+
+        // Add top level taxonomic function contributions if the sample function profile is linked to taxa
+        if (!(unlinked_taxon_name in this.original_contribution_cube[sample])){
+          for (var j = 0; j < this.taxa_tree.length; j++){
+            var taxon = this.taxa_tree[j].key;
+            this.displayed_contribution_cube[sample][taxon] = {};
+            for (var k = 0; k < this.func_tree.length; k++){
+              var func = this.func_tree[k].key;
+              this.displayed_contribution_cube[sample][taxon][func] = this.calculate_new_contribution(sample, taxon, func);
+            }
+          }  
+        } else {
+          this.displayed_contribution_cube[sample][unlinked_taxon_name] = {};
           for (var k = 0; k < this.func_tree.length; k++){
             var func = this.func_tree[k].key;
-            this.displayed_contribution_cube[sample][taxon][func] = this.calculate_new_contribution(sample, taxon, func);
+            this.displayed_contribution_cube[sample][unlinked_taxon_name][func] = this.calculate_new_contribution(sample, unlinked_taxon_name, func);
           }
         }
       }
