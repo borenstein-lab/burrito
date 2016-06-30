@@ -49,7 +49,7 @@ body {
 path.link {
    fill: none;
    stroke: #ccc;
-   stroke-width: 1.5px;
+   /* stroke-width: 1.5px; */
 }
 
 /*.svg_pattern {
@@ -605,7 +605,7 @@ update_progress = function(curr_sample, total_samples){
 }
 
 draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
-	
+		
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -919,6 +919,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	getLinkData = function(){
 		//get unique linked functions for each taxon
 		allSamples = d3.keys(data_cube.displayed_contribution_cube);
+		allSamples = allSamples.filter(function(d){ return d != "Average_contrib" })
 		var fixed_allSamples = [];
 		// Remove samples without taxa links to functions
 		for (var i = 0; i < allSamples.length; i++){
@@ -955,6 +956,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		var tcount = 0;
 
 		allSamples = d3.keys(data_cube.displayed_contribution_cube).sort();
+		allSamples = allSamples.filter(function(d){ return d != "Average_contrib"; })
 		var all_taxa_links = []; //{Taxa:[], Functions:[]};
 		//loop through all the functions
 		//this keeps all functions together
@@ -1011,7 +1013,10 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	var taxLevels = d3.keys(taxa_tree_data[0]);
 	//data_cube.expand_taxon("Bacteria");
 
+
 	var bpData = getLinkData();
+	var avg_contrib_data = data_cube.displayed_contribution_cube["Average_contrib"]
+
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 
 
@@ -1027,7 +1032,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
 
 
-	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
+	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall, avg_contrib_data);
 
 
 	function update_otu_bar(){
@@ -1048,7 +1053,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	//data_cube.expand_func("Metabolism");
 	var bpData = getLinkData();
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
+	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data);
 
 	var taxa_data = jQuery.extend(true, [], taxa_tree_data);
 
@@ -1590,7 +1595,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	function updateBPgraph() {
 		var bpData = getLinkData();
 		var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall);
+		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data);
 		return visdata;
 	}
 
