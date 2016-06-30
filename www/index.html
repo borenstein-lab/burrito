@@ -600,8 +600,12 @@ Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples)
 })
 
 update_progress = function(curr_sample, total_samples){
-	document.getElementById("loading_sample_text").innerHTML = "Samples loaded " + curr_sample + "/" + total_samples
-	document.getElementById("progress_bar").setAttribute("width", (width / 4.5) * (curr_sample / total_samples))
+	if(curr_sample==1){
+		document.getElementById("loading_sample_text").innerHTML = "Sample averages loaded"	
+	} else{
+	document.getElementById("loading_sample_text").innerHTML = "Samples loaded " + (curr_sample-1) + "/" + (total_samples-1)
+	}
+	document.getElementById("progress_bar").setAttribute("width", (width / 4.5) * ((curr_sample) / (total_samples)))
 }
 
 draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
