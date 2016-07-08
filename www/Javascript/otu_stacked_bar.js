@@ -75,17 +75,7 @@
     })
 
 
-    svglink.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(" + (dims.width-graphdims.width - graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
-      .call(xAxis)
-      .selectAll("text")
-      .style("text-anchor", "end")
-      .attr("dx", "-8")
-      .attr("dy", - (x.rangeBand() / 2) - graphdims.sample_buffer)
-      .attr("transform", function(d) {
-        return "rotate(-90)"
-      });
+
       //y-axis label
     svglink.append("text")
     .attr("class", "y label")
@@ -108,12 +98,6 @@
     .attr("dy", ".75em")
     .text("Samples");
 
-
-    svglink.selectAll("text").style("fill",function(m){
-      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-        return sampleColor(otu_bar.getSampleGroup(m, sampledata, grouping));        
-      }
-    });
 
     var Sample = svglink.selectAll(".Sample")
       .data(bar_data)
@@ -138,7 +122,7 @@
         return y(d.y1); 
       })
       .attr("height", function(d) { 
-        return y(d.y0) - y(d.y1); 
+        return y(d.y0) - y(d.y1) + 1; 
       })
       .style("fill", function(d) { 
         return colors(d.name); 
@@ -160,6 +144,18 @@
         return tooltip.style("visibility", "hidden");
       });
 
+          svglink.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(" + (dims.width-graphdims.width - graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-8")
+      .attr("dy", - (x.rangeBand() / 2) - graphdims.sample_buffer)
+      .attr("transform", function(d) {
+        return "rotate(-90)"
+      });
+
     svglink.append("g")
       .attr("class", "y axis")
 	  .attr("transform","translate("+ (dims.width-graphdims.width - graphdims.width_buffer) +"," + graphdims.height_buffer + ")")
@@ -170,6 +166,13 @@
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .attr("class", "y_label"); 
+
+          svglink.selectAll("text").style("fill",function(m){
+      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
+        return sampleColor(otu_bar.getSampleGroup(m, sampledata, grouping));        
+      }
+    });
+
 
     // var normalizebox = svg.append("foreignObject")
     //   .attr("width", 100)

@@ -14,10 +14,10 @@
 
   fB.vizData = function(data, sample_order){
 
-    var alldata = [];
     var y0 = 0;
     var y1 = 0;
     var total = 0;
+
     data.forEach(function(d) {
       var length = d.data.length;
       var y0 = 0;
@@ -57,7 +57,6 @@
     // });
     x.domain(sample_order);
     y.domain([0, 100]);
-
     return data;
   }
 
@@ -87,20 +86,8 @@
    yAxis.scale(y);
 
    var viz = fB.vizData(stackdata, sample_order);
-    //get the x axis set
+   console.log(viz)
 
-
-  svglink.append("g")
-  .attr("class", "x axis")
-  .attr("transform", "translate(" + (dims.width-graphdims.width - graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
-  .call(xAxis)
-  .selectAll("text")
-  .style("text-anchor", "end")
-  .attr("dx", "-8")
-  .attr("dy", - (x.rangeBand() / 2) - graphdims.sample_buffer)
-  .attr("transform", function(d) {
-    return "rotate(-90)"
-  });
   //y axis label
   svglink.append("text")
     .attr("class", "y label")
@@ -126,11 +113,7 @@
 
 
 
-  svglink.selectAll("text").style("fill",function(m){
-    if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-      return sampleColor(fB.getSampleGroup(m, sampledata, grouping));        
-    }
-  });
+
     //init the tooltip as invisible
   var tooltip = d3.select("body")
   .append("div")
@@ -152,11 +135,11 @@
 
     //create a Sample object for each sample
   var Sample = svglink.selectAll(".Sample")
-  .data(viz)
+  .data(viz.filter(function(d){ return d.Sample != average_contrib_sample_name}))
   .enter().append("g")
   .attr("class", "g")
   .attr("id", function(d){ return "func_"+d.Sample })
-  .attr("transform", function(d) {return "translate(" + (dims.width-graphdims.width  - graphdims.width_buffer - graphdims.sample_buffer + x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
+  .attr("transform", function(d) { return "translate(" + (dims.width-graphdims.width  - graphdims.width_buffer - graphdims.sample_buffer + x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
 
 
     //create rects for each value, transpose based on sample
@@ -170,7 +153,7 @@
   .attr("taxon", function(d) { return d.Taxa})
   .attr("width", x.rangeBand())
   .attr("y", function(d) {return y(d.y1); })
-  .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
+  .attr("height", function(d) {return y(d.y0) - y(d.y1) + 1;} )
   .style("fill", function(d) { return colors(d.func); })
   .style("opacity", 0.75)
   .on("mouseover", function(d){
@@ -195,6 +178,21 @@
 
   });
 
+      //get the x axis set
+
+
+  svglink.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(" + (dims.width-graphdims.width - graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
+  .call(xAxis)
+  .selectAll("text")
+  .style("text-anchor", "end")
+  .attr("dx", "-8")
+  .attr("dy", - (x.rangeBand() / 2) - graphdims.sample_buffer)
+  .attr("transform", function(d) {
+    return "rotate(-90)"
+  });
+
 
 
 
@@ -211,6 +209,12 @@
   .attr("dy", ".71em")
   .style("text-anchor", "end")
   .attr("class", "y_label");
+
+    svglink.selectAll("text").style("fill",function(m){
+    if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
+      return sampleColor(fB.getSampleGroup(m, sampledata, grouping));        
+    }
+  });
 
 
 
