@@ -746,7 +746,9 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	////////////////////////// Colors
 	//color_option = "Categories" //Categories or Random
 	color_option = d3.select("#color_option_selector").property("value")
+
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
+		//color scale already has core colors set up
 		//1st - divide up color space into number of leaves
 		//then assign each subgroup of leaves alternating extremes
 		//then assign each parent extreme or average value of its children
@@ -758,20 +760,20 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 			}
 		    color_range = leaves.length //number of colors to expand in each direction depends on # of leaves
 
+			//generate variations of core color
 		    var core_color = d3.hcl(color_scale(main_list[j]))
 	    	new_colors = []
 	    	flip = -1
 	    	for(k=0; k < color_range; k++){
 	    		var new_color = d3.hcl()
-				new_color["l"] = core_color["l"] - 36*flip*(k + (k%2))/(color_range+1)
-	      		new_color["h"] = core_color["h"] - 8*flip*(k+ (k%2))/(color_range+1)
+				new_color["l"] = core_color["l"] - 32*flip*(k + (k%2))/(color_range+1)
+	      		new_color["h"] = core_color["h"] - 7.5*flip*(k+ (k%2))/(color_range+1)
 	      		new_color["c"] = core_color["c"] - 4*flip*(k+ (k%2))/(color_range+1)
 	      		new_colors.push(new_color)
 	      		flip *= -1
-
 	      	}
 			new_colors = new_colors.sort(function(a,b){ return a.l - b.l })
-
+			
 	      	if(list_type=="taxa"){
 	      		layer1 = data_cube.taxa_lookup[main_list[j]]
 	      		descendents = data_cube.get_descendents(main_list[j], data_cube.taxa_lookup)
@@ -782,7 +784,7 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	      		first_level = descendents.filter(function(d){ return data_cube.func_lookup[d].level == 1})
 	      	}
 	      	num_levels = layer1.level
-
+			
 	      	color_count = 0	      	
 	      	for(k=0; k < first_level.length; k++){
 	      		if(list_type=="taxa"){
@@ -792,19 +794,22 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	      		}
 	      		color_slice = new_colors.slice(color_count, color_count + desc_leaves.length) 
 	      		color_count += desc_leaves.length
-	      		//assign variants to each group of leaves
+	      		
+	      		//add leaf colors to scale
 	      		for(m=0; m < desc_leaves.length; m++){
 	      			if(color_scale.domain().indexOf(desc_leaves[m])==-1){
-	      				if(m % 2==0){ //go from front or back
-			    			color_scale.range().push(color_slice[m])
+	      				if(m % 2==0){ //go from front or back of slice
+			    			color_scale.range().push(color_slice[m].toString())
 	      				} else {
-	      					color_scale.range().push(color_slice[desc_leaves.length-m])
+	      					color_scale.range().push(color_slice[desc_leaves.length-m].toString())
 	      				}
+	      				color_scale(desc_leaves[m])
 	      			}
 	      		}
 	      	}
+
 	      	//now get the rest of the levels, assign mean or most extreme value of descendents
-	      	level = 1
+	      	if(layer1.level != 1){ level = 1 } else { level = 0; }
 	      	while(level < num_levels){
 	      		if(list_type=="taxa"){
 	      			level_items = descendents.filter(function(d){ return data_cube.taxa_lookup[d].level == level })
@@ -819,20 +824,20 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	      				desc_leaves = data_cube.get_leaves(level_items[m], data_cube.func_lookup)
 	      			}
 	      			desc_colors = desc_leaves.map(function(d){ return d3.hcl(color_scale(d)) })
-	      		if(m==0 & level_items.length > 1){
-	      			parent_color.h = d3.min(desc_colors.map(function(d){ return d.h}))
-	      			parent_color.c = d3.min(desc_colors.map(function(d){ return d.c}))
+	      		if(m%2 == 0 & level_items.length > 1){
+	      			parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
+	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
 	      			parent_color.l = d3.min(desc_colors.map(function(d){ return d.l}))
-	      		} else if(m == level_items.length -1 & m != 0) {
-	      			parent_color.h = d3.max(desc_colors.map(function(d){ return d.h}))
-	      			parent_color.c = d3.max(desc_colors.map(function(d){ return d.c}))
+	      		} else if((level_items.length > 1) & m%2 != 0) {
+	      			parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
+	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
 	      			parent_color.l = d3.max(desc_colors.map(function(d){ return d.l}))
 	      		} else{
 					parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
 	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
 	      			parent_color.l = d3.mean(desc_colors.map(function(d){ return d.l}))
 	      		
-	      		}
+ 	      		}
 		      	if(color_scale.domain().indexOf(level_items[m])==-1){
 		      		color_scale.range().push(parent_color.toString())
 	      			color_scale(level_items[m])
@@ -895,6 +900,10 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	taxa_colors.range().push("black")
 	taxa_colors("All Taxa")
 
+// 	console.log(taxa_colors.domain())
+// 	console.log(taxa_colors.domain().length)
+// 	console.log(taxa_colors.range())
+// 	console.log(taxa_colors.range().length)
 
 	//func colors
 	var func_colors = d3.scale.ordinal()
