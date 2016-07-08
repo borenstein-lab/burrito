@@ -31,6 +31,9 @@ body {
    stroke: grey;
    stroke-width: 1.5px;
 }
+.node rect {
+   cursor: pointer;
+}
 .node text {
    font-size: 11px;
 }

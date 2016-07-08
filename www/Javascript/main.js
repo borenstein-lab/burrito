@@ -1,11 +1,11 @@
+// main.js
+//
+
 mainui.createUI();
 
 var aspecrat, width, height, hidewidth, margin;
 var barDimensions, navDims, bpdims;
-var i,
-duration;
-
-//var diagonal;
+var duration; //used in trees to set animation speed
 
 var MainSVG, plotSVG;
 
@@ -15,33 +15,26 @@ draw_svg = function() {
 
 		width = 1000 * aspecrat;
 		height = 1000;
-		hidewidth = 0;
-		margin ={left:(10 + hidewidth), right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
+		//hidewidth = 0;
+		margin ={left:20, right:20, top:20, bottom:20 , btwnavbar:40, btwbars:40};
 		barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
 		navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
 		navDims.treewidth = navDims.width * 2/9;
 		bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
-		i = 0;
 		duration = 300;
 		roots = {};
 
 		trees.SetUp(navDims);
 		
-
-/*		diagonal = d3.svg.diagonal()  DELETE IF BEING COMMENTED ISNT A PROBLEM
-			.projection(function (d) {
-			return [d.y, d.x];
-		}); */
-
 		MainSVG = d3.select("#mainplot").append("svg")
 			.attr("id","mainsvg")
-			.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
+			.attr("viewBox","0 0 " + width + " " + height + "")
 			.attr("preserveAspectRatio","none");
 
 		uploader.svgCreated = true;	
 		plotSVG = d3.select("#mainsvg").append("svg")
 			.attr("id","plots_svg")
-			.attr("viewBox","0 0 " + (width - hidewidth) + " " + height + "")
+			.attr("viewBox","0 0 " + width + " " + height + "")
 			.attr("preserveAspectRatio","none")
 			.style("font-family", "Verdana");
 	

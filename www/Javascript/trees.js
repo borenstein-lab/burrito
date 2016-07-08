@@ -14,6 +14,7 @@
 	var diagonal;
 	var taxa_colors;
 	var func_colors;
+	var bpBarHeight = {};
 	var highlightOverall = function(){};
 	var dehighlightOverall = function(){};
 	var updateOtherThings = function(){};
@@ -53,6 +54,7 @@
 		trees.taxa_tree_data = tax_hierarchy_t;
 		trees.func_tree_data = func_hierarchy_t;
 		
+		bpBarHeight[0] = 50; bpBarHeight[1] = 50;	
 	}
 	
 	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall, taxa_cols, func_cols, updateFunc) {
@@ -69,7 +71,6 @@
 		curlevelNames['taxa'] = levelNames['taxa'];
 		curlevelNames['func'] = levelNames['func'];
 
-		console.log(bpvisdata);
 		var taxa_data = jQuery.extend(true, [], trees.taxa_tree_data);
 		
 		/*var curr_taxa = [];
@@ -160,14 +161,7 @@
 			nleaf = nleaf + (d.values ? 0 : 1);
 		})
 
-		console.log(bpvisdata);
-		/*
-		
-		var leafC = 1;
-		*/
 		nodes.forEach(function (d) {
-			//console.log("in nodes.foreach");
-			//console.log(bpvisdata);
 			if (!(d.values)) { 
 				var dattype = d.type == "taxa" ? 0 : 1;
 				var thedat = -1;
@@ -178,7 +172,6 @@
 				}
 				
 				if (thedat >= 0) {
-					//console.log("dattype: " + dattype + ", and thedat: " + thedat);
 					d.x = bpvisdata.mainBars[dattype][thedat].y;	
 				} else { d.x = 0; 
 				}
@@ -215,8 +208,11 @@
 				depthpos['func'][d.depth] = d.y;
 			}
 		}); 
-
-
+		
+		// update BP bar height
+		//bpBarHeight[0] = bpvisdata.mainBars[0][
+		bpBarHeight[0] = Math.min( d3.select("#part0").select(".mainrect").attr("height"), 100);
+		bpBarHeight[1] = Math.min( d3.select("#part1").select(".mainrect").attr("height"), 100);
 		//\¯\¯\Update hierarchical level labels¯\¯\¯\¯\¯\¯\¯\
 
 		// figure out which depth levels exist
@@ -303,22 +299,21 @@
 
 		nodeEnter.filter( function(d) { return (~d.values) }).append("rect")
 			.attr("x", function (d) {
-				if (source.type == 'taxa') {
-					return 0; 
-				} else {
-					return (-170 - d.y);
-				}})
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return -1*(bpBarHeight[dattype]/2); 
+				})
 			.attr("width", function(d) {
-				if (source.type == 'taxa') {
-					return "" + (navDims.treewidth + margin.left - d.y) + ""
-				} else {
-					return 170+d.y;
-				}})
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return bpBarHeight[dattype];	
+				})
 			.attr("height", function(d) {
-				return (height / 2 / nleaf / 1.5);
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return bpBarHeight[dattype];
 				})
 			.attr("y", function (d) {
-				return (-1 * height / 2 / nleaf / 3); })
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return -1*(bpBarHeight[dattype]/2);
+				})	
 			.attr("style","opacity:0")
 			;
 		
@@ -360,40 +355,37 @@
 			.attr("transform", function (d) {
 			return "translate(" + d.y + "," + d.x + ")";
 		}); 
-
-		nodeUpdate.filter( function (d) {return (d.values) } ).selectAll("rect").remove();
-		
 		
 				
 		nodeUpdate.selectAll("rect")
 			.attr("x", function (d) {
-				if (source.type == 'taxa') {
-					return 0; 
-				} else {
-					return (-170 - d.y);
-				}})
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return -1*(bpBarHeight[dattype]/2); 
+				})
 			.attr("width", function(d) {
-				if (source.type == 'taxa') {
-					return "" + (navDims.treewidth + margin.left - d.y) + ""
-				} else {
-					return 170+d.y;
-				}})
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return bpBarHeight[dattype];	
+				})
 			.attr("height", function(d) {
-				return (height / 2 / nleaf / 1.5);
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return bpBarHeight[dattype];
 				})
 			.attr("y", function (d) {
-				return (-1 * height / nleaf / 3); })
+				var dattype = d.type == "taxa" ? 0 : 1;
+				return -1*(bpBarHeight[dattype]/2);
+				})
 			.attr("style","opacity:0")
 			;
 		
 		
 		nodeUpdate.select("circle")
 			.attr("r", function (d) {
+				var dattype = d.type == "taxa" ? 0 : 1;
 				if(d.sampleAvg && d._values){
-					return 25 * Math.sqrt(d.sampleAvg)
+					return (bpBarHeight[dattype]/2) * Math.sqrt(d.sampleAvg)
 					//return (4 * Math.sqrt(d.Ndescendents))
 				}else{
-					return 4;
+					return 5;
 				}
 			})
 			.style("fill", function (d) { 
@@ -611,7 +603,7 @@
 			.style("stroke-width", "5")
 			.style("stroke", "black");
 			
-		data.thisandparents.append("text")
+		data.thisandparents.insert("text", "rect")
 				.text(function (d5) {
 				if (d5.values) {
 					name_split = (d5.key.split('_')).pop()
@@ -709,7 +701,7 @@
 			taxa_means[otus[j]] = taxa_means[otus[j]]/(otu_abundance_data.length)
 		}
 	}	
-	// Accessor functions
+	// Accessor and settor functions
 	
 	trees.getTaxaTreeData = function() {
 		return trees.taxa_tree_data;
