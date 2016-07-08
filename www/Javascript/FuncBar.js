@@ -12,7 +12,7 @@
   .tickFormat(d3.format(".2s"));
 
 
-  fB.vizData = function(data){
+  fB.vizData = function(data, sample_order){
 
     var alldata = [];
     var y0 = 0;
@@ -48,22 +48,22 @@
       
     });
 
-    var h = [];
-    data.map(function(d) { 
-      d.data.map(function(e){
-        h.push(e.Sample);
-        return e.Sample;
-      })  
-    });
-    x.domain(h);
+    // var h = [];
+    // data.map(function(d) { 
+    //   d.data.map(function(e){
+    //     h.push(e.Sample);
+    //     return e.Sample;
+    //   })  
+    // });
+    x.domain(sample_order);
     y.domain([0, 100]);
 
     return data;
   }
 
 
-  getSampleGroup = function(samp, sampledata){
-    group = sampledata.filter(function(e){ return e.Sample==samp;})[0].Group;
+  fB.getSampleGroup = function(samp, sampledata, grouping){
+    group = sampledata.filter(function(e){ return e.Sample==samp;})[0][grouping];
     return group;
   }
 
@@ -77,36 +77,36 @@
 
 
 
-  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, comparison_data){
+  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping){
 
-	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, buffer:7}
+	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, height_buffer:10, width_buffer:-10, sample_buffer:5}
    x.rangeRoundBands([0, graphdims.width], .2);
    y.rangeRound([graphdims.height, 0]);
 
    xAxis.scale(x);
    yAxis.scale(y);
 
-   var viz = fB.vizData(stackdata);
+   var viz = fB.vizData(stackdata, sample_order);
     //get the x axis set
 
 
   svglink.append("g")
   .attr("class", "x axis")
-  .attr("transform", "translate(" + (dims.width-graphdims.width) + "," + (graphdims.height + graphdims.buffer) + ")")
+  .attr("transform", "translate(" + (dims.width-graphdims.width - graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
   .call(xAxis)
   .selectAll("text")
   .style("text-anchor", "end")
-  .attr("dx", "-4")
-  .attr("dy", "5")
+  .attr("dx", "-8")
+  .attr("dy", - (x.rangeBand() / 2) - graphdims.sample_buffer)
   .attr("transform", function(d) {
-    return "rotate(-35)"
+    return "rotate(-90)"
   });
   //y axis label
   svglink.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", 18)
-    .attr("x", -1*dims.height/10)
+    .attr("y", 0)
+    .attr("x", -1*dims.height/6)
     .attr("font-size",18)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
@@ -117,7 +117,7 @@
     .attr("class", "y label")
     .attr("text-anchor", "end")
     .attr("y", dims.height-18)
-    .attr("x", (dims.width - graphdims.width) + graphdims.width/2)
+    .attr("x", (dims.width - graphdims.width - graphdims.width_buffer) + graphdims.width/2)
     .attr("font-size",18)
     .attr("dy", ".75em")
     .text("Samples");
@@ -128,7 +128,7 @@
 
   svglink.selectAll("text").style("fill",function(m){
     if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-      return sampleColor(getSampleGroup(m, sampledata));        
+      return sampleColor(fB.getSampleGroup(m, sampledata, grouping));        
     }
   });
     //init the tooltip as invisible
@@ -150,13 +150,13 @@
 
 
 
-    //create a Sample object, creates 28 groups(one for each sample)
+    //create a Sample object for each sample
   var Sample = svglink.selectAll(".Sample")
   .data(viz)
   .enter().append("g")
   .attr("class", "g")
   .attr("id", function(d){ return "func_"+d.Sample })
-  .attr("transform", function(d) {return "translate(" + (dims.width-graphdims.width + x(d.Sample)) + "," + graphdims.buffer + ")"; });
+  .attr("transform", function(d) {return "translate(" + (dims.width-graphdims.width  - graphdims.width_buffer - graphdims.sample_buffer + x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
 
 
     //create rects for each value, transpose based on sample
@@ -203,7 +203,7 @@
     //init y-axis
   svglink.append("g")
   .attr("class", "y axis")
-  .attr("transform","translate(" + (dims.width-graphdims.width) +"," +graphdims.buffer + ")")
+  .attr("transform","translate(" + (dims.width-graphdims.width - graphdims.width_buffer) +"," +graphdims.height_buffer + ")")
   .call(yAxis)
   .append("text")
   .attr("transform", "rotate(-90)")

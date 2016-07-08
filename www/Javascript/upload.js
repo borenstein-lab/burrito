@@ -13,6 +13,7 @@
 		uploader.func_averages_loaded = false;
 		uploader.samp_map_loaded = false;
 		uploader.otu_table_loaded = false;
+		uploader.sample_order_loaded = false;
 		
 		uploader.svgCreated = false;
 
@@ -39,6 +40,7 @@
 		uploader.otu_table = [];
 		uploader.current_contribution_sample_index = 0;
 		uploader.current_otu_sample_index = 0;
+		uploader.sample_order = [];
 
 		/*
 		load_default_data()
@@ -79,7 +81,7 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			var load_flags = [uploader.otu_table_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated];
+			var load_flags = [uploader.otu_table_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated, uploader.sample_order_loaded];
 
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < load_flags.length; i++){
@@ -91,7 +93,7 @@
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded){
 
-				draw_everything(uploader.otu_table, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text);
+				draw_everything(uploader.otu_table, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text, uploader.sample_order);
 			}
 		}
 
@@ -149,6 +151,12 @@
 			}, 2);
         });
 
+        Shiny.addCustomMessageHandler("sample_order", function(sample_order){
+        	uploader.sample_order_loaded = false;
+        	uploader.sample_order = sample_order;
+        	uploader.sample_order_loaded = true;
+        });
+
 		Shiny.addCustomMessageHandler("tax_hierarchy", function(taxa_hierarchy){
 			uploader.tax_hierarchy_loaded = false;
 			uploader.tax_hierarchy_text = taxa_hierarchy;
@@ -181,11 +189,47 @@
 			uploader.update_plots();
 		});
 
+		Shiny.addCustomMessageHandler("func_hierarchy_labels", function(labels){
+			func_dropdown = document.getElementById("funcLODselector")
+			var old_options = jQuery.extend(true, [], func_dropdown.options)
+			for (var i = 0; i < old_options.length; i++){
+				func_dropdown.remove(old_options[i])
+			}
+			var blank_option = document.createElement("option");
+			blank_option.text="";
+			blank_option.value="";
+			func_dropdown.add(blank_option);
+			for (var i = 0; i < labels.length; i++){
+				var option = document.createElement("option");
+				option.text = labels[i];
+				option.value = labels[i];
+				func_dropdown.add(option);
+			}
+		});
+
 		Shiny.addCustomMessageHandler("func_averages", function(func_averages){
 			uploader.func_averages_loaded = false;
 			uploader.func_averages_text = func_averages;
 			uploader.func_averages_loaded = true;
 			uploader.update_plots();
+		});
+
+		Shiny.addCustomMessageHandler("sample_map_labels", function(labels){
+			sample_group_dropdown = document.getElementById("sampgroupselector")
+			var old_options = jQuery.extend(true, [], sample_group_dropdown.options)
+			for (var i = 0; i < old_options.length; i++){
+				sample_group_dropdown.remove(old_options[i])
+			}
+			var blank_option = document.createElement("option");
+			blank_option.text="";
+			blank_option.value="";
+			sample_group_dropdown.add(blank_option);
+			for (var i = 0; i < labels.length; i++){
+				var option = document.createElement("option");
+				option.text = labels[i];
+				option.value = labels[i];
+				sample_group_dropdown.add(option);
+			}
 		});
 
 		uploader.execute_on_default_samp_map_load = function() {

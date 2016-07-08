@@ -388,6 +388,20 @@ white-space: pre-line;
 		</tr>
 		<tr>
 		<td>
+			<select name="funclevelofdetail" id="funcLODselector">
+			</select>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.</span></span></span>		
+		</td>
+		</tr>
+		<tr>
+		<td>
+			<select name="sampgroup" id="sampgroupselector">
+			</select>
+				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select a grouping for samples if desired.</span></span></span>		
+		</td>
+		</tr>
+		<tr>
+		<td>
 			<select name="color_option_selector" id="color_option_selector">
 			<option value="Categories">Hierarchical color scale</option>
 			<option value="Random">Random color scale</option>
@@ -604,8 +618,10 @@ update_progress = function(curr_sample, total_samples){
 	document.getElementById("progress_bar").setAttribute("width", (width / 4.5) * (curr_sample / total_samples))
 }
 
-draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages){
+draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, sample_order){
 	
+	var grouping = document.getElementById("sampgroupselector").value;
+
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -1009,13 +1025,12 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 	//draw the stacked bar
 
 	var stackData = getFuncBarData();
-
-	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, sample_order, grouping);
 
 
 	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
 
-	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, grouping);
 
 
 	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall);
@@ -1025,14 +1040,14 @@ otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
 		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, grouping);
 	}
 
 	function update_func_bar(){
 		//remove old graph before redrawing new
 			FunctionBar.selectAll("g").remove();
 			var func_data = getFuncBarData();
-			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor);
+			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, sample_order, grouping);
 
 	}
 
