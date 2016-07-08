@@ -140,7 +140,7 @@
 		if ( nbar < 5) { padding = 20;
 		}else if (nbar < 11) {padding = 10;
 		}else if (nbar < 25) {padding = 5;
-		}else { nbar = 4;}
+		}else { nbar = 4;} // THIS SEEMS WRONG????????? -CM
 // 		console.log(nbar)
 // 		console.log(padding)
 // 		console.log(nbar*10+padding*12)
