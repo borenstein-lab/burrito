@@ -99,6 +99,7 @@
 		//console.log(vis.subBars[0].toSource());
 		
 		vis.edges = vis.subBars[0].map(function(p,i){
+
 			return {
 				key1: p.key1,
 				key2: p.key2,
@@ -107,7 +108,7 @@
 				h1:p.h,
 				h2:vis.subBars[1][i].h,
 				val:p.value,
-				wid:p.wid
+				wid:p.value
 			};
 		});
 		//console.log(vis.edges.length);
@@ -222,23 +223,26 @@
 
 	// }
 	
-	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
+	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
 		d3.select("#"+id).append("g").attr("class","edges").transition().duration(300).attr("transform","translate(0,0)");
 
 		edgeBar = d3.select("#"+id).select(".edges").selectAll(".edge")
 			.data(data.edges).enter().append("polygon")
 			.attr("class","edge")
-			.attr("points", bP.edgePolygon);
+			.attr("points", bP.edgePolygon2);
 
 		edgeBar.style("fill", "grey") //function(d){ return taxa_colors(data.keys[0][d.key1]) ;})
 			.style("opacity",0.2).each(function(d) { this._current = d; })
+			.attr("width", function(d){ 
+				return 10;
+				})
 			.on("mouseover", function(d,i){ 
 				d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 				var current_data = this._current;
 				bP.selectEdge(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall);
 			})
 			.on("mouseout", function(d,i){ 
-				d3.select(this).attr("points", bP.edgePolygon).style("opacity",0.2).style("fill", "grey");
+				d3.select(this).attr("points", bP.edgePolygon2).style("opacity",0.2).style("fill", "grey");
 				var current_data = this._current;
 				bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);
 			})
@@ -271,15 +275,17 @@
 	}	
 
 	bP.edgePolygon2 = function(d){
-		if(d.wid===1){ //don't change
-			return [-bb, d.y1, bb, d.y2, bb, d.y2+d.h2, -bb, d.y1+d.h1].join(" ");
-		} else{
-			return [-bb, d.y1-Math.sqrt(d.wid)/2, bb, d.y2-Math.sqrt(d.wid)/2, bb, d.y2+Math.sqrt(d.wid)/2, -bb, d.y1+Math.sqrt(d.wid)].join(" ");
-		}
+// 		if(d.wid===1){ //don't change
+// 			return [-bb, d.y1, bb, d.y2, bb, d.y2+d.h2, -bb, d.y1+d.h1].join(" ");
+// 		} else{
+			return [-bb, d.y1-Math.sqrt(d.wid), bb, d.y2-Math.sqrt(d.wid), bb, d.y2+Math.sqrt(d.wid), -bb, d.y1+Math.sqrt(d.wid)].join(" ");
+			//return [-bb, d.y1-d.wid/5, bb, d.y2-d.wid/5, bb, d.y2+d.wid/5, -bb, d.y1+d.wid/5].join(" ");
+
+//		}
 		//
 	}	
 	
-	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){
+	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
 		
 		bb = dims.width * .075;
 		b = dims.width / 50;
@@ -319,9 +325,17 @@
 				//.attr("transform","translate("+ (550*s)+",0)");
 		//console.log(bip.data.data.toSource());		
 		var visData = visualize(bip.data);
+		visData["edges"] = visData.edges.map(function(d){
+			sub_contrib = avg_contrib_data[displayed_taxa[d.key1]][displayed_funcs[d.key2]]
+			//divided by all the things with that function
+			all_func = d3.keys(avg_contrib_data).map(function(e){ 
+				return avg_contrib_data[e][displayed_funcs[d.key2]]; })					
+			return {h1: d.h1, h2: d.h2, key1: d.key1, key2: d.key2, val: d.val, wid: 300*sub_contrib/d3.sum(all_func), y1: d.y1, y2:d.y2 };
+		})
+
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
-		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall);
+		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
 //		drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
@@ -347,7 +361,7 @@
 	}
 		
 
-	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
@@ -366,11 +380,19 @@
 // 		//or .remove()?
 
 		var visData = visualize(bip.data);
+		visData["edges"] = visData.edges.map(function(d){
+				sub_contrib = avg_contrib_data[displayed_taxa[d.key1]][displayed_funcs[d.key2]]
+			//divided by all the things with that function
+				all_func = d3.keys(avg_contrib_data).map(function(e){ 
+					return avg_contrib_data[e][displayed_funcs[d.key2]]; })					
+			return {h1: d.h1, h2: d.h2, key1: d.key1, key2: d.key2, val: d.val, wid: 100*sub_contrib/d3.sum(all_func), y1: d.y1, y2:d.y2 };
+			})
+
 		//updatePart(visData, bip.id, 0);
 		//updatePart(visData, bip.id, 1);
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
-		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall);
+		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
 		//drawHeader(bip.header, bip.id);
 			
 		[0,1].forEach(function(p){			
@@ -486,10 +508,10 @@
 			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 		//console.log(selectedEdges.toSource());
 
-		selectedEdges.attr("points", bP.edgePolygon)
-			.style("opacity", 0.2)
-			.style("fill", "grey")
-			.attr("visibility", "hidden");
+		selectedEdges.attr("visibility", "hidden")
+			//.style("opacity", 0.2)
+			//.style("fill", "grey")
+			//.attr("points", bP.edgePolygon);
 
 		//selectedBar.select(".barvalue").style('font-weight','normal');
 		//selectedBar.select(".barpercent").style('font-weight','normal');

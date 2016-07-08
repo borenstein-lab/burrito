@@ -302,6 +302,8 @@ shinyServer(function(input, output, session) {
 
 			session$sendCustomMessage("upload_status", "Calculating average function abundances")
 			otu_matched_samples = grep(paste(".*", comparison_tag, "$", sep=""), output$Sample, invert=TRUE)
+			#Make sure to exclude average contributions
+			otu_matched_samples = otu_matched_samples[otu_matched_samples != "Average_contrib"] 
 			#sum over taxa
 			count_name = names(output)[!names(output) %in% c("Sample", "OTU", func_summary_level)]
 			total_funcs = output[otu_matched_samples,lapply(.SD, sum), by=c(func_summary_level, "Sample"), .SDcols=count_name] #whatever the count name is
@@ -467,9 +469,19 @@ shinyServer(function(input, output, session) {
 
 			# Format the contribution table to match the expected javascript array
 			# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings
-			output[,SubPathway:=paste(func_summary_level,SubPathway,sep="_")]
-			output = dcast(output, Sample + OTU ~ SubPathway, value.var="relative_contributions")
 
+			output[,SubPathway:=paste(func_summary_level,SubPathway,sep="_")]
+			
+			##add a sample called "Average_contrib" to the contribution table, include 0s for missing OTU/Pathway combos
+			foo = melt(dcast(output, Sample + OTU ~ SubPathway, value.var = "relative_contributions", fun.aggregate=sum), id.vars = c("Sample", "OTU"), variable.name = "SubPathway", value.name = "value")
+			num_samps = output[,length(unique(Sample))]			
+			averages = foo[,sum(value)/num_samps, by=list(OTU, SubPathway)]
+
+			averages[,Sample:="Average_contrib"]
+			setnames(averages, "V1", "relative_contributions")
+			output = rbind(output, averages[,list(Sample, OTU, SubPathway, relative_contributions)])
+			
+			output = dcast(output, Sample + OTU ~ SubPathway, value.var="relative_contributions")
 			# Create a single column for SubPathways that contains a list of the SubPathways for that row's Sample and OTU, remove empty elements from those lists
 			output = data.table(Sample = output$Sample, OTU = output$OTU, SubPathways = apply(output[,3:dim(output)[2], with=FALSE], 1, function(row){return(as.list(row[!is.na(row)]))}))
 
@@ -499,6 +511,7 @@ shinyServer(function(input, output, session) {
 			tracked_data$contribution_table = output
 
 			session$sendCustomMessage("number_of_samples_message", length(output))
+			
 
 			session$sendCustomMessage(type="contribution_table_ready", length(output))
 		}
