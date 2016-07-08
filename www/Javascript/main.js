@@ -267,7 +267,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      	} else {
 	      		layer1 = data_cube.func_lookup[main_list[j]]
 	      		descendents = data_cube.get_descendents(main_list[j], data_cube.func_lookup)
-	      		first_level = descendents.filter(function(d){ return data_cube.func_lookup[d].level == 1})
+	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.func_lookup[d].level == 1 } else { return data_cube.func_lookup[d].level == 0 }})
 	      	}
 	      	num_levels = layer1.level
 			
@@ -293,7 +293,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      			}
 	      		}
 	      	}
-
 	      	//now get the rest of the levels, assign mean or most extreme value of descendents
 	      	if(layer1.level != 1){ level = 1 } else { level = 0; }
 	      	while(level < num_levels){
