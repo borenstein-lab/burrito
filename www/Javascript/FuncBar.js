@@ -86,7 +86,7 @@
    yAxis.scale(y);
 
    var viz = fB.vizData(stackdata, sample_order);
-   console.log(viz)
+   //console.log(viz)
 
   //y axis label
   svglink.append("text")
@@ -155,7 +155,7 @@
   .attr("y", function(d) {return y(d.y1); })
   .attr("height", function(d) {return y(d.y0) - y(d.y1) + 1;} )
   .style("fill", function(d) { return colors(d.func); })
-  .style("opacity", 0.75)
+  //.style("opacity", 0.75)
   .on("mouseover", function(d){
     current_rectangle_data = d3.select(this).datum();
 	selected = d3.select("#func_" + current_rectangle_data.Sample)
@@ -233,7 +233,7 @@ fB.select_bars = function(func, colors){
   if (d3.select("#" + trimstr)[0][0] == null) {
      var t = textures.lines()
        .thicker()
-       .background(colors(func))
+       .background(colors(func).brighter(0.4))
        .id(trimstr)
        .stroke("white");
 
@@ -254,11 +254,11 @@ fB.deselect_bars = function(func, colors){
     .filter(function(d) {
       return d.func == func;
     })
-    .style("opacity", 0.75)
+    //.style("opacity", 0.75)
     .style("fill", colors(func));
 }
 
-fB.select_contribution = function(taxon, colors){
+fB.select_contribution = function(taxon, colors, changeAlpha){
   var selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
@@ -266,13 +266,13 @@ fB.select_contribution = function(taxon, colors){
       return d.Taxa == taxon;
     });
 
-  selected.style("opacity", 1)
-    .style("fill", function(d){
+  //selected.style("opacity", 1)
+    selected.style("fill", function(d){
       var trimstr = d.func.replace(/\W+/g,'') + "_tx";
       if (d3.select("#" + trimstr)[0][0] == null) {
         var t = textures.lines()
           .thicker()
-          .background(colors(d.func))
+          .background(d3.rgb(colors(d.func)).brighter(0.4))
           .id(trimstr)
           .stroke("white");
 
@@ -291,10 +291,10 @@ fB.deselect_contribution = function(taxon, colors){
     .filter(function(d) {
       return d.Taxa == taxon;
     });
-    selected.style("opacity", 0.75).style("fill",function(d){ return colors(d.func); });
+    selected.style("fill",function(d){ return colors(d.func); });
 }
 
-fB.select_single_contribution = function(taxon, func, colors){
+fB.select_single_contribution = function(taxon, func, colors, changeAlpha){
   selected = d3.select("#func_bars")
     .selectAll(".g")
     .selectAll("rect")
@@ -305,7 +305,7 @@ fB.select_single_contribution = function(taxon, func, colors){
   if (d3.select("#" + trimstr)[0][0] == null) {
      var t = textures.lines()
        .thicker()
-       .background(colors(func))
+       .background(d3.rgb(colors(func)).brighter(0.4))
        .id(trimstr)
        .stroke("white");
 
@@ -324,7 +324,7 @@ fB.deselect_single_contribution = function(taxon, func, colors){
       return d.func == func && d.Taxa == taxon;
     });
 
-    selected.style("opacity", 0.75).style("fill", function(d){ return colors(d.func); });
+    selected.style("fill", function(d){ return colors(d.func); });
 }
 
 this.fB = fB;

@@ -1,8 +1,8 @@
 (function(){
   var otu_bar = {};
 
-  otu_bar.getSampleGroup = function(samp, sampledata, grouping){
-    group = sampledata.filter(function(e){ return e.Sample==samp;})[0][grouping];
+  getSampleGroup = function(samp, sampledata){
+    group = sampledata.filter(function(e){ return e.Sample==samp;})[0].Group;
     return group;
   }
 
@@ -33,11 +33,11 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, grouping){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
 
-	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, height_buffer:10, width_buffer:-10, sample_buffer:5}
+	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, buffer:7}
     var x = d3.scale.ordinal()
-      .rangeRoundBands([0, graphdims.width], .2);
+      .rangeRoundBands([0, graphdims.width], .3);
 
     var y = d3.scale.linear()
       .rangeRound([graphdims.height, 0]);
@@ -75,13 +75,23 @@
     })
 
 
-
+    svglink.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(" + (dims.width-graphdims.width) + "," + (graphdims.height + graphdims.buffer) + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-4")
+      .attr("dy", "5")
+      .attr("transform", function(d) {
+        return "rotate(-35)"
+      });
       //y-axis label
     svglink.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr("y", 0)
-    .attr("x", -1*dims.height/6)
+    .attr("y", 18)
+    .attr("x", -1*dims.height/10)
     .attr("font-size",18)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
@@ -92,19 +102,25 @@
     .attr("class", "y label")
     .attr("text-anchor", "end")
     .attr("y", dims.height - 18)
-    .attr("x", (dims.width - graphdims.width - graphdims.width_buffer) + graphdims.width / 2)
+    .attr("x", (dims.width - graphdims.width) + graphdims.width / 2)
     .attr("font-size",18)
     .attr("font-style","bold")
     .attr("dy", ".75em")
     .text("Samples");
 
 
+    svglink.selectAll("text").style("fill",function(m){
+      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
+        return sampleColor(getSampleGroup(m, sampledata));        
+      }
+    });
+
     var Sample = svglink.selectAll(".Sample")
       .data(bar_data)
       .enter().append("g")
       .attr("class", "g")
       .attr("transform", function(d) { 
-        return "translate(" + (dims.width-graphdims.width - graphdims.width_buffer  - graphdims.sample_buffer + x(d.Sample)) + "," + graphdims.height_buffer +")"; 
+        return "translate(" + (dims.width-graphdims.width + x(d.Sample)) + "," + graphdims.buffer +")"; 
       });
 
     Sample.selectAll("rect")
@@ -122,12 +138,12 @@
         return y(d.y1); 
       })
       .attr("height", function(d) { 
-        return y(d.y0) - y(d.y1) + 1; 
+        return y(d.y0) - y(d.y1); 
       })
       .style("fill", function(d) { 
         return colors(d.name); 
       })
-      .style("opacity", 0.75)
+      //.style("opacity", 0.75)
       .on("mouseover", function(d){
         var current_rectangle_data = d3.select(this).datum();
         highlight_overall(current_rectangle_data.name, "", 1);
@@ -144,21 +160,9 @@
         return tooltip.style("visibility", "hidden");
       });
 
-          svglink.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(" + (dims.width-graphdims.width - graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
-      .call(xAxis)
-      .selectAll("text")
-      .style("text-anchor", "end")
-      .attr("dx", "-8")
-      .attr("dy", - (x.rangeBand() / 2) - graphdims.sample_buffer)
-      .attr("transform", function(d) {
-        return "rotate(-90)"
-      });
-
     svglink.append("g")
       .attr("class", "y axis")
-	  .attr("transform","translate("+ (dims.width-graphdims.width - graphdims.width_buffer) +"," + graphdims.height_buffer + ")")
+	  .attr("transform","translate("+ (dims.width-graphdims.width) +"," + graphdims.buffer + ")")
       .call(yAxis)
       .append("text")
       .attr("transform", "rotate(-90)")
@@ -166,13 +170,6 @@
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .attr("class", "y_label"); 
-
-          svglink.selectAll("text").style("fill",function(m){
-      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
-        return sampleColor(otu_bar.getSampleGroup(m, sampledata, grouping));        
-      }
-    });
-
 
     // var normalizebox = svg.append("foreignObject")
     //   .attr("width", 100)
@@ -235,7 +232,7 @@
     //   .text("Raw Counts");
   };
 
-otu_bar.select_bars = function(taxon){
+otu_bar.select_bars = function(taxon, changeAlpha){
  selected =  d3.select("#taxa_bars")
     .selectAll(".g")
     .selectAll("rect")
@@ -248,7 +245,7 @@ otu_bar.select_bars = function(taxon){
 	if (d3.select("#" + trimstr)[0][0] == null) {
   		var t = textures.lines()
     			.thicker()
-    			.background(current_color)
+    			.background(d3.rgb(current_color).brighter(0.4))
 			.id(trimstr)
     			.stroke("white");
 
@@ -267,7 +264,7 @@ otu_bar.deselect_bars = function(taxon, colors){
     .filter(function(d) {
       return d.name == taxon;
     })
-    .style("opacity", 0.75)
+    //.style("opacity", 0.75)
     .style("fill", function(d){ return colors(d.name); });
 }
 
