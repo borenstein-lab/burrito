@@ -267,7 +267,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      		flip *= -1
 	      	}
 			new_colors = new_colors.sort(function(a,b){ return a.l - b.l })
-			console.log(new_colors)
 			
 	      	if(list_type=="taxa"){
 	      		layer1 = data_cube.taxa_lookup[main_list[j]]
@@ -367,20 +366,12 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many function categories, colors will repeat")
 		}
-// 		for(j=0; j < taxa_palette.length; j++){
-// 			taxa_palette[j] = d3.rgb(taxa_palette[j]).brighter()
-// 		}
-		console.log(taxa_palette)
 		
 		if(num_function_categories <= d3.keys(colorbrewer["Set1"]).pop()){
 			func_palette = colorbrewer["Set1"][num_function_categories]
 		} else {
 			func_palette = colorbrewer["Set1"][(d3.keys(colorbrewer["Set1"]).pop()-1)].concat(colorbrewer["Dark2"][num_function_categories - d3.keys(colorbrewer["Set1"]).pop()])
 		}
-// 		for(j=0; j < func_palette.length; j++){
-// 			func_palette[j] = d3.rgb(func_palette[j]).brighter()
-// 		}
-		console.log(func_palette)
 		
 		var taxa_colors = d3.scale.ordinal()
 		taxa_colors.range(taxa_palette)
@@ -411,8 +402,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		func_colors.range().push(d3.rgb("black"))//.brighter())
 		func_colors("All Functions")
 	
-		console.log(taxa_colors.range())
-		console.log(func_colors.range())
 		
 	} else if(color_option == "Random"){
 		taxa_colors_palette = (d3.scale.category20()).range()
