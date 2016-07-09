@@ -233,6 +233,14 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	////////////////////////// Colors
 	//color_option = "Categories" //Categories or Random
 	color_option = d3.select("#color_option_selector").property("value")
+	
+// 	var changeAlpha = function(color, alphaVal){ 
+// 		color = d3.rgb(color.toString())
+// 		color["r"] = alphaVal * color["r"]
+// 		color["g"] = alphaVal * color["g"]
+// 		color["b"] = alphaVal * color["b"]
+// 		return color;
+// 	}
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		//color scale already has core colors set up
 		//1st - divide up color space into number of leaves
@@ -255,7 +263,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				new_color["l"] = core_color["l"] - 32*flip*(k + (k%2))/(color_range+1)
 	      		new_color["h"] = core_color["h"] - 7.5*flip*(k+ (k%2))/(color_range+1)
 	      		new_color["c"] = core_color["c"] - 4*flip*(k+ (k%2))/(color_range+1)
-	      		new_colors.push(new_color)
+	      		new_colors.push(d3.hcl(new_color))
 	      		flip *= -1
 	      	}
 			new_colors = new_colors.sort(function(a,b){ return a.l - b.l })
@@ -267,7 +275,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      	} else {
 	      		layer1 = data_cube.func_lookup[main_list[j]]
 	      		descendents = data_cube.get_descendents(main_list[j], data_cube.func_lookup)
-	      		first_level = descendents.filter(function(d){ return data_cube.func_lookup[d].level == 1})
+	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.func_lookup[d].level == 1 } else { return data_cube.func_lookup[d].level == 0 }})
 	      	}
 	      	num_levels = layer1.level
 			
@@ -293,7 +301,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      			}
 	      		}
 	      	}
-
 	      	//now get the rest of the levels, assign mean or most extreme value of descendents
 	      	if(layer1.level != 1){ level = 1 } else { level = 0; }
 	      	while(level < num_levels){
@@ -359,13 +366,13 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many function categories, colors will repeat")
 		}
-
+		
 		if(num_function_categories <= d3.keys(colorbrewer["Set1"]).pop()){
 			func_palette = colorbrewer["Set1"][num_function_categories]
 		} else {
 			func_palette = colorbrewer["Set1"][(d3.keys(colorbrewer["Set1"]).pop()-1)].concat(colorbrewer["Dark2"][num_function_categories - d3.keys(colorbrewer["Set1"]).pop()])
 		}
-
+		
 		var taxa_colors = d3.scale.ordinal()
 		taxa_colors.range(taxa_palette)
 		main_taxa = []
@@ -376,14 +383,14 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
 
 		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
-		col1 = d3.hsl("black")
+		col1 = d3.rgb("black") //.brighter()
 		//if there are other kingdoms besides Bacteria, shades of grey
 		for(j=0; j < kingdoms.length; j++){
 			taxa_colors.range().push(col1)
 			taxa_colors(kingdoms[j])
 			col1["l"] +=  (j+1)/(kingdoms.length + 1)
 		}
-		taxa_colors.range().push("black")
+		taxa_colors.range().push(d3.rgb("black"))//.brighter())
 		taxa_colors("All Taxa")
 
 		//func colors
@@ -392,14 +399,25 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		main_funcs = data_cube.func_tree.map(function(d){ return d.key;})
 		func_colors.domain(main_funcs)
 		func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
-		func_colors.range().push("black")
+		func_colors.range().push(d3.rgb("black"))//.brighter())
 		func_colors("All Functions")
 	
+		
 	} else if(color_option == "Random"){
-		taxa_colors = d3.scale.category20()
+		taxa_colors_palette = (d3.scale.category20()).range()
+// 		for(j=0; j < taxa_colors_palette.length; j++){
+// 			taxa_colors_palette[j] = d3.rgb(taxa_colors_palette[j]).brighter()
+// 		}
+		taxa_colors = d3.scale.ordinal()
+		taxa_colors.range(taxa_colors_palette)
 		taxa_colors.domain(d3.keys(data_cube.taxa_tree_lookup))
+		
+		func_colors_palette = colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"])
+// 		for(j=0; j < func_colors_palette.length; j++){
+// 			func_colors_palette[j] = d3.rgb(func_colors_palette[j]).brighter()
+// 		}		
 		func_colors = d3.scale.ordinal()
-		func_colors.range(colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"]))
+		func_colors.range(func_colors_palette)
 		func_colors.domain(d3.keys(data_cube.func_tree_lookup))
 	}
 

@@ -140,7 +140,7 @@
 		if ( nbar < 5) { padding = 20;
 		}else if (nbar < 11) {padding = 10;
 		}else if (nbar < 25) {padding = 5;
-		}else { nbar = 4;} // THIS SEEMS WRONG????????? -CM
+		}else { nbar = 4;}
 // 		console.log(nbar)
 // 		console.log(padding)
 // 		console.log(nbar*10+padding*12)
@@ -193,7 +193,8 @@
 				return (d.height - padding); })
 			.style("shape-rendering","auto")
 			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
-			.style("fill-opacity",.75).style("stroke-width","0.5")
+			//.style("fill-opacity",.75)
+			.style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
  
@@ -457,7 +458,7 @@
 			if (d3.select("#" + trimstr)[0][0] == null) {
 				var t = textures.lines()
 			    		.thicker()
-			    		.background(current_color)
+			    		.background(d3.rgb(current_color).brighter(0.4))
 					.id(trimstr)
 			    		.stroke("white");
 
@@ -510,7 +511,7 @@
 
 		selectedBar.select(".barlabel").style('font-weight','normal'); //.style("visibility", "hidden");
 		selectedBar.select(".mainrect")
-			.style('fill-opacity',.75)
+			//.style('fill-opacity',.75)
 			.style("fill", current_color);
 		
 
@@ -537,16 +538,16 @@
 
 			if(m==1){
 				var trimstr = displayed_funcs[current_data["key"+(m+1)]].replace(/\W+/g,'') + "_tx";
-				current_color = func_colors(displayed_funcs[current_data["key"+(m+1)]]) 
+				current_color = d3.rgb(func_colors(displayed_funcs[current_data["key"+(m+1)]])) 
 			} else {
 				var trimstr = displayed_taxa[current_data["key"+(m+1)]].replace(/\W+/g,'') + "_tx";
-				current_color = taxa_colors(displayed_taxa[current_data["key"+(m+1)]]);
+				current_color = d3.rgb(taxa_colors(displayed_taxa[current_data["key"+(m+1)]]));
 			}
 
 			if (d3.select("#" + trimstr)[0][0] == null) {
 				var t = textures.lines()
 			    		.thicker()
-			    		.background(current_color)
+			    		.background(d3.rgb(current_color).brighter(0.4))
 					.id(trimstr)
 			    		.stroke("white");
 
@@ -580,7 +581,7 @@
 		}
 
 		selectedBar.select(".mainrect")
-			.style("fill-opacity",.75)
+			//.style("fill-opacity",.75)
 			.style("fill", current_color)
 
 
