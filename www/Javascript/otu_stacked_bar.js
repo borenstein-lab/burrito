@@ -35,7 +35,7 @@
 
   otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor){
 
-	var graphdims = {width: dims.width * 10/11, height: dims.height * 8/10, buffer:7}
+    var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:-5}
     var x = d3.scale.ordinal()
       .rangeRoundBands([0, graphdims.width], .3);
 
@@ -75,18 +75,7 @@
     })
 
 
-    svglink.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(" + (dims.width-graphdims.width) + "," + (graphdims.height + graphdims.buffer) + ")")
-      .call(xAxis)
-      .selectAll("text")
-      .style("text-anchor", "end")
-      .attr("dx", "-4")
-      .attr("dy", "5")
-      .attr("transform", function(d) {
-        return "rotate(-35)"
-      });
-      //y-axis label
+    //y-axis label
     svglink.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
@@ -102,7 +91,7 @@
     .attr("class", "y label")
     .attr("text-anchor", "end")
     .attr("y", dims.height - 18)
-    .attr("x", (dims.width - graphdims.width) + graphdims.width / 2)
+    .attr("x", (dims.width - graphdims.width + graphdims.width_buffer) + graphdims.width / 2)
     .attr("font-size",18)
     .attr("font-style","bold")
     .attr("dy", ".75em")
@@ -120,7 +109,7 @@
       .enter().append("g")
       .attr("class", "g")
       .attr("transform", function(d) { 
-        return "translate(" + (dims.width-graphdims.width + x(d.Sample)) + "," + graphdims.buffer +")"; 
+        return "translate(" + (dims.width-graphdims.width + graphdims.width_buffer  + graphdims.sample_buffer + x(d.Sample)) + "," + graphdims.height_buffer +")"; 
       });
 
     Sample.selectAll("rect")
@@ -161,8 +150,20 @@
       });
 
     svglink.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(" + (dims.width-graphdims.width + graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-8")
+      .attr("dy", - 10)
+      .attr("transform", function(d) {
+        return "rotate(-90)"
+      });
+
+    svglink.append("g")
       .attr("class", "y axis")
-	  .attr("transform","translate("+ (dims.width-graphdims.width) +"," + graphdims.buffer + ")")
+      .attr("transform","translate("+ (dims.width-graphdims.width + graphdims.width_buffer) +"," + graphdims.height_buffer + ")")
       .call(yAxis)
       .append("text")
       .attr("transform", "rotate(-90)")
