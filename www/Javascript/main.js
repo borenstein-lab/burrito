@@ -149,7 +149,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	barDimensions = {width: (width/2 - (margin.btwbars/2) - margin.left), height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
 	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
 	navDims.treewidth = navDims.width * 2/9;
-	bpdims = {height:navDims.height, width: navDims.width, header:margin.top};
+	bpdims = {height:navDims.height, width: navDims.width, header:margin.top, treewidth: navDims.treewidth};
 	
 	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
 	plotSVG.attr("viewBox","0 0 " + width + " " + height + "")
@@ -171,7 +171,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	.style("font-family", "Verdana");
 			
 	var bpG = NavSVG.append("g")
-		.attr("transform","translate("+ (width / 2) +","+ margin.top +")");
+		.attr("transform","translate("+ (navDims.width / 2) +","+ margin.top +")");
 		
 	trees.SetUp2("navbar", margin, navDims, tax_hierarchy_text, func_hierarchy_text);
 	

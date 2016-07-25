@@ -1,7 +1,7 @@
 (function(){
 	var bP={};	
 	var b=20, bb=150, height=0, buffMargin=1, minHeight=14;
-	var c1=[-15, 35], c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
+	var c1=[-15, 15]; //, c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
 	var colors = d3.scale.category20().range();
 	
 	bP.partData = function(data, displayed_taxa, displayed_funcs){
@@ -145,11 +145,12 @@
 // 		console.log(padding)
 // 		console.log(nbar*10+padding*12)
 // 		console.log(b)
+
 		
 		saveLegBar = d3.select("#"+id).select(".part"+p).append("svg")
 			.attr("id","saveLegBar"+p)			
-			.attr("x", p == 0 ? -extra_width : 0)
-			.attr("width", p == 0 ? b + extra_width : b + 1.5*extra_width) //function legend is larger because longer names
+			.attr("x", p == 0 ? -(extra_width - b - bb) : 0)
+			.attr("width", p == 0 ? (extra_width - bb) : (extra_width - bb)) //function legend is larger because longer names
 			.attr("height", height)
 			.attr("font-family","Verdana");
 
@@ -163,10 +164,28 @@
 			.selectAll(".mainbar").data(data.mainBars[p])
 			.enter().append("g").attr("class","mainbar");
 
-
+		mainbar.append("text").attr("class","barlabel")
+			.attr("x", p == 0 ? c1[p] + (extra_width-b-bb) : c1[p])
+			.attr("y",function(d){ return d.middle+5;})
+			.text(function(d,i){ 
+				name_split = (data.keys[p][i].split('_')).pop()
+				return name_split;
+				//return data.keys[p][i];
+				})
+			.attr("text-anchor", p == 0 ? "end" : "start" )
+			.transition().duration(300);
 		
+		mainbar.append("rect")
+			.attr("x", 0)
+			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
+			.attr("width",extra_width - bb)
+			.attr("height",function(d){ 
+				//console.log(d.height)
+				return (d.height - padding); })
+			.style("fill-opacity",0).style("stroke-opacity",0)
+
 		mainbar.append("rect").attr("class","mainrect")
-			.attr("x", p == 0 ? (extra_width-10) : 10)//0)
+			.attr("x", p == 0 ? (extra_width -bb - b) : 0)//0)
 			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
 			.attr("width",b)
 			.attr("height",function(d){ 
@@ -179,16 +198,7 @@
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
  
-		mainbar.append("text").attr("class","barlabel")
-			.attr("x", p == 0 ? c1[p] + (extra_width-10) : c1[p])
-			.attr("y",function(d){ return d.middle+5;})
-			.text(function(d,i){ 
-				name_split = (data.keys[p][i].split('_')).pop()
-				return name_split;
-				//return data.keys[p][i];
-				})
-			.attr("text-anchor", p == 0 ? "end" : "start" )
-			.transition().duration(300);
+		
 			
 		
 		if(data.keys[p].length==1){
@@ -291,7 +301,7 @@
 		bb = dims.width * .075;
 		b = dims.width / 50;
 		c1 = [-(5 + 0.005*dims.width), b + (5 + 0.005*dims.width)];
-		extra_width = dims.width /11
+		extra_width = (dims.width /2) - dims.treewidth;
 		//add parameters here once I figure out ideal
 		
 		svg.append("g")
