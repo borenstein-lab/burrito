@@ -78,10 +78,9 @@
 
   fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping){
 
-	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:-5 }
+	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:-dims.width / 100, sample_label_buffer:-2000/dims.width}
    x.rangeRoundBands([0, graphdims.width], .2);
    y.rangeRound([graphdims.height, 0]);
-
    xAxis.scale(x);
    yAxis.scale(y);
 
@@ -91,9 +90,9 @@
   //y axis label
   svglink.append("text")
     .attr("class", "y label")
-    .attr("text-anchor", "end")
+    .attr("text-anchor", "middle")
     .attr("y", 0)
-    .attr("x", -1*dims.height/6)
+    .attr("x", -(graphdims.height + graphdims.height_buffer) / 2)
     .attr("font-size",18)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
@@ -102,9 +101,9 @@
   //x-axis label
     svglink.append("text")
     .attr("class", "x label")
-    .attr("text-anchor", "end")
+    .attr("text-anchor", "middle")
     .attr("y", dims.height-18)
-    .attr("x", (dims.width - graphdims.width + graphdims.width_buffer) + graphdims.width/2)
+    .attr("x", dims.width - graphdims.width + graphdims.width_buffer + ((graphdims.width - graphdims.width_buffer) / 2))
     .attr("font-size",18)
     .attr("dy", ".75em")
     .text("Samples");
@@ -167,15 +166,22 @@
 
       //get the x axis set
 
+  var xtick_svg = svglink.append("svg")
+    .attr("id", "xtick_svg")
+    .attr("x", 0)
+    .attr("y",graphdims.height + graphdims.height_buffer)
+    .attr("width", dims.width)
+    .attr("height", dims.height-25 - graphdims.height - graphdims.height_buffer)
+    .style("font-family", "Verdana");
 
-  svglink.append("g")
+  xtick_svg.append("g")
   .attr("class", "x axis")
-  .attr("transform", "translate(" + (dims.width-graphdims.width + graphdims.width_buffer) + "," + (graphdims.height + graphdims.height_buffer) + ")")
+  .attr("transform", "translate(" + (dims.width-graphdims.width + graphdims.width_buffer) + ",0)")
   .call(xAxis)
   .selectAll("text")
   .style("text-anchor", "end")
-  .attr("dx", "-8")
-  .attr("dy", - 10)
+  .attr("dx", -8)
+  .attr("dy", graphdims.sample_label_buffer)
   .attr("transform", function(d) {
     return "rotate(-90)"
   });
