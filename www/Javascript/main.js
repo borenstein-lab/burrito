@@ -7,7 +7,7 @@ var aspecrat, width, height, hidewidth, margin;
 var barDimensions, navDims, bpdims;
 var duration; //used in trees to set animation speed
 
-var MainSVG, plotSVG;
+var MainSVG, plotSVG, sidebarSVG;
 
 draw_svg = function() {
 	if (d3.select("#mainsvg")[0][0] === null) {
@@ -38,42 +38,68 @@ draw_svg = function() {
 			.attr("preserveAspectRatio","none")
 			.style("font-family", "Verdana");
 	
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
+		sidebarSVG = d3.select("#mainsvg").append("svg")
+			.attr("id","sidebar_svg")
+			.attr("x",-100)
+			.attr("y",0)
+			.attr("width",130)
+			.attr("height",height);
+		
+		sidebarSVG.append("rect")
+			.attr("x",0)
+			.attr("y",0)
+			.attr("width",100)
+			.attr("height",height)
+			.attr("fill","#ffff66");
+
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "sidebar_hide", 100, 0, 30, 60, "switchb", fill = "#e62e00", fontsize = "16px", "Show", function(){
+			var sidebarz = d3.select("#sidebar_svg");
+			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
+			if (curpos > -10) {
+				sidebarz.transition().attr("x",-100);
+				d3.select("#sidebar_hide").select("text").text("Show");
+			} else {
+				sidebarz.transition().attr("x",0);
+				d3.select("#sidebar_hide").select("text").text("Hide");
+			}
+		});
+
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
 			saveSvgAsPng(document.getElementById("plots_svg"), "screenshot.png", { backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg", 10, 100, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg", 10, 100, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
 			svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { //console.log(uri)
 				saveSvg(uri, "screenshot.svg")
 			}); 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 190, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_taxa_bar", 10, 190, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
 			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_taxa_bar", 10, 280, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg_taxa_bar", 10, 280, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
 			svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) {
 				saveSvg(uri, "taxa_bar.svg")
 			}); 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg", 10, 370, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg", 10, 370, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
 			saveSvgAsPng(document.getElementById("saveLegBar0"), "taxonomy_legend.png",{ backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
 			svgAsDataUri(document.getElementById("saveLegBar0"), {}, function(uri) {
 				saveSvg(uri, "taxonomy_legend.svg")
 			}); 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 490, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_func_bar", 10, 490, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
 			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_func_bar", 10, 580, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg_func_bar", 10, 580, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
 			svgAsDataUri(document.getElementById("func_bars"), {}, function(uri) {
 				saveSvg(uri, "function_bar.svg")
 			});
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg", 10, 670, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg", 10, 670, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
 			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5}) 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg_svg", 10, 730, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg_svg", 10, 730, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
 			svgAsDataUri(document.getElementById("saveLegBar1"), {}, function(uri) {
 				saveSvg(uri, "function_legend.svg")
 			});
