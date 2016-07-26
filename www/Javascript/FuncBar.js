@@ -78,6 +78,10 @@
 
   fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping){
 
+  d3.select("#y_label").remove()
+  d3.select("#x_label").remove()
+  d3.select("#func_xtick_svg").remove()
+
 	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:-dims.width / 100, sample_label_buffer:-2000/dims.width}
    x.rangeRoundBands([0, graphdims.width], .2);
    y.rangeRound([graphdims.height, 0]);
@@ -90,6 +94,7 @@
   //y axis label
   svglink.append("text")
     .attr("class", "y label")
+    .attr("id", "y_label")
     .attr("text-anchor", "middle")
     .attr("y", 0)
     .attr("x", -(graphdims.height + graphdims.height_buffer) / 2)
@@ -101,6 +106,7 @@
   //x-axis label
     svglink.append("text")
     .attr("class", "x label")
+    .attr("id", "x_label")
     .attr("text-anchor", "middle")
     .attr("y", dims.height-18)
     .attr("x", dims.width - graphdims.width + graphdims.width_buffer + ((graphdims.width - graphdims.width_buffer) / 2))
@@ -166,25 +172,25 @@
 
       //get the x axis set
 
-  var xtick_svg = svglink.append("svg")
-    .attr("id", "xtick_svg")
+  svglink.append("svg")
+    .attr("id", "func_xtick_svg")
     .attr("x", 0)
     .attr("y",graphdims.height + graphdims.height_buffer)
     .attr("width", dims.width)
     .attr("height", dims.height-25 - graphdims.height - graphdims.height_buffer)
     .style("font-family", "Verdana");
-
-  xtick_svg.append("g")
-  .attr("class", "x axis")
-  .attr("transform", "translate(" + (dims.width-graphdims.width + graphdims.width_buffer) + ",0)")
-  .call(xAxis)
-  .selectAll("text")
-  .style("text-anchor", "end")
-  .attr("dx", -8)
-  .attr("dy", graphdims.sample_label_buffer)
-  .attr("transform", function(d) {
-    return "rotate(-90)"
-  });
+    
+  d3.select("#func_xtick_svg").append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(" + (dims.width-graphdims.width + graphdims.width_buffer) + ",0)")
+    .call(xAxis)
+    .selectAll("text")
+    .style("text-anchor", "end")
+    .attr("dx", -8)
+    .attr("dy", graphdims.sample_label_buffer)
+    .attr("transform", function(d) {
+      return "rotate(-90)"
+    });
 
     //init y-axis
   svglink.append("g")

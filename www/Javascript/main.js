@@ -184,9 +184,9 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
 	d3.select("#loadingG").remove()	
-	d3.select("#navbar").remove()
+/*	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
-	d3.select("#func_bars").remove()
+	d3.select("#func_bars").remove()*/
 
 	var NavSVG = plotSVG.insert("svg", "#sidebar")
     	.attr("x",margin.left)
