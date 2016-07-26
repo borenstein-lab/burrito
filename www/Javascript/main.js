@@ -26,6 +26,8 @@ draw_svg = function() {
 
 		trees.SetUp(navDims);
 		
+		d3.select("body").attr("class","svgBody");
+
 		MainSVG = d3.select("#mainplot").append("svg")
 			.attr("id","mainsvg")
 			.attr("viewBox","0 0 " + width + " " + height + "")
