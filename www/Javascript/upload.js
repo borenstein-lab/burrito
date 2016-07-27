@@ -13,7 +13,8 @@
 		uploader.func_averages_loaded = false;
 		uploader.samp_map_loaded = false;
 		uploader.otu_table_loaded = false;
-		uploader.sample_order_loaded = false;
+		uploader.otu_sample_order_loaded = false;
+		uploader.func_sample_order_loaded = false;
 		
 		uploader.svgCreated = false;
 
@@ -40,7 +41,8 @@
 		uploader.otu_table = [];
 		uploader.current_contribution_sample_index = 0;
 		uploader.current_otu_sample_index = 0;
-		uploader.sample_order = [];
+		uploader.otu_sample_order = [];
+		uploader.func_sample_order = [];
 
 		/*
 		load_default_data()
@@ -81,7 +83,7 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			var load_flags = [uploader.otu_table_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated, uploader.sample_order_loaded];
+			var load_flags = [uploader.otu_table_loaded, uploader.contribution_table_loaded, uploader.tax_hierarchy_loaded, uploader.func_hierarchy_loaded, uploader.func_averages_loaded, uploader.svgCreated, uploader.otu_sample_order_loaded, uploader.func_sample_order_loaded];
 
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < load_flags.length; i++){
@@ -92,8 +94,7 @@
 
 			// If all of the flags are true, redraw the graphics
 			if (all_loaded){
-
-				draw_everything(uploader.otu_table, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text, uploader.sample_order);
+				draw_everything(uploader.otu_table, uploader.contribution_table, uploader.tax_hierarchy_text, uploader.func_hierarchy_text, uploader.samp_map_text, uploader.func_averages_text, uploader.otu_sample_order, uploader.func_sample_order);
 			}
 		}
 
@@ -151,10 +152,16 @@
 			}, 2);
         });
 
-        Shiny.addCustomMessageHandler("sample_order", function(sample_order){
-        	uploader.sample_order_loaded = false;
-        	uploader.sample_order = sample_order;
-        	uploader.sample_order_loaded = true;
+		Shiny.addCustomMessageHandler("otu_sample_order", function(sample_order){
+        	uploader.otu_sample_order_loaded = false;
+        	uploader.otu_sample_order = sample_order;
+        	uploader.otu_sample_order_loaded = true;
+        });
+
+        Shiny.addCustomMessageHandler("func_sample_order", function(sample_order){
+        	uploader.func_sample_order_loaded = false;
+        	uploader.func_sample_order = sample_order;
+        	uploader.func_sample_order_loaded = true;
         });
 
 		Shiny.addCustomMessageHandler("tax_hierarchy", function(taxa_hierarchy){

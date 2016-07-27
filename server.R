@@ -270,8 +270,7 @@ shinyServer(function(input, output, session) {
 	        	return(list("key" = paste(l[func_summary_level]), "level"=0, "values" = list(l)))
 	        })
 
-	        session$sendCustomMessage("shiny_test", base_objects)
-
+	        base_objects = base_objects[order(unlist(lapply(base_objects, function(obj){return(obj["key"])})))]
 	        # Iteratively generate the next layer up in the tree, grouping the previous level of nodes by their parent
 	        output_func_hierarchy = base_objects
 	        if (dim(func_hierarchy)[2] > 1){
@@ -299,8 +298,6 @@ shinyServer(function(input, output, session) {
 		        	base_objects = output_func_hierarchy
 		        }
 		    }
-
-	       	session$sendCustomMessage("shiny_test", output_func_hierarchy)
 
 			session$sendCustomMessage(type='function_hierarchy', output_func_hierarchy)
 			
@@ -403,7 +400,7 @@ shinyServer(function(input, output, session) {
 
 	        ################################# Organizing OTU table samples if grouping is chosen #################################
 
-	        if(samp_grouping != ""){ # If they've chosen a metadata factor to group by
+	        if(!is.null(samp_grouping)){ # If they've chosen a metadata factor to group by
 	        	samples = sapply(otu_table_objects, function(obj){return(obj["Sample"])})
 	        	setkeyv(sample_map, c(samp_grouping, colnames(sample_map)[1]))
 	        	sample_order = sapply(unlist(sample_map[,1,with=F]), function(sample_name){
@@ -442,30 +439,32 @@ shinyServer(function(input, output, session) {
 	        })
 
 	        # Iteratively generate the next layer up in the tree, grouping the previous level of nodes by their parent
-	        output_taxa_hierarchy = NULL
-	        for (depth in (dim(summarized_taxa_hierarchy)[2] - 1):1){
+	        output_taxa_hierarchy = base_objects
+	        if (dim(summarized_taxa_hierarchy)[2] > 1){
+		        for (depth in (dim(summarized_taxa_hierarchy)[2] - 1):1){
 
-	        	# Get the label for the depth of the tree we're creating a layer for
-	        	depth_name = colnames(summarized_taxa_hierarchy)[depth][[1]]
+		        	# Get the label for the depth of the tree we're creating a layer for
+		        	depth_name = colnames(summarized_taxa_hierarchy)[depth][[1]]
 
-	        	# Get the labels for the nodes in the previous layer
-	        	vals = sapply(base_objects, function(obj){return(obj[["key"]])})
+		        	# Get the labels for the nodes in the previous layer
+		        	vals = sapply(base_objects, function(obj){return(obj[["key"]])})
 
-	        	# Get the mapping between parent nodes in the new layer and children nodes in the previous layer
-	        	next_levels = sapply(vals, function(curr_level){
-        			prev_depth = depth + 1
-	        		setkeyv(summarized_taxa_hierarchy, colnames(summarized_taxa_hierarchy)[prev_depth])
-	        		return(unique(summarized_taxa_hierarchy[curr_level,depth,with=F][[1]]))
-	        	})
+		        	# Get the mapping between parent nodes in the new layer and children nodes in the previous layer
+		        	next_levels = sapply(vals, function(curr_level){
+	        			prev_depth = depth + 1
+		        		setkeyv(summarized_taxa_hierarchy, colnames(summarized_taxa_hierarchy)[prev_depth])
+		        		return(unique(summarized_taxa_hierarchy[curr_level,depth,with=F][[1]]))
+		        	})
 
-	        	# Create a new node for each parent node of the previous layer
-	        	output_taxa_hierarchy = lapply(levels(factor(next_levels)), function(level){
-	        		return(list("key" = level, "level" = dim(summarized_taxa_hierarchy)[2] - depth + 1, "values" = base_objects[which(next_levels == level)]))
-	        	})
+		        	# Create a new node for each parent node of the previous layer
+		        	output_taxa_hierarchy = lapply(levels(factor(next_levels)), function(level){
+		        		return(list("key" = level, "level" = dim(summarized_taxa_hierarchy)[2] - depth + 1, "values" = base_objects[which(next_levels == level)]))
+		        	})
 
-	        	# Set the base objects list to the current state of the tree so we can group the current top layer in the next iteration
-	        	base_objects = output_taxa_hierarchy
-	        }
+		        	# Set the base objects list to the current state of the tree so we can group the current top layer in the next iteration
+		        	base_objects = output_taxa_hierarchy
+		        }
+		    }
 
 			session$sendCustomMessage(type='tax_hierarchy', output_taxa_hierarchy)
 
@@ -504,17 +503,38 @@ shinyServer(function(input, output, session) {
 			# Format so that the top level Sample lists are nested properly
 			output = lapply(output, function(el){return(el[[1]])})
 			
-			sample_order = 1:length(output)
-			if(samp_grouping != ""){ # If they've chosen a metadata factor to group by
-	        	samples = names(output)
+			otu_sample_order = c()
+			func_sample_order = c()
+			samples = names(output)
+			if(!is.null(samp_grouping)){ # If they've chosen a metadata factor to group by
 	        	setkeyv(sample_map, c(samp_grouping, colnames(sample_map)[1]))
-	        	sample_order = unlist(sapply(unlist(sample_map[,1,with=F]), function(sample_name){
-	        		if (sample_name != average_contrib_sample_name){
-		        		return(c(which(unlist(samples) == sample_name), which(unlist(samples) == paste(sample_name, comparison_tag, sep=""))))
-		        	}
-	        	}))
 	        }
-	        session$sendCustomMessage("sample_order", names(output)[sample_order])
+        	otu_sample_order = unlist(sapply(unlist(sample_map[,1,with=F]), function(sample_name){
+        		if (sample_name != average_contrib_sample_name){
+	        		return(which(unlist(samples) == sample_name))
+	        	}
+        	}))
+        	func_sample_order = unlist(sapply(unlist(sample_map[,1,with=F]), function(sample_name){
+        		if (sample_name != average_contrib_sample_name){
+        			if (!is.null(input$function_abundances)){
+        				return(c(which(unlist(samples) == sample_name), which(unlist(samples) == paste(sample_name, comparison_tag, sep=""))))
+       				} else {
+       					return(which(unlist(samples) == sample_name))
+	        		}
+	        	}
+        	}))
+        	otu_sample_order = c(otu_sample_order, which(!(samples %in% unlist(sample_map[,1,with=F])) & samples != average_contrib_sample_name & !grepl(comparison_tag, samples)))
+        	func_sample_order = c(func_sample_order, unlist(sapply(samples[which(!(samples %in% unlist(sample_map[,1,with=F])) & !grepl(comparison_tag, samples))], function(sample_name){
+        		if (sample_name != average_contrib_sample_name){
+        			if (!is.null(input$function_abundances)){
+        				return(c(which(unlist(samples) == sample_name), which(unlist(samples) == paste(sample_name, comparison_tag, sep=""))))
+        			} else {
+        				return(which(unlist(samples) == sample_name))
+        			}
+        		}
+        	})))
+	        session$sendCustomMessage("otu_sample_order", names(output)[otu_sample_order])
+	        session$sendCustomMessage("func_sample_order", names(output)[func_sample_order])
 
 			tracked_data$contribution_table = output
 

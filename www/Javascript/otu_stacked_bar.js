@@ -1,6 +1,16 @@
 (function(){
   var otu_bar = {};
 
+  var x = d3.scale.ordinal();
+  var y = d3.scale.linear();
+
+  var xAxis = d3.svg.axis()
+  .orient("bottom");
+
+  var yAxis = d3.svg.axis()
+  .orient("left")
+  .tickFormat(d3.format(".2s"));
+
   otu_bar.getSampleGroup = function(samp, sampledata, grouping){
     group = sampledata.filter(function(e){ return e.Sample==samp;})[0][grouping];
     return group;
@@ -16,7 +26,7 @@
     return total;
   }
 
-  otu_bar.make_data = function(otu_abundance_data, data_cube){
+  otu_bar.make_data = function(otu_abundance_data, data_cube, sample_order){
     var bar_data = [];
     otu_abundance_data.forEach(function(d){
       var bar = {};
@@ -30,26 +40,22 @@
       bar.total = bar.taxa[bar.taxa.length - 1].y1;
       bar_data.push(bar);
     })
+    x.domain(sample_order);
+    y.domain([0, 100]);
     return bar_data;
   }
 
-  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, grouping){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping){
 
-	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:-dims.width/100, sample_label_buffer:-dims.width/30}
-    var x = d3.scale.ordinal()
-      .rangeRoundBands([0, graphdims.width], .2);
+    d3.select("#otu_bar_y_label").remove()
+    d3.select("#otu_bar_x_label").remove()
+    d3.select("#otu_bar_xtick_svg").remove()
 
-    var y = d3.scale.linear()
-      .rangeRound([graphdims.height, 0]);
-
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left")
-      .tickFormat(d3.format(".2s"));
+	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8}
+    x.rangeRoundBands([0, graphdims.width], .2);
+    y.rangeRound([graphdims.height, 0]);
+    xAxis.scale(x);
+    yAxis.scale(y);
 
     var tooltip = d3.select("body")
       .append("div")
@@ -65,8 +71,6 @@
 
     var normalized = true;
 
-    x.domain(bar_data.map(function(d) { return d.Sample }));
-    y.domain([0, 100]);
     bar_data.forEach(function(d) {
       d.taxa.forEach(function(e){
         e.y0 = Math.round(e.y0/d.total*100*100)/100;
@@ -74,12 +78,14 @@
       })
     })
 
-
+    var first_sample_x = x(sample_order[0]);
+    var last_sample_x = x(sample_order[sample_order.length - 1]);
 
       //y-axis label
     svglink.append("text")
     .attr("class", "y label")
-    .attr("text-anchor", "end")
+    .attr("id", "otu_bar_y_label")
+    .attr("text-anchor", "middle")
     .attr("y", 0)
     .attr("x", -(graphdims.height + graphdims.height_buffer) / 2)
     .attr("font-size",18)
@@ -89,7 +95,8 @@
 
   //x-axis label
     svglink.append("text")
-    .attr("class", "y label")
+    .attr("class", "x label")
+    .attr("id", "otu_bar_x_label")
     .attr("text-anchor", "end")
     .attr("y", dims.height - 18)
     .attr("x", (dims.width - graphdims.width + graphdims.width_buffer) + ((graphdims.width  - graphdims.width_buffer)/ 2))
@@ -104,7 +111,7 @@
       .enter().append("g")
       .attr("class", "g")
       .attr("transform", function(d) { 
-        return "translate(" + (dims.width-graphdims.width + graphdims.width_buffer  + graphdims.sample_buffer + x(d.Sample)) + "," + graphdims.height_buffer +")"; 
+        return "translate(" + (graphdims.sample_buffer - first_sample_x + x(d.Sample)) + "," + graphdims.height_buffer +")"; 
       });
 
     Sample.selectAll("rect")
@@ -144,24 +151,24 @@
         return tooltip.style("visibility", "hidden");
       });
 
-    var xtick_svg = svglink.append("svg")
-    .attr("id", "xtick_svg")
+    svglink.append("svg")
+    .attr("id", "otu_bar_xtick_svg")
     .attr("x", 0)
     .attr("y",graphdims.height + graphdims.height_buffer)
-    .attr("width", dims.width)
+    .attr("width", last_sample_x - first_sample_x + graphdims.x_axis_x_buffer + x.rangeBand())
     .attr("height", dims.height-25 - graphdims.height - graphdims.height_buffer)
     .style("font-family", "Verdana");
 
-      xtick_svg.append("g")
+      d3.select("#otu_bar_xtick_svg").append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(" + (dims.width-graphdims.width + graphdims.width_buffer) + ",0)")
+      .attr("transform", "translate(" + graphdims.x_axis_x_buffer + ",0)")
       .call(xAxis)
       .selectAll("text")
       .style("text-anchor", "end")
-      .attr("dx", "-8")
-      .attr("dy", graphdims.sample_label_buffer)
+      .attr("dx", 0)
+      .attr("dy", 0)
       .attr("transform", function(d) {
-        return "rotate(-90)"
+        return "translate(-" + (first_sample_x + (x.rangeBand()/2)) + "," + graphdims.sample_label_buffer + ") rotate(-90)"
       });
 
     svglink.append("g")
@@ -175,9 +182,11 @@
       .style("text-anchor", "end")
       .attr("class", "y_label"); 
 
-        svglink.selectAll("text").style("fill",function(m){
-      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1){
+    svglink.selectAll("text").style("fill",function(m){
+      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1 & grouping != ""){
         return sampleColor(otu_bar.getSampleGroup(m, sampledata, grouping));        
+      } else {
+        return "#000000";
       }
     });
 
