@@ -161,7 +161,14 @@ g.updateb.activebutton:hover rect {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	cursor:default;
+	//cursor:default;
+}
+
+.svgbutton {
+	cursor: pointer;
+}
+.svgbutton:hover text {
+	opacity:0.5;
 }
 .activebutton:hover text {
 	opacity:0.5;

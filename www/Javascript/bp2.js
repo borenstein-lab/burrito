@@ -166,15 +166,16 @@
 
 		mainbar.append("text").attr("class","barlabel")
 			.attr("x", p == 0 ? c1[p] + (extra_width-b-bb) : c1[p])
-			.attr("y",function(d){ return d.middle+5;})
-			.text(function(d,i){ 
+			.attr("y",function(d){ return d.middle;})
+			.attr("text-anchor", p == 0 ? "end" : "start" )
+			.attr("alignment-baseline","middle")
+			.text(function(d,i){
 				name_split = (data.keys[p][i].split('_')).pop()
 				return name_split;
 				//return data.keys[p][i];
-				})
-			.attr("text-anchor", p == 0 ? "end" : "start" )
-			.transition().duration(300);
-		
+				});
+		//		.transition().duration(300);
+	
 		mainbar.append("rect")
 			.attr("x", 0)
 			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
@@ -197,10 +198,7 @@
 			.style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
- 
-		
-			
-		
+
 		if(data.keys[p].length==1){
 			fontSize=24;	
 		}  else{
@@ -208,7 +206,41 @@
 		}
 		mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
 		
+	
+/*		mainbar.append("rect")               //Uncomment this to help with aligning the text to the middle
+			.attr("x". p == 0 ? (extra_width -bb - b) : 0)//0)
+			.attr("y",function(d){ return (d.middle-1); })
+			.attr("width",extra_width - bb)
+			.attr("height",2)
+			.style("fill","black");*/
+ 		
+		//console.log('----------------------')
+		if (p == 1) { //only split function labels into multiline if too long
+			mainbar.selectAll("text").each( function(d,i) {
+				var thistxt = d3.select(this);
+				//console.log(thistxt.text());
+				var thisbbox = thistxt[0][0].getBBox();	
+				//console.log('bboxw: ' + (c1[p] + thisbbox.width) + ' , barw: ' + (extra_width - bb - (d.height - padding)/2));
+				if ((c1[p] + thisbbox.width) > (extra_width - bb - b)) {
+					//console.log(thistxt.text());
+					var txt = thistxt.text();
+					//console.log('editing ' + txt);
+					//var lastsp = (txt.length - 1) - txt.split('').reverse().join('').indexOf(' ');
+					var lastsp = Math.ceil(txt.length/2) + txt.substring(Math.ceil(txt.length/2),txt.length).indexOf(' ');
+					//console.log('last space at : ' + lastsp);
+					//console.log('substring: ' + txt.substring(0,lastsp));
+					thistxt.text(txt.substring(0,lastsp));
+					thistxt.attr("y", d.middle - ((thisbbox.height + 0.2*(d.height - 25)) / 2.5))
+					thistxt.append("tspan")
+						.attr("x",thistxt.attr("x"))
+						.attr("dy",thisbbox.height + (d.height - 25) * 0.2)
+						.text(txt.substring((lastsp + 1),txt.length));
+				}
 
+				thisbbox = thistxt[0][0].getBBox();
+			});
+		}
+		//mainbar.selectAll(".barlabel").style("visibility","visible");
 		/*
 		d3.select("#"+id).select(".part"+p).select(".subbars")
 			.selectAll(".subbar").data(data.subBars[p]).enter()
