@@ -240,22 +240,63 @@
 		edgeBar = d3.select("#"+id).select(".edges").selectAll(".edge")
 			.data(data.edges).enter().append("polygon")
 			.attr("class","edge")
-			.attr("points", bP.edgePolygon2);
+			.attr("points", bP.edgePolygon2)
+			.classed("highlighted", false);
 
 		edgeBar.style("fill", "grey") //function(d){ return taxa_colors(data.keys[0][d.key1]) ;})
-			.style("opacity",0.2).each(function(d) { this._current = d; })
+			.style("opacity",0.8).each(function(d) { this._current = d; })
 			.attr("width", function(d){ 
-				return 10;
+				return d.wid;
 				})
 			.on("mouseover", function(d,i){ 
-				d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
-				var current_data = this._current;
-				bP.selectEdge(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall);
+					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
+					//var current_data = this._current;
+					//highlightall(displayed_taxa[current_data.key0], displayed_funcs[current_data.key1], 3)
+					//bP.selectEdge(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall);
+					//console.log(d3.select("#"+id+"0"+displayed_taxa[current_data.key0]))
+
+// 				} else if(d3.select(this).attr("visibility") !== "hidden"){
+// 					bP.selectEdge(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall);					
+// 				}
 			})
 			.on("mouseout", function(d,i){ 
-				d3.select(this).attr("points", bP.edgePolygon2).style("opacity",0.2).style("fill", "grey");
-				var current_data = this._current;
-				bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);
+					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",0.8);//.style("fill", "grey");
+// 					var current_data = this._current;
+// 					if(d3.select("#Genomes0"+displayed_taxa[(current_data.key0).replace(/ /g, "_")]).attr("highlighted")=="true"){
+// 						//restore to before mouseover
+// 						highlightall(displayed_taxa[current_data.key0], "", 1)
+// 					} else if(d3.select("#Genomes1"+displayed_funcs[(current_data.key1).replace(/ /g, "_")]).attr("highlighted")=="true"){
+// 						highlightall("", displayed_funcs[current_data.key1], 2)
+// 					}
+					//bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);
+// 				} else if(d3.select(this).attr("visibility") !== "hidden"){
+// 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",0.8);//.style("fill", "grey");
+// 					var current_data = this._current;
+// 					bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);					
+// 				}
+			})
+			.on("click", function(d,i){
+				current_data = this._current
+				console.log(current_data)
+// 				highlightall(displayed_taxa[current_data.key0], displayed_funcs[current_data.key1],3)
+// 				displayed_taxa.map(function(e){
+// 					if(d3.select("#Genomes0"+displayed_taxa.replace(/ /g, "_")).classed("highlighted")=="true"){
+// 						displayed_funcs.map(function(f, j){
+// 							if(j != current_data.key1){
+// 							dehighlightall(e, f, 3)
+// 							}
+// 						})
+// 					}
+// 				})
+// 				displayed_funcs.map(function(e){
+// 					if(d3.select("#Genomes1"+displayed_funcs.replace(/ /g, "_")).classed("highlighted")=="true"){
+// 						displayed_taxa.map(function(f, j){
+// 							if(j != current_data.key0){
+// 							dehighlightall(e, f, 3)
+// 							}
+// 						})
+// 					}
+// 				})
 			})
 			.transition().duration(300)
 			.attr("visibility","hidden");
@@ -348,26 +389,77 @@
 		drawPart(visData, bip.id, 1, func_colors); 
 		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
 //		drawHeader(bip.header, bip.id);
+
 			
 		[0,1].forEach(function(p){			
 			d3.select("#"+bip.id)
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
+				.classed("highlighted",false)
+				.attr("id",function(d,i){
+					if(p == 0){
+						return bip.id+p+displayed_taxa[i].replace(/ /g,"_").replace(/,/g, "_");
+						} else {
+						return bip.id+p+displayed_funcs[i].replace(/ /g,"_").replace(/,/g, "_");
+					}
+				})
 				.on("mouseover",function(d, i){ 
 					if (p == 0) {
 						return highlightall(displayed_taxa[i],"",1);
 					} else {
-						return highlightall("", displayed_funcs[i],2);
-				} })						
+					return highlightall("", displayed_funcs[i],2);
+				} 
+				})						
 				.on("mouseout",function(d, i){ 
+					if(d3.select(this).classed("highlighted") =="false"){
 					if (p == 0) {
 						return dehighlightall(displayed_taxa[i],"",1);
 					} else {
 						return dehighlightall("", displayed_funcs[i],2);
-				}
+					}
+					}
+				})
+				.on("click", function(d,i){
+					if(d3.select(this).classed("highlighted") == "false"){
+						//console.log(d3.select(this).attr("highlighted") == "false")
+						current_id = d3.select(this).attr("id")
+						//Unselect things currently clicked
+						displayed_taxa.map(function(e){
+							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/,/g, "_")
+							if(d_id != current_id){
+								if(d3.select("#"+d_id).classed("highlighted")=="true"){
+									d3.select("#"+d_id).classed("highlighted",false)
+									dehighlightall(e,"",1);
+								}}})
+						displayed_funcs.map(function(e){
+							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/,/g, "_")
+							if(d_id != current_id){
+								if(d3.select("#"+d_id).classed("highlighted")=="true"){
+									d3.select("#"+d_id).classed("highlighted",false)
+									dehighlightall(e,"",2)
+								}}})
+
+						d3.select(this).attr("highlighted",true)
+						d3.select("#Genomes").select(".edges").selectAll(".edge")
+							.filter(function(d,i){ 
+								return (d["key"+(p+1)]==i); })
+							.classed("highlighted", true);
+					if (p == 0) {
+							return highlightall(displayed_taxa[i],"",1);
+						} else {
+							return highlightall("", displayed_funcs[i],2);						
+						}
+					} else {
+						d3.select(this).classed("highlighted",false)
+						if (p == 0) {
+							return dehighlightall(displayed_taxa[i],"",1);
+						} else {
+							return dehighlightall("", displayed_funcs[i],2);
+						}					
+					}
 				});	
-		});
+						});
 
 	}
 		
@@ -401,33 +493,105 @@
 
 		//updatePart(visData, bip.id, 0);
 		//updatePart(visData, bip.id, 1);
+
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
 		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
 		//drawHeader(bip.header, bip.id);
+		
 			
 		[0,1].forEach(function(p){			
 			d3.select("#"+bip.id)
 				.select(".part"+p)
 				.select(".mainbars")
 				.selectAll(".mainbar")
+				.classed("highlighted",false)
+				.attr("id",function(d,i){
+					if(p == 0){ //get rid of spaces
+						return bip.id+p+displayed_taxa[i].replace(/ /g,"_").replace(/,/g, "_");
+						} else {
+						return bip.id+p+displayed_funcs[i].replace(/ /g,"_").replace(/,/g, "_");
+					}
+				})
 				.on("mouseover",function(d, i){ 
+					//if(d3.select(this).classed("highlighted") == false){ //if not already highlighted
 					if (p == 0) {
 						return highlightall(displayed_taxa[i],"",1);
 					} else {
 						return highlightall("", displayed_funcs[i],2);
-				} })						
+					}
+				//} 
+				})						
 				.on("mouseout",function(d, i){ 
+					//only de-highlight if not clicked on
+					if(d3.select(this).classed("highlighted") == false){
 					if (p == 0) {
 						return dehighlightall(displayed_taxa[i],"",1);
 					} else {
 						return dehighlightall("", displayed_funcs[i],2);
-				}
-				});	
+					}
+					}
+				})
+				.on("click", function(d,i){
+					if(d3.select(this).classed("highlighted") == false){
+						//console.log(d3.select(this).attr("highlighted") == "false")
+						current_id = d3.select(this).attr("id")
+						//Unselect things currently clicked
+						displayed_taxa.map(function(e,j){
+							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/,/g, "_")
+							if(d_id !== current_id){
+								if(d3.select("#"+d_id).classed("highlighted")==true){
+									d3.select("#"+d_id).classed("highlighted",false)
+									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+										.filter(function(f,k){ 
+										return (f["key1"]==j); })
+									assocEdges.classed("highlighted", false);
+									dehighlightall(e,"",1);
+								}}})
+						
+						displayed_funcs.map(function(e,j){
+							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/,/g, "_")
+							if(d_id !== current_id){
+								if(d3.select("#"+d_id).classed("highlighted")==true){
+									d3.select("#"+d_id).classed("highlighted",false)
+									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+										.filter(function(f,k){ 
+										return (f["key2"]==j); })
+									assocEdges.classed("highlighted", false);
+									dehighlightall("", e, 2)
+								}}})
+
+						d3.select("#"+current_id).classed("highlighted",true)
+						
+						//connecting edges
+						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+							.filter(function(e,j){ 
+								return (e["key"+(p+1)]==i); })
+						selectedEdges.classed("highlighted", true);
+						if (p == 0) {
+							return highlightall(displayed_taxa[i],"",1);
+						} else {
+							return highlightall("", displayed_funcs[i],2);						
+						}
+					} else {
+						d3.select(this).classed("highlighted",false)
+						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+							.filter(function(e,j){ 
+								return (e["key"+(p+1)]==i); })
+						selectedEdges.classed("highlighted", false);
+						
+						if (p == 0) {
+							return dehighlightall(displayed_taxa[i],"",1);
+						} else {
+							return dehighlightall("", displayed_funcs[i],2);
+						}					
+					}
+				});		
 		});
 		
 		return visData;
 	} 
+	
 
 	bP.selectSegment = function(m, s, taxa_colors, func_colors, displayed_taxa, displayed_funcs){ //s # of node, m which side of nodes
 			// var newdata =  {keys:[], data:[]};	
@@ -459,33 +623,38 @@
 				var t = textures.lines()
 			    		.thicker()
 			    		.background(d3.rgb(current_color).brighter(0.4))
-					.id(trimstr)
+						.id(trimstr)
 			    		.stroke("white");
 
 				d3.select("#patternsvg").call(t);
 			}
 
 			selectedBar.select(".mainrect")
-				.style('fill-opacity',1)
+				.attr('fill-opacity',1)
 				.style("fill", "url(#" + trimstr + ")");
 
 			var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
 			//console.log(selectedEdges.toSource());
 
-			if(m==0){
-				n = 1;
-			} else{
-				n = 0;
-			} 
 
 			selectedEdges.attr("points", bP.edgePolygon2)
-				.style("opacity", 1)
-				.style("fill", function(f){ if(n==1){
-				return func_colors(displayed_funcs[f["key2"]]);	
-			} else{
-				return taxa_colors(displayed_taxa[f["key1"]]);
-			} })
+				.style("opacity", 0.8)
+				.style("fill", function(f){ 
+					if(d3.select(this).classed("highlighted") == true){
+						if(d3.select("#Genomes1"+displayed_funcs[f["key2"]].replace(/ /g,"_").replace(/,/g, "_")).classed("highlighted")){ //must be a highlighted function
+							return taxa_colors(displayed_taxa[f["key1"]])
+						} else {
+							return func_colors(displayed_funcs[f["key2"]]);
+						}
+						//return(d3.select(this).style("fill")) //keep it whatever it is
+					} else{
+				if(m==0){
+					return func_colors(displayed_funcs[f["key2"]]);	
+				} else{
+					return taxa_colors(displayed_taxa[f["key1"]]);
+				}
+				} })
 				.attr("width", function(d){ 
 					return d.wid;
 					})
@@ -515,11 +684,29 @@
 			.style("fill", current_color);
 		
 
-		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-			.filter(function(d,i){ return (d["key"+(m+1)]==s); });
-		//console.log(selectedEdges.toSource());
+		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll('.edge')
+			.filter(function(d,i){ 
+			return (d["key"+(m+1)]==s); })
 
-		selectedEdges.attr("visibility", "hidden")
+		selectedEdges.attr("visibility", function(d,i){
+			if(d3.select(this).classed("highlighted") == false){
+				return "hidden";
+				} else {
+				return "visible";
+			}
+		});
+// 		.attr("fill", function(d,i){
+// 			//reset fill for highlighted taxa
+// 			if(d3.select(this).classed("highlighted") == true){
+// 				selBarTaxa = d3.select("Genomes0").select(".highlighted")
+// 				if(selBarTaxa.length > 0){
+// 					return taxa_colors(displayed_taxa[d["key1"]]);
+// 				} else {
+// 					return func_colors(displayed_funcs[d["key2"]]);
+// 				}
+// 			}
+// 		});
+		
 			//.style("opacity", 0.2)
 			//.style("fill", "grey")
 			//.attr("points", bP.edgePolygon);
@@ -589,7 +776,7 @@
 			.selectAll(".subbar")
 			.filter(function(d,i){ 
 				return (d["key"+(m+1)]==current_data["key"+(m+1)]); }); 
-		selSubBar.style("opacity", 0.2);
+		selSubBar.style("opacity", 0.8);
 		});		
 		dehighlightall(displayed_taxa[current_data["key1"]], displayed_funcs[current_data["key2"]], 3);
 
