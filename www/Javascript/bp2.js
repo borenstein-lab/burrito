@@ -260,7 +260,16 @@
 // 				}
 			})
 			.on("mouseout", function(d,i){ 
-					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",0.8);//.style("fill", "grey");
+					d3.select(this).attr("points", bP.edgePolygon2)
+						.style("opacity",function(e){
+							if(d3.select(this).classed("clicked")){
+								return 1;
+							} else if(d3.select("#Genomes").select(".edges").selectAll(".clicked").empty() == false){ //if something else is clicked
+								return 0.3;
+							} else{
+								return 0.8;
+							}
+							});//.style("fill", "grey");
 // 					var current_data = this._current;
 // 					if(d3.select("#Genomes0"+displayed_taxa[(current_data.key0).replace(/ /g, "_")]).attr("highlighted")=="true"){
 // 						//restore to before mouseover
@@ -278,25 +287,55 @@
 			.on("click", function(d,i){
 				current_data = this._current
 				console.log(current_data)
-// 				highlightall(displayed_taxa[current_data.key0], displayed_funcs[current_data.key1],3)
-// 				displayed_taxa.map(function(e){
-// 					if(d3.select("#Genomes0"+displayed_taxa.replace(/ /g, "_")).classed("highlighted")=="true"){
-// 						displayed_funcs.map(function(f, j){
-// 							if(j != current_data.key1){
-// 							dehighlightall(e, f, 3)
-// 							}
-// 						})
-// 					}
-// 				})
-// 				displayed_funcs.map(function(e){
-// 					if(d3.select("#Genomes1"+displayed_funcs.replace(/ /g, "_")).classed("highlighted")=="true"){
-// 						displayed_taxa.map(function(f, j){
-// 							if(j != current_data.key0){
-// 							dehighlightall(e, f, 3)
-// 							}
-// 						})
-// 					}
-// 				})
+				if(d3.select(this).classed("highlighted")==false){
+				//unselect other edges
+					console.log("Not highlighted??")
+				} 
+				if(d3.select(this).classed("clicked")==true){ //edge already clicked
+					d3.select(this).style("opacity", 0.8)
+					d3.select(this).classed("clicked", false)
+					dehighlightall(displayed_taxa[current_data.key1], displayed_funcs[current_data.key2], 3, bars_only = true)
+					//Revert to original highlighting
+					if(d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/,/g, "_")).classed("highlighted")==true){
+						highlightall(displayed_taxa[current_data.key1], "", 1)
+					} else {
+						highlightall("", displayed_funcs[current_data.key2], 2)
+					}
+					
+				}else{
+					d3.select(this).style("opacity",1)
+					console.log("Dehighlighting everything else")
+					
+				displayed_taxa.map(function(e,j){
+					if(j != current_data.key1){
+						d3.select("#Genomes0"+e.replace(/ /g,"_").replace(/,/g, "_")).classed("highlighted",false)
+						d3.select("#Genomes").select(".edges").selectAll(".edge")
+							.filter(function(f){ 
+								return (f["key1"]==j); })
+							.classed("clicked", false)
+							.style("opacity",0.3);
+						dehighlightall(e, displayed_funcs[current_data.key2], 3, bars_only = true)
+					} else{
+						console.log("Skipping this one "+e)
+					} })
+				displayed_funcs.map(function(e,j){
+					if(j != current_data.key2){
+						d3.select("#Genomes1"+e.replace(/ /g,"_").replace(/,/g, "_")).classed("highlighted",false)
+						d3.select("#Genomes").select(".edges").selectAll(".edge")
+							.filter(function(f){ 
+								return (f["key2"]==j); })
+							.classed("clicked", false)
+							.style("opacity",0.3);
+
+						dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = true)
+						}else{
+						console.log("Skipping this one "+e)
+					}
+				})
+				highlightall(displayed_taxa[current_data.key1], displayed_funcs[current_data.key2],3)
+					
+				d3.select(this).classed("clicked",true)
+				}
 			})
 			.transition().duration(300)
 			.attr("visibility","hidden");
@@ -542,10 +581,12 @@
 							if(d_id !== current_id){
 								if(d3.select("#"+d_id).classed("highlighted")==true){
 									d3.select("#"+d_id).classed("highlighted",false)
+									d3.select("#"+d_id).classed("clicked",false)
 									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 										.filter(function(f,k){ 
 										return (f["key1"]==j); })
-									assocEdges.classed("highlighted", false);
+									assocEdges.classed("highlighted", false)
+									assocEdges.classed("clicked", false)
 									dehighlightall(e,"",1);
 								}}})
 						
@@ -554,14 +595,22 @@
 							if(d_id !== current_id){
 								if(d3.select("#"+d_id).classed("highlighted")==true){
 									d3.select("#"+d_id).classed("highlighted",false)
-									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-										.filter(function(f,k){ 
+									d3.select("#"+d_id).classed("clicked",false)
+									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge").filter(function(f,k){ 
 										return (f["key2"]==j); })
-									assocEdges.classed("highlighted", false);
+									assocEdges.select(".clicked").each(function(m){
+										dehighlightall(m.key1, m.key2, 3)
+									})
+
+									assocEdges.classed("highlighted", false)
+									assocEdges.classed("clicked", false);
+																			
+									assocEdges.attr("visibility", "hidden")
 									dehighlightall("", e, 2)
 								}}})
 
 						d3.select("#"+current_id).classed("highlighted",true)
+						d3.select("#"+current_id).classed("clicked",true)
 						
 						//connecting edges
 						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
@@ -575,10 +624,12 @@
 						}
 					} else {
 						d3.select(this).classed("highlighted",false)
+						d3.select(this).classed("clicked",false)
 						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 							.filter(function(e,j){ 
 								return (e["key"+(p+1)]==i); })
-						selectedEdges.classed("highlighted", false);
+						selectedEdges.classed("highlighted", false)
+						selectedEdges.classed("clicked", false);
 						
 						if (p == 0) {
 							return dehighlightall(displayed_taxa[i],"",1);
@@ -669,32 +720,34 @@
 		var selectedBar = d3.select("#Genomes").select(".part"+m).select(".mainbars")
 			.selectAll(".mainbar").filter(function(d,i){ return (i==s);});
 
-		var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
-			.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
-			selSubBar.style("opacity", 0.1);
+		if(selectedBar.classed("clicked")==false){
+			var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
+				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
+				selSubBar.style("opacity", 0.1);
 
-		if(m==1){
-			current_color = func_colors(displayed_funcs[s]) } else {
-				current_color = taxa_colors(displayed_taxa[s]);
-			}
+			if(m==1){
+				current_color = func_colors(displayed_funcs[s]) } else {
+					current_color = taxa_colors(displayed_taxa[s]);
+				}
 
-		selectedBar.select(".barlabel").style('font-weight','normal'); //.style("visibility", "hidden");
-		selectedBar.select(".mainrect")
+			selectedBar.select(".barlabel").style('font-weight','normal'); //.style("visibility", "hidden");
+			selectedBar.select(".mainrect")
 			//.style('fill-opacity',.75)
-			.style("fill", current_color);
+				.style("fill", current_color);
 		
 
-		var selectedEdges = d3.select("#Genomes").select(".edges").selectAll('.edge')
-			.filter(function(d,i){ 
-			return (d["key"+(m+1)]==s); })
+			var selectedEdges = d3.select("#Genomes").select(".edges").selectAll('.edge')
+				.filter(function(d,i){ 
+				return (d["key"+(m+1)]==s); })
 
-		selectedEdges.attr("visibility", function(d,i){
-			if(d3.select(this).classed("highlighted") == false){
-				return "hidden";
-				} else {
-				return "visible";
+			selectedEdges.attr("visibility", function(d,i){
+				if(d3.select(this).classed("highlighted") == false && d3.select(this).classed("clicked") == false){
+					return "hidden";
+					} else {
+					return "visible";
+				}
+			});
 			}
-		});
 // 		.attr("fill", function(d,i){
 // 			//reset fill for highlighted taxa
 // 			if(d3.select(this).classed("highlighted") == true){

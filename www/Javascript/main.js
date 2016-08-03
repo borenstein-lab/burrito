@@ -26,6 +26,11 @@ draw_svg = function() {
 
 		trees.SetUp(navDims);
 		
+// 		patternSVG = d3.select("#patternsvg")
+// 			.attr("viewBox","0 0 " + width + " " + height + "")
+// 			.attr("preserveAspectRatio","none");
+// 
+// 		console.log("modified patternsvg")
 		MainSVG = d3.select("#mainplot").append("svg")
 			.attr("id","mainsvg")
 			.attr("viewBox","0 0 " + width + " " + height + "")
@@ -213,11 +218,9 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				new_key = "OTU_ID_"+otu_data[k]["OTU_ID"] // Can we key anonymously? Maybe set name of column ourselves so it always matches
 				new_otu_data[j][new_key] = +otu_data[k][samples[j]]
 			}
-
 		}	
 		return new_otu_data;
 	}
-
 	otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently*/
 	
 	otu_abundance_data = otu_table
@@ -645,7 +648,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 	}
 
-	function dehighlightOverall(taxonName, functionName, highlightwhat) {
+	function dehighlightOverall(taxonName, functionName, highlightwhat, bars_only = false) {
 
 		if (highlightwhat == 1) {
 			// dehighlight tree
@@ -682,12 +685,13 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 		
 		if (highlightwhat == 3) {
+			if(bars_only == false){
 			// dehighlight taxa tree
 			trees.dehighlightTree(taxonName, 'taxa');
 			
 			//dehighlight function tree
 			trees.dehighlightTree(functionName, 'func');
-			
+			}
 			// dehighlight Taxa Bar Chart
 			otu_bar.deselect_bars(taxonName, taxa_colors);
 
