@@ -216,16 +216,16 @@ g.updateb.activebutton:hover rect {
 	position:relative;
 }
 .tt img {
-	z-index:2;
+	z-index:12;
 }
 .tt span{
 	display:none; 
 }
-.tt:hover span.tooltip{
+.tt > img:hover ~span.tooltip{
 	display:block;
 	position:absolute;
-	top:0px; left:0;
-	padding: 15px 0 0 0;
+//	top:0px; left:0;
+//	padding: 15px 0 0 0;
 	width:300px;
 	text-align: center;
 	filter: alpha(opacity:90);
@@ -234,11 +234,11 @@ g.updateb.activebutton:hover rect {
 	opacity: 0.90;
 	z-index: 10;
 }
-.tt:hover span.blank{
+.tt > img:hover ~span.tooltip span.blank{
 	display:block;
 	padding: 5px 8px 0;
 }
-.tt:hover span.content{
+.tt > img:hover ~span.tooltip span.content{
 	display:block;
 	padding: 5 8px;
 	background: #ffffff;
