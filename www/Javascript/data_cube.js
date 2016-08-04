@@ -600,13 +600,15 @@
         this.displayed_contribution_cube[sample] = {};
 
         // Add top level taxonomic function contributions if the sample function profile is linked to taxa
-        if (!(unlinked_taxon_name in this.original_contribution_cube[sample])){
+        if (sample == average_contrib_sample_name | !(unlinked_taxon_name in this.original_contribution_cube[sample])){
           for (var j = 0; j < this.taxa_tree.length; j++){
             var taxon = this.taxa_tree[j].key;
-            this.displayed_contribution_cube[sample][taxon] = {};
-            for (var k = 0; k < this.func_tree.length; k++){
-              var func = this.func_tree[k].key;
-              this.displayed_contribution_cube[sample][taxon][func] = this.calculate_new_contribution(sample, taxon, func);
+            if (taxon != unlinked_taxon_name){
+              this.displayed_contribution_cube[sample][taxon] = {};
+              for (var k = 0; k < this.func_tree.length; k++){
+                var func = this.func_tree[k].key;
+                this.displayed_contribution_cube[sample][taxon][func] = this.calculate_new_contribution(sample, taxon, func);
+              }
             }
           }  
         } else {

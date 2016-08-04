@@ -7,7 +7,7 @@ var aspecrat, width, height, hidewidth, margin;
 var barDimensions, navDims, bpdims;
 var duration; //used in trees to set animation speed
 
-var MainSVG, plotSVG;
+var MainSVG, plotSVG, sidebarSVG;
 
 draw_svg = function() {
 	if (d3.select("#mainsvg")[0][0] === null) {
@@ -31,6 +31,8 @@ draw_svg = function() {
 // 			.attr("preserveAspectRatio","none");
 // 
 // 		console.log("modified patternsvg")
+		d3.select("body").attr("class","svgBody");
+
 		MainSVG = d3.select("#mainplot").append("svg")
 			.attr("id","mainsvg")
 			.attr("viewBox","0 0 " + width + " " + height + "")
@@ -43,42 +45,68 @@ draw_svg = function() {
 			.attr("preserveAspectRatio","none")
 			.style("font-family", "Verdana");
 	
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png", 10, 10, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
+		sidebarSVG = d3.select("#mainsvg").append("svg")
+			.attr("id","sidebar_svg")
+			.attr("x",-100)
+			.attr("y",0)
+			.attr("width",130)
+			.attr("height",height);
+		
+		sidebarSVG.append("rect")
+			.attr("x",0)
+			.attr("y",0)
+			.attr("width",100)
+			.attr("height",height)
+			.attr("fill","#ffff66");
+
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "sidebar_hide", 100, 0, 30, 60, "svgbutton", fill = "#e62e00", fontsize = "16px", "Show", function(){
+			var sidebarz = d3.select("#sidebar_svg");
+			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
+			if (curpos > -10) {
+				sidebarz.transition().attr("x",-100);
+				d3.select("#sidebar_hide").select("text").text("Show");
+			} else {
+				sidebarz.transition().attr("x",0);
+				d3.select("#sidebar_hide").select("text").text("Hide");
+			}
+		});
+
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png", 10, 10, 80, 80, "svgbutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
 			saveSvgAsPng(document.getElementById("plots_svg"), "screenshot.png", { backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg", 10, 100, 80, 80, "switchb activebutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg", 10, 100, 80, 80, "svgbutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
 			svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { //console.log(uri)
 				saveSvg(uri, "screenshot.svg")
 			}); 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_taxa_bar", 10, 190, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_taxa_bar", 10, 190, 80, 80, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
 			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_taxa_bar", 10, 280, 80, 80, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg_taxa_bar", 10, 280, 80, 80, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
 			svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) {
 				saveSvg(uri, "taxa_bar.svg")
 			}); 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg", 10, 370, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg", 10, 370, 80, 50, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
 			saveSvgAsPng(document.getElementById("saveLegBar0"), "taxonomy_legend.png",{ backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "switchb activebutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
 			svgAsDataUri(document.getElementById("saveLegBar0"), {}, function(uri) {
 				saveSvg(uri, "taxonomy_legend.svg")
 			}); 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_png_func_bar", 10, 490, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_func_bar", 10, 490, 80, 80, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
 			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_svg_func_bar", 10, 580, 80, 80, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg_func_bar", 10, 580, 80, 80, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
 			svgAsDataUri(document.getElementById("func_bars"), {}, function(uri) {
 				saveSvg(uri, "function_bar.svg")
 			});
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg", 10, 670, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg", 10, 670, 80, 50, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
 			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5}) 
 		});
-		button_maker.add_rect_button(d3.select("#mainsvg"), "save_function_leg_svg", 10, 730, 80, 50, "switchb activebutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg_svg", 10, 730, 80, 50, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
 			svgAsDataUri(document.getElementById("saveLegBar1"), {}, function(uri) {
 				saveSvg(uri, "function_legend.svg")
 			});
@@ -145,7 +173,7 @@ update_progress = function(curr_sample, total_samples){
 	document.getElementById("progress_bar").setAttribute("width", (width / 4.5) * (curr_sample / total_samples))
 }
 
-draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, sample_order){
+draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order){
 	
 	var grouping = document.getElementById("sampgroupselector").value;
 	// Find the new window size, adjust the aspect ratio
@@ -163,9 +191,9 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
 	d3.select("#loadingG").remove()	
-	d3.select("#navbar").remove()
+/*	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
-	d3.select("#func_bars").remove()
+	d3.select("#func_bars").remove()*/
 
 	var NavSVG = plotSVG.insert("svg", "#sidebar")
     	.attr("x",margin.left)
@@ -351,20 +379,27 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		//colors	
 		//start one level in for bacteria but at the 0th level for functions
 		num_function_categories = data_cube.func_tree.length
-		num_taxa_categories = 0
-		for(j=0; j < data_cube.taxa_tree.length; j++){
-			num_taxa_categories += data_cube.taxa_tree[j].values.length
+		num_taxa_categories = data_cube.taxa_tree.length
+		if (data_cube.taxa_tree[0].level != 0){
+			num_taxa_categories = 0
+			for(j=0; j < data_cube.taxa_tree.length; j++){
+				num_taxa_categories += data_cube.taxa_tree[j].values.length
+			}
 		}
 
 		//taxa colors
 		if(num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many taxa categories, colors will repeat")
 		}
-		if(num_taxa_categories <= d3.keys(colorbrewer["Set3"]).pop()){
+		if(num_taxa_categories <= d3.keys(colorbrewer["Set3"]).pop() & num_taxa_categories >= d3.keys(colorbrewer["Set3"]).shift()){
 			taxa_palette = colorbrewer["Set3"][num_taxa_categories]
 			//taxa_palette = taxa_palette.reverse()
-		} else {
+		} else if (num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()){
 			taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop()-1)].concat(colorbrewer["Dark2"][num_taxa_categories -  d3.keys(colorbrewer["Set3"]).pop()])
+		} else if (num_taxa_categories == 2){
+			taxa_palette = ["#8dd3c7", "#ffffb3"]
+		} else {
+			taxa_palette = ["#8dd3c7"]
 		}
 		if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many function categories, colors will repeat")
@@ -380,7 +415,11 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		taxa_colors.range(taxa_palette)
 		main_taxa = []
 		for(j=0; j < data_cube.taxa_tree.length; j++){
-			main_taxa = main_taxa.concat(data_cube.taxa_tree[j].values.map(function(d){ return d.key;}))
+			if (data_cube.taxa_tree[0].level != 0){
+				main_taxa = main_taxa.concat(data_cube.taxa_tree[j].values.map(function(d){ return d.key;}))
+			} else {
+				main_taxa = data_cube.taxa_tree.map(function(d){ return d.key})
+			}
 		}
 		taxa_colors.domain(main_taxa)
 		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
@@ -388,10 +427,12 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
 		col1 = d3.rgb("black") //.brighter()
 		//if there are other kingdoms besides Bacteria, shades of grey
-		for(j=0; j < kingdoms.length; j++){
-			taxa_colors.range().push(col1)
-			taxa_colors(kingdoms[j])
-			col1["l"] +=  (j+1)/(kingdoms.length + 1)
+		if (data_cube.taxa_tree[0].level != 0){
+			for(j=0; j < kingdoms.length; j++){
+				taxa_colors.range().push(col1)
+				taxa_colors(kingdoms[j])
+				col1["l"] +=  (j+1)/(kingdoms.length + 1)
+			}
 		}
 		taxa_colors.range().push(d3.rgb("black"))//.brighter())
 		taxa_colors("All Taxa")
@@ -427,7 +468,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	//sample colors
 	groupValsAll = samplemap.map(function(d,i){ 
-		return d["Group"]; })
+		return d[grouping]; })
 
 	groupVals = groupValsAll.filter(function(d,i){ return groupValsAll.indexOf(d)===i; })
 
@@ -436,7 +477,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	getLinkData = function(){
 		//get unique linked functions for each taxon
 		allSamples = d3.keys(data_cube.displayed_contribution_cube);
-		allSamples = allSamples.filter(function(d){ return d != "Average_contrib" })
+		allSamples = allSamples.filter(function(d){ return d != average_contrib_sample_name })
 		var fixed_allSamples = [];
 		// Remove samples without taxa links to functions
 		for (var i = 0; i < allSamples.length; i++){
@@ -538,12 +579,12 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	var stackData = getFuncBarData();
 
-	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, sample_order, grouping);
+	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping);
 
 
-	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
+	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, otu_sample_order);
 
-	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, grouping);
+	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping);
 
 
 	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall, avg_contrib_data);
@@ -552,15 +593,15 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	function update_otu_bar(){
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
-		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube);
-		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, grouping);
+		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, otu_sample_order);
+		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping);
 	}
 
 	function update_func_bar(){
 		//remove old graph before redrawing new
 			FunctionBar.selectAll("g").remove();
 			var func_data = getFuncBarData();
-			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, sample_order, grouping);
+			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping);
 
 	}
 
