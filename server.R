@@ -130,6 +130,8 @@ shinyServer(function(input, output, session) {
 				otu_table_with_normalization = merge(melted_otu_table, normalization, by.x=c(colnames(otu_table)[1]), by.y=c(colnames(normalization)[1]), allow.cartesian=TRUE, sort=FALSE)
 				rm(normalization)
 				rm(melted_otu_table)
+				
+				session$sendCustomMessage("upload_status", "Preparing to run PICRUSt")
 
 				# Get the PICRUSt ko table
 				melted_ko_counts = fread(picrust_ko_file, sep="\t", header=TRUE, stringsAsFactors=FALSE)

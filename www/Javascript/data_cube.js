@@ -570,7 +570,7 @@
       // Accessed by func_lookup[FUNC_NAME], returns the object in the tree with key=FUNC_NAME, values=children objects, unless it is a leaf, in which case KO=FUNC_NAME
       curr_funcs = [];
 
-      // Use a BFS to add all taxa
+      // Use a BFS to add all functions
       for (var i = 0; i < this.func_tree.length; i++){
         curr_funcs.push(this.func_tree[i]);
       }

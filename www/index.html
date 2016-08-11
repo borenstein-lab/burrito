@@ -12,9 +12,8 @@
 
 </head>
 
-<body>
+<body onresize="resizeRedraw()">
 <div id="mainthing" style="overflow-x:auto">
-
 
 <table width="900" align="center">
 	<tr>
@@ -25,8 +24,7 @@
 	<tr>
 		<td colspan=2 align="center"> 
 			<h2>Burrito: A Marriage of Taxonomy and Function</h2> 
-			<img border="0" src="images/burrito.jpg"></img>
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A tasty burrito.</span></span></span>
+			<img border="1" src="images/bEXnotext.jpg" width="400"></img>		
 		</td>
 	</tr>
 	
@@ -94,7 +92,35 @@
 						</div>
 						<div id="read_counts_g" class="hidexp">
 							16s Reads
-							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundaces of each taxa in each sample. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
+								A file containing abundaces of each taxa in each sample. See documentation for an example.
+								<table class="ExampleTable">
+									<tr>
+										<th>OTU</th>
+										<th>Sample1_Name</th>
+										<th>Sample2_Name</th>
+										<th>etc.</th>
+									</tr>
+									<tr>
+										<td>OTU1_ID</td>
+										<td>10</td>
+										<td>5</td>
+										<td>...</td>
+									</tr>
+									<tr>
+										<td>OTU2_ID</td>
+										<td>0</td>
+										<td>5</td>
+										<td>...</td>
+									</tr>
+									<tr>
+										<td>etc.</td>
+										<td>...</td>
+										<td>...</td>
+										<td>...</td>
+									</tr>
+								</table>
+						</span></span></span>
 							<input type="file" name="read_counts" id="read_counts">
 						</div>
 					</td>
@@ -120,22 +146,134 @@
 				<tr>
 					<td>
 						Function Abundances
-						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.</span></span></span>
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
+							A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
+							<table class="ExampleTable">
+								<tr>
+									<th>Gene</th>
+									<th>Sample1_Name</th>
+									<th>Sample2_Name</th>
+									<th>etc.</th>
+								</tr>
+								<tr>
+									<td>Gene1_Name</td>
+									<td>0.1</td>
+									<td>0.2</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>Gene2_Name</td>
+									<td>0.3</td>
+									<td>0.25</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>etc.</td>
+									<td>...</td>
+									<td>...</td>
+									<td>...</td>
+								</tr>
+							</table>
+						</span></span></span>
 						<input type="file" name="function_abundances" id="function_abundances">
 					</td>
 					<td>
 						Taxonomic Hierarchy
-						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.</span></span></span>
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
+							A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
+							<table class="ExampleTable">
+								<tr>
+									<th>OTU</th>
+									<th>Taxa_Level_1</th>
+									<th>Taxa_Level_2</th>
+									<th>etc.</th>
+								</tr>
+								<tr>
+									<td>OTU1_ID</td>
+									<td>Bacteria</td>
+									<td>Firmicutes</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>OTU2_ID</td>
+									<td>Bacteria</td>
+									<td>Proteobacteria</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>etc.</td>
+									<td>...</td>
+									<td>...</td>
+									<td>...</td>
+								</tr>
+							</table>
+						</span></span></span>
 						<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
 					</td>
 					<td>
 						Function Hierarchy
-						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.</span></span></span>
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
+							A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
+							<table class="ExampleTable">
+								<tr>
+									<th>Gene</th>
+									<th>Level_0</th>
+									<th>Level_1</th>
+									<th>etc.</th>
+								</tr>
+								<tr>
+									<td>Gene1_Name</td>
+									<td>Metabolism</td>
+									<td>Lipid Metabolism</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>Gene2_Name</td>
+									<td>Cellular Processes</td>
+									<td>Cell Motility</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>etc.</td>
+									<td>...</td>
+									<td>...</td>
+									<td>...</td>
+								</tr>
+							</table>
+						</span></span></span>
 						<input type="file" name="function_hierarchy" id="function_hierarchy">
 					</td>
 					<td>
 						Sample Map
-						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file describing the relationship between samples, i.e. which ones are the same treatment condition.</span></span></span>
+						<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
+							A file describing the relationship between samples, i.e. which ones are the same treatment condition.
+							<table class="ExampleTable">
+								<tr>
+									<th>Sample</th>
+									<th>Grouping_1</th>
+									<th>Grouping_2</th>
+									<th>etc.</th>
+								</tr>
+								<tr>
+									<td>Sample1_Name</td>
+									<td>Case</td>
+									<td>Human</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>Sample2_Name</td>
+									<td>Control</td>
+									<td>Mouse</td>
+									<td>...</td>
+								</tr>
+								<tr>
+									<td>etc.</td>
+									<td>...</td>
+									<td>...</td>
+									<td>...</td>
+								</tr>
+							</table>
+						</span></span></span>
 						<input type="file" name="sample_map" id="sample_map">
 					</td>
 				</tr>

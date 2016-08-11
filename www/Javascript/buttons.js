@@ -24,7 +24,7 @@
 		//button.selectAll("text").attr("opacity",0.5);
 	}
 	
-	button_maker.add_rect_button = function(element, id, x, y, width, height, newclass, fill, fontsize, text, on_click){
+	button_maker.add_rect_button = function(element, id, x, y, width, height, rxy, newclass, fontsize, text, on_click){
 
 		var thisg = element.append("g")
 			.attr("id", id);
@@ -36,9 +36,11 @@
 			.attr("x", x)
 			.attr("y", y)
 			.attr("width", width)
-			.attr("height", height);
+			.attr("height", height)
+			.attr("rx", rxy)
+			.attr("ry", rxy);
 		
-		if (fill) { thisrect.style("fill",fill); }
+		//if (fill) { thisrect.style("fill",fill); }
 		if (fontsize) { thisrect.style("font-size", fontsize) }
 
 		document.getElementById(id).addEventListener("click", function() {
