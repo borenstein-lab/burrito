@@ -119,47 +119,6 @@ path.link {
 #sidebar {
 	z-index:5;
 }
-.sidebutton {
-	stroke:black;
-	stroke-width:1;
-	opacity:1;
-	cursor:default;
-}
-g.switchb rect {
-	fill:white;
-}
-g.switchb.selectedbutton rect {
-	fill:green;
-	stroke:#005000;
-	stroke-width:4;
-}
-g.uploadb rect {
-	fill: orange;
-}
-g.uploadb.activebutton:hover rect {
-	fill:#ffc000;
-}
-g.updateb rect {
-	fill:#b3ffff;
-	stroke-width:1;
-	stroke:#000066;
-}
-g.updateb text {
-	opacity:0.5;
-}
-g.updateb.activebutton rect {
-	fill:#00ffff;
-	stroke-width:4;
-}
-g.updateb.activebutton text {
-	opacity:1;
-}
-g.updateb.activebutton:hover rect {
-	fill:#008080;
-}
-/*g.uploadb:not(activebutton) {
-	pointer-events:none;
-}*/
 .noselect {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -174,16 +133,7 @@ g.updateb.activebutton:hover rect {
 	cursor: pointer;
 }
 .svgbutton:hover text {
-	opacity:0.5;
-}
-.activebutton:hover text {
-	opacity:0.5;
-}
-.activebutton.switchb:hover rect {
-	fill:#d4ffd4;
-}
-.activebutton:active {
-	stroke-width:3;
+//	opacity:0.5;
 }
 #sidebar_hide:hover {
 	opacity:1;
@@ -191,32 +141,14 @@ g.updateb.activebutton:hover rect {
 #sidebar_hide {
 	stroke:none;
 }
-.nullfilesymb {
-	fill:none;
-	stroke:black;
-	stroke-width:3;
-	stroke-linejoin:round;
-	
-} 
-.hidexp {
-	display:none;
+#sidebar_hide rect {
+	fill:#000066;
 }
-.hidbut {
-	visibility:hidden;
+#sidebar_hide text {
+	fill: white;
 }
-@keyframes loadcircanim {
-	0% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
-	25% {fill:blue; cx:50%; cy:40%; rx:40; ry:20;}
-	50% {fill:green; cx:60%; cy:50%; rx:20; ry:40;}
-	75% {fill:orange; cx:50%; cy:60%; rx:40; ry:20;}
-	100% {fill:red; cx:40%; cy:50%; rx:20; ry:40;}
-}
-#loadcirc {
-	position: relative;
-	animation-name: loadcircanim;
-	animation-duration:4s;
-	animation-iteration-count: infinite;
-	animation-timing-function: linear:
+#sidebar_hide:hover rect {
+	fill:#660066;
 }
 .tt { 
 	position:relative;
@@ -232,12 +164,12 @@ g.updateb.activebutton:hover rect {
 	position:absolute;
 //	top:0px; left:0;
 //	padding: 15px 0 0 0;
-	width:300px;
+	width:400px;
 	text-align: center;
-	filter: alpha(opacity:90);
-	KHTMLOpacity: 0.90;
-	MozOpacity: 0.90;
-	opacity: 0.90;
+//	filter: alpha(opacity:90);
+//	KHTMLOpacity: 0.90;
+//	MozOpacity: 0.90;
+//	opacity: 0.90;
 	z-index: 10;
 }
 .tt > img:hover ~span.tooltip span.blank{
@@ -245,13 +177,64 @@ g.updateb.activebutton:hover rect {
 	padding: 5px 8px 0;
 }
 .tt > img:hover ~span.tooltip span.content{
+	text-align: left;
 	display:block;
-	padding: 5 8px;
-	background: #ffffff;
+	padding: 5px 5px 5px 5px;
+	background: #fff0ff;
 	border-style: solid;
 	border-width: 1px;
 	border-color: #000000;
 	margin-left: -20px;
 	z-index: 10;
+}
+table.ExampleTable {
+	border: 1px solid black;
+	border-collapse: collapse;
+	margin-top: 1em;
+	margin-left: 1em;
+	margin-bottom: 1em;
+	margin-right: 1em;
+}
+table.ExampleTable th, table.ExampleTable td {
+	border: 1px solid black;
+	padding: 10px;
+}
+div#SaveInputDiv * {
+	line-height: 100%;
+	margin: 3px 0;
+//	-webkit-margin-after: 0em;
+//	-webkit-margin-before: 0em;
+}
+#saveFileNameInput {
+	border: 2px solid black;
+	border-radius: 2px;
+}
+.savebutton rect {
+	stroke:#ff6600;
+	stroke-width:2;
+	fill:#cc2900;
+}
+.savebutton text {
+	fill:white;
+}
+.savebutton:hover rect {
+	stroke-width:4;
+	fill:#ff704d;
+}
+.savebutton:hover text {
+	fill:black;
+}
+.savebutton:active rect {
+	stroke-width:6;
+	fill:#ffad99;
+}
+.savebutton:active text {
+	fill:black;
+}
+.hidexp {
+	display:none;
+}
+.hidbut {
+	visibility:hidden;
 }
 white-space: pre-line;

@@ -47,23 +47,23 @@ draw_svg = function() {
 	
 		sidebarSVG = d3.select("#mainsvg").append("svg")
 			.attr("id","sidebar_svg")
-			.attr("x",-100)
+			.attr("x",-150)
 			.attr("y",0)
-			.attr("width",130)
+			.attr("width",180)
 			.attr("height",height);
 		
 		sidebarSVG.append("rect")
 			.attr("x",0)
 			.attr("y",0)
-			.attr("width",100)
+			.attr("width",150)
 			.attr("height",height)
 			.attr("fill","#ffff66");
 
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "sidebar_hide", 100, 0, 30, 60, "svgbutton", fill = "#e62e00", fontsize = "16px", "Show", function(){
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "sidebar_hide", 150, 0, 30, 60, 0, "svgbutton", fontsize = "16px", "Show", function(){
 			var sidebarz = d3.select("#sidebar_svg");
 			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
 			if (curpos > -10) {
-				sidebarz.transition().attr("x",-100);
+				sidebarz.transition().attr("x",-150);
 				d3.select("#sidebar_hide").select("text").text("Show");
 			} else {
 				sidebarz.transition().attr("x",0);
@@ -71,46 +71,76 @@ draw_svg = function() {
 			}
 		});
 
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png", 10, 10, 80, 80, "svgbutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as png", function(){
-			saveSvgAsPng(document.getElementById("plots_svg"), "screenshot.png", { backgroundColor : "white", scale: 1.5})
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_screenshot", 35, 200, 80, 70, 5, "svgbutton savebutton", fontsize = "16px", "Save screenshot", function(){
+			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.png";
+				saveSvgAsPng(document.getElementById("plots_svg"), fileString, { backgroundColor : "white", scale: 1.5})
+			} else { // SVG
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.svg";
+				svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { 
+					saveSvg(uri, fileString)
+				});
+			}
 		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg", 10, 100, 80, 80, "svgbutton", fill = "lightgrey", fontsize = "16px", "Save screenshot as svg", function(){
-			svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { //console.log(uri)
-				saveSvg(uri, "screenshot.svg")
-			}); 
+
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_taxa_bar", 35, 300, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save taxonomy plot", function(){
+			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.png";
+				saveSvgAsPng(document.getElementById("taxa_bars"), fileString, { backgroundColor : "white", scale: 1.5})
+			} else { // SVG
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.svg";
+				svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) { 
+					saveSvg(uri, fileString)
+				});
+			}
 		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_taxa_bar", 10, 190, 80, 80, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as png", function(){
-			saveSvgAsPng(document.getElementById("taxa_bars"), "taxa_bar.png",{ backgroundColor : "white", scale: 1.5})
+		
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg", 35, 400, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save taxonomy legend", function(){
+			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_legend.png";
+				saveSvgAsPng(document.getElementById("saveLegBar0"), fileString, { backgroundColor : "white", scale: 1.5})
+			} else { // SVG
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_legend.svg";
+				svgAsDataUri(document.getElementById("saveLegBar0"), {}, function(uri) {
+					saveSvg(uri, fileString)
+				});
+			}
+		
 		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg_taxa_bar", 10, 280, 80, 80, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy plot as svg", function(){
-			svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) {
-				saveSvg(uri, "taxa_bar.svg")
-			}); 
+		
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_func_bar", 35, 500, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save function plot", function(){
+			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_bar.png";
+				saveSvgAsPng(document.getElementById("func_bars"), fileString, { backgroundColor : "white", scale: 1.5})
+			} else { // SVG
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_bar.svg";
+				svgAsDataUri(document.getElementById("func_bars"), {}, function(uri) { 
+					saveSvg(uri, fileString)
+				});
+			}
 		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg", 10, 370, 80, 50, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend", function(){
-			saveSvgAsPng(document.getElementById("saveLegBar0"), "taxonomy_legend.png",{ backgroundColor : "white", scale: 1.5})
+
+		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg", 35, 600, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save function legend", function(){
+			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_legend.png";
+				saveSvgAsPng(document.getElementById("saveLegBar1"), fileString, { backgroundColor : "white", scale: 1.5})
+			} else { // SVG
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_legend.svg";
+				svgAsDataUri(document.getElementById("saveLegBar1"), {}, function(uri) { 
+					saveSvg(uri, fileString)
+				});
+			} 
 		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg_svg", 10, 430, 80, 50, "svgbutton", fill = "lightblue", fontsize = "14px", "Save taxonomy legend svg", function(){
-			svgAsDataUri(document.getElementById("saveLegBar0"), {}, function(uri) {
-				saveSvg(uri, "taxonomy_legend.svg")
-			}); 
-		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_func_bar", 10, 490, 80, 80, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function plot as png", function(){
-			saveSvgAsPng(document.getElementById("func_bars"), "func_bar.png",{ backgroundColor : "white", scale: 1.5})
-		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_svg_func_bar", 10, 580, 80, 80, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function plot as svg", function(){
-			svgAsDataUri(document.getElementById("func_bars"), {}, function(uri) {
-				saveSvg(uri, "function_bar.svg")
-			});
-		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg", 10, 670, 80, 50, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function legend", function(){
-			saveSvgAsPng(document.getElementById("saveLegBar1"), "function_legend.png",{ backgroundColor : "white", scale: 1.5}) 
-		});
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg_svg", 10, 730, 80, 50, "svgbutton", fill = "lightgreen", fontsize = "14px", "Save function legend svg", function(){
-			svgAsDataUri(document.getElementById("saveLegBar1"), {}, function(uri) {
-				saveSvg(uri, "function_legend.svg")
-			});
-		});
+	
+		d3.select("#sidebar_svg").append("foreignObject")
+			.attr("x", 20)
+			.attr("y", 20)
+		.append("xhtml:div")
+			.attr("id","SaveInputDiv")
+			.style("width","120px")
+			.html("<p>Output file prefix:</p><input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>Image format:</p><form action=''> <input type='radio' name='format' value='PNG' checked='checked'> PNG<br><input type='radio' name='format' value='SVG'> SVG </form>");
+
+
 		draw_loading();
 	}
 }
@@ -749,6 +779,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data);
 		return visdata;
 	}
+}
+
+function resizeRedraw() {
+	uploader.update_plots();
 }
 
 var uploader = uploader_wrapper.make_uploader(draw_everything, update_progress);
