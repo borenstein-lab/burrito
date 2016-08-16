@@ -597,14 +597,19 @@
 				})
 				.on("mouseover",function(d, i){ 
 					//if(d3.select(this).classed("highlighted") == false){ //if not already highlighted
-					if (p == 0) {
-						return highlightall(displayed_taxa[i],"",1);
-					} else {
-						return highlightall("", displayed_funcs[i],2);
-					}
+					clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
+					if(clickedBars.empty()){
+						if (p == 0) {
+							return highlightall(displayed_taxa[i],"",1);
+						} else {
+							return highlightall("", displayed_funcs[i],2);
+						}
+					} //else do nothing
 				//} 
 				})						
 				.on("mouseout",function(d, i){ 
+					clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
+					if(clickedBars.empty()){
 					//only de-highlight if not clicked on, and if none of its edges are clicked
 					if(d3.select(this).classed("clicked") == false){
 						if (p == 0) {
@@ -639,6 +644,7 @@
 							}
 						}
 					}
+				}
 				})
 				.on("click", function(d,i){
 					if(d3.select(this).classed("clicked") == false){
