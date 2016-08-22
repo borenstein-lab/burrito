@@ -231,11 +231,18 @@
 			blank_option.text="";
 			blank_option.value="";
 			sample_group_dropdown.add(blank_option);
-			for (var i = 0; i < labels.length; i++){
+			if (typeof labels === 'string' || labels instanceof String){ //if only one grouping option, to keep from splitting into characters
 				var option = document.createElement("option");
-				option.text = labels[i];
-				option.value = labels[i];
+				option.text = labels;
+				option.value = labels;
 				sample_group_dropdown.add(option);
+			} else {
+				for (var i = 0; i < labels.length; i++){
+					var option = document.createElement("option");
+					option.text = labels[i];
+					option.value = labels[i];
+					sample_group_dropdown.add(option);
+				}
 			}
 		});
 
