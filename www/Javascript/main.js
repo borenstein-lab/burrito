@@ -133,7 +133,7 @@ draw_svg = function() {
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width","120px")
-			.html("<p>Output file prefix:</p><input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>Image format:</p><form action=''> <input type='radio' name='format' value='PNG' checked='checked'> PNG<br><input type='radio' name='format' value='SVG'> SVG </form>");
+			.html("<p>Output file prefix:</p><input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>Image format:</p><form action=''><label> <input type='radio' name='format' value='PNG' checked='checked'> PNG</label><br><label><input type='radio' name='format' value='SVG'> SVG </label></form>");
 
 
 		draw_loading();
