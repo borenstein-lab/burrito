@@ -69,11 +69,11 @@
 					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select this option if you have your own data to upload and visualize.</span></span></span> 
 				</td></tr>
 				<tr><td colspan=3>
-					<input type="radio" name="inptype" id="sixteenradio" onchange="mainui.checkInpDataRadio()" value="16s">16s Reads
-					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You only have 16s reads.</span></span></span>
+					<input type="radio" name="inptype" id="sixteenradio" onchange="mainui.checkInpDataRadio()" value="16s">16S rRNA Greengenes OTU Table
+					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You only have OTU abundances with Greengenes IDs.</span></span></span>
 						
 						<input type="radio" name="inptype" id="funcradio" onchange="mainui.checkInpDataRadio()" value="func">Functional Contributions
-					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have run PICRUST yourself and have reads and contributions.</span></span></span>
+					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have run PICRUSt and/or have both OTU abundances and functional contributions.</span></span></span>
 						
 						<input type="radio" name="inptype" id="genomeradio" onchange="mainui.checkInpDataRadio()" value="genome">Genomic Annotations
 					<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> You have the genome content of each taxa and their abundances.</span></span></span>
@@ -87,13 +87,13 @@
 						</div>
 						<div id="taxonomic_abundances_2_g" class="hidexp">
 							Taxonomic Abundances
-							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each taxa in each sample. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each taxon in each sample. See documentation for an example.</span></span></span>
 							<input type="file" name="taxonomic_abundances_2" id="taxonomic_abundances_2">
 						</div>
 						<div id="read_counts_g" class="hidexp">
-							16s Reads
+							16S rRNA OTU Table
 							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-								A file containing abundaces of each taxa in each sample. See documentation for an example.
+								A file containing abundances of each taxon in each sample. See documentation for an example.
 								<table class="ExampleTable">
 									<tr>
 										<th>OTU</th>
@@ -132,7 +132,7 @@
 						</div>
 						<div id="function_contributions_g" class="hidexp">
 							Function Contributions
-							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional contribution of each taxa. See documentation for an example.</span></span></span>
+							<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional contribution of each taxon. See documentation for an example.</span></span></span>
 							<input type="file" name="function_contributions" id="function_contributions">
 						</div>
 					</td>

@@ -84,7 +84,12 @@
 
    xAxis.scale(x);
    yAxis.scale(y);
+   
 
+	display_func = d3.set(stackdata[0].data.map(function(d){
+		return(d.func)
+	})).values().sort(function(a,b){ return a > b; })
+	
    var viz = fB.vizData(stackdata, sample_order);
    //console.log(viz)
 
@@ -172,7 +177,7 @@
         tooltip.html("<strong>Function: </strong>" + name_split + "<br>" +  "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
     } else if(clickedFuncBars.empty() == false){
-    	if(colors.domain()[clickedFuncBars.datum().key] == current_rectangle_data.func){
+    	if(display_func[clickedFuncBars.datum().key] == current_rectangle_data.func){
     	selected = d3.select("#func_" + current_rectangle_data.Sample)
 			.selectAll("rect").data()
 			.filter(function(e){ 
@@ -188,7 +193,7 @@
   .on("mousemove", function(d){
   	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   	clickedFuncBars = d3.select("#Genomes").select(".part1").selectAll(".mainbars").select(".clicked")
-  	if(clickedBars.empty() || (clickedFuncBars.empty() == false && colors.domain()[clickedFuncBars.datum().key] == d.func)){
+  	if(clickedBars.empty() || (clickedFuncBars.empty() == false && display_func[clickedFuncBars.datum().key] == d.func)){
   	return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
   	}
   	})
@@ -200,7 +205,7 @@
     	dehighlight_overall("", current_rectangle_data.func, 2);
     	return tooltip.style("visibility", "hidden");
     	} else if(clickedFuncBars.empty() == false){
-    	if(colors.domain()[clickedFuncBars.datum().key] == d.func){
+    	if(display_func[clickedFuncBars.datum().key] == d.func){
 	    	return tooltip.style("visibility", "hidden");
     	}
     	}

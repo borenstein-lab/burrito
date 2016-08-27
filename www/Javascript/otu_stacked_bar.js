@@ -56,6 +56,10 @@
     y.rangeRound([graphdims.height, 0]);
     xAxis.scale(x);
     yAxis.scale(y);
+    
+    display_taxa = bar_data[0].taxa.map(function(d){
+    	return d.name;
+    }).sort(function(a,b){ return a > b; })
 
     var tooltip = d3.select("body")
       .append("div")
@@ -144,8 +148,8 @@
         	name_split = (current_rectangle_data.name.split('_')).pop()
         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
         	return tooltip.style("visibility", "visible");
-        }else if(clickedTaxaBars.empty() == false){
-    	if(colors.domain()[clickedTaxaBars.datum().key] == current_rectangle_data.name){
+        }else if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
+    	if(display_taxa[clickedTaxaBars.datum().key] == current_rectangle_data.name){
         	name_split = (current_rectangle_data.name.split('_')).pop()
         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           	return tooltip.style("visibility", "visible");
@@ -155,7 +159,7 @@
       .on("mousemove", function(d){ 
         clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   		clickedTaxaBars = d3.select("#Genomes").select(".part0").selectAll(".mainbars").select(".clicked")
-  		if(clickedBars.empty() || (clickedTaxaBars.empty() == false && colors.domain()[clickedTaxaBars.datum().key] == d.name)){
+  		if(clickedBars.empty() || (clickedTaxaBars.empty() == false && display_taxa[clickedTaxaBars.datum().key] == d.name)){
 	        return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
         }
       })
@@ -167,7 +171,7 @@
         dehighlight_overall(current_rectangle_data.name, "", 1);
         return tooltip.style("visibility", "hidden");
         }  else if(clickedTaxaBars.empty() == false){
-    	if(colors.domain()[clickedTaxaBars.datum().key] == d.name){
+    	if(display_taxa[clickedTaxaBars.datum().key] == d.name){
 	    	return tooltip.style("visibility", "hidden");
     	}
     	}

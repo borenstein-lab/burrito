@@ -388,6 +388,7 @@ shinyServer(function(input, output, session) {
 	        otu_table[,OTU:=as.character(OTU)]
 	        expanded_table = merge(otu_table, level_match_taxa_hierarchy, by.x = c(colnames(otu_table)[1]), by.y = c(colnames(level_match_taxa_hierarchy)[1]), all.y=F, allow.cartesian=T)
 	        summarized_otu_table = expanded_table[,lapply(.SD[,2:dim(.SD)[2],with=F], sum), by=new_summary_level]
+			
 	        summarized_otu_table_col_names = colnames(summarized_otu_table)
 	        summarized_otu_table[,(colnames(summarized_otu_table)[2:dim(summarized_otu_table)[2]]):=lapply(.SD, function(col){
 	        	return(col/sum(col))
@@ -399,7 +400,7 @@ shinyServer(function(input, output, session) {
 	        	l["Sample"] = colnames(summarized_otu_table)[col]
 	        	return(l)
 	        })
-
+			
 	        ################################# Organizing OTU table samples if grouping is chosen #################################
 
 	        if(!is.null(samp_grouping)){ # If they've chosen a metadata factor to group by

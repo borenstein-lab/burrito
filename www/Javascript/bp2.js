@@ -343,8 +343,11 @@
 					
 				displayed_taxa.map(function(e,j){
 					if(j != current_data.key1){
-						d3.select("#Genomes0"+e.replace(/ /g,"_").replace(/,/g, "_")).classed("highlighted",false)
-						d3.select("#Genomes0"+e.replace(/ /g,"_").replace(/,/g, "_")).classed("clicked",false)
+						d3.select("#Genomes0"+e.replace(/ /g,"_").replace(/,/g, "_"))
+							.classed("highlighted",false)
+							.classed("clicked",false);
+							
+						bP.deSelectSegment(0, j, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
 						d3.select("#Genomes").select(".edges").selectAll(".edge")
 							.filter(function(f){ 
 								return (f["key1"]==j); })
@@ -357,6 +360,7 @@
 					if(j != current_data.key2){
 						d3.select("#Genomes1"+e.replace(/ /g,"_").replace(/,/g, "_")).classed("highlighted",false)
 						d3.select("#Genomes1"+e.replace(/ /g,"_").replace(/,/g, "_")).classed("clicked",false)
+						bP.deSelectSegment(1, j, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
 						d3.select("#Genomes").select(".edges").selectAll(".edge")
 							.filter(function(f){ 
 								return (f["key2"]==j); })
