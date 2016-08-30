@@ -42,6 +42,12 @@ body.svgBody {
 .node text {
    font-size: 11px;
 }
+.edge {
+	cursor: pointer;
+} 
+.mainbars {
+	cursor: pointer;
+}
 path.link {
    fill: none;
    stroke: #ccc;

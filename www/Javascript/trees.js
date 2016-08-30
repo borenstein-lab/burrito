@@ -273,6 +273,8 @@
 			})
 			.on("click", trees.click)
 			.on("mouseover", function (d) {
+				clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
+  				if(clickedBars.empty()){
 				if (~d.values) {
 					if (d.type == 'taxa') {
 						highlightOverall(d.key, "", 1);
@@ -282,10 +284,11 @@
 				} else {
 					highlightTree(d, this);
 				}
-												
-
+				}												
 			})
 			.on("mouseout", function(d) {
+			  	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
+  				if(clickedBars.empty()){
 				if (~d.values) {
 					if (d.type == 'taxa') {
 						dehighlightOverall(d.key, "", 1);
@@ -294,6 +297,7 @@
 					}
 				} else {
 					dehighlightTree(d, this);
+				}
 				}
 				});
 

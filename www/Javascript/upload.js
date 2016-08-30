@@ -244,6 +244,7 @@
 					sample_group_dropdown.add(option);
 				}
 			}
+
 		});
 
 		uploader.execute_on_default_samp_map_load = function() {
