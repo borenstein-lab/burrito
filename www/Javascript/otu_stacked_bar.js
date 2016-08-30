@@ -143,39 +143,63 @@
       	current_rectangle_data = d3.select(this).datum();
   		clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   		clickedTaxaBars = d3.select("#Genomes").select(".part0").selectAll(".mainbars").select(".clicked")
-  		if(clickedBars.empty()){
+  		clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
+  		if(clickedBars.empty()){ //if nothing is clicked
         	highlight_overall(current_rectangle_data.name, "", 1);
         	name_split = (current_rectangle_data.name.split('_')).pop()
         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
         	return tooltip.style("visibility", "visible");
-        }else if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
-    	if(display_taxa[clickedTaxaBars.datum().key] == current_rectangle_data.name){
+        }
+        if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
+    		if(display_taxa[clickedTaxaBars.datum().key] == current_rectangle_data.name){
         	name_split = (current_rectangle_data.name.split('_')).pop()
         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           	return tooltip.style("visibility", "visible");
-    }
-    }
+    		}
+    	} else if(clickedEdges.empty() == false){ //if an edge is clicked
+    		if(display_taxa[clickedEdges.datum().key1] == current_rectangle_data.name){ //if relevant edge is clicked
+    		    name_split = (current_rectangle_data.name.split('_')).pop()
+        		tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+          		return tooltip.style("visibility", "visible");
+    		}
+    	}
       })
       .on("mousemove", function(d){ 
+      	current_rectangle_data = d3.select(this).datum();
         clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   		clickedTaxaBars = d3.select("#Genomes").select(".part0").selectAll(".mainbars").select(".clicked")
-  		if(clickedBars.empty() || (clickedTaxaBars.empty() == false && display_taxa[clickedTaxaBars.datum().key] == d.name)){
+  		clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
+  		if(clickedBars.empty()){
 	        return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-        }
+        } else if(clickedTaxaBars.empty() == false){
+         	if(display_taxa[clickedTaxaBars.datum().key] == d.name){
+         		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+         	}
+         } else if(clickedEdges.empty() == false){
+         	if(display_taxa[clickedEdges.datum().key1] == current_rectangle_data.name){
+         		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+         	}
+         }
       })
       .on("mouseout", function(d){
+      	current_rectangle_data = d3.select(this).datum();
 	    clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   		clickedTaxaBars = d3.select("#Genomes").select(".part0").selectAll(".mainbars").select(".clicked")
+  		clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
   		if(clickedBars.empty()){
-        var current_rectangle_data = d3.select(this).datum();
-        dehighlight_overall(current_rectangle_data.name, "", 1);
-        return tooltip.style("visibility", "hidden");
-        }  else if(clickedTaxaBars.empty() == false){
-    	if(display_taxa[clickedTaxaBars.datum().key] == d.name){
-	    	return tooltip.style("visibility", "hidden");
+        	var current_rectangle_data = d3.select(this).datum();
+        	dehighlight_overall(current_rectangle_data.name, "", 1);
+        	return tooltip.style("visibility", "hidden");
+        }  
+        if(clickedTaxaBars.empty() == false){
+    		if(display_taxa[clickedTaxaBars.datum().key] == d.name){
+	    		return tooltip.style("visibility", "hidden");
+    		} 
+    	} else if(clickedEdges.empty() == false){
+    		if(display_taxa[clickedEdges.datum().key1] == current_rectangle_data.name){
+    			return tooltip.style("visibility", "hidden");
+    		}
     	}
-    	}
-
       });
 
     svglink.append("svg")

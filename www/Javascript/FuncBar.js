@@ -89,6 +89,10 @@
 	display_func = d3.set(stackdata[0].data.map(function(d){
 		return(d.func)
 	})).values().sort(function(a,b){ return a > b; })
+
+	display_taxa = d3.set(stackdata[0].data.map(function(d){
+		return(d.Taxa)
+	})).values().sort(function(a,b){ return a > b; })
 	
    var viz = fB.vizData(stackdata, sample_order);
    //console.log(viz)
@@ -165,6 +169,7 @@
 	current_rectangle_data = d3.select(this).datum();
   	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   	clickedFuncBars = d3.select("#Genomes").select(".part1").selectAll(".mainbars").select(".clicked")
+  	clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
   	if(clickedBars.empty()){
 	    highlight_overall("", current_rectangle_data.func, 2);		
 		selected = d3.select("#func_" + current_rectangle_data.Sample)
@@ -176,39 +181,74 @@
     	//taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split 
         tooltip.html("<strong>Function: </strong>" + name_split + "<br>" +  "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
-    } else if(clickedFuncBars.empty() == false){
+    } else if(clickedFuncBars.empty() == false && clickedEdges.empty()==true){ 
     	if(display_func[clickedFuncBars.datum().key] == current_rectangle_data.func){
-    	selected = d3.select("#func_" + current_rectangle_data.Sample)
-			.selectAll("rect").data()
-			.filter(function(e){ 
-				return e.func == current_rectangle_data.func; })
+	    	selected = d3.select("#func_" + current_rectangle_data.Sample)
+				.selectAll("rect").data()
+				.filter(function(e){ 
+					return e.func == current_rectangle_data.func; })
      	total_abund = d3.sum(selected.map(function(e){ return e.contributions; }))
-    	name_split = (current_rectangle_data.func.split('_')).pop()
-    	//taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split 
-        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" +  "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
+    	name_split = (current_rectangle_data.func.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split  + "<br>" 
+        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
     }
-    }
-        })
+    } else if(clickedEdges.empty() == false){
+    	if(display_func[clickedEdges.datum().key2] == current_rectangle_data.func && display_taxa[clickedEdges.datum().key1] == current_rectangle_data.Taxa){ //if a taxon is highlighted with an edge clicked, just show contributions from that edge
+    		name_split = (current_rectangle_data.func.split('_')).pop()
+    		taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //
+    		abund = current_rectangle_data.contributions
+        	tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Taxon: </strong>" + taxa_split  + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(abund*100*100)/100+ "%");
+          	return tooltip.style("visibility", "visible");    		
+    	}
+	} else if(clickedBars.empty() == false && clickedFuncBars.empty() == true){ //highlight contributions if taxon selected
+		if(display_taxa[clickedBars.datum().key] == current_rectangle_data.Taxa){
+			name_split = (current_rectangle_data.func.split('_')).pop()
+    		taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //
+    		abund = current_rectangle_data.contributions
+        	tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Taxon: </strong>" + taxa_split  + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(abund*100*100)/100+ "%");
+          	return tooltip.style("visibility", "visible");   
+		}
+	}
+	})
   .on("mousemove", function(d){
+  	current_rectangle_data = d3.select(this).datum()
   	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   	clickedFuncBars = d3.select("#Genomes").select(".part1").selectAll(".mainbars").select(".clicked")
-  	if(clickedBars.empty() || (clickedFuncBars.empty() == false && display_func[clickedFuncBars.datum().key] == d.func)){
+  	 clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
+  	if(clickedBars.empty() || (clickedFuncBars.empty() == false && clickedEdges.empty()== true && display_func[clickedFuncBars.datum().key] == current_rectangle_data.func)){
   	return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
-  	}
+  	} else if(clickedEdges.empty() == false){
+  		 if(display_func[clickedEdges.datum().key2] == current_rectangle_data.func && display_taxa[clickedEdges.datum().key1] == current_rectangle_data.Taxa){ //if a taxon is highlighted with an edge clicked, just show contributions from that edge
+		  	return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+		  }
+  		} else if(clickedBars.empty() == false && clickedFuncBars.empty() == true){ //highlight contributions if taxon selected
+			if(display_taxa[clickedBars.datum().key] == current_rectangle_data.Taxa){
+				return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+			}
+		}
   	})
   .on("mouseout", function(d){
+  current_rectangle_data = d3.select(this).datum()
     clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   	clickedFuncBars = d3.select("#Genomes").select(".part1").selectAll(".mainbars").select(".clicked")
+  	 clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
   	if(clickedBars.empty()){
 	    current_rectangle_data = d3.select(this).datum();
     	dehighlight_overall("", current_rectangle_data.func, 2);
     	return tooltip.style("visibility", "hidden");
-    	} else if(clickedFuncBars.empty() == false){
-    	if(display_func[clickedFuncBars.datum().key] == d.func){
-	    	return tooltip.style("visibility", "hidden");
-    	}
-    	}
+    	} else if(clickedFuncBars.empty() == false && clickedEdges.empty() == true){
+	    	if(display_func[clickedFuncBars.datum().key] == d.func){
+		    	return tooltip.style("visibility", "hidden");
+    		}
+    	} else if(clickedEdges.empty() == false){
+    		if(display_func[clickedEdges.datum().key2] == current_rectangle_data.func && display_taxa[clickedEdges.datum().key1] == current_rectangle_data.Taxa){
+    			return tooltip.style("visibility", "hidden");
+    		}
+    	} else if(clickedBars.empty() == false && clickedFuncBars.empty() == true){ //highlight contributions if taxon selected
+			if(display_taxa[clickedBars.datum().key] == current_rectangle_data.Taxa){
+				return tooltip.style("visibility", "hidden");
+			}
+		}
   });
 
       //get the x axis set
