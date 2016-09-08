@@ -20,13 +20,14 @@ average_contrib_sample_name = unlist(constants_table[unlist(constants_table[,2,w
 options(shiny.maxRequestSize = as.numeric(unlist(constants_table[unlist(constants_table[,2,with=F]) == "max_upload_size",4,with=F])))
 options(stringsAsFactors = F)
 
+# Defining constants used by the server
 comparison_tag = "_comparison"
 
 # Actual Shiny server code
 shinyServer(function(input, output, session) {
 
     # Variables that the server keeps track of but doesn't need to run functions to calculate
-    tracked_data = reactiveValues(previous_contribution_sample = -1, previous_otu_sample = -1, otu_table = NULL, contribution_table = NULL) 
+    tracked_data = reactiveValues(previous_contribution_sample = -1, previous_otu_sample = -1, otu_table = NULL, contribution_table = NULL, tax_summary_level = "Genus", func_summary_level = "SubPathway")
 
     # Functional to calculate the normalization factors for partial KO contributions
     ko_normalization_table = reactive({ # Reactive, when called only recalculates output if variables it depends on change
@@ -48,11 +49,11 @@ shinyServer(function(input, output, session) {
 	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
 		tracked_data$contribution_table = NULL
 		output = NULL
-		tax_summary_level = "Genus"
+		tax_summary_level = tracked_data$tax_summary_level
 		if (!is.null(input$taxLODselector)){
 			tax_summary_level = input$taxLODselector
 		}
-		func_summary_level = "SubPathway"
+		func_summary_level = tracked_data$func_summary_level
 		if (!is.null(input$funcLODselector)){
 			func_summary_level = input$funcLODselector
 		}
@@ -374,7 +375,6 @@ shinyServer(function(input, output, session) {
 
 	        output[,OTU:=as.character(OTU)]
 	        level_match_taxa_hierarchy = NULL
-	        session$sendCustomMessage("shiny_test", tax_summary_level)
 	        if (which(colnames(taxa_hierarchy) == tax_summary_level) != 1){
 		        # Summarize contribution table to the correct taxonomic level
 		        level_match_taxa_hierarchy = taxa_hierarchy[,c(1,which(colnames(taxa_hierarchy) == tax_summary_level)),with=F]
@@ -628,6 +628,11 @@ shinyServer(function(input, output, session) {
 			} else {
 				session$sendCustomMessage("tax_hierarchy_labels", list(colnames(taxa_hierarchy)))
 			}
+			if ("Genus" %in% colnames(taxa_hierarchy)){
+				tracked_data$tax_summary_level = "Genus"
+			} else {
+				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
+			}
 		} else {
 			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
 			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
@@ -643,6 +648,11 @@ shinyServer(function(input, output, session) {
 				session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[c(2:ncol(func_hierarchy), 1)])
 			} else {
 				session$sendCustomMessage("func_hierarchy_labels", list(colnames(func_hierarchy)))
+			}
+			if ("SubPathway" %in% colnames(func_hierarchy)){
+				tracked_data$func_summary_level = "SubPathway"
+			} else {
+				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
 			}
 		} else {
 			func_hierarchy = fread(default_func_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
