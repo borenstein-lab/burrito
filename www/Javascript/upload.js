@@ -178,14 +178,17 @@
 				tax_dropdown.remove(old_options[i])
 			}
 			var blank_option = document.createElement("option");
-			blank_option.text="";
-			blank_option.value="";
-			tax_dropdown.add(blank_option);
 			for (var i = 0; i < labels.length; i++){
 				var option = document.createElement("option");
 				option.text = labels[i];
 				option.value = labels[i];
 				tax_dropdown.add(option);
+			}
+			for (var i, j = 0; i = tax_dropdown.options[j]; j++){
+				if (i.value == "Genus") {
+					tax_dropdown.selectedIndex = j;
+					break;
+				}
 			}
 		});
 
@@ -203,14 +206,17 @@
 				func_dropdown.remove(old_options[i])
 			}
 			var blank_option = document.createElement("option");
-			blank_option.text="";
-			blank_option.value="";
-			func_dropdown.add(blank_option);
 			for (var i = 0; i < labels.length; i++){
 				var option = document.createElement("option");
 				option.text = labels[i];
 				option.value = labels[i];
 				func_dropdown.add(option);
+			}
+			for (var i, j = 0; i = func_dropdown.options[j]; j++){
+				if (i.value == "SubPathway") {
+					func_dropdown.selectedIndex = j;
+					break;
+				}
 			}
 		});
 
