@@ -714,12 +714,15 @@
 						selectedEdges.classed("highlighted", false)
 						selectedEdges.classed("clicked", false);
 						//dehighlight bar on other side assoicated with edge
+						
+						if(clickedEdges.empty() == false){
 						if(p ==0){
 							edgeOtherSide = clickedEdges.datum().key2
 							dehighlightall("", displayed_funcs[edgeOtherSide], 2)
 							} else {
 							edgeOtherSide = clickedEdges.datum().key1
 							dehighlightall(displayed_taxa[edgeOtherSide], "", 1)
+						}
 						}
 						
 						if (p == 0) {
