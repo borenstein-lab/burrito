@@ -651,7 +651,7 @@
 				}
 				})
 				.on("click", function(d,i){
-					if(d3.select(this).classed("clicked") == false){
+					if(d3.select(this).classed("clicked") == false){ //if not already clicked
 						//console.log(d3.select(this).attr("highlighted") == "false")
 						current_id = d3.select(this).attr("id")
 						//Unselect things currently clicked
@@ -701,16 +701,26 @@
 						} else {
 							return highlightall("", displayed_funcs[i],2);						
 						}
-					} else {
+					} else { //if already clicked
 						d3.select(this).classed("highlighted",false)
 						d3.select(this).classed("clicked",false)
 						//dehighlight everything for good measure
 						d3.select("#Genomes").select(".part"+m).selectAll(".mainbars").classed("highlighted", false).classed("clicked",false)
+						//clicked edges
 						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 							.filter(function(e,j){ 
 								return (e["key"+(p+1)]==i); })
+						clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
 						selectedEdges.classed("highlighted", false)
 						selectedEdges.classed("clicked", false);
+						//dehighlight bar on other side assoicated with edge
+						if(p ==0){
+							edgeOtherSide = clickedEdges.datum().key2
+							dehighlightall("", displayed_funcs[edgeOtherSide], 2)
+							} else {
+							edgeOtherSide = clickedEdges.datum().key1
+							dehighlightall(displayed_taxa[edgeOtherSide], "", 1)
+						}
 						
 						if (p == 0) {
 							return dehighlightall(displayed_taxa[i],"",1);
