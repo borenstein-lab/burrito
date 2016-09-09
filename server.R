@@ -273,7 +273,6 @@ shinyServer(function(input, output, session) {
 
 					session$sendCustomMessage("upload_status", "Reading contribution table")
 					tracked_data$old_contributions_datapath = contribution_file_path
-					session$sendCustomMessage("shiny_test", contribution_file_path)
 					contribution = fread(contribution_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
 					# File checking
