@@ -188,10 +188,29 @@ draw_loading = function() {
 		.attr("fill", "blue")
 }
 Shiny.addCustomMessageHandler("upload_status", function(message){
-	document.getElementById("loading_sample_text").innerHTML = message
+	message_element = document.getElementById("loading_sample_text")
+	if (message_element){
+		message_element.innerHTML = message
+	}
 })
 Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples){
-	document.getElementById("loading_sample_text").innerHTML = "Formatting " + num_samples + " samples"
+	message_element = document.getElementById("loading_sample_text")
+	if (message_element){
+		message_element.innerHTML = "Formatting " + num_samples + " samples"
+	}
+})
+Shiny.addCustomMessageHandler("abort", function(message){
+	d3.select("#mainsvg").remove();
+	alert(message);
+	document.getElementById("taxonomic_abundances_1").value = null
+	document.getElementById("taxonomic_abundances_2").value = null
+	document.getElementById("read_counts").value = null
+	document.getElementById("genome_annotations").value = null
+	document.getElementById("function_contributions").value = null
+	document.getElementById("function_abundances").value = null
+	document.getElementById("taxonomic_hierarchy").value = null
+	document.getElementById("function_hierarchy").value = null
+	document.getElementById("sample_map").value = null
 })
 
 update_progress = function(curr_sample, total_samples){
