@@ -19,7 +19,7 @@
 
 	
 	mainui.createUI = function() {
-		
+		/*
 		//console.log("setting stuff up");
 		document.getElementById("sampleselector").addEventListener("change", function() {
 			mainui.checkSampleDataSelect();
@@ -37,18 +37,51 @@
 				// draw_svg();
 				uploader.load_default_data();
 				//document.getElementById("update_button").click();
-			}/* else if (mainui.datamode == "upload") {
-				draw_svg();
-				//document.getElementById("update_button").click();
-			}*/
+			}
 		});
-	}
+		*/
+		document.getElementById("ReadOption").addEventListener("click", function() {
+			if (mainui.uploadMode == "Read") {
+				mainui.uploadMode = "";
+				d3.select("#ReadMenu").classed("hidexp",true);
+			} else {
+				mainui.uploadMode = "Read";
+				d3.select("#ReadMenu").classed("hidexp",false);
+				d3.select("#ContributionMenu").classed("hidexp",true);
+				d3.select("#GenomeMenu").classed("hidexp",true);
+			}
+		});
+		document.getElementById("ContributionOption").addEventListener("click", function() {
+			if (mainui.uploadMode == "Contribution") {
+				mainui.uploadMode = "";
+				d3.select("#ContributionMenu").classed("hidexp",true);
+			} else {
+				mainui.uploadMode = "Contribution";
+				d3.select("#ReadMenu").classed("hidexp",true);
+				d3.select("#ContributionMenu").classed("hidexp",false);
+				d3.select("#GenomeMenu").classed("hidexp",true);
+			}
+		});
+		document.getElementById("GenomeOption").addEventListener("click", function() {
+			if (mainui.uploadMode == "Genome") {
+				mainui.uploadMode = "";
+				d3.select("#GenomeMenu").classed("hidexp",true);
+			} else {
+				mainui.uploadMode = "Genome";
+				d3.select("#ReadMenu").classed("hidexp",true);
+				d3.select("#ContributionMenu").classed("hidexp",true);
+				d3.select("#GenomeMenu").classed("hidexp",false);
+			}
+		});
+	
+			
+			}
 		
 		/*document.getElementById("update_button").addEventListener("click", function() {
 			console.log("update button clicked");
 		}); */	
 
-
+/* % out of date with UI change, delete
 	mainui.checkWhichInput = function() {
 		if (document.getElementById("usesample").checked) {
 			d3.select("#sampletable").attr("bgcolor","#b3ff99");
@@ -76,7 +109,7 @@
 		mainui.sampleSelected = sampsel.options[sampsel.selectedIndex].value;
 		mainui.RefreshUploadReady();
 	}
-
+*/
 	mainui.checkInpDataRadio = function() {
 		if (document.getElementById("sixteenradio").checked) {
 			mainui.deselAllInps();

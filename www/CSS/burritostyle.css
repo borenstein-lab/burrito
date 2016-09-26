@@ -150,43 +150,6 @@ path.link {
 #sidebar_hide:hover rect {
 	fill:#660066;
 }
-.tt { 
-	position:relative;
-}
-.tt img {
-	z-index:12;
-}
-.tt span{
-	display:none; 
-}
-.tt > img:hover ~span.tooltip{
-	display:block;
-	position:absolute;
-//	top:0px; left:0;
-//	padding: 15px 0 0 0;
-	width:400px;
-	text-align: center;
-//	filter: alpha(opacity:90);
-//	KHTMLOpacity: 0.90;
-//	MozOpacity: 0.90;
-//	opacity: 0.90;
-	z-index: 10;
-}
-.tt > img:hover ~span.tooltip span.blank{
-	display:block;
-	padding: 5px 8px 0;
-}
-.tt > img:hover ~span.tooltip span.content{
-	text-align: left;
-	display:block;
-	padding: 5px 5px 5px 5px;
-	background: #fff0ff;
-	border-style: solid;
-	border-width: 1px;
-	border-color: #000000;
-	margin-left: -20px;
-	z-index: 10;
-}
 table.ExampleTable {
 	border: 1px solid black;
 	border-collapse: collapse;
@@ -194,10 +157,11 @@ table.ExampleTable {
 	margin-left: 1em;
 	margin-bottom: 1em;
 	margin-right: 1em;
+	font-size: 10px;
 }
 table.ExampleTable th, table.ExampleTable td {
 	border: 1px solid black;
-	padding: 10px;
+	padding: 4px;
 }
 div#SaveInputDiv * {
 	line-height: 100%;
@@ -235,7 +199,34 @@ div#SaveInputDiv * {
 .hidexp {
 	display:none;
 }
-.hidbut {
+/*.hidbut {
 	visibility:hidden;
+}*/
+.inputSelectorB {
+	width: 100%;
+	height: 60px;
+}
+#mainthing {
+	width: 1000px;
+	margin: 0 auto;
+}
+.menuEl {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+h2 {
+	text-align: center;
+}
+.uploadtable td {
+	border-bottom: 1px solid #202020;
+}
+.btn-primary {
+	width: 150px;
+	height: 40px;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #ff6666;
 }
 white-space: pre-line;
