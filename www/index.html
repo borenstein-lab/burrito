@@ -38,6 +38,11 @@
 	<col>
 	<col align="right">
 	<tr>
+		<td colspan=3>
+			<b>File Upload</b>
+		</td>
+	</tr>
+	<tr>
 		<td>
 			<div id="read_counts_g">
 				<b>16S rRNA OTU Table<b>
@@ -80,7 +85,7 @@
 	<tr>
 		<td>
 			Taxonomic Hierarchy
-			<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
+			<input type="file" name="taxonomic_hierarchy_R" id="taxonomic_hierarchy_R">
 		</td>
 		<td>
 			A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
@@ -117,7 +122,7 @@
 	<tr>
 		<td>
 			Function Hierarchy
-			<input type="file" name="function_hierarchy" id="function_hierarchy">
+			<input type="file" name="function_hierarchy_R" id="function_hierarchy_R">
 		</td>
 		<td>
 			A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
@@ -154,7 +159,7 @@
 	<tr>
 		<td>
 			Sample Map
-			<input type="file" name="sample_map" id="sample_map">
+			<input type="file" name="sample_map_R" id="sample_map_R">
 		</td>
 		<td>
 			A file describing the relationship between samples, i.e. which ones are the same treatment condition.
@@ -191,7 +196,7 @@
 	<tr>
 		<td>
 			Function Abundances
-			<input type="file" name="function_abundances" id="function_abundances">
+			<input type="file" name="function_abundances_R" id="function_abundances_R">
 		</td>
 		<td>
 			A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
@@ -226,30 +231,67 @@
 		</td>
 	</tr>
 
+	<tr>
+		<td colspan=3>
+			<b>Visualization Options</b>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Taxonomic level of detail
+			<br>
+			<select name="taxlevelofdetail_R" id="taxLODselector_R"></select>
+		</td>
+		<td colspan=2>
+			Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Function level of detail
+			<br>
+			<select name="funclevelofdetail_R" id="funcLODselector_R"></select>
+		</td>
+		<td colspan=2>
+			Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Sample grouping
+			<br>
+			<select name="sampgroup_R" id="sampgroupselector_R"></select>
+		</td>
+		<td colspan=2>
+			Select a grouping for samples if desired. Requires uploading a sample map.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Color scale
+			<br>
+			<select name="color_option_selector_R" id="color_option_selector_R">
+			<option value="Categories">Hierarchical color scale</option>
+			<option value="Random">Random color scale</option>
+			</select>
+		</td>
+		<td colspan=2>
+			Color scheme. Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3>
+			<h4>Draw the burrito</h4>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3>
+			<button id="update_button_R" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
+			<button id="update_button5000_R" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
+		</td>
+	</tr>
 </table>
 
-<select name="taxlevelofdetail" id="taxLODselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.</span></span></span>		
-<br>
-<select name="funclevelofdetail" id="funcLODselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.</span></span></span>		
-<br>
-<select name="sampgroup" id="sampgroupselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select a grouping for samples if desired.</span></span></span>		
-<br>
-<select name="color_option_selector" id="color_option_selector">
-<option value="Categories">Hierarchical color scale</option>
-<option value="Random">Random color scale</option>
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.</span></span></span>
-<br>
-<h4>Draw the burrito</h4>
-<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-<button id="update_button5000" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
-<br>
 </div>
 
 <button class="inputSelectorB" id="ContributionOption">
@@ -259,188 +301,327 @@
 </button>
 
 <div id="ContributionMenu" class="hidexp">
-
 <table class="uploadtable" width=100%>
-	
+	<col>
+	<col>
+	<col align="right">
+	<tr>
+		<td colspan=3>
+			<b>File Upload</b>
+		</td>
+	</tr>
 	<tr>
 		<td>
-			<div id="taxonomic_abundances_2_g">
-				Taxonomic Abundances
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each taxon in each sample. See documentation for an example.</span></span></span>
+			<div id="tax_counts_g">
+				<b>16S rRNA OTU Table<b>
+				<br>
 				<input type="file" name="taxonomic_abundances_2" id="taxonomic_abundances_2">
 			</div>
 		</td>
 		<td>
-			<div id="function_contributions_g">
-				Function Contributions
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional contribution of each taxon. See documentation for an example.</span></span></span>
+			A file containing abundances of each taxon in each sample. See documentation for an example.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>OTU</th>
+					<th>Sample1_Name</th>
+					<th>Sample2_Name</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>OTU1_ID</td>
+					<td>10</td>
+					<td>5</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>OTU2_ID</td>
+					<td>0</td>
+					<td>5</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div id="func_contribution_g">
+				<b>Function Contributions<b>
+				<br>
 				<input type="file" name="function_contributions" id="function_contributions">
 			</div>
 		</td>
 		<td>
-			
+			An output file from PiCRUST, containing the contribution each taxa makes to each function.
+		</td>
+		<td>
+			<div id="tooLongTableDiv">
+				<div id="tooLongTable">
+					<table class="ExampleTable">
+						<tr>
+							<th>Gene</th>
+							<th>Sample</th>
+							<th>OTU</th>
+							<th>GeneCountPerGenome</th>
+							<th>OTUAbundanceInSample</th>
+							<th>CountContributedByOTU</th>
+							<th>ContributionPercentOfSample</th>
+							<th>ContributionPercentOfAllSamples</th>
+						</tr>
+						<tr>
+							<td>Gene1_Name</td>
+							<td>Sample1_Name</td>
+							<td>OTU1_ID</td>
+							<td>1.0</td>
+							<td>10.0</td>
+							<td>10.0</td>
+							<td>0.5</td>
+							<td>0.0002</td>
+						</tr>
+						<tr>
+							<td>Gene1_Name</td>
+							<td>Sample1_Name</td>
+							<td>OTU2_ID</td>
+							<td>2.0</td>
+							<td>5.0</td>
+							<td>10.0</td>
+							<td>0.5</td>
+							<td>0.0002</td>
+						</tr>
+						<tr>
+							<td>etc.</td>
+							<td>etc.</td>
+							<td>etc.</td>
+							<td>etc.</td>
+							<td>etc.</td>
+							<td>etc.</td>
+							<td>etc.</td>
+							<td>etc.</td>
+						</tr>
+					</table>
+				</div>
+			</div>
 		</td>
 	</tr>
-	<tr> 
-		<td colspan=3> Optional Files:</td>
+	
+	
+	
+	<tr>
+		<td>
+			Taxonomic Hierarchy
+			<input type="file" name="taxonomic_hierarchy_C" id="taxonomic_hierarchy_C">
+		</td>
+		<td>
+			A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>OTU</th>
+					<th>Taxa_Level_1</th>
+					<th>Taxa_Level_2</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>OTU1_ID</td>
+					<td>Bacteria</td>
+					<td>Firmicutes</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>OTU2_ID</td>
+					<td>Bacteria</td>
+					<td>Proteobacteria</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Function Hierarchy
+			<input type="file" name="function_hierarchy_C" id="function_hierarchy_C">
+		</td>
+		<td>
+			A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>Gene</th>
+					<th>Level_0</th>
+					<th>Level_1</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>Gene1_Name</td>
+					<td>Metabolism</td>
+					<td>Lipid Metabolism</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Gene2_Name</td>
+					<td>Cellular Processes</td>
+					<td>Cell Motility</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Sample Map
+			<input type="file" name="sample_map_C" id="sample_map_C">
+		</td>
+		<td>
+			A file describing the relationship between samples, i.e. which ones are the same treatment condition.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>Sample</th>
+					<th>Grouping_1</th>
+					<th>Grouping_2</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>Sample1_Name</td>
+					<td>Case</td>
+					<td>Human</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Sample2_Name</td>
+					<td>Control</td>
+					<td>Mouse</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
 	</tr>
 	<tr>
 		<td>
 			Function Abundances
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
-				<table class="ExampleTable">
-					<tr>
-						<th>Gene</th>
-						<th>Sample1_Name</th>
-						<th>Sample2_Name</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>Gene1_Name</td>
-						<td>0.1</td>
-						<td>0.2</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>Gene2_Name</td>
-						<td>0.3</td>
-						<td>0.25</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="function_abundances" id="function_abundances">
+			<input type="file" name="function_abundances_C" id="function_abundances_C">
 		</td>
 		<td>
-			Taxonomic Hierarchy
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
-				<table class="ExampleTable">
-					<tr>
-						<th>OTU</th>
-						<th>Taxa_Level_1</th>
-						<th>Taxa_Level_2</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>OTU1_ID</td>
-						<td>Bacteria</td>
-						<td>Firmicutes</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>OTU2_ID</td>
-						<td>Bacteria</td>
-						<td>Proteobacteria</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
+			A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
 		</td>
 		<td>
-			Function Hierarchy
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
-				<table class="ExampleTable">
-					<tr>
-						<th>Gene</th>
-						<th>Level_0</th>
-						<th>Level_1</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>Gene1_Name</td>
-						<td>Metabolism</td>
-						<td>Lipid Metabolism</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>Gene2_Name</td>
-						<td>Cellular Processes</td>
-						<td>Cell Motility</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="function_hierarchy" id="function_hierarchy">
+			<table class="ExampleTable">
+				<tr>
+					<th>Gene</th>
+					<th>Sample1_Name</th>
+					<th>Sample2_Name</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>Gene1_Name</td>
+					<td>0.1</td>
+					<td>0.2</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Gene2_Name</td>
+					<td>0.3</td>
+					<td>0.25</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
 		</td>
+	</tr>
+
+	<tr>
+		<td colspan=3>
+			<b>Visualization Options</b>
+		</td>
+	</tr>
+	<tr>
 		<td>
-			Sample Map
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file describing the relationship between samples, i.e. which ones are the same treatment condition.
-				<table class="ExampleTable">
-					<tr>
-						<th>Sample</th>
-						<th>Grouping_1</th>
-						<th>Grouping_2</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>Sample1_Name</td>
-						<td>Case</td>
-						<td>Human</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>Sample2_Name</td>
-						<td>Control</td>
-						<td>Mouse</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="sample_map" id="sample_map">
+			Taxonomic level of detail
+			<br>
+			<select name="taxlevelofdetail_C" id="taxLODselector_C"></select>
+		</td>
+		<td colspan=2>
+			Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Function level of detail
+			<br>
+			<select name="funclevelofdetail_C" id="funcLODselector_C"></select>
+		</td>
+		<td colspan=2>
+			Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Sample grouping
+			<br>
+			<select name="sampgroup_C" id="sampgroupselector_C"></select>
+		</td>
+		<td colspan=2>
+			Select a grouping for samples if desired. Requires uploading a sample map.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Color scale
+			<br>
+			<select name="color_option_selector_C" id="color_option_selector_C">
+			<option value="Categories">Hierarchical color scale</option>
+			<option value="Random">Random color scale</option>
+			</select>
+		</td>
+		<td colspan=2>
+			Color scheme. Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3>
+			<h4>Draw the burrito</h4>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3>
+			<button id="update_button_C" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
+			<button id="update_button5000_C" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 		</td>
 	</tr>
 </table>
-
-<select name="taxlevelofdetail" id="taxLODselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.</span></span></span>		
-<br>
-<select name="funclevelofdetail" id="funcLODselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.</span></span></span>		
-<br>
-<select name="sampgroup" id="sampgroupselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select a grouping for samples if desired.</span></span></span>		
-<br>
-<select name="color_option_selector" id="color_option_selector">
-<option value="Categories">Hierarchical color scale</option>
-<option value="Random">Random color scale</option>
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.</span></span></span>
-<br>
-<h4>Draw the burrito</h4>
-<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
-<button id="update_button5000" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 
 </div>
 <button class="inputSelectorB" id="GenomeOption">
@@ -450,188 +631,298 @@
 </button>
 
 <div id="GenomeMenu" class="hidexp">
-
-<table id="uploadtable" width="500" height = "200">
-	
+<table class="uploadtable" width=100%>
+	<col>
+	<col>
+	<col align="right">
+	<tr>
+		<td colspan=3>
+			<b>File Upload</b>
+		</td>
+	</tr>
 	<tr>
 		<td>
-			<div id="taxonomic_abundances_1_g">
-				Genome Abundances
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing abundances of each genome in each sample. See documentation for an example.</span></span></span>
-				<input type="file" name="taxonomic_abundances_1" id="taxonomic_abundances_1">
-			</div>
+			<b>Genome Abundances<b>
+			<br>
+			<input type="file" name="taxonomic_abundances_1" id="taxonomic_abundances_1">
 		</td>
 		<td>
-			<div id="genome_annotations_g">
-				Genome Annotations
-				<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> A file containing the functional content of each genome. See documentation for an example.</span></span></span>
+			A file containing abundances of each taxon in each sample. See documentation for an example.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>OTU</th>
+					<th>Sample1_Name</th>
+					<th>Sample2_Name</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>OTU1_ID</td>
+					<td>10</td>
+					<td>5</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>OTU2_ID</td>
+					<td>0</td>
+					<td>5</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div id="read_counts_g">
+				<b>Genome Annotations<b>
+				<br>
 				<input type="file" name="genome_annotations" id="genome_annotations">
 			</div>
 		</td>
 		<td>
-			
+			A file containing abundances of each taxon in each sample. See documentation for an example.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>OTU</th>
+					<th>Gene</th>
+					<th>CopyNumber</th>
+				</tr>
+				<tr>
+					<td>OTU1_ID</td>
+					<td>Gene1_Name</td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td>OTU1_ID</td>
+					<td>Gene2_Name</td>
+					<td>2</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>etc.</td>
+					<td>etc.</td>
+				</tr>
+			</table>
 		</td>
 	</tr>
-	<tr> 
-		<td colspan=3> Optional Files:</td>
+	<tr>
+		<td>
+			Taxonomic Hierarchy
+			<input type="file" name="taxonomic_hierarchy_G" id="taxonomic_hierarchy_G">
+		</td>
+		<td>
+			A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>OTU</th>
+					<th>Taxa_Level_1</th>
+					<th>Taxa_Level_2</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>OTU1_ID</td>
+					<td>Bacteria</td>
+					<td>Firmicutes</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>OTU2_ID</td>
+					<td>Bacteria</td>
+					<td>Proteobacteria</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Function Hierarchy
+			<input type="file" name="function_hierarchy_G" id="function_hierarchy_G">
+		</td>
+		<td>
+			A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>Gene</th>
+					<th>Level_0</th>
+					<th>Level_1</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>Gene1_Name</td>
+					<td>Metabolism</td>
+					<td>Lipid Metabolism</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Gene2_Name</td>
+					<td>Cellular Processes</td>
+					<td>Cell Motility</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Sample Map
+			<input type="file" name="sample_map_G" id="sample_map_G">
+		</td>
+		<td>
+			A file describing the relationship between samples, i.e. which ones are the same treatment condition.
+		</td>
+		<td>
+			<table class="ExampleTable">
+				<tr>
+					<th>Sample</th>
+					<th>Grouping_1</th>
+					<th>Grouping_2</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>Sample1_Name</td>
+					<td>Case</td>
+					<td>Human</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Sample2_Name</td>
+					<td>Control</td>
+					<td>Mouse</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
+		</td>
 	</tr>
 	<tr>
 		<td>
 			Function Abundances
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
-				<table class="ExampleTable">
-					<tr>
-						<th>Gene</th>
-						<th>Sample1_Name</th>
-						<th>Sample2_Name</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>Gene1_Name</td>
-						<td>0.1</td>
-						<td>0.2</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>Gene2_Name</td>
-						<td>0.3</td>
-						<td>0.25</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="function_abundances" id="function_abundances">
+			<input type="file" name="function_abundances_G" id="function_abundances_G">
 		</td>
 		<td>
-			Taxonomic Hierarchy
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
-				<table class="ExampleTable">
-					<tr>
-						<th>OTU</th>
-						<th>Taxa_Level_1</th>
-						<th>Taxa_Level_2</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>OTU1_ID</td>
-						<td>Bacteria</td>
-						<td>Firmicutes</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>OTU2_ID</td>
-						<td>Bacteria</td>
-						<td>Proteobacteria</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="taxonomic_hierarchy" id="taxonomic_hierarchy">
+			A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
 		</td>
 		<td>
-			Function Hierarchy
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
-				<table class="ExampleTable">
-					<tr>
-						<th>Gene</th>
-						<th>Level_0</th>
-						<th>Level_1</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>Gene1_Name</td>
-						<td>Metabolism</td>
-						<td>Lipid Metabolism</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>Gene2_Name</td>
-						<td>Cellular Processes</td>
-						<td>Cell Motility</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="function_hierarchy" id="function_hierarchy">
+			<table class="ExampleTable">
+				<tr>
+					<th>Gene</th>
+					<th>Sample1_Name</th>
+					<th>Sample2_Name</th>
+					<th>etc.</th>
+				</tr>
+				<tr>
+					<td>Gene1_Name</td>
+					<td>0.1</td>
+					<td>0.2</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>Gene2_Name</td>
+					<td>0.3</td>
+					<td>0.25</td>
+					<td>...</td>
+				</tr>
+				<tr>
+					<td>etc.</td>
+					<td>...</td>
+					<td>...</td>
+					<td>...</td>
+				</tr>
+			</table>
 		</td>
+	</tr>
+
+	<tr>
+		<td colspan=3>
+			<b>Visualization Options</b>
+		</td>
+	</tr>
+	<tr>
 		<td>
-			Sample Map
-			<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> 
-				A file describing the relationship between samples, i.e. which ones are the same treatment condition.
-				<table class="ExampleTable">
-					<tr>
-						<th>Sample</th>
-						<th>Grouping_1</th>
-						<th>Grouping_2</th>
-						<th>etc.</th>
-					</tr>
-					<tr>
-						<td>Sample1_Name</td>
-						<td>Case</td>
-						<td>Human</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>Sample2_Name</td>
-						<td>Control</td>
-						<td>Mouse</td>
-						<td>...</td>
-					</tr>
-					<tr>
-						<td>etc.</td>
-						<td>...</td>
-						<td>...</td>
-						<td>...</td>
-					</tr>
-				</table>
-			</span></span></span>
-			<input type="file" name="sample_map" id="sample_map">
+			Taxonomic level of detail
+			<br>
+			<select name="taxlevelofdetail_G" id="taxLODselector_G"></select>
+		</td>
+		<td colspan=2>
+			Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Function level of detail
+			<br>
+			<select name="funclevelofdetail_G" id="funcLODselector_G"></select>
+		</td>
+		<td colspan=2>
+			Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Sample grouping
+			<br>
+			<select name="sampgroup_G" id="sampgroupselector_G"></select>
+		</td>
+		<td colspan=2>
+			Select a grouping for samples if desired. Requires uploading a sample map.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Color scale
+			<br>
+			<select name="color_option_selector_G" id="color_option_selector_G">
+			<option value="Categories">Hierarchical color scale</option>
+			<option value="Random">Random color scale</option>
+			</select>
+		</td>
+		<td colspan=2>
+			Color scheme. Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3>
+			<h4>Draw the burrito</h4>
+		</td>
+	</tr>
+	<tr>
+		<td colspan=3>
+			<button id="update_button_G" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
+			<button id="update_button5000_G" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 		</td>
 	</tr>
 </table>
-
-<select name="taxlevelofdetail" id="taxLODselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.</span></span></span>		
-<br>
-<select name="funclevelofdetail" id="funcLODselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.</span></span></span>		
-<br>
-<select name="sampgroup" id="sampgroupselector">
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Select a grouping for samples if desired.</span></span></span>		
-<br>
-<select name="color_option_selector" id="color_option_selector">
-<option value="Categories">Hierarchical color scale</option>
-<option value="Random">Random color scale</option>
-</select>
-	<span class="tt"><img src="images/help.png" style="vertical-align; middle;"><span class="tooltip"><span class="blank"></span><span class="content"> Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.</span></span></span>
-<br>
-<h4>Draw the burrito</h4>
-<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Generate Visualization</button>
-<button id="update_button5000" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 
 </div>
 

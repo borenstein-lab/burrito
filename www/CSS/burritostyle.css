@@ -207,7 +207,7 @@ div#SaveInputDiv * {
 	height: 60px;
 }
 #mainthing {
-	width: 1000px;
+	width: 1200px;
 	margin: 0 auto;
 }
 .menuEl {
@@ -228,5 +228,13 @@ h2 {
 	margin-left: auto;
 	margin-right: auto;
 	background-color: #ff6666;
+}
+#tooLongTableDiv {
+	position:relative;
+	width: 500px;
+}
+#tooLongTable {
+	width:100%;
+	overflow:auto;
 }
 white-space: pre-line;

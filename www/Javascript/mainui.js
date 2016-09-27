@@ -110,7 +110,7 @@
 		mainui.RefreshUploadReady();
 	}
 */
-	mainui.checkInpDataRadio = function() {
+	/*mainui.checkInpDataRadio = function() {
 		if (document.getElementById("sixteenradio").checked) {
 			mainui.deselAllInps();
 			d3.select("#read_counts_g").classed("hidexp", false);
@@ -148,9 +148,10 @@
 				alert("The file '" + document.getElementById(buttonname).files[0].name + "'' is too large to upload at this time. We apologize for the inconvienence.")
 		}
 		mainui.RefreshUploadReady();
-	}
+	}*/
 	
-	mainui.RefreshUploadReady = function() {
+	/*
+	 * mainui.RefreshUploadReady = function() {
 		var readytogo = false;
 		if (mainui.datamode == "upload") {
 			if (mainui.uploadMode == "Genome") {
@@ -179,7 +180,7 @@
 		} else {
 			document.getElementById("update_button").disabled = true;
 		}
-	}
+	}*/
 
 	this.mainui = mainui;
 })();
