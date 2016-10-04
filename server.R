@@ -10,7 +10,7 @@ default_sample_map_table = "www/Data/mice_samplemap.txt"
 default_contribution_table = "www/Data/mice_metagenome_contributions_K01516_removed.txt"
 default_otu_table = "www/Data/otu_table_even_2.txt"
 picrust_normalization_file = "www/Data/16S_13_5_precalculated.tab.gz"
-picrust_ko_file = "www/Data/melted_picrust_ko_table_K01516_removed.txt"
+picrust_ko_file = "www/Data/melted_filtered_picrust_ko_table.txt"
 constants_file = "www/Javascript/constants.js"
 
 # Defining constants shared between javascript and R code
