@@ -40,6 +40,20 @@
 			}
 		});
 		*/
+		document.getElementById("update_button").addEventListener("click", function() {
+			uploader.reset_load_flags();
+			draw_svg();
+			if (mainui.uploadMode == "example") {
+				uploader.load_default_data();
+			}
+		});
+
+		document.getElementById("example_button").addEventListener("click", function() {
+			mainui.uploadMode = "example";
+			Shiny.onInputChange("input_type", "example");
+			document.getElementById("update_button").click();
+		});
+
 		document.getElementById("ReadOption").addEventListener("click", function() {
 			if (mainui.uploadMode == "Read") {
 				mainui.uploadMode = "";
@@ -49,6 +63,7 @@
 				d3.select("#ReadMenu").classed("hidexp",false);
 				d3.select("#ContributionMenu").classed("hidexp",true);
 				d3.select("#GenomeMenu").classed("hidexp",true);
+				Shiny.onInputChange("input_type", "run_picrust");
 			}
 		});
 		document.getElementById("ContributionOption").addEventListener("click", function() {
@@ -60,6 +75,7 @@
 				d3.select("#ReadMenu").classed("hidexp",true);
 				d3.select("#ContributionMenu").classed("hidexp",false);
 				d3.select("#GenomeMenu").classed("hidexp",true);
+				Shiny.onInputChange("input_type", "contributions");
 			}
 		});
 		document.getElementById("GenomeOption").addEventListener("click", function() {
@@ -71,11 +87,27 @@
 				d3.select("#ReadMenu").classed("hidexp",true);
 				d3.select("#ContributionMenu").classed("hidexp",true);
 				d3.select("#GenomeMenu").classed("hidexp",false);
+				Shiny.onInputChange("input_type", "annotations");
 			}
 		});
-	
+
+		document.getElementById("update_button_R").addEventListener("click", function() {
+			document.getElementById("update_button").click()
+		});
+		document.getElementById("update_button_C").addEventListener("click", function() {
+			document.getElementById("update_button").click()
+		});
+		document.getElementById("update_button_G").addEventListener("click", function() {
+			document.getElementById("update_button").click()
+		});
 			
-			}
+	}
+
+	mainui.fileloading = function(buttonname, filename) {
+		if (document.getElementById(buttonname).files[0].size > max_upload_size){
+				alert("The file '" + document.getElementById(buttonname).files[0].name + "'' is too large to upload at this time. We apologize for the inconvienence.")
+		}
+	}
 		
 		/*document.getElementById("update_button").addEventListener("click", function() {
 			console.log("update button clicked");

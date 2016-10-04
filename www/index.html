@@ -23,7 +23,7 @@
 
 <p>This is a tool to visualize the relationship between taxonomy and function. You can view sample data or upload your own data.</p>
 <p>Source code available <a href="https://github.com/borenstein-lab/burrito">here</a></p>
-<p>Preview the tool with an example data set: <button type="button">Taste the burrito</button></p>
+<p>Preview the tool with an example data set: <button type="button" name="example_button" id="example_button">Taste the burrito</button></p>
 <p>Or upload your own data, choosing one of the three upload options below:<p>
 
 <button class="inputSelectorB" id="ReadOption">
@@ -287,7 +287,6 @@
 	<tr>
 		<td colspan=3>
 			<button id="update_button_R" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-			<button id="update_button5000_R" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 		</td>
 	</tr>
 </table>
@@ -618,7 +617,6 @@
 	<tr>
 		<td colspan=3>
 			<button id="update_button_C" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-			<button id="update_button5000_C" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 		</td>
 	</tr>
 </table>
@@ -919,7 +917,6 @@
 	<tr>
 		<td colspan=3>
 			<button id="update_button_G" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-			<button id="update_button5000_G" type="button" class="btn action-button btn-large btn-primary" style="display:none"></button>
 		</td>
 	</tr>
 </table>
@@ -928,6 +925,7 @@
 
 <br>
 <span class="error" id="upload_message"></span>
+<button id="update_button" type="button" style="display:none" class="btn action-button btn-large btn-primary"></button>
 </div>
 <div style="float:left" id="button_holder"><br><br><br><br><br><br><br><br></div>
 

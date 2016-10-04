@@ -22,6 +22,9 @@ options(stringsAsFactors = F)
 
 # Defining constants used by the server
 comparison_tag = "_comparison"
+default_tax_summary_level = "Genus"
+default_func_summary_level = "SubPathway"
+default_samp_grouping = "Group"
 
 # Actual Shiny server code
 shinyServer(function(input, output, session) {
@@ -33,12 +36,24 @@ shinyServer(function(input, output, session) {
     ko_normalization_table = reactive({ # Reactive, when called only recalculates output if variables it depends on change
 
     	func_hierarchy = NULL
-		if (is.null(input$function_hierarchy)){ # If they haven't uploaded a function hierarchy, then we load the default
+		if (is.null(input$input_type)){ # If they haven't chosen an input type, then we load the default
 			func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-		} else { # If they've loaded a function hierarchy, we load theirs
-			func_hierarchy_file = input$function_hierarchy
-			func_hierarchy_file_path = func_hierarchy_file$datapath
-			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+		} else { # If they've chosen an input type
+			if (input$input_type == "run_picrust" & !is.null(input$function_hierarchy_R)){ # If they've also uploaded a custom hierarchy, use theirs
+				func_hierarchy_file = input$function_hierarchy_R
+				func_hierarchy_file_path = func_hierarchy_file$datapath
+				func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)	
+			} else if (input$input_type == "contributions" & !is.null(input$function_hierarchy_C)){
+				func_hierarchy_file = input$function_hierarchy_C
+				func_hierarchy_file_path = func_hierarchy_file$datapath
+				func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+			} else if (input$input_type == "annotations" & !is.null(input$function_hierarchy_G)){
+				func_hierarchy_file = input$function_hierarchy_G
+				func_hierarchy_file_path = func_hierarchy_file$datapath
+				func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+			} else {
+				func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+			}
 		}
 
 		# Sum the occurrences of each KO
@@ -52,20 +67,44 @@ shinyServer(function(input, output, session) {
 		tracked_data$contribution_table = NULL
 		output = NULL
 		tax_summary_level = tracked_data$tax_summary_level
-		if (!is.null(input$taxLODselector)){
-			tax_summary_level = input$taxLODselector
-		}
 		func_summary_level = tracked_data$func_summary_level
-		if (!is.null(input$funcLODselector)){
-			func_summary_level = input$funcLODselector
+		samp_grouping = NULL
+		if (!is.null(input$input_type)){
+			if (input$input_type == "run_picrust" & !is.null(input$taxLODselector_R)){
+				tax_summary_level = input$taxLODselector_R
+			} else if (input$input_type == "contributions" & !is.null(input$taxLODselector_C)){
+				tax_summary_level = input$taxLODselector_C
+			} else if (input$input_type == "annotations" & !is.null(input$taxLODselector_G)){
+				tax_summary_level = input$taxLODselector_G
+			}
+			if (input$input_type == "run_picrust" & !is.null(input$funcLODselector_R)){
+				func_summary_level = input$funcLODselector_R
+			} else if (input$input_type == "contributions" & !is.null(input$funcLODselector_C)){
+				func_summary_level = input$funcLODselector_C
+			} else if (input$input_type == "annotations" & !is.null(input$funcLODselector_G)){
+				func_summary_level = input$funcLODselector_G
+			}
+			if (input$input_type == "run_picrust" & !is.null(input$sampgroupselector_R)){
+				samp_grouping = input$sampgroupselector_R
+			} else if (input$input_type == "contributions" & !is.null(input$sampgroupselector_C)){
+				samp_grouping = input$sampgroupselector_C
+			} else if (input$input_type == "annotations" & !is.null(input$sampgroupselector_G)){
+				samp_grouping = input$sampgroupselector_G
+			} else if (input$input_type == "example"){
+				samp_grouping = "Group"
+			}
 		}
-		samp_grouping = input$sampgroupselector
+		
 		otu_table = NULL
 
 		session$sendCustomMessage("upload_status", "Starting input processing")
 
 		################################# Loading/calculating contribution table #################################
-		if (is.null(input$input_type)){ # If they haven't chosen an input method, we'll load the default contribution table
+		if (is.null(input$input_type)){ # If they somehow trigger the visualization without an input type, do nothing and send a warning
+
+			session$sendCustomMessage("shiny_test", "Visualization trigger without input type.")
+
+		} else if(input$input_type == "example"){ # If they've chosen to view the example
 
 			session$sendCustomMessage("upload_status", "Loading default data")
 
@@ -75,7 +114,7 @@ shinyServer(function(input, output, session) {
 			# Remove the unnecessary columns (keep Sample, OTU, KO, and contribution)
 			output = output[,c(2,3,1,6), with=FALSE]
 
-		} else if (input$input_type == "genome_annotation"){ # If they've chosen the genome annotation option
+		} else if (input$input_type == "annotations"){ # If they've chosen the genome annotation option
 
 			otu_table_file = input$taxonomic_abundances_1
 			annotation_file = input$genome_annotations
@@ -158,7 +197,7 @@ shinyServer(function(input, output, session) {
 				}
 			}
 
-		} else if (input$input_type == "16S"){ # If they've chosen the PICRUSt option
+		} else if (input$input_type == "run_picrust"){ # If they've chosen the PICRUSt option
 
 			otu_table_file = input$read_counts
 			if (is.null(otu_table_file)){
@@ -243,7 +282,7 @@ shinyServer(function(input, output, session) {
 				}
 			}
 
-		} else if (input$input_type == "contribution"){ # If they've chosen the contribution table option
+		} else if (input$input_type == "contributions"){ # If they've chosen the contribution table option
 
 			otu_table_file = input$taxonomic_abundances_2
 			contribution_file = input$function_contributions
@@ -339,9 +378,16 @@ shinyServer(function(input, output, session) {
 			colnames(output) = c("Sample", "OTU", "Gene", "CountContributedByOTU")
 
 			# If we have a table of function abundances for comparison, add that to the contribution table, tagging sample names as comparisons
-			if (!is.null(input$function_abundances)){
+			comparison_table_file = NULL
+			if (input$input_type == "run_picrust" & !is.null(input$function_abundances_R)){
+				comparison_table_file = input$function_abundances_R
+			} else if (input$input_type == "contributions" & !is.null(input$function_abundances_C)){
+				comparison_table_file = input$function_abundances_C
+			} else if (input$input_type == "contributions" & !is.null(input$function_abundances_G)){
+				comparison_table_file = input$function_abundances_G
+			}
 
-				comparison_table_file = input$function_abundances
+			if (!is.null(comparison_table_file)){
 				comparison_table_file_path = comparison_table_file$datapath
 				if (!is.null(tracked_data$old_function_abundances_datapath)){
 					if (tracked_data$old_function_abundances_datapath == comparison_table_file_path){
@@ -677,7 +723,7 @@ shinyServer(function(input, output, session) {
 		        if (which(colnames(taxa_hierarchy) == tax_summary_level) != 1){
 			        expanded_table = merge(otu_table, level_match_taxa_hierarchy, by.x = c(colnames(otu_table)[1]), by.y = c(colnames(level_match_taxa_hierarchy)[1]), all.y=F, allow.cartesian=T)
 			        summarized_otu_table = expanded_table[,lapply(.SD[,2:dim(.SD)[2],with=F], sum), by=new_summary_level]
-					
+
 			        summarized_otu_table_col_names = colnames(summarized_otu_table)
 			        summarized_otu_table[,(colnames(summarized_otu_table)[2:dim(summarized_otu_table)[2]]):=lapply(.SD, function(col){
 			        	return(col/sum(col))
@@ -716,6 +762,7 @@ shinyServer(function(input, output, session) {
 				session$sendCustomMessage(type="otu_table_ready", length(otu_table_objects))
 
 		        id_levels = names(taxa_hierarchy)
+
 				for(j in 1:length(id_levels)){
 					taxa_hierarchy[[id_levels[j]]] = paste(id_levels[j],as.character(taxa_hierarchy[[id_levels[j]]]), sep = "_")
 				}
@@ -882,8 +929,8 @@ shinyServer(function(input, output, session) {
 
 	# Return optional table labels when they are loaded
 	observe({
-		if (!is.null(input$taxonomic_hierarchy)){
-			taxa_hierarchy_file = input$taxonomic_hierarchy
+		if (!is.null(input$taxonomic_hierarchy_R)){
+			taxa_hierarchy_file = input$taxonomic_hierarchy_R
 			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
 			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
 			if (ncol(taxa_hierarchy) > 1){
@@ -903,8 +950,50 @@ shinyServer(function(input, output, session) {
 	})
 
 	observe({
-		if (!is.null(input$function_hierarchy)){
-			func_hierarchy_file = input$function_hierarchy
+		if (!is.null(input$taxonomic_hierarchy_C)){
+			taxa_hierarchy_file = input$taxonomic_hierarchy_C
+			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
+			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
+			if (ncol(taxa_hierarchy) > 1){
+				session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
+			} else {
+				session$sendCustomMessage("tax_hierarchy_labels", list(colnames(taxa_hierarchy)))
+			}
+			if ("Genus" %in% colnames(taxa_hierarchy)){
+				tracked_data$tax_summary_level = "Genus"
+			} else {
+				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
+			}
+		} else {
+			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
+		}
+	})
+
+	observe({
+		if (!is.null(input$taxonomic_hierarchy_G)){
+			taxa_hierarchy_file = input$taxonomic_hierarchy_G
+			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
+			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
+			if (ncol(taxa_hierarchy) > 1){
+				session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
+			} else {
+				session$sendCustomMessage("tax_hierarchy_labels", list(colnames(taxa_hierarchy)))
+			}
+			if ("Genus" %in% colnames(taxa_hierarchy)){
+				tracked_data$tax_summary_level = "Genus"
+			} else {
+				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
+			}
+		} else {
+			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
+		}
+	})
+
+	observe({
+		if (!is.null(input$function_hierarchy_R)){
+			func_hierarchy_file = input$function_hierarchy_R
 			func_hierarchy_file_path = func_hierarchy_file$datapath
 			func_hierarchy = fread(func_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
 			if (ncol(func_hierarchy) > 1){
@@ -924,14 +1013,71 @@ shinyServer(function(input, output, session) {
 	})
 
 	observe({
-		if (!is.null(input$sample_map)){
-			sample_map_file = input$sample_map
+		if (!is.null(input$function_hierarchy_C)){
+			func_hierarchy_file = input$function_hierarchy_C
+			func_hierarchy_file_path = func_hierarchy_file$datapath
+			func_hierarchy = fread(func_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
+			if (ncol(func_hierarchy) > 1){
+				session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[c(2:ncol(func_hierarchy), 1)])
+			} else {
+				session$sendCustomMessage("func_hierarchy_labels", list(colnames(func_hierarchy)))
+			}
+			if ("SubPathway" %in% colnames(func_hierarchy)){
+				tracked_data$func_summary_level = "SubPathway"
+			} else {
+				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
+			}
+		} else {
+			func_hierarchy = fread(default_func_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
+		}
+	})
+
+	observe({
+		if (!is.null(input$function_hierarchy_G)){
+			func_hierarchy_file = input$function_hierarchy_G
+			func_hierarchy_file_path = func_hierarchy_file$datapath
+			func_hierarchy = fread(func_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
+			if (ncol(func_hierarchy) > 1){
+				session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[c(2:ncol(func_hierarchy), 1)])
+			} else {
+				session$sendCustomMessage("func_hierarchy_labels", list(colnames(func_hierarchy)))
+			}
+			if ("SubPathway" %in% colnames(func_hierarchy)){
+				tracked_data$func_summary_level = "SubPathway"
+			} else {
+				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
+			}
+		} else {
+			func_hierarchy = fread(default_func_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
+		}
+	})
+
+	observe({
+		if (!is.null(input$sample_map_R)){
+			sample_map_file = input$sample_map_R
 			sample_map_file_path = sample_map_file$datapath
 			sample_map = fread(sample_map_file_path, sep = "\t", header=T, stringsAsFactors = F)
 			session$sendCustomMessage("sample_map_labels", colnames(sample_map)[2:ncol(sample_map)])
-		}# } else {
-		# 	sample_map = fread(default_sample_map_table, sep = "\t", header=T, stringsAsFactors = F)
-		# 	session$sendCustomMessage("sample_map_labels", colnames(sample_map)[2:ncol(sample_map)])
-		# }
+		}
+	})
+
+	observe({
+		if (!is.null(input$sample_map_C)){
+			sample_map_file = input$sample_map_C
+			sample_map_file_path = sample_map_file$datapath
+			sample_map = fread(sample_map_file_path, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("sample_map_labels", colnames(sample_map)[2:ncol(sample_map)])
+		}
+	})
+
+	observe({
+		if (!is.null(input$sample_map_G)){
+			sample_map_file = input$sample_map_G
+			sample_map_file_path = sample_map_file$datapath
+			sample_map = fread(sample_map_file_path, sep = "\t", header=T, stringsAsFactors = F)
+			session$sendCustomMessage("sample_map_labels", colnames(sample_map)[2:ncol(sample_map)])
+		}
 	})
 })

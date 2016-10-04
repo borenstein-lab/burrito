@@ -224,7 +224,16 @@ update_progress = function(curr_sample, total_samples){
 
 draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order){
 	
-	var grouping = document.getElementById("sampgroupselector").value;
+	var grouping = null;
+	if (mainui.uploadMode == "example"){
+		grouping = "Group";
+	} else if (mainui.uploadMode == "Read"){
+		grouping = document.getElementById("sampgroupselector_R").value;
+	} else if (mainui.uploadMode == "Contribution"){
+		grouping = document.getElementById("sampgroupselector_C").value;
+	} else if (mainui.uploadMode == "Genome"){
+		grouping = document.getElementById("sampgroupselector_G").value;
+	}
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -312,7 +321,16 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	////////////////////////// Colors
 	//color_option = "Categories" //Categories or Random
-	color_option = d3.select("#color_option_selector").property("value")
+	var color_option = null;
+	if (mainui.uploadMode == "example"){
+		color_option = "Categories";
+	} else if (mainui.uploadMode == "Read"){
+		color_option = d3.select("#color_option_selector_R").property("value")	
+	} else if (mainui.uploadMode == "Contribution"){
+		color_option = d3.select("#color_option_selector_C").property("value")	
+	} else if (mainui.uploadMode == "Genome"){
+		color_option = d3.select("#color_option_selector_G").property("value")	
+	}
 	
 // 	var changeAlpha = function(color, alphaVal){ 
 // 		color = d3.rgb(color.toString())
