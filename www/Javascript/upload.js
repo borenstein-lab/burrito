@@ -172,22 +172,53 @@
 		});
 
 		Shiny.addCustomMessageHandler("tax_hierarchy_labels", function(labels){
-			tax_dropdown = document.getElementById("taxLODselector")
-			var old_options = jQuery.extend(true, [], tax_dropdown.options)
-			for (var i = 0; i < old_options.length; i++){
-				tax_dropdown.remove(old_options[i])
+			tax_dropdown = null;
+			if (mainui.uploadMode == "Read"){
+				tax_dropdown = document.getElementById("taxLODselector_R")
+			} else if (mainui.uploadMode == "Contribution"){
+				tax_dropdown = document.getElementById("taxLODselector_C")
+			} else if (mainui.uploadMode == "Genome"){
+				tax_dropdown = document.getElementById("taxLODselector_G")
 			}
-			var blank_option = document.createElement("option");
-			for (var i = 0; i < labels.length; i++){
-				var option = document.createElement("option");
-				option.text = labels[i];
-				option.value = labels[i];
-				tax_dropdown.add(option);
-			}
-			for (var i, j = 0; i = tax_dropdown.options[j]; j++){
-				if (i.value == "Genus") {
-					tax_dropdown.selectedIndex = j;
-					break;
+			if (tax_dropdown != null){
+				var old_options = jQuery.extend(true, [], tax_dropdown.options)
+				for (var i = 0; i < old_options.length; i++){
+					tax_dropdown.remove(old_options[i])
+				}
+				var blank_option = document.createElement("option");
+				for (var i = 0; i < labels.length; i++){
+					var option = document.createElement("option");
+					option.text = labels[i];
+					option.value = labels[i];
+					tax_dropdown.add(option);
+				}
+				for (var i, j = 0; i = tax_dropdown.options[j]; j++){
+					if (i.value == "Genus") {
+						tax_dropdown.selectedIndex = j;
+						break;
+					}
+				}
+			} else {
+				tax_selectors = ["taxLODselector_R", "taxLODselector_C", "taxLODselector_G"]
+				for (var k = 0; k < tax_selectors.length; k++){
+					tax_dropdown = document.getElementById(tax_selectors[k]);
+					var old_options = jQuery.extend(true, [], tax_dropdown.options)
+					for (var i = 0; i < old_options.length; i++){
+						tax_dropdown.remove(old_options[i])
+					}
+					var blank_option = document.createElement("option");
+					for (var i = 0; i < labels.length; i++){
+						var option = document.createElement("option");
+						option.text = labels[i];
+						option.value = labels[i];
+						tax_dropdown.add(option);
+					}
+					for (var i, j = 0; i = tax_dropdown.options[j]; j++){
+						if (i.value == "Genus") {
+							tax_dropdown.selectedIndex = j;
+							break;
+						}
+					}	
 				}
 			}
 		});
@@ -200,22 +231,53 @@
 		});
 
 		Shiny.addCustomMessageHandler("func_hierarchy_labels", function(labels){
-			func_dropdown = document.getElementById("funcLODselector")
-			var old_options = jQuery.extend(true, [], func_dropdown.options)
-			for (var i = 0; i < old_options.length; i++){
-				func_dropdown.remove(old_options[i])
+			func_dropdown = null;
+			if (mainui.uploadMode == "Read"){
+				func_dropdown = document.getElementById("funcLODselector_R")
+			} else if (mainui.uploadMode == "Contribution"){
+				func_dropdown = document.getElementById("funcLODselector_C")
+			} else if (mainui.uploadMode == "Genome"){
+				func_dropdown = document.getElementById("funcLODselector_G")
 			}
-			var blank_option = document.createElement("option");
-			for (var i = 0; i < labels.length; i++){
-				var option = document.createElement("option");
-				option.text = labels[i];
-				option.value = labels[i];
-				func_dropdown.add(option);
-			}
-			for (var i, j = 0; i = func_dropdown.options[j]; j++){
-				if (i.value == "SubPathway") {
-					func_dropdown.selectedIndex = j;
-					break;
+			if (func_dropdown != null){
+				var old_options = jQuery.extend(true, [], func_dropdown.options)
+				for (var i = 0; i < old_options.length; i++){
+					func_dropdown.remove(old_options[i])
+				}
+				var blank_option = document.createElement("option");
+				for (var i = 0; i < labels.length; i++){
+					var option = document.createElement("option");
+					option.text = labels[i];
+					option.value = labels[i];
+					func_dropdown.add(option);
+				}
+				for (var i, j = 0; i = func_dropdown.options[j]; j++){
+					if (i.value == "SubPathway") {
+						func_dropdown.selectedIndex = j;
+						break;
+					}
+				}
+			} else {
+				func_selectors = ["funcLODselector_R", "funcLODselector_C", "funcLODselector_G"]
+				for (var k = 0; k < func_selectors.length; k++){
+					func_dropdown = document.getElementById(func_selectors[k]);
+					var old_options = jQuery.extend(true, [], func_dropdown.options)
+					for (var i = 0; i < old_options.length; i++){
+						func_dropdown.remove(old_options[i])
+					}
+					var blank_option = document.createElement("option");
+					for (var i = 0; i < labels.length; i++){
+						var option = document.createElement("option");
+						option.text = labels[i];
+						option.value = labels[i];
+						func_dropdown.add(option);
+					}
+					for (var i, j = 0; i = func_dropdown.options[j]; j++){
+						if (i.value == "SubPathway") {
+							func_dropdown.selectedIndex = j;
+							break;
+						}
+					}	
 				}
 			}
 		});
@@ -228,29 +290,37 @@
 		});
 
 		Shiny.addCustomMessageHandler("sample_map_labels", function(labels){
-			sample_group_dropdown = document.getElementById("sampgroupselector")
-			var old_options = jQuery.extend(true, [], sample_group_dropdown.options)
-			for (var i = 0; i < old_options.length; i++){
-				sample_group_dropdown.remove(old_options[i])
+			sample_group_dropdown = null;
+			if (mainui.uploadMode == "Read"){
+				sample_group_dropdown = document.getElementById("sampgroupselector_R")
+			} else if (mainui.uploadMode == "Contribution"){
+				sample_group_dropdown = document.getElementById("sampgroupselector_C")
+			} else if (mainui.uploadMode == "Genome"){
+				sample_group_dropdown = document.getElementById("sampgroupselector_G")
 			}
-			var blank_option = document.createElement("option");
-			blank_option.text="";
-			blank_option.value="";
-			sample_group_dropdown.add(blank_option);
-			if (typeof labels === 'string' || labels instanceof String){ //if only one grouping option, to keep from splitting into characters
-				var option = document.createElement("option");
-				option.text = labels;
-				option.value = labels;
-				sample_group_dropdown.add(option);
-			} else {
-				for (var i = 0; i < labels.length; i++){
+			if (sample_group_dropdown != null){
+				var old_options = jQuery.extend(true, [], sample_group_dropdown.options)
+				for (var i = 0; i < old_options.length; i++){
+					sample_group_dropdown.remove(old_options[i])
+				}
+				var blank_option = document.createElement("option");
+				blank_option.text="";
+				blank_option.value="";
+				sample_group_dropdown.add(blank_option);
+				if (typeof labels === 'string' || labels instanceof String){ //if only one grouping option, to keep from splitting into characters
 					var option = document.createElement("option");
-					option.text = labels[i];
-					option.value = labels[i];
+					option.text = labels;
+					option.value = labels;
 					sample_group_dropdown.add(option);
+				} else {
+					for (var i = 0; i < labels.length; i++){
+						var option = document.createElement("option");
+						option.text = labels[i];
+						option.value = labels[i];
+						sample_group_dropdown.add(option);
+					}
 				}
 			}
-
 		});
 
 		uploader.execute_on_default_samp_map_load = function() {
@@ -282,9 +352,17 @@
 		document.getElementById("read_counts").addEventListener('change', function(e) {
 			mainui.fileloading("read_counts",this.files[0].name);
 			});
-		document.getElementById("sample_map").addEventListener('change', function(e) {
+		document.getElementById("sample_map_R").addEventListener('change', function(e) {
 			uploader.samp_map_reader.readAsText(this.files[0]);
-			mainui.fileloading("sample_map",this.files[0].name);
+			mainui.fileloading("sample_map_R",this.files[0].name);
+			});
+		document.getElementById("sample_map_C").addEventListener('change', function(e) {
+			uploader.samp_map_reader.readAsText(this.files[0]);
+			mainui.fileloading("sample_map_C",this.files[0].name);
+			});
+		document.getElementById("sample_map_G").addEventListener('change', function(e) {
+			uploader.samp_map_reader.readAsText(this.files[0]);
+			mainui.fileloading("sample_map_G",this.files[0].name);
 			});
 			
 		// Set up event handlers for selecting other files, only for UI
@@ -294,11 +372,32 @@
 		document.getElementById("genome_annotations").addEventListener('change', function(e) {
 			mainui.fileloading("genome_annotations",this.files[0].name);
 			});
-		document.getElementById("taxonomic_hierarchy").addEventListener('change', function(e) {
-			mainui.fileloading("taxonomic_hierarchy",this.files[0].name);
+		document.getElementById("taxonomic_hierarchy_R").addEventListener('change', function(e) {
+			mainui.fileloading("taxonomic_hierarchy_R",this.files[0].name);
 			});
-		document.getElementById("function_hierarchy").addEventListener('change', function(e) {
-			mainui.fileloading("function_hierarchy",this.files[0].name);
+		document.getElementById("taxonomic_hierarchy_C").addEventListener('change', function(e) {
+			mainui.fileloading("taxonomic_hierarchy_C",this.files[0].name);
+			});
+		document.getElementById("taxonomic_hierarchy_G").addEventListener('change', function(e) {
+			mainui.fileloading("taxonomic_hierarchy_G",this.files[0].name);
+			});
+		document.getElementById("function_hierarchy_R").addEventListener('change', function(e) {
+			mainui.fileloading("function_hierarchy_R",this.files[0].name);
+			});
+		document.getElementById("function_hierarchy_C").addEventListener('change', function(e) {
+			mainui.fileloading("function_hierarchy_C",this.files[0].name);
+			});
+		document.getElementById("function_hierarchy_G").addEventListener('change', function(e) {
+			mainui.fileloading("function_hierarchy_G",this.files[0].name);
+			});
+		document.getElementById("function_abundances_R").addEventListener('change', function(e) {
+			mainui.fileloading("function_abundances_R",this.files[0].name);
+			});
+		document.getElementById("function_abundances_C").addEventListener('change', function(e) {
+			mainui.fileloading("function_abundances_C",this.files[0].name);
+			});
+		document.getElementById("function_abundances_G").addEventListener('change', function(e) {
+			mainui.fileloading("function_abundances_G",this.files[0].name);
 			});
 			
 		return(uploader);
