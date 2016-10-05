@@ -116,8 +116,7 @@
         var box = el.getBBox();
         width = box.x + box.width;
         height = box.y + box.height;
-        clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
-
+        clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));		
         var svg = document.createElementNS('http://www.w3.org/2000/svg','svg')
         svg.appendChild(clone)
         clone = svg;
@@ -140,14 +139,17 @@
 
       outer.appendChild(clone);
 
+      var defs = document.createElement('defs');
+      patternClone = document.getElementById("patternsvg").cloneNode(true)
+      defs.appendChild(patternClone); 
+
       var css = styles(el, options.selectorRemap);
       var s = document.createElement('style');
       s.setAttribute('type', 'text/css');
       s.innerHTML = "<![CDATA[\n" + css + "\n]]>";
-      var defs = document.createElement('defs');
       defs.appendChild(s);
       clone.insertBefore(defs, clone.firstChild);
-
+		
       var svg = doctype + outer.innerHTML;
       var uri = 'data:image/svg+xml;base64,' + window.btoa(reEncode(svg));
       if (cb) {
