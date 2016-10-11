@@ -57,9 +57,13 @@
     xAxis.scale(x);
     yAxis.scale(y);
     
-    display_taxa = bar_data[0].taxa.map(function(d){
-    	return d.name;
-    }).sort(function(a,b){ return a > b; })
+//     display_taxa = bar_data[0].taxa.map(function(d){
+//     	return d.name;
+//     }).sort(function(a,b){ return a.replace(/^[A-Za-z0-9]+_/,"") > b.replace(/^[A-Za-z0-9]+_/,""); })
+	display_taxa = []
+	d3.select("#Genomes").select(".part0").select("#saveLegBar0").select(".mainbars")
+			.selectAll(".mainbar").each(function(d){
+			display_taxa.push((d3.select(this).attr("id")).replace("Genomes0","")); })
 
     var tooltip = d3.select("body")
       .append("div")
@@ -151,13 +155,13 @@
         	return tooltip.style("visibility", "visible");
         }
         if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
-    		if(display_taxa[clickedTaxaBars.datum().key] == current_rectangle_data.name){
+    		if(display_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
         	name_split = (current_rectangle_data.name.split('_')).pop()
         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           	return tooltip.style("visibility", "visible");
     		}
     	} else if(clickedEdges.empty() == false){ //if an edge is clicked
-    		if(display_taxa[clickedEdges.datum().key1] == current_rectangle_data.name){ //if relevant edge is clicked
+    		if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){ //if relevant edge is clicked
     		    name_split = (current_rectangle_data.name.split('_')).pop()
         		tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           		return tooltip.style("visibility", "visible");
@@ -172,11 +176,11 @@
   		if(clickedBars.empty()){
 	        return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
         } else if(clickedTaxaBars.empty() == false){
-         	if(display_taxa[clickedTaxaBars.datum().key] == d.name){
+         	if(display_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
          		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
          	}
          } else if(clickedEdges.empty() == false){
-         	if(display_taxa[clickedEdges.datum().key1] == current_rectangle_data.name){
+         	if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
          		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
          	}
          }
@@ -192,11 +196,11 @@
         	return tooltip.style("visibility", "hidden");
         }  
         if(clickedTaxaBars.empty() == false){
-    		if(display_taxa[clickedTaxaBars.datum().key] == d.name){
+    		if(display_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
 	    		return tooltip.style("visibility", "hidden");
     		} 
     	} else if(clickedEdges.empty() == false){
-    		if(display_taxa[clickedEdges.datum().key1] == current_rectangle_data.name){
+    		if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
     			return tooltip.style("visibility", "hidden");
     		}
     	}

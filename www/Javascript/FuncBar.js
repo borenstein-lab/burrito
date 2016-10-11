@@ -90,13 +90,22 @@
    yAxis.scale(y);
    
 
-	display_func = d3.set(stackdata[0].data.map(function(d){
-		return(d.func)
-	})).values().sort(function(a,b){ return a > b; })
+// 	display_func = d3.set(stackdata[0].data.map(function(d){
+// 		return(d.func)
+// 	})).values().sort(function(a,b){ return a.replace(/^[A-Za-z0-9]+_/,"") > b.replace(/^[A-Za-z0-9]+_/,"");; })
+	
+	display_func = []
+	d3.select("#Genomes").select(".part1").select("#saveLegBar1").select(".mainbars")
+			.selectAll(".mainbar").each(function(d){
+			display_func.push((d3.select(this).attr("id")).replace("Genomes1","")); })
 
-	display_taxa = d3.set(stackdata[0].data.map(function(d){
-		return(d.Taxa)
-	})).values().sort(function(a,b){ return a > b; })
+// 	display_taxa = d3.set(stackdata[0].data.map(function(d){
+// 		return(d.Taxa)
+// 	})).values().sort(function(a,b){ return a.replace(/^[A-Za-z0-9]+_/,"") > b.replace(/^[A-Za-z0-9]+_/,"");; })
+	display_taxa = []
+	d3.select("#Genomes").select(".part0").select("#saveLegBar0").select(".mainbars")
+			.selectAll(".mainbar").each(function(d){
+			display_taxa.push((d3.select(this).attr("id")).replace("Genomes0","")); })
 	
    var viz = fB.vizData(stackdata, sample_order);
    //console.log(viz)
@@ -179,7 +188,7 @@
   	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   	clickedFuncBars = d3.select("#Genomes").select(".part1").selectAll(".mainbars").select(".clicked")
   	clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
-  	if(clickedBars.empty()){
+  	if(clickedBars.empty()){ //nothing is clicked
 	    highlight_overall("", current_rectangle_data.func, 2);		
 		selected = d3.select("#func_" + current_rectangle_data.Sample)
 			.selectAll("rect").data()
@@ -190,8 +199,8 @@
     	//taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split 
         tooltip.html("<strong>Function: </strong>" + name_split + "<br>" +  "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
           return tooltip.style("visibility", "visible");
-    } else if(clickedFuncBars.empty() == false && clickedEdges.empty()==true){ 
-    	if(display_func[clickedFuncBars.datum().key] == current_rectangle_data.func){
+    } else if(clickedFuncBars.empty() == false && clickedEdges.empty()==true){ //function bar is clicked
+    	if(display_func[clickedFuncBars.datum().key] == (current_rectangle_data.func).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
 	    	selected = d3.select("#func_" + current_rectangle_data.Sample)
 				.selectAll("rect").data()
 				.filter(function(e){ 
@@ -202,7 +211,7 @@
           return tooltip.style("visibility", "visible");
     }
     } else if(clickedEdges.empty() == false){
-    	if(display_func[clickedEdges.datum().key2] == current_rectangle_data.func && display_taxa[clickedEdges.datum().key1] == current_rectangle_data.Taxa){ //if a taxon is highlighted with an edge clicked, just show contributions from that edge
+    	if(display_func[clickedEdges.datum().key2] == (current_rectangle_data.func).replace(/ /g,"_").replace(/(,|\(|\))/g, "_") && display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.Taxa).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){ //if a taxon is highlighted with an edge clicked, just show contributions from that edge
     		name_split = (current_rectangle_data.func.split('_')).pop()
     		taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //
     		abund = current_rectangle_data.contributions
@@ -210,7 +219,7 @@
           	return tooltip.style("visibility", "visible");    		
     	}
 	} else if(clickedBars.empty() == false && clickedFuncBars.empty() == true){ //highlight contributions if taxon selected
-		if(display_taxa[clickedBars.datum().key] == current_rectangle_data.Taxa){
+		if(display_taxa[clickedBars.datum().key] == (current_rectangle_data.Taxa).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
 			name_split = (current_rectangle_data.func.split('_')).pop()
     		taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //
     		abund = current_rectangle_data.contributions
@@ -224,14 +233,14 @@
   	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   	clickedFuncBars = d3.select("#Genomes").select(".part1").selectAll(".mainbars").select(".clicked")
   	 clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
-  	if(clickedBars.empty() || (clickedFuncBars.empty() == false && clickedEdges.empty()== true && display_func[clickedFuncBars.datum().key] == current_rectangle_data.func)){
+  	if(clickedBars.empty() || (clickedFuncBars.empty() == false && clickedEdges.empty()== true && display_func[clickedFuncBars.datum().key] == (current_rectangle_data.func).replace(/ /g,"_").replace(/(,|\(|\))/g, "_"))){
   	return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
   	} else if(clickedEdges.empty() == false){
-  		 if(display_func[clickedEdges.datum().key2] == current_rectangle_data.func && display_taxa[clickedEdges.datum().key1] == current_rectangle_data.Taxa){ //if a taxon is highlighted with an edge clicked, just show contributions from that edge
+  		 if(display_func[clickedEdges.datum().key2] == (current_rectangle_data.func).replace(/ /g,"_").replace(/(,|\(|\))/g, "_") && display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.Taxa).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){ //if a taxon is highlighted with an edge clicked, just show contributions from that edge
 		  	return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 		  }
   		} else if(clickedBars.empty() == false && clickedFuncBars.empty() == true){ //highlight contributions if taxon selected
-			if(display_taxa[clickedBars.datum().key] == current_rectangle_data.Taxa){
+			if(display_taxa[clickedBars.datum().key] == (current_rectangle_data.Taxa).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
 				return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 			}
 		}
@@ -246,15 +255,15 @@
     	dehighlight_overall("", current_rectangle_data.func, 2);
     	return tooltip.style("visibility", "hidden");
     	} else if(clickedFuncBars.empty() == false && clickedEdges.empty() == true){
-	    	if(display_func[clickedFuncBars.datum().key] == d.func){
+	    	if(display_func[clickedFuncBars.datum().key] == (d.func).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
 		    	return tooltip.style("visibility", "hidden");
     		}
     	} else if(clickedEdges.empty() == false){
-    		if(display_func[clickedEdges.datum().key2] == current_rectangle_data.func && display_taxa[clickedEdges.datum().key1] == current_rectangle_data.Taxa){
+    		if(display_func[clickedEdges.datum().key2] == (current_rectangle_data.func).replace(/ /g,"_").replace(/(,|\(|\))/g, "_") && display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.Taxa).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
     			return tooltip.style("visibility", "hidden");
     		}
     	} else if(clickedBars.empty() == false && clickedFuncBars.empty() == true){ //highlight contributions if taxon selected
-			if(display_taxa[clickedBars.datum().key] == current_rectangle_data.Taxa){
+			if(display_taxa[clickedBars.datum().key] == (current_rectangle_data.Taxa).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
 				return tooltip.style("visibility", "hidden");
 			}
 		}
