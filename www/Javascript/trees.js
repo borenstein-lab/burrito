@@ -14,6 +14,7 @@
 	var diagonal;
 	var taxa_colors;
 	var func_colors;
+	var nodeIndex = 0;
 	var bpBarHeight = {};
 	var highlightOverall = function(){};
 	var dehighlightOverall = function(){};
@@ -259,10 +260,10 @@
 		//\_/_/_/_/End level label update_/_/_/_/_/_/_/_/_/_/_/_/_/_/
 			
 		
-		// Update the nodes…
+		// Update the nodes
 		var node = trees.SVGs[source.type].selectAll("g.node")
 			.data(nodes, function (d) {
-			return d.id || (d.id = ++i);
+			return d.id || (d.id = ++nodeIndex);
 		});
 
 		// Enter any new nodes at the parent's previous position.

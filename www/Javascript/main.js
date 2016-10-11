@@ -57,21 +57,43 @@ draw_svg = function() {
 			.attr("y",0)
 			.attr("width",150)
 			.attr("height",height)
-			.attr("fill","#ffff66");
+			.attr("fill","#E6E6E6");
 
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "sidebar_hide", 150, 0, 30, 60, 0, "svgbutton", fontsize = "16px", "Show", function(){
+		d3.select("#sidebar_svg").append("polygon")
+			.attr("id","sidebar_hide")
+			.attr("points","150,0 150,60 180,30")
+			.attr("fill","#DADADA");
+
+		document.getElementById("sidebar_hide").addEventListener('click', function() {
 			var sidebarz = d3.select("#sidebar_svg");
 			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
 			if (curpos > -10) {
 				sidebarz.transition().attr("x",-150);
-				d3.select("#sidebar_hide").select("text").text("Show");
+				d3.select("#sidebar_hide").attr("points","150,0 150,60 180,30");
 			} else {
 				sidebarz.transition().attr("x",0);
-				d3.select("#sidebar_hide").select("text").text("Hide");
+				d3.select("#sidebar_hide").attr("points","150,30 180,0 180,60");
 			}
 		});
 
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_screenshot", 35, 200, 80, 70, 5, "svgbutton savebutton", fontsize = "16px", "Save screenshot", function(){
+		
+		d3.select("#sidebar_svg").append("foreignObject")
+			.attr("x", 20)
+			.attr("y", 20)
+		.append("xhtml:div")
+			.attr("id","SaveInputDiv")
+			.style("width","120px")
+			.html("<p>Output file prefix:</p>" + 
+				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>Image format:</p>" +
+				"<form action=''><label> <input type='radio' name='format' value='PNG' checked='checked'> PNG</label><br><label><input type='radio' name='format' value='SVG'> SVG </label></form>" + 
+			"<br><br><button id='save_screenshot' class='savebutton' type='button'>Save screenshot</button>" +	
+			"<br><br><button id='save_taxa_bar' class='savebutton' type='button'>Save taxonomy plot</button>" +	
+			"<br><br><button id='save_taxonomy_leg' class='savebutton' type='button'>Save taxonomy legend</button>" +	
+			"<br><br><button id='save_func_bar' class='savebutton' type='button'>Save function plot</button>" +
+			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>");
+
+	
+	document.getElementById('save_screenshot').addEventListener('click', function() {
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.png";
 				saveSvgAsPng(document.getElementById("plots_svg"), fileString, { backgroundColor : "white", scale: 1.5})
@@ -81,9 +103,9 @@ draw_svg = function() {
 					saveSvg(uri, fileString)
 				});
 			}
-		});
-
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_taxa_bar", 35, 300, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save taxonomy plot", function(){
+		}); 	
+	
+	document.getElementById('save_taxa_bar').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.png";
 				saveSvgAsPng(document.getElementById("taxa_bars"), fileString, { backgroundColor : "white", scale: 1.5})
@@ -95,7 +117,7 @@ draw_svg = function() {
 			}
 		});
 		
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_taxonomy_leg", 35, 400, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save taxonomy legend", function(){
+		document.getElementById('save_taxonomy_leg').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_legend.png";
 				saveSvgAsPng(document.getElementById("saveLegBar0"), fileString, { backgroundColor : "white", scale: 1.5})
@@ -108,7 +130,7 @@ draw_svg = function() {
 		
 		});
 		
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_png_func_bar", 35, 500, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save function plot", function(){
+		document.getElementById('save_func_bar').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_bar.png";
 				saveSvgAsPng(document.getElementById("func_bars"), fileString, { backgroundColor : "white", scale: 1.5})
@@ -120,7 +142,7 @@ draw_svg = function() {
 			}
 		});
 
-		button_maker.add_rect_button(d3.select("#sidebar_svg"), "save_function_leg", 35, 600, 80, 70, 5, "svgbutton savebutton", fontsize = "14px", "Save function legend", function(){
+		document.getElementById('save_function_leg').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_legend.png";
 				saveSvgAsPng(document.getElementById("saveLegBar1"), fileString, { backgroundColor : "white", scale: 1.5})
@@ -131,15 +153,6 @@ draw_svg = function() {
 				});
 			} 
 		});
-	
-		d3.select("#sidebar_svg").append("foreignObject")
-			.attr("x", 20)
-			.attr("y", 20)
-		.append("xhtml:div")
-			.attr("id","SaveInputDiv")
-			.style("width","120px")
-			.html("<p>Output file prefix:</p><input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>Image format:</p><form action=''><label> <input type='radio' name='format' value='PNG' checked='checked'> PNG</label><br><label><input type='radio' name='format' value='SVG'> SVG </label></form>");
-
 
 		draw_loading();
 	}

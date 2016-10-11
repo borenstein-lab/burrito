@@ -129,27 +129,11 @@ path.link {
 	user-select: none;
 	//cursor:default;
 }
-
-.svgbutton {
-	cursor: pointer;
-}
-.svgbutton:hover text {
-//	opacity:0.5;
-}
 #sidebar_hide:hover {
 	opacity:1;
 }
 #sidebar_hide {
 	stroke:none;
-}
-#sidebar_hide rect {
-	fill:#000066;
-}
-#sidebar_hide text {
-	fill: white;
-}
-#sidebar_hide:hover rect {
-	fill:#660066;
 }
 table.ExampleTable {
 	border: 1px solid black;
@@ -174,28 +158,6 @@ div#SaveInputDiv * {
 	border: 2px solid black;
 	border-radius: 2px;
 	padding-left: 5px;
-}
-.savebutton rect {
-	stroke:#ff6600;
-	stroke-width:2;
-	fill:#cc2900;
-}
-.savebutton text {
-	fill:white;
-}
-.savebutton:hover rect {
-	stroke-width:4;
-	fill:#ff704d;
-}
-.savebutton:hover text {
-	fill:black;
-}
-.savebutton:active rect {
-	stroke-width:6;
-	fill:#ffad99;
-}
-.savebutton:active text {
-	fill:black;
 }
 .hidexp {
 	display:none;
