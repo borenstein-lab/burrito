@@ -371,7 +371,12 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	    	flip = -1
 	    	for(k=0; k < color_range; k++){
 	    		var new_color = d3.hcl()
-				new_color["l"] = core_color["l"] - 32*flip*(k + (k%2))/(color_range+1)
+	    		if(list_type == "taxa"){
+	    			light_range = 14
+	    			} else {
+	    				light_range = 28
+	    			}
+				new_color["l"] = core_color["l"] - light_range*flip*(k + (k%2))/(color_range+1)
 	      		new_color["h"] = core_color["h"] - 7.5*flip*(k+ (k%2))/(color_range+1)
 	      		new_color["c"] = core_color["c"] - 4*flip*(k+ (k%2))/(color_range+1)
 	      		new_colors.push(d3.hcl(new_color))

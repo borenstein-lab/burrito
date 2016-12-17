@@ -800,12 +800,20 @@
 			} else {
 				var trimstr = displayed_taxa[s].replace(/\W+/g,'') + "_tx";
 				current_color = taxa_colors(displayed_taxa[s]);
+				console.log(current_color)
 			}
+			
 
 			if (d3.select("#" + trimstr)[0][0] == null) {
+				col_switch = d3.rgb(current_color)
+				if(col_switch["r"] > 230 ||col_switch["g"] > 230 || col_switch["b"] > 230){
+					col_fill = col_switch
+					} else {
+					col_fill = col_switch.brighter(0.3)
+					}
 				var t = textures.lines()
 			    		.thicker()
-			    		.background(d3.rgb(current_color).brighter(0.4))
+			    		.background(col_fill)
 						.id(trimstr)
 			    		.stroke("white");
 
@@ -928,10 +936,16 @@
 			}
 
 			if (d3.select("#" + trimstr)[0][0] == null) {
+				col_switch = d3.rgb(current_color)
+				if(col_switch["r"] > 230 ||col_switch["g"] > 230 || col_switch["b"] > 230){
+					col_fill = col_switch
+					} else {
+					col_fill = col_switch.brighter(0.3)
+					}
 				var t = textures.lines()
 			    		.thicker()
-			    		.background(d3.rgb(current_color).brighter(0.4))
-					.id(trimstr)
+			    		.background(col_fill)
+						.id(trimstr)
 			    		.stroke("white");
 
 				d3.select("#patternsvg").call(t);

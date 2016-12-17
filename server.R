@@ -102,7 +102,7 @@ shinyServer(function(input, output, session) {
 		################################# Loading/calculating contribution table #################################
 		if (is.null(input$input_type)){ # If they somehow trigger the visualization without an input type, do nothing and send a warning
 
-			session$sendCustomMessage("shiny_test", "Visualization trigger without input type.")
+			#session$sendCustomMessage("shiny_test", "Visualization trigger without input type.")
 
 		} else if(input$input_type == "example"){ # If they've chosen to view the example
 
@@ -515,6 +515,7 @@ shinyServer(function(input, output, session) {
 
 			sample_map = NULL
 			if(!is.null(input$sample_map)){ # If they've uploaded a sample metadata table
+				##### Change input$sample_map vs input$sample_map_R, etc !!!
 				sample_map_file = input$sample_map
 				sample_map_file_path = sample_map_file$datapath
 				if (!is.null(tracked_data$old_samp_map_datapath)){
@@ -551,6 +552,7 @@ shinyServer(function(input, output, session) {
 
 			} else { # Read in default
 				sample_map = fread(default_sample_map_table, sep="\t", header=T, stringsAsFactors = F)
+
 			}
 
 			if (!abort & !retry_upload){

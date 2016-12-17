@@ -331,7 +331,7 @@ fB.select_bars = function(func, colors){
   if (d3.select("#" + trimstr)[0][0] == null) {
      var t = textures.lines()
        .thicker()
-       .background(colors(func).brighter(0.4))
+       .background(colors(func).brighter(0.2))
        .id(trimstr)
        .stroke("white");
 
@@ -370,7 +370,7 @@ fB.select_contribution = function(taxon, colors, changeAlpha){
       if (d3.select("#" + trimstr)[0][0] == null) {
         var t = textures.lines()
           .thicker()
-          .background(d3.rgb(colors(d.func)).brighter(0.4))
+          .background(d3.rgb(colors(d.func)).brighter(0.2))
           .id(trimstr)
           .stroke("white");
 
@@ -403,7 +403,7 @@ fB.select_single_contribution = function(taxon, func, colors, changeAlpha){
   if (d3.select("#" + trimstr)[0][0] == null) {
      var t = textures.lines()
        .thicker()
-       .background(d3.rgb(colors(func)).brighter(0.4))
+       .background(d3.rgb(colors(func)).brighter(0.2))
        .id(trimstr)
        .stroke("white");
 

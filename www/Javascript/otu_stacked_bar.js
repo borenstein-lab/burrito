@@ -320,8 +320,8 @@ otu_bar.select_bars = function(taxon){
 	if (d3.select("#" + trimstr)[0][0] == null) {
   		var t = textures.lines()
     			.thicker()
-    			.background(current_color)
-			.id(trimstr)
+    			.background(d3.rgb(current_color).brighter(0.2))
+				.id(trimstr)
     			.stroke("white");
 
   		d3.select("#patternsvg").call(t);
