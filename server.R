@@ -458,8 +458,10 @@ shinyServer(function(input, output, session) {
 				func_hierarchy_functions = unlist(func_hierarchy[,1,with=F])
 				extra_output_functions = !(output_functions %in% func_hierarchy_functions)
 				if (any(extra_output_functions)){
-					session$sendCustomMessage("abort", paste("The following functions in the contributions are not present in the function hierarchy: ", paste(unique(output_functions[extra_output_functions]), collapse=" "), sep=""))
-					abort = TRUE
+					session$sendCustomMessage("warning", paste("The following functions in the contributions are not present in the function hierarchy: ", paste(unique(output_functions[extra_output_functions]), collapse=" "), sep=""))
+					# abort = TRUE
+					# Instead of aborting for now, we will just filter the KOs not present
+					output = output[unlist(output[,3,with=F]) %in% func_hierarchy_functions]
 				}
 
 				session$sendCustomMessage("upload_status", "Checking for duplicate hierarchy levels")

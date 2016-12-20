@@ -225,6 +225,9 @@ Shiny.addCustomMessageHandler("abort", function(message){
 	document.getElementById("function_hierarchy").value = null
 	document.getElementById("sample_map").value = null
 })
+Shiny.addCustomMessageHandler("warning", function(message){
+	alert(message);
+})
 
 update_progress = function(curr_sample, total_samples){
 	if(curr_sample==1){
