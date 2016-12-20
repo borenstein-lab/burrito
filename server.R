@@ -36,24 +36,20 @@ shinyServer(function(input, output, session) {
     ko_normalization_table = reactive({ # Reactive, when called only recalculates output if variables it depends on change
 
     	func_hierarchy = NULL
-		if (is.null(input$input_type)){ # If they haven't chosen an input type, then we load the default
+		if (input$input_type == "run_picrust" & !is.null(input$function_hierarchy_R)){ # If they've uploaded a custom hierarchy, use theirs
+			func_hierarchy_file = input$function_hierarchy_R
+			func_hierarchy_file_path = func_hierarchy_file$datapath
+			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)	
+		} else if (input$input_type == "contributions" & !is.null(input$function_hierarchy_C)){
+			func_hierarchy_file = input$function_hierarchy_C
+			func_hierarchy_file_path = func_hierarchy_file$datapath
+			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+		} else if (input$input_type == "annotations" & !is.null(input$function_hierarchy_G)){
+			func_hierarchy_file = input$function_hierarchy_G
+			func_hierarchy_file_path = func_hierarchy_file$datapath
+			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+		} else {
 			func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-		} else { # If they've chosen an input type
-			if (input$input_type == "run_picrust" & !is.null(input$function_hierarchy_R)){ # If they've also uploaded a custom hierarchy, use theirs
-				func_hierarchy_file = input$function_hierarchy_R
-				func_hierarchy_file_path = func_hierarchy_file$datapath
-				func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)	
-			} else if (input$input_type == "contributions" & !is.null(input$function_hierarchy_C)){
-				func_hierarchy_file = input$function_hierarchy_C
-				func_hierarchy_file_path = func_hierarchy_file$datapath
-				func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-			} else if (input$input_type == "annotations" & !is.null(input$function_hierarchy_G)){
-				func_hierarchy_file = input$function_hierarchy_G
-				func_hierarchy_file_path = func_hierarchy_file$datapath
-				func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-			} else {
-				func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-			}
 		}
 
 		# Sum the occurrences of each KO
@@ -69,30 +65,32 @@ shinyServer(function(input, output, session) {
 		tax_summary_level = tracked_data$tax_summary_level
 		func_summary_level = tracked_data$func_summary_level
 		samp_grouping = NULL
-		if (!is.null(input$input_type)){
-			if (input$input_type == "run_picrust" & !is.null(input$taxLODselector_R)){
-				tax_summary_level = input$taxLODselector_R
-			} else if (input$input_type == "contributions" & !is.null(input$taxLODselector_C)){
-				tax_summary_level = input$taxLODselector_C
-			} else if (input$input_type == "annotations" & !is.null(input$taxLODselector_G)){
-				tax_summary_level = input$taxLODselector_G
-			}
-			if (input$input_type == "run_picrust" & !is.null(input$funcLODselector_R)){
-				func_summary_level = input$funcLODselector_R
-			} else if (input$input_type == "contributions" & !is.null(input$funcLODselector_C)){
-				func_summary_level = input$funcLODselector_C
-			} else if (input$input_type == "annotations" & !is.null(input$funcLODselector_G)){
-				func_summary_level = input$funcLODselector_G
-			}
-			if (input$input_type == "run_picrust" & !is.null(input$sampgroupselector_R)){
-				samp_grouping = input$sampgroupselector_R
-			} else if (input$input_type == "contributions" & !is.null(input$sampgroupselector_C)){
-				samp_grouping = input$sampgroupselector_C
-			} else if (input$input_type == "annotations" & !is.null(input$sampgroupselector_G)){
-				samp_grouping = input$sampgroupselector_G
-			} else if (input$input_type == "example"){
-				samp_grouping = "Group"
-			}
+		if (input$input_type == "run_picrust" & !is.null(input$taxLODselector_R)){
+			tax_summary_level = input$taxLODselector_R
+		} else if (input$input_type == "contributions" & !is.null(input$taxLODselector_C)){
+			tax_summary_level = input$taxLODselector_C
+		} else if (input$input_type == "annotations" & !is.null(input$taxLODselector_G)){
+			tax_summary_level = input$taxLODselector_G
+		} else if (input$input_type == "example"){
+			tax_summary_level = "Genus"
+		}
+		if (input$input_type == "run_picrust" & !is.null(input$funcLODselector_R)){
+			func_summary_level = input$funcLODselector_R
+		} else if (input$input_type == "contributions" & !is.null(input$funcLODselector_C)){
+			func_summary_level = input$funcLODselector_C
+		} else if (input$input_type == "annotations" & !is.null(input$funcLODselector_G)){
+			func_summary_level = input$funcLODselector_G
+		} else if (input$input_type == "example"){
+			func_summary_level = "SubPathway"
+		}
+		if (input$input_type == "run_picrust" & !is.null(input$sampgroupselector_R)){
+			samp_grouping = input$sampgroupselector_R
+		} else if (input$input_type == "contributions" & !is.null(input$sampgroupselector_C)){
+			samp_grouping = input$sampgroupselector_C
+		} else if (input$input_type == "annotations" & !is.null(input$sampgroupselector_G)){
+			samp_grouping = input$sampgroupselector_G
+		} else if (input$input_type == "example"){
+			samp_grouping = "Group"
 		}
 		
 		otu_table = NULL
@@ -102,7 +100,8 @@ shinyServer(function(input, output, session) {
 		################################# Loading/calculating contribution table #################################
 		if (is.null(input$input_type)){ # If they somehow trigger the visualization without an input type, do nothing and send a warning
 
-			session$sendCustomMessage("shiny_test", "Visualization trigger without input type.")
+			session$sendCustomMessage("abort", "Visualization trigger without input type.")
+			abort = TRUE
 
 		} else if(input$input_type == "example"){ # If they've chosen to view the example
 
@@ -418,13 +417,19 @@ shinyServer(function(input, output, session) {
 			################################# Assigning partial KO Contributions to subpathways #################################
 
 			func_hierarchy = NULL
-			if (is.null(input$function_hierarchy)){ # If they haven't uploaded a function hierarchy, we use the default
-
-				func_hierarchy = fread(default_func_hierarchy_table, header=TRUE, sep="\t", stringsAsFactors=FALSE)
-
-			} else { # Othwerwise, we load theirs
-
-				func_hierarchy_file = input$function_hierarchy
+			custom_func_hierarchy_present = FALSE
+			if (input$input_type == "run_picrust" & !is.null(input$function_hierarchy_R)){
+				func_hierarchy_file = input$function_hierarchy_R
+				custom_func_hierarchy_present = TRUE
+			} else if (input$input_type == "contributions" & !is.null(input$function_hierarchy_C)){
+				func_hierarchy_file = input$function_hierarchy_C
+				custom_func_hierarchy_present = TRUE
+			} else if (input$input_type == "annotations" & !is.null(input$function_hierarchy_G)){
+				func_hierarchy_file = input$function_hierarchy_G
+				custom_func_hierarchy_present = TRUE
+			}
+			
+			if (custom_func_hierarchy_present){
 				func_hierarchy_file_path = func_hierarchy_file$datapath
 				if (!is.null(tracked_data$old_func_hierarchy_datapath)){
 					if (tracked_data$old_func_hierarchy_datapath == func_hierarchy_file_path){
@@ -439,6 +444,10 @@ shinyServer(function(input, output, session) {
 					tracked_data$old_func_hierarchy_datapath = func_hierarchy_file_path
 					func_hierarchy = fread(func_hierarchy_file_path, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 				}
+			}
+
+			if (is.null(func_hierarchy) | input$input_type == "example"){ # If there was no custom function hiearchy or they are looking at the example, read in the default
+				func_hierarchy = fread(default_func_hierarchy_table, header=TRUE, sep="\t", stringsAsFactors=FALSE)
 			}
 
 			if (!retry_upload){
@@ -463,8 +472,19 @@ shinyServer(function(input, output, session) {
 			}
 
 			taxa_hierarchy = NULL
-			if(!is.null(input$taxonomic_hierarchy)){ # If they've uploaded a custom taxonomic hierarchy
-				taxa_hierarchy_file = input$taxonomic_hierarchy
+			custom_taxa_hierarchy_present = FALSE
+			if (input$input_type == "run_picrust" & !is.null(input$taxonomic_hierarchy_R)){
+				taxa_hierarchy_file = input$taxonomic_hierarchy_R
+				custom_taxa_hierarchy_present = TRUE
+			} else if (input$input_type == "contributions" & !is.null(input$taxonomic_hierarchy_C)){
+				taxa_hierarchy_file = input$taxonomic_hierarchy_C
+				custom_taxa_hierarchy_present = TRUE
+			} else if (input$input_type == "annotations" & !is.null(input$taxonomic_hierarchy_G)){
+				taxa_hierarchy_file = input$taxonomic_hierarchy_G
+				custom_taxa_hierarchy_present = TRUE
+			}
+			
+			if (custom_taxa_hierarchy_present){
 				taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
 				if (!is.null(tracked_data$old_tax_hierarchy_datapath)){
 					if (tracked_data$old_tax_hierarchy_datapath == taxa_hierarchy_file_path){
@@ -479,10 +499,12 @@ shinyServer(function(input, output, session) {
 					tracked_data$old_tax_hierarchy_datapath = taxa_hierarchy_file_path
 					taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
 				}
-			} else { # Read in default
-		    	taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
 			}
 
+			if (is.null(taxa_hierarchy) | input$input_type == "example"){ # If there was no custom taxonomic hiearchy or they are looking at the example, read in the default
+				taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			}
+			
 			if (!retry_upload){
 				# File checking
 				session$sendCustomMessage("upload_status", "Verifying OTUs present in the abundance tables are in the provided taxonomic hierarchy")
@@ -514,8 +536,19 @@ shinyServer(function(input, output, session) {
 			################################# Reading sample group mapping table for sample sorting later #################################
 
 			sample_map = NULL
-			if(!is.null(input$sample_map)){ # If they've uploaded a sample metadata table
-				sample_map_file = input$sample_map
+			custom_sample_map_present = FALSE
+			if (input$input_type == "run_picrust" & !is.null(input$sample_map_R)){
+				sample_map_file = input$sample_map_R
+				custom_sample_map_present = TRUE
+			} else if (input$input_type == "contributions" & !is.null(input$sample_map_C)){
+				sample_map_file = input$sample_map_C
+				custom_sample_map_present = TRUE
+			} else if (input$input_type == "annotations" & !is.null(input$sample_map_G)){
+				sample_map_file = input$sample_map_G
+				custom_sample_map_present = TRUE
+			}
+
+			if (custom_sample_map_present){
 				sample_map_file_path = sample_map_file$datapath
 				if (!is.null(tracked_data$old_samp_map_datapath)){
 					if (tracked_data$old_samp_map_datapath == sample_map_file_path){
@@ -529,28 +562,31 @@ shinyServer(function(input, output, session) {
 					session$sendCustomMessage("upload_status", "Reading sample metadta")
 					tracked_data$old_samp_map_datapath = sample_map_file_path
 					sample_map = fread(sample_map_file_path, sep="\t", header=T, stringsAsFactors = F)
+				}
+			}
 
-					# File checking
-					session$sendCustomMessage("upload_status", "Verifying samples in the abundance tables are present in the sample metadata")
-					output_samples = unlist(output[,1,with=F])
-					metadata_samples = unlist(sample_map[,1,with=F])
-					extra_output_samples = !(output_samples %in% metadata_samples)
-					if (any(extra_output_samples)){
-						session$sendCustomMessage("abort", paste("The following samples do not have metadata: ", paste(unique(output_samples[extra_output_samples]), collapse = " "), sep=""))
-						abort = TRUE
-					}
+			if (input$input_type == "example") { # If they're looking at the example, we load the default sample map
+				sample_map = fread(default_sample_map_table, sep="\t", header=T, stringsAsFactors = F)
+			}
 
-					session$sendCustomMessage("upload_status", "Checking for duplicate metadata factors")
-					metadata_factors = colnames(sample_map)
-					duplicate_factors = duplicated(metadata_factors)
-					if (any(duplicate_factors)){
-						session$sendCustomMessage("abort", paste("The following names are used for multiple metadata factors: ", paste(unique(metadata_factors[duplicate_factors]), collapse = " "), sep=""))
-						abort = TRUE
-					}
+			if (!retry_upload & custom_sample_map_present){
+				# File checking
+				session$sendCustomMessage("upload_status", "Verifying samples in the abundance tables are present in the sample metadata")
+				output_samples = unlist(output[,1,with=F])
+				metadata_samples = unlist(sample_map[,1,with=F])
+				extra_output_samples = !(output_samples %in% metadata_samples)
+				if (any(extra_output_samples)){
+					session$sendCustomMessage("abort", paste("The following samples do not have metadata: ", paste(unique(output_samples[extra_output_samples]), collapse = " "), sep=""))
+					abort = TRUE
 				}
 
-			} else { # Read in default
-				sample_map = fread(default_sample_map_table, sep="\t", header=T, stringsAsFactors = F)
+				session$sendCustomMessage("upload_status", "Checking for duplicate metadata factors")
+				metadata_factors = colnames(sample_map)
+				duplicate_factors = duplicated(metadata_factors)
+				if (any(duplicate_factors)){
+					session$sendCustomMessage("abort", paste("The following names are used for multiple metadata factors: ", paste(unique(metadata_factors[duplicate_factors]), collapse = " "), sep=""))
+					abort = TRUE
+				}
 			}
 
 			if (!abort & !retry_upload){
@@ -587,11 +623,9 @@ shinyServer(function(input, output, session) {
 				session$sendCustomMessage("upload_status", "Formatting the function hierarchy")
 
 				if (ncol(func_hierarchy) > 1 & which(colnames(func_hierarchy) == func_summary_level) != 1){
-
-					# Remove the column of KOs
-					if (which(colnames(func_hierarchy) == func_summary_level) != 1){
-						func_hierarchy = func_hierarchy[,2:(which(colnames(func_hierarchy) == func_summary_level)),with=F]
-					}
+					func_hierarchy = func_hierarchy[,2:(which(colnames(func_hierarchy) == func_summary_level)),with=F]
+				} else if (ncol(func_hierarchy) > 1){
+					func_hierarchy = func_hierarchy[,c(2:ncol(func_hierarchy), 1),with=F]
 				}
 
 				# Remove rows that correspond to selected summary levels not in the contribution table data
@@ -713,11 +747,9 @@ shinyServer(function(input, output, session) {
 		        ################################# Summarizing the OTU table to the desired taxonomic level #################################
 
 		        session$sendCustomMessage("upload_status", "Summarizing OTU table to desired taxonomic level")
-
 		        otu_table[is.na(otu_table)] = 0
 		        colnames(otu_table)[1] = "OTU"
 		        otu_table[,OTU:=as.character(OTU)]
-
 		        otu_table_objects = NULL
 
 		        if (which(colnames(taxa_hierarchy) == tax_summary_level) != 1){
@@ -779,6 +811,8 @@ shinyServer(function(input, output, session) {
 			        cutoff = which(colnames(summarized_taxa_hierarchy) == tax_summary_level)
 		    	    summarized_taxa_hierarchy = summarized_taxa_hierarchy[,1:cutoff,with=F]
 		        	summarized_taxa_hierarchy = unique(summarized_taxa_hierarchy)
+		        } else if (ncol(taxa_hierarchy) > 1){
+		        	summarized_taxa_hierarchy = taxa_hierarchy[,c(2:ncol(taxa_hierarchy), 1),with=F]
 		        } else {
 		        	summarized_taxa_hierarchy = taxa_hierarchy
 		        }
