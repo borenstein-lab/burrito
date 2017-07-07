@@ -4,19 +4,27 @@ library(shiny)
 library(data.table)
 
 # Defining important files
-default_tax_hierarchy_table = "www/Data/97_otu_taxonomy_split_with_header.txt"
-default_func_hierarchy_table = "www/Data/classes_parsed2.tsv"
-default_sample_map_table = "www/Data/mice_samplemap.txt"
-default_contribution_table = "www/Data/mice_metagenome_contributions_K01516_removed.txt"
-default_otu_table = "www/Data/otu_table_even_2.txt"
-picrust_normalization_file = "www/Data/16S_13_5_precalculated.tab.gz"
-picrust_ko_file = "www/Data/melted_filtered_picrust_ko_table.txt"
-constants_file = "www/Javascript/constants.js"
+default_tax_hierarchy_table_filename = "www/Data/97_otu_taxonomy_split_with_header.txt"
+default_func_hierarchy_table_filename = "www/Data/classes_parsed2.tsv"
+default_sample_map_table_filename = "www/Data/mice_samplemap.txt"
+default_contribution_table_filename = "www/Data/mice_metagenome_contributions_K01516_removed.txt"
+default_otu_table_filename = "www/Data/otu_table_even_2.txt"
+picrust_normalization_table_filename = "www/Data/16S_13_5_precalculated.tab.gz"
+picrust_ko_table_filename = "www/Data/melted_filtered_picrust_ko_table.txt.gz"
+constants_filename = "www/Javascript/constants.js"
 
 # Defining constants shared between javascript and R code
-constants_table = fread(constants_file, header=F)
+constants_table = fread(constants_filename, header=F)
 unlinked_taxon_name = unlist(constants_table[unlist(constants_table[,2,with=F]) == "unlinked_taxon_name",4,with=F])
 average_contrib_sample_name = unlist(constants_table[unlist(constants_table[,2,with=F]) == "average_contrib_sample_name",4,with=F])
+default_tax_hierarchy_table = fread(default_tax_hierarchy_table_filename, header=T, showProgress=F)
+default_func_hierarchy_table = fread(default_func_hierarchy_table_filename, header=T, showProgress=F)
+default_sample_map_table = fread(default_sample_map_table_filename, header=T, showProgress=F)
+default_contribution_table = fread(default_contribution_table_filename, header=T, showProgress=F)
+default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
+picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
+picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
+
 options(shiny.maxRequestSize = as.numeric(unlist(constants_table[unlist(constants_table[,2,with=F]) == "max_upload_size",4,with=F])))
 options(stringsAsFactors = F)
 
@@ -49,7 +57,7 @@ shinyServer(function(input, output, session) {
 			func_hierarchy_file_path = func_hierarchy_file$datapath
 			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 		} else {
-			func_hierarchy = fread(default_func_hierarchy_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+			func_hierarchy = default_func_hierarchy_table
 		}
 
 		# Sum the occurrences of each KO
@@ -107,8 +115,8 @@ shinyServer(function(input, output, session) {
 
 			session$sendCustomMessage("upload_status", "Loading default data")
 
-			otu_table = fread(default_otu_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-			output = fread(default_contribution_table, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+			otu_table = default_otu_table
+			output = default_contribution_table
 
 			# Remove the unnecessary columns (keep Sample, OTU, KO, and contribution)
 			output = output[,c(2,3,1,6), with=FALSE]
@@ -217,13 +225,13 @@ shinyServer(function(input, output, session) {
 					tracked_data$old_read_counts_datapath = otu_table_file_path
 					otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
 
-					# Get the PICRUSt normalization table
-					normalization = data.table(read.csv(gzfile(picrust_normalization_file), sep="\t", header=TRUE, stringsAsFactors=FALSE))
+					# # Get the PICRUSt normalization table
+					# picrust_normalization_table = data.table(read.csv(gzfile(picrust_normalization_table_filename), sep="\t", header=TRUE, stringsAsFactors=FALSE))
 
 					# File checking
 					session$sendCustomMessage("upload_status", "Verifying OTUs are known to PICRUSt") # Maybe be less stringent here, just ignore OTUs without PICRUSt annotations?
 					otu_table_otus = unlist(otu_table[,1,with=F])
-					normalization_otus = unlist(normalization[,1,with=F])
+					normalization_otus = unlist(picrust_normalization_table[,1,with=F])
 					extra_otu_table_otus = !(otu_table_otus %in% normalization_otus)
 					if (any(extra_otu_table_otus)){
 						session$sendCustomMessage("abort", paste("The following OTUs in the OTU table are unrecognized by our version of PICRUSt: ", paste(unique(otu_table_otus[extra_otu_table_otus]), collapse = " "), sep=""))
@@ -244,33 +252,29 @@ shinyServer(function(input, output, session) {
 						abort = TRUE
 					}
 
+					# Rename label columns to make it easier to work with later
+					colnames(otu_table)[1] = "OTU"
+					colnames(picrust_normalization_table) = c("OTU", "norm")
+
 					if (!abort){
 
 						# Change zeros in reads matrix to NAs so we can remove them when melting
 						otu_table[otu_table == 0] = NA
 
-						session$sendCustomMessage("upload_status", "Normalizing OTU abundances")
+						session$sendCustomMessage("upload_status", "Running PICRUSt")
 
 						# Melt the read count table so we can merge with the normalization table and ko table
+
 						melted_otu_table = melt(otu_table, id=colnames(otu_table)[1], na.rm=TRUE)
 
 						# Merge the column of normalization factors
-						otu_table_with_normalization = merge(melted_otu_table, normalization, by.x=c(colnames(otu_table)[1]), by.y=c(colnames(normalization)[1]), allow.cartesian=TRUE, sort=FALSE)
-						rm(normalization)
+						otu_table_with_normalization = merge(melted_otu_table, picrust_normalization_table, by.x=c(colnames(otu_table)[1]), by.y=c(colnames(picrust_normalization_table)[1]), allow.cartesian=TRUE, sort=FALSE)
 						rm(melted_otu_table)
-						
-						session$sendCustomMessage("upload_status", "Preparing to run PICRUSt")
-
-						# Get the PICRUSt ko table
-						melted_ko_counts = fread(picrust_ko_file, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-						session$sendCustomMessage("upload_status", "Calculating function contributions")
 
 						# Merge the column of ko counts
-						reads_norms_kos = merge(otu_table_with_normalization, melted_ko_counts, by.x=c(colnames(otu_table_with_normalization)[1]), by.y=c(colnames(melted_ko_counts)[1]), allow.cartesian=TRUE, sort=FALSE)
-						rm(melted_ko_counts)
+						reads_norms_kos = merge(otu_table_with_normalization, picrust_ko_table, by.x=c(colnames(otu_table_with_normalization)[1]), by.y=c(colnames(picrust_ko_table)[1]), allow.cartesian=TRUE, sort=FALSE)
 						rm(otu_table_with_normalization)
-						
+
 						# Make a contribution column by multiplying the read counts with normalization factors with ko counts
 						reads_norms_kos$contribution = reads_norms_kos[,3,with=FALSE] * reads_norms_kos[,6,with=FALSE] / reads_norms_kos[,4,with=FALSE]
 
@@ -447,7 +451,7 @@ shinyServer(function(input, output, session) {
 			}
 
 			if (is.null(func_hierarchy) | input$input_type == "example"){ # If there was no custom function hiearchy or they are looking at the example, read in the default
-				func_hierarchy = fread(default_func_hierarchy_table, header=TRUE, sep="\t", stringsAsFactors=FALSE)
+				func_hierarchy = default_func_hierarchy_table
 			}
 
 			if (!retry_upload){
@@ -504,7 +508,7 @@ shinyServer(function(input, output, session) {
 			}
 
 			if (is.null(taxa_hierarchy) | input$input_type == "example"){ # If there was no custom taxonomic hiearchy or they are looking at the example, read in the default
-				taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+				taxa_hierarchy = default_tax_hierarchy_table
 			}
 			
 			if (!retry_upload){
@@ -569,7 +573,7 @@ shinyServer(function(input, output, session) {
 			}
 
 			if (input$input_type == "example") { # If they're looking at the example, we load the default sample map
-				sample_map = fread(default_sample_map_table, sep="\t", header=T, stringsAsFactors = F)
+				sample_map = default_sample_map_table
 			}
 
 			if (!retry_upload & custom_sample_map_present){
@@ -982,7 +986,7 @@ shinyServer(function(input, output, session) {
 				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
 			}
 		} else {
-			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			taxa_hierarchy = default_tax_hierarchy_table
 			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
 		}
 	})
@@ -1003,7 +1007,7 @@ shinyServer(function(input, output, session) {
 				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
 			}
 		} else {
-			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			taxa_hierarchy = default_tax_hierarchy_table
 			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
 		}
 	})
@@ -1024,7 +1028,7 @@ shinyServer(function(input, output, session) {
 				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
 			}
 		} else {
-			taxa_hierarchy = fread(default_tax_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			taxa_hierarchy = default_tax_hierarchy_table
 			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
 		}
 	})
@@ -1045,7 +1049,7 @@ shinyServer(function(input, output, session) {
 				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
 			}
 		} else {
-			func_hierarchy = fread(default_func_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			func_hierarchy = default_func_hierarchy_table
 			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
 		}
 	})
@@ -1066,7 +1070,7 @@ shinyServer(function(input, output, session) {
 				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
 			}
 		} else {
-			func_hierarchy = fread(default_func_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			func_hierarchy = default_func_hierarchy_table
 			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
 		}
 	})
@@ -1087,7 +1091,7 @@ shinyServer(function(input, output, session) {
 				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
 			}
 		} else {
-			func_hierarchy = fread(default_func_hierarchy_table, sep = "\t", header=T, stringsAsFactors = F)
+			func_hierarchy = default_func_hierarchy_table
 			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
 		}
 	})
