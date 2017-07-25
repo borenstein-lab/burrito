@@ -62,24 +62,28 @@ draw_svg = function() {
 		d3.select("#sidebar_svg").append("polygon")
 			.attr("id","sidebar_hide")
 			.attr("points","150,0 150,60 180,30")
-			.attr("fill","#DADADA");
+			.attr("fill","#D0D0D0");
 
 		document.getElementById("sidebar_hide").addEventListener('click', function() {
 			var sidebarz = d3.select("#sidebar_svg");
 			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
 			if (curpos > -10) {
 				sidebarz.transition().attr("x",-150);
-				d3.select("#sidebar_hide").attr("points","150,0 150,60 180,30");
+				d3.select("#sidebar_hide")
+					.attr("points","150,0 150,60 180,30")
+					.attr("fill","#D0D0D0");
 			} else {
 				sidebarz.transition().attr("x",0);
-				d3.select("#sidebar_hide").attr("points","150,30 180,0 180,60");
+				d3.select("#sidebar_hide")
+					.attr("points","120,30 150,0 150,60")
+					.attr("fill","#606060");
 			}
 		});
 
 		
 		d3.select("#sidebar_svg").append("foreignObject")
 			.attr("x", 20)
-			.attr("y", 20)
+			.attr("y", 80)
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width","120px")
@@ -153,6 +157,56 @@ draw_svg = function() {
 				});
 			} 
 		});
+
+		// Make the help svg overlay and mouseover trigger
+		
+		helpSVG = d3.select("#mainsvg").append("svg")
+			.attr("id","help_svg")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", width)
+			.attr("height", height);
+
+		helpSVG.append("rect")
+			.attr("id", "help_background")
+			.attr("x", 0)
+			.attr("y", 0)
+			.attr("width", width)
+			.attr("height", height)
+			.attr("fill", "#404040")
+			.attr("fill-opacity", "0");
+
+		helpSVG_button = helpSVG.append("g")
+			.attr("id", "help_button")
+			.attr("transform", "translate( " +  0.97 * width + ", " + 0.03 * height + ")");
+
+		helpSVG_button.append("circle")
+			.attr("fill", "#202020")
+			.attr("r", 12)
+			.attr("stroke", "none");
+
+		helpSVG_button.append("text")
+			.attr("stroke","white")
+			.attr("text-anchor","middle")
+			.attr("y", 6)
+			.attr("font-size",16)
+			.classed("noselect","true")
+			.text("?");
+
+		helpSVGitems = helpSVG.append("g")
+			.attr("id","help_items")
+			.attr("visibility", "hidden");
+
+		helpSVG_button.on("mouseover", function(d) { 
+				d3.select("#help_background").attr("fill-opacity", "0.2");
+				d3.select("#help_items").attr("visibility", "visible"); 
+			})
+			.on("mouseout", function(d) {
+				d3.select("#help_background").attr("fill-opacity", "0");
+				d3.select("#help_items").attr("visibility", "hidden");
+			});
+
+		helpOverlay.createItems();
 
 		draw_loading();
 	}
@@ -268,6 +322,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 /*	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()*/
+
+	helpOverlay.redraw();
 
 	var NavSVG = plotSVG.insert("svg", "#sidebar")
     	.attr("x",margin.left)
