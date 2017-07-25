@@ -279,9 +279,6 @@ Shiny.addCustomMessageHandler("abort", function(message){
 	document.getElementById("function_hierarchy").value = null
 	document.getElementById("sample_map").value = null
 })
-Shiny.addCustomMessageHandler("warning", function(message){
-	alert(message);
-})
 
 update_progress = function(curr_sample, total_samples){
 	if(curr_sample==1){
@@ -390,7 +387,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			
 	//if( not expand to OTU level
 	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
-
 	////////////////////////// Colors
 	//color_option = "Categories" //Categories or Random
 	var color_option = null;
@@ -567,6 +563,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 		taxa_colors.domain(main_taxa)
 		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
+		console.log(main_taxa)
+		console.log(taxa_colors.range())
 
 		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
 		col1 = d3.rgb("black") //.brighter()
@@ -758,6 +756,41 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
     //d3.select(self.frameElement).style("height", "800px");
 
 	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall, taxa_colors, func_colors, function() {
+		//updateFunc when a node is clicked
+		//update other tree (dehighlight)
+				//dehighlight everything
+// 		data_cube.displayed_taxa.map(function(e){
+// 			console.log(e)
+// 			var treedatainterest = trees.treestructure["taxa"].nodes(roots["taxa"]).filter( function(f) {
+// 				return f.key == e;
+// 			});
+// 			var data = treedatainterest[0];
+// 			console.log(data.thisandparents)
+// 			console.log(data.thisandparents==null)
+// 			if(data.thisandparents !== null){ //if it has ever been highlighted
+// 				dehighlightOverall(e, "", 1); 
+// 			}
+// 			});
+// 				
+// 		data_cube.displayed_funcs.map(function(e){
+// 			console.log(e)
+// 			var treedatainterest = trees.treestructure["func"].nodes(roots["func"]).filter( function(f) {
+// 				return f.key == e;
+// 			});
+// 			var data = treedatainterest[0];
+// 			if(data.thisandparents !== null){
+// 				dehighlightOverall("", e, 2); 
+// 			}
+// 			});		
+		for (var i=0; i < data_cube.displayed_taxa; i++){
+			dehighlightOverall(data_cube.displayed_taxa[i], "", 1)
+			for (var j=0; j < data_cube.displayed_funcs; j++){
+				if(i==0){
+					dehighlightOverall("", data_cube.displayed_funcs[j], 2)
+				}
+				dehighlightOverall(data_cube.displayed_taxa[i], data_cube.displayed_funcs[j], 3)
+			}
+		}
 		trees.updateBPvisdata( updateBPgraph() );
 		update_otu_bar();
 		update_func_bar();
@@ -884,6 +917,44 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			fB.deselect_single_contribution(taxonName, functionName, func_colors);
 		
 		}
+	}
+	
+	function unclickEverything(taxon_id, list_type){ //unclick everything not associated with a particular taxon or function
+		////IN PROGRESS
+			display_taxa.map(function(e,j){
+			d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+			if(d_id !== current_id){
+								if(d3.select("#"+d_id).classed("highlighted")==true){
+									d3.select("#"+d_id).classed("highlighted",false)
+									d3.select("#"+d_id).classed("clicked",false)
+									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+										.filter(function(f,k){ 
+										return (f["key1"]==j); })
+									assocEdges.classed("highlighted", false)
+									assocEdges.classed("clicked", false)
+									assocEdges.style("opacity", 0)
+									dehighlightall(e,"",1);
+								}}})
+						
+						displayed_funcs.map(function(e,j){
+							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+							if(d_id !== current_id){
+								if(d3.select("#"+d_id).classed("highlighted")==true){
+									d3.select("#"+d_id).classed("highlighted",false)
+									d3.select("#"+d_id).classed("clicked",false)
+									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge").filter(function(f,k){ 
+										return (f["key2"]==j); })
+									assocEdges.select(".clicked").each(function(m){
+										dehighlightall(m.key1, m.key2, 3)
+									})
+
+									assocEdges.classed("highlighted", false)
+									assocEdges.classed("clicked", false);
+																			
+									assocEdges.attr("visibility", "hidden")
+									assocEdges.style("opacity", 0)
+									dehighlightall("", e, 2)
+								}}})
 	}
 	
 	// Update the bipartite graph after changes to data_cube
