@@ -32,9 +32,9 @@
       var bar = {};
       bar.Sample = d.Sample;
       var y0 = 0;
-      var my_displayed_taxa = data_cube.displayed_taxa.slice(0);
-      my_displayed_taxa.reverse()
-      bar.taxa = my_displayed_taxa.map(function(name){
+      var my_display_taxa = data_cube.displayed_taxa.slice(0);
+      my_display_taxa.reverse()
+      bar.taxa = my_display_taxa.map(function(name){
         return { name: name, y0: y0, y1: y0 += get_taxon_abundance(name, d, data_cube)};
       });
       bar.total = bar.taxa[bar.taxa.length - 1].y1;
@@ -45,7 +45,7 @@
     return bar_data;
   }
 
-  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping){
+  otu_bar.draw = function(bar_data, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping, unclickEverything){
 
     d3.select("#otu_bar_y_label").remove()
     d3.select("#otu_bar_x_label").remove()
@@ -155,13 +155,13 @@
         	return tooltip.style("visibility", "visible");
         }
         if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
-    		if(display_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
+    		if(display_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
         	name_split = (current_rectangle_data.name.split('_')).pop()
         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           	return tooltip.style("visibility", "visible");
     		}
     	} else if(clickedEdges.empty() == false){ //if an edge is clicked
-    		if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){ //if relevant edge is clicked
+    		if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){ //if relevant edge is clicked
     		    name_split = (current_rectangle_data.name.split('_')).pop()
         		tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           		return tooltip.style("visibility", "visible");
@@ -176,11 +176,11 @@
   		if(clickedBars.empty()){
 	        return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
         } else if(clickedTaxaBars.empty() == false){
-         	if(display_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
+         	if(display_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
          		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
          	}
          } else if(clickedEdges.empty() == false){
-         	if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
+         	if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
          		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
          	}
          }
@@ -196,14 +196,59 @@
         	return tooltip.style("visibility", "hidden");
         }  
         if(clickedTaxaBars.empty() == false){
-    		if(display_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
+    		if(display_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
 	    		return tooltip.style("visibility", "hidden");
     		} 
     	} else if(clickedEdges.empty() == false){
-    		if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\))/g, "_")){
+    		if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
     			return tooltip.style("visibility", "hidden");
     		}
     	}
+      })
+      .on("click", function(d){
+      	//need to de-highlight everything first
+        current_rectangle_data = d3.select(this).datum();
+        current_id = "Genomes0"+current_rectangle_data.name.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+        console.log(current_id)
+      	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
+  		clickedTaxaBars = d3.select("#Genomes").select(".part0").selectAll(".mainbars").select(".clicked")
+  		clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
+  		
+		//Unselect things currently clicked
+		//unclickEverything(current_id) //unclick everything except specified ID
+
+		if(d3.select("#"+current_id).classed("clicked")){ //if clicked already
+			d3.select("#"+current_id).classed("highlighted",false)
+			d3.select("#"+current_id).classed("clicked",false)
+			dehighlight_overall(current_rectangle_data.name, "",1)
+		} else{
+			d3.select("#"+current_id).classed("highlighted",true)
+			d3.select("#"+current_id).classed("clicked",true)
+			highlight_overall(current_rectangle_data.name, "", 1);
+		}
+		return tooltip.style("visibility", "hidden")
+						
+					
+//   		if(clickedBars.empty()){ //if nothing is clicked
+        	
+//         	name_split = (current_rectangle_data.name.split('_')).pop()
+//         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+//         	return tooltip.style("visibility", "visible");
+//         }
+//         if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
+//     		if(display_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
+//         	name_split = (current_rectangle_data.name.split('_')).pop()
+//         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+//           	return tooltip.style("visibility", "visible");
+//     		}
+//     	} else if(clickedEdges.empty() == false){ //if an edge is clicked
+//     		if(display_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){ //if relevant edge is clicked
+//     		    name_split = (current_rectangle_data.name.split('_')).pop()
+//         		tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+//           		return tooltip.style("visibility", "visible");
+//     		}
+//     	}
+
       });
 
     svglink.append("svg")

@@ -152,6 +152,9 @@
 	// Update the tree graphs
 	// Expands or collapses the source node, depending on whether it is currently open or closed
 	trees.update = function(source) {
+	
+		console.log(source)
+		
 		// Compute the new tree layout.
 		var nodes = trees.treestructure[source.type].nodes(roots[source.type]).reverse();
 		var links = trees.treestructure[source.type].links(nodes);
@@ -247,8 +250,8 @@
 				return "translate(" + depthpos[source.type][d.depth+1] + "," + -15 + ") rotate(" + (source.type == 'taxa' ? -35 : 35) + ")";
 			});
 			
-		upddepthlabels.select("text")
-			.attr("visibility", "visible");
+// 		upddepthlabels.select("text")
+// 			.attr("visibility", "visible");
 		
 		var labelexit = depthlabels.exit().transition()
 			.duration(duration)
@@ -265,6 +268,29 @@
 			.data(nodes, function (d) {
 			return d.id || (d.id = ++nodeIndex);
 		});
+		
+// 		var treedatainterest = trees.treestructure[source.type].nodes(roots[source.type])
+// 		console.log(treedatainterest)
+// 		var data = treedatainterest[0];
+// 		var thisnode = data;
+// 		var thisNparents = [];
+// 		thisNparents.push(thisnode);
+// 		while (thisnode.parent) {
+// 			thisnode = thisnode.parent;
+// 			thisNparents.push(thisnode);
+// 		}
+// 		data.thisandparents = node.filter(function (d2) { 
+// 			var good = false;
+// 			thisNparents.forEach( function (d4) {
+// 				if (d2.id == d4.id) {
+// 					good = true;} 
+// 					});
+// 			return good;
+// 		})
+// 		console.log(data.thisandparents)
+
+
+		//data.thisandparents.selectAll("text").remove(); 
 
 		// Enter any new nodes at the parent's previous position.
 		var nodeEnter = node.enter().append("g")
@@ -328,7 +354,10 @@
 				if(source.type==="taxa"){
 					return taxa_colors(d.key); } else {
 					return func_colors(d.key);
-				 } });
+				 } })
+			.style("stroke-width", "1") //make them unhighlighted style to start
+			.style("stroke", "grey");
+
 
 	/*								return d._values ? "lightsteelblue" : "#fff";
 		});
@@ -397,7 +426,10 @@
 				if(source.type==="taxa"){
 					return taxa_colors(d.key); } else {
 					return func_colors(d.key);
-				 } });
+				 } })
+			.style("stroke-width", "1")
+			.style("stroke", "grey");
+
 
 	/*								.style("fill", function (d) {
 				if (d.values) {
@@ -541,17 +573,62 @@
 				if (d.depth > 0) {//don't collapse the root
 					trees.collapseTree(d);
 					d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
+					//d3.selectAll(".clicked").classed("clicked", false) //wipe all clicking and highlighting
+					//d3.selectAll(".highlighted").classed("highlighted", false)			
 				}
 			} else { //expand
 				if (d._values[0].hasOwnProperty('key')) {
 					d.values = d._values;
 					d._values = null;
 					d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
+					//d3.selectAll(".clicked").classed("clicked", false)
+					//d3.selectAll(".highlighted").classed("highlighted", false)
 				} else {
 				}			
 			}
+
 		updateOtherThings();
 		trees.update(d);
+		//dehighlight everything 	
+		data_cube.displayed_taxa.map(function(e,j){
+			d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+// 			if(d3.select("#"+d_id).classed("highlighted")==true){
+				d3.select("#"+d_id).classed("highlighted",false)
+				d3.select("#"+d_id).classed("clicked",false)
+				assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+					.filter(function(f,k){ 
+						return (f["key1"]==j); })
+				assocEdges.select(".clicked").each(function(m){
+					dehighlightOverall(m.key1, m.key2, 3)
+						})
+						assocEdges.classed("highlighted", false)
+						assocEdges.classed("clicked", false)
+						assocEdges.style("opacity", 0)
+					dehighlightOverall(e,"",1);
+					trees.dehighlightTree(e, "taxa");
+					})
+						
+		data_cube.displayed_funcs.map(function(e,j){
+			d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+// 				if(d3.select("#"+d_id).classed("highlighted")==true){
+					d3.select("#"+d_id).classed("highlighted",false)
+					d3.select("#"+d_id).classed("clicked",false)
+					assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge").filter(function(f,k){ 
+						return (f["key2"]==j); })
+					assocEdges.select(".clicked").each(function(m){
+						dehighlightOverall(m.key1, m.key2, 3)
+						})
+
+					assocEdges.classed("highlighted", false)
+					assocEdges.classed("clicked", false);
+																			
+					assocEdges.attr("visibility", "hidden")
+					assocEdges.style("opacity", 0)
+					dehighlightOverall("", e, 2)
+					trees.dehighlightTree(e, "func");
+								})
+
+				
 	}
 
 	// collapse all children of the collapsing node recursively
@@ -579,6 +656,8 @@
 
 
 	trees.highlightTree = function( name, type) {
+		//first, de-highlight everything else in the tree
+		
 		var treedatainterest = trees.treestructure[type].nodes(roots[type]).filter( function(d) {
 			return d.key == name;
 		} );
@@ -595,6 +674,22 @@
 			thisNparents.push(thisnode);
 		}
 		var node = trees.SVGs[data.type].selectAll("g.node");
+		
+		data.notthisandparents = node.filter(function(d2) {
+			var good = false;
+			thisNparents.forEach( function (d4) {
+				if (d2.id == d4.id) {
+					good = true;} 
+					});
+			return good == false;
+		})
+		data.notthisandparents.select("circle")
+			.style("stroke-width", "1")
+			.style("stroke", "grey");
+
+		data.notthisandparents.selectAll("text").remove(); 
+
+		
 		data.thisandparents = node.filter(function (d2) { 
 			var good = false;
 			thisNparents.forEach( function (d4) {
@@ -631,11 +726,39 @@
 			return d.key == name;
 		} );
 		var data = treedatainterest[0];
+		console.log(data.thisandparents)
+		if(data.thisandparents == null){ //do nothing if the thing has never been highlighted
+			var treedatainterest = trees.treestructure[type].nodes(roots[type]).filter( function(d) {
+			return d.key == name;
+			} );
+			var treedatainterestobj = trees.SVGs[type].selectAll("g.node").filter( function(d) {
+				return d.key == name;
+			})
+			var data = treedatainterest[0];
+			var thisobj = treedatainterestobj[0];
+			var thisnode = data;
+			var thisNparents = [];
+			thisNparents.push(thisnode);
+			while (thisnode.parent) {
+				thisnode = thisnode.parent;
+				thisNparents.push(thisnode);
+			}
+			var node = trees.SVGs[data.type].selectAll("g.node");
+			data.thisandparents = node.filter(function (d2) { 
+				var good = false;
+				thisNparents.forEach( function (d4) {
+				if (d2.id == d4.id) {
+					good = true;} 
+					});
+			return good;
+			})
+		}
 		data.thisandparents.select("circle")
 			.style("stroke-width", "1")
 			.style("stroke", "grey");
 
 		data.thisandparents.selectAll("text").remove(); 
+
 	}
 	
 	function getAvgs(rootnode){
