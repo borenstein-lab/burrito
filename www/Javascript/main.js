@@ -31,7 +31,7 @@ draw_svg = function() {
 // 			.attr("preserveAspectRatio","none");
 // 
 // 		console.log("modified patternsvg")
-		d3.select("body").attr("class","svgBody");
+		d3.select("body").classed("svgBody", true);
 
 		MainSVG = d3.select("#mainplot").append("svg")
 			.attr("id","mainsvg")
@@ -268,6 +268,7 @@ Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples)
 })
 Shiny.addCustomMessageHandler("abort", function(message){
 	d3.select("#mainsvg").remove();
+	d3.select("body").classed("svgBody", false);
 	alert(message);
 	document.getElementById("taxonomic_abundances_1").value = null
 	document.getElementById("taxonomic_abundances_2").value = null
