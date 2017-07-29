@@ -334,12 +334,6 @@
 				metadata_label_dropdown.remove(old_options[i])
 			}
 
-			// Add a blank option for choosing no metadata grouping
-			var blank_option = document.createElement("option");
-			blank_option.text="";
-			blank_option.value="";
-			metadata_label_dropdown.add(blank_option);
-
 			// If there is only one label, treat it as a single string rather than a list of characters
 			if (typeof labels === 'string' || labels instanceof String){
 

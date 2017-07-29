@@ -135,24 +135,116 @@ shinyServer(function(input, output, session) {
 
 	# Reactive elements that keep track of the current choice for summary levels and metadata factors
 	taxonomic_summary_level = reactive({
-		if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "CUSTOM"){
+
+		# If the example is not being displayed, look at the taxonomic level of detail selector
+		if (input$example_visualization != "TRUE"){
+
+			# If something hasn't been selected (currently having trouble setting a selected choice when we update the dropdown), load the hierarchy and check for the default taxonomic summary level, otherwise use the first column
+			if (is.null(input$taxonomic_level_of_detail_selector)){
+
+
+				# If a custom taxonomic hierarchy has been selected, we refer to it
+				if (input$taxonomic_hierarchy_choice == "CUSTOM"){
+					
+					# If the custom taxonoimc hierarchy has been uploaded, we refer to it
+					if (!is.null(input$custom_taxonomic_hierarchy_table)){
+
+						# Read in the taxonomic hierarchy table
+						taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
+						taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
+						taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+
+						# If the default exists, use it
+						if (default_taxonomic_summary_level %in% colnames(taxonomic_hierarchy_table)){
+							return(default_taxonomic_summary_level)
+						}
+
+						# Otherwise, return the first column name
+						return(colnames(taxonomic_hierarchy_table)[1])
+					}
+
+					# Otherwise, a custom taxonomic hierarchy has not been selected and there is no selection
+					return(NULL)
+				}
+
+				# Otherwise, we're looking at the default taxonomic hierarchy, in which case we just return the default since nothing has been selected
+				return(default_taxonomic_summary_level)
+			}
+
+			# Otherwise, we just look at their choice
 			return(unname(input$taxonomic_level_of_detail_selector))
+
+		# Otherwise, we use the default for the example
 		} else {
 			return(default_taxonomic_summary_level)
 		}
 	})
 
 	function_summary_level = reactive({
-		if (input$example_visualization != "TRUE" & input$function_hierarchy_choice == "CUSTOM"){
+
+		# If the example is not being displayed, look at the function level of detail selector
+		if (input$example_visualization != "TRUE"){
+
+			# If something hasn't been selected (currently having trouble setting a selected choice when we update the dropdown), load the hierarchy and check for the default function summary level, otherwise use the first column
+			if (is.null(input$function_level_of_detail_selector)){
+
+
+				# If a custom function hierarchy has been selected, we refer to it
+				if (input$function_hierarchy_choice == "CUSTOM"){
+
+					# If the custom taxonoimc hierarchy has been uploaded, we refer to it
+					if (!is.null(input$custom_function_hierarchy_table)){
+
+						# Read in the function hierarchy table
+						function_hierarchy_table_file = input$custom_function_hierarchy_table
+						function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
+						function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+
+						# If the default exists, use it
+						if (default_function_summary_level %in% colnames(function_hierarchy_table)){
+							return(default_function_summary_level)
+						}
+
+						# Otherwise, return the first column name
+						return(colnames(function_hierarchy_table)[1])
+					}
+
+					# Otherwise, a custom function hierarchy has not been selected and there is no selection
+					return(NULL)
+				}
+
+				# Otherwise, we're looking at the default function hierarchy, in which case we just return the default since nothing has been selected
+				return(default_function_summary_level)
+			}
+
+			# Otherwise, we just look at their choice
 			return(unname(input$function_level_of_detail_selector))
+
+		# Otherwise, we use the default for the example
 		} else {
 			return(default_function_summary_level)
 		}
 	})
 
 	metadata_factor = reactive({
+
+		# If the example is not being displayed, look at the metdata factor selector
 		if (input$example_visualization != "TRUE"){
+
+			# If something hasn't been selected, we don't have a metadata factor
+			if (is.null(input$metadata_factor_selector)){
+				return(NULL)
+			}
+
+			# If N/A is selected, we don't have a metadata factor
+			if (input$metadata_factor_selector == "N/A"){
+				return(NULL)
+			}
+
+			# Otherwise, we return the selection
 			return(unname(input$metadata_factor_selector))
+
+		# Otherwise, we just use the default metadata factor for the example
 		} else {
 			return(default_metadata_factor)
 		}
@@ -206,20 +298,28 @@ shinyServer(function(input, output, session) {
 	observe({
 
 		# If a custom taxonomic hierarchy has been selected, we refer to it
-		if (!is.null(input$custom_taxonomic_hierarchy_table)){
+		if (input$taxonomic_hierarchy_choice == "CUSTOM"){
 
-			# Read in the taxonomic hierarchy table
-			taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
-			taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
-			taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+			# If a custom taxonomic hierarchy has been uploaded, we refer to it
+			if (!is.null(input$custom_taxonomic_hierarchy_table)){
 
-			# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
-			if (ncol(taxonomic_hierarchy_table) > 1){
-				session$sendCustomMessage("taxonomic_hierarchy_labels", colnames(taxonomic_hierarchy_table)[c(2:ncol(taxonomic_hierarchy_table), 1)])
+				# Read in the taxonomic hierarchy table
+				taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
+				taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
+				taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
 
-			# Otherwise with a single column the order of the single label doesn't matter
+				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
+				if (ncol(taxonomic_hierarchy_table) > 1){
+					session$sendCustomMessage("taxonomic_hierarchy_labels", colnames(taxonomic_hierarchy_table)[c(2:ncol(taxonomic_hierarchy_table), 1)])
+
+				# Otherwise with a single column the order of the single label doesn't matter
+				} else {
+					session$sendCustomMessage("taxonomic_hierarchy_labels", list(colnames(taxonomic_hierarchy_table)))
+				}
+
+			# Otherwise, we send the N/A string
 			} else {
-				session$sendCustomMessage("taxonomic_hierarchy_labels", list(colnames(taxonomic_hierarchy_table)))
+				session$sendCustomMessage("taxonomic_hierarchy_labels", list("N/A"))
 			}
 
 		# Otherwise, we use the default taxonomic hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
@@ -231,20 +331,28 @@ shinyServer(function(input, output, session) {
 	observe({
 
 		# If a custom function hierarchy has been selected, we refer to it
-		if (!is.null(input$custom_function_hierarchy_table)){
+		if (input$function_hierarchy_choice == "CUSTOM"){
 
-			# Read in the funciton hierarchy table
-			function_hierarchy_table_file = input$custom_function_hierarchy_table
-			function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
-			function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+			# If a custom function hierarchy has been uploaded, we refer to it
+			if (!is.null(input$custom_function_hierarchy_table)){
 
-			# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
-			if (ncol(function_hierarchy_table) > 1){
-				session$sendCustomMessage("function_hierarchy_labels", colnames(function_hierarchy_table)[c(2:ncol(function_hierarchy_table), 1)])
+				# Read in the funciton hierarchy table
+				function_hierarchy_table_file = input$custom_function_hierarchy_table
+				function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
+				function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
 
-			# Otherwise with a single column the order of the single label doesn't matter
+				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
+				if (ncol(function_hierarchy_table) > 1){
+					session$sendCustomMessage("function_hierarchy_labels", colnames(function_hierarchy_table)[c(2:ncol(function_hierarchy_table), 1)])
+
+				# Otherwise with a single column the order of the single label doesn't matter
+				} else {
+					session$sendCustomMessage("function_hierarchy_labels", list(colnames(function_hierarchy_table)))
+				}
+
+			# Otherwise, we send the N/A string
 			} else {
-				session$sendCustomMessage("function_hierarchy_labels", list(colnames(function_hierarchy_table)))
+				session$sendCustomMessage("function_hierarchy_labels", list("N/A"))
 			}
 
 		# Otherwise, we use the default function hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
@@ -254,11 +362,34 @@ shinyServer(function(input, output, session) {
 	})
 
 	observe({
-		if (!is.null(input$metadata_table)){
-			metadata_table_file = input$metadata_table
-			metadata_table_file_path = metadata_table_file$datapath
-			metadata_table = fread(metadata_table_file_path, header=T)
-			session$sendCustomMessage("metadata_table_labels", colnames(metadata_table)[2:ncol(metadata_table)])
+
+		# If the option to upload metadata has been selected, we refer to it
+		if (input$metadata_choice == "PRESENT"){
+
+			# If the metadata table has been uploaded, we refer to it
+			if (!is.null(input$metadata_table)){
+
+				metadata_table_file = input$metadata_table
+				metadata_table_file_path = metadata_table_file$datapath
+				metadata_table = fread(metadata_table_file_path, header=T)
+
+				# If there is only one column, then we send the N/A string
+				if (ncol(metadata_table) < 2){
+					session$sendCustomMessage("metadata_table_labels", list("N/A"))
+
+				# Otherwise, we can send the non-sample columns, lead by the N/A option as the default
+				} else {
+					session$sendCustomMessage("metadata_table_labels", c("N/A", colnames(metadata_table)[2:ncol(metadata_table)]))
+				}
+
+			# Otherwise, we send the N/A string
+			} else {
+				session$sendCustomMessage("metadata_table_labels", list("N/A"))
+			}
+
+		# Otherwise, we send the N/A string
+		} else {
+			session$sendCustomMessage("metadata_table_labels", list("N/A"))
 		}
 	})
 
@@ -1400,7 +1531,6 @@ shinyServer(function(input, output, session) {
 		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, first_taxonomic_level(), contribution_table[[first_taxonomic_level()]])
 
 		taxonomic_hierarchy_table = make_hierarchy_table_level_entries_unique(taxonomic_hierarchy_table, first_taxonomic_level())
-
 		contribution_table = summarize_table_to_selected_level(contribution_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
 
 		session$sendCustomMessage("upload_status", "Summarizing OTU table to desired taxonomic level")
