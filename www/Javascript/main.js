@@ -26,7 +26,7 @@ draw_svg = function() {
 
 		trees.SetUp(navDims);
 		
-		d3.select("body").attr("class","svgBody");
+		d3.select("body").classed("svgBody", true);
 
 		MainSVG = d3.select("#mainplot").append("svg")
 			.attr("id","mainsvg")
@@ -263,6 +263,7 @@ Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples)
 })
 Shiny.addCustomMessageHandler("abort", function(message){
 	d3.select("#mainsvg").remove();
+	d3.select("body").classed("svgBody", false);
 	alert(message);
 })
 
