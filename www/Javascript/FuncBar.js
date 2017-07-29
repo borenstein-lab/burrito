@@ -108,7 +108,6 @@
 			display_taxa.push((d3.select(this).attr("id")).replace("Genomes0","")); })
 	
    var viz = fB.vizData(stackdata, sample_order);
-   //console.log(viz)
 
    var first_sample_x = x(sample_order[0]);
    var last_sample_x = x(sample_order[sample_order.length - 1]);

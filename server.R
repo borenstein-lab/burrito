@@ -3,1123 +3,1476 @@
 library(shiny)
 library(data.table)
 
-# Defining important files
-default_tax_hierarchy_table_filename = "www/Data/97_otu_taxonomy_split_with_header.txt"
-default_func_hierarchy_table_filename = "www/Data/classes_parsed2.tsv"
-default_sample_map_table_filename = "www/Data/mice_samplemap.txt"
+# Default files, tables for contribution calculations, and a file of shared constants
+default_taxonomic_hierarchy_table_filename = "www/Data/97_otu_taxonomy_split_with_header.txt"
+default_function_hierarchy_table_filename = "www/Data/classes_parsed2.tsv"
+default_metadata_table_filename = "www/Data/mice_samplemap.txt"
 default_contribution_table_filename = "www/Data/mice_metagenome_contributions_K01516_removed.txt"
 default_otu_table_filename = "www/Data/otu_table_even_2.txt"
 picrust_normalization_table_filename = "www/Data/16S_13_5_precalculated.tab.gz"
 picrust_ko_table_filename = "www/Data/melted_filtered_picrust_ko_table.txt.gz"
 constants_filename = "www/Javascript/constants.js"
 
-# Defining constants shared between javascript and R code
+# Read the shared constants table
 constants_table = fread(constants_filename, header=F)
-unlinked_taxon_name = unlist(constants_table[unlist(constants_table[,2,with=F]) == "unlinked_taxon_name",4,with=F])
-average_contrib_sample_name = unlist(constants_table[unlist(constants_table[,2,with=F]) == "average_contrib_sample_name",4,with=F])
-default_tax_hierarchy_table = fread(default_tax_hierarchy_table_filename, header=T, showProgress=F)
-default_func_hierarchy_table = fread(default_func_hierarchy_table_filename, header=T, showProgress=F)
-default_sample_map_table = fread(default_sample_map_table_filename, header=T, showProgress=F)
-default_contribution_table = fread(default_contribution_table_filename, header=T, showProgress=F)
-default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
-picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
-picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
-
+unlinked_name = unname(unlist(constants_table[unlist(constants_table[,2,with=F]) == "unlinked_name",4,with=F]))
+default_taxonomic_summary_level = unname(unlist(constants_table[unlist(constants_table[,2,with=F]) == "default_taxonomic_summary_level",4,with=F]))
+default_function_summary_level = unname(unlist(constants_table[unlist(constants_table[,2,with=F]) == "default_function_summary_level",4,with=F]))
+default_metadata_factor = unname(unlist(constants_table[unlist(constants_table[,2,with=F]) == "default_metadata_factor",4,with=F]))
 options(shiny.maxRequestSize = as.numeric(unlist(constants_table[unlist(constants_table[,2,with=F]) == "max_upload_size",4,with=F])))
 options(stringsAsFactors = F)
 
-# Defining constants used by the server
-comparison_tag = "_comparison"
-default_tax_summary_level = "Genus"
-default_func_summary_level = "SubPathway"
-default_samp_grouping = "Group"
+# Tables shared between sessions
+default_taxonomic_hierarchy_table = fread(default_taxonomic_hierarchy_table_filename, header=T, showProgress=F)
+default_function_hierarchy_table = fread(default_function_hierarchy_table_filename, header=T, showProgress=F)
+default_metadata_table = fread(default_metadata_table_filename, header=T, showProgress=F)
+default_contribution_table = fread(default_contribution_table_filename, header=T, showProgress=F)
+default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
+picrust_normalization_table = NULL
+picrust_ko_table = NULL
+if (basename(getwd()) %in% c("burrito", "burrito-alex")){
+	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
+	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
+}
 
-# Actual Shiny server code
+# Constant to mark entries for comparison in the contribution table
+comparison_tag = "_comparison"
+
+### Shiny server session code ###
 shinyServer(function(input, output, session) {
 
-    # Variables that the server keeps track of but doesn't need to run functions to calculate
-    tracked_data = reactiveValues(previous_contribution_sample = -1, previous_otu_sample = -1, otu_table = NULL, contribution_table = NULL, tax_summary_level = "Genus", func_summary_level = "SubPathway", old_tax_abund_1_datapath = NULL, old_tax_abund_2_datapath = NULL, old_read_counts_datapath = NULL, old_annotation_datapath = NULL, old_contributions_datapath = NULL, old_function_abundances_datapath = NULL, old_func_hierarchy_datapath = NULL, old_tax_hierarchy_datapath = NULL, old_samp_map_datapath = NULL)
+	###Session variables tracked on the server ###
 
-    # Functional to calculate the normalization factors for partial KO contributions
-    ko_normalization_table = reactive({ # Reactive, when called only recalculates output if variables it depends on change
+	# Map of previous file paths to uploaded files, used to detect when a new file has been selected but has not finished uploading
+	old_file_paths = reactiveValues()
+	old_file_paths[["taxonomic_abundance_table"]] = NULL
+	old_file_paths[["genomic_content_table"]] = NULL
+	old_file_paths[["contribution_table"]] = NULL
+	old_file_paths[["custom_taxonomic_hierarhcy_table"]] = NULL
+	old_file_paths[["custom_function_hierarchy_table"]] = NULL
+	old_file_paths[["metadata_table"]] = NULL
+	old_file_paths[["function_abundance_table"]] = NULL
 
-    	func_hierarchy = NULL
-		if (input$input_type == "run_picrust" & !is.null(input$function_hierarchy_R)){ # If they've uploaded a custom hierarchy, use theirs
-			func_hierarchy_file = input$function_hierarchy_R
-			func_hierarchy_file_path = func_hierarchy_file$datapath
-			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)	
-		} else if (input$input_type == "contributions" & !is.null(input$function_hierarchy_C)){
-			func_hierarchy_file = input$function_hierarchy_C
-			func_hierarchy_file_path = func_hierarchy_file$datapath
-			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-		} else if (input$input_type == "annotations" & !is.null(input$function_hierarchy_G)){
-			func_hierarchy_file = input$function_hierarchy_G
-			func_hierarchy_file_path = func_hierarchy_file$datapath
-			func_hierarchy = fread(func_hierarchy_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
+	# Map of flags indicating that a new file has been selected, used to detect when a new file has been selected but has not finished uploading
+	new_file_flags = reactiveValues()
+	new_file_flags[["taxonomic_abundance_table"]] = FALSE
+	new_file_flags[["genomic_content_table"]] = FALSE
+	new_file_flags[["contribution_table"]] = FALSE
+	new_file_flags[["custom_taxonomic_hierarchy_table"]] = FALSE
+	new_file_flags[["custom_function_hierarchy_table"]] = FALSE
+	new_file_flags[["metadata_table"]] = FALSE
+	new_file_flags[["function_abundance_table"]] = FALSE
+
+	# Map of sample indices for tables that need to be sent to the browser, used to determine whether a new sample is being requested
+	previous_sample_indices = reactiveValues()
+	previous_sample_indices[["contribution_table"]] = -1
+	previous_sample_indices[["otu_table"]] = -1
+
+	# Map of tables that hold data to be sent to the browser
+	tracked_tables = reactiveValues()
+	tracked_tables[["contribution_table"]] = NULL
+	tracked_tables[["otu_table"]] = NULL
+
+	### Reactive values for keeping track of choices made on the upload page ###
+
+	# Reactive elements that keep track of the name of the first level of the hierarchies (what show up in the OTU and contribution tables)
+	first_taxonomic_level = reactive({
+
+		# If there is no custom taxonomic hierarchy, use the default
+		if (is.null(input$custom_taxonomic_hierarchy_table)){
+			return(colnames(default_taxonomic_hierarchy_table)[1])
+
+		# Otherwise, use the custom taxonomic hierarchy
 		} else {
-			func_hierarchy = default_func_hierarchy_table
-		}
 
-		# Sum the occurrences of each KO
-		output = func_hierarchy[,.N,by="KO"]
+			# Read in the taxonomic hierarchy table
+			taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
+			taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
+			taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+
+			# Return the name of the first column
+			return(colnames(taxonomic_hierarchy_table)[1])
+		}
+	})
+
+	first_function_level = reactive({
+
+		# If there is no custom function hierarchy, use the default
+		if (is.null(input$custom_function_hierarchy_table)){
+			return(colnames(default_function_hierarchy_table)[1])
+
+		# Otherwise, use the custom function hierarchy
+		} else {
+
+			# Read in the function hierarchy table
+			function_hierarchy_table_file = input$custom_function_hierarchy_table
+			function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
+			function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+
+			# Return the name of the first column
+			return(colnames(function_hierarchy_table)[1])
+		}
+	})
+
+	first_metadata_level = reactive({
+
+		# If there is no uploaded metadata table, use the default
+		if (is.null(input$metadata_table)){
+			return(colnames(default_metadata_table)[1])
+
+		# Otherwise, use the selected metadata table
+		} else {
+
+			# Read in the metadata table
+			metadata_table_file = input$metadata_table
+			metadata_table_file_path = metadata_table_file$datapath
+			metadata_table = fread(metadata_table_file_path, header=T)
+
+			# Return the name of the first column
+			return(colnames(metadata_table)[1])
+		}
+	})
+
+	# Reactive elements that keep track of the current choice for summary levels and metadata factors
+	taxonomic_summary_level = reactive({
+		if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "CUSTOM"){
+			return(unname(input$taxonomic_level_of_detail_selector))
+		} else {
+			return(default_taxonomic_summary_level)
+		}
+	})
+
+	function_summary_level = reactive({
+		if (input$example_visualization != "TRUE" & input$function_hierarchy_choice == "CUSTOM"){
+			return(unname(input$function_level_of_detail_selector))
+		} else {
+			return(default_function_summary_level)
+		}
+	})
+
+	metadata_factor = reactive({
+		if (input$example_visualization != "TRUE"){
+			return(unname(input$metadata_factor_selector))
+		} else {
+			return(default_metadata_factor)
+		}
+	})
+
+	# Reactive element to calculate partial contribution factors for the taxonomic hierarchy and function hierarchy
+	taxonomic_partial_contribution_table = reactive({ 
+
+    	taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
+    	if (input$example_visualization != "TRUE" & !is.null(input$custom_taxonomic_hierarchy_table)){
+    		taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
+    		taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
+    		taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+    	}
+
+		# Sum the occurrences of each element in the first column
+		output = taxonomic_hierarchy_table[,.N, by = eval(first_taxonomic_level())]
+
+		# Rename normalization column for consistency
+		colnames(output)[2] = "partial_contribution_factor"
 		return(output)
 	})
 
-	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
-		abort = FALSE
-		retry_upload = FALSE
-		tracked_data$contribution_table = NULL
-		output = NULL
-		tax_summary_level = tracked_data$tax_summary_level
-		func_summary_level = tracked_data$func_summary_level
-		samp_grouping = NULL
-		if (input$input_type == "run_picrust" & !is.null(input$taxLODselector_R)){
-			tax_summary_level = input$taxLODselector_R
-		} else if (input$input_type == "contributions" & !is.null(input$taxLODselector_C)){
-			tax_summary_level = input$taxLODselector_C
-		} else if (input$input_type == "annotations" & !is.null(input$taxLODselector_G)){
-			tax_summary_level = input$taxLODselector_G
-		} else if (input$input_type == "example"){
-			tax_summary_level = "Genus"
+    function_partial_contribution_table = reactive({ 
+
+    	function_hierarchy_table = default_function_hierarchy_table
+    	if (input$example_visualization != "TRUE" & !is.null(input$custom_function_hierarchy_table)){
+    		function_hierarchy_table_file = input$custom_function_hierarchy_table
+    		function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
+    		function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+    	}
+
+		# Sum the occurrences of each element in the first column
+		output = function_hierarchy_table[,.N, by = eval(first_function_level())]
+
+		# Rename normalization column for consistency
+		colnames(output)[2] = "partial_contribution_factor"
+		return(output)
+	})
+
+	# Observer that updates the flags indicating that a new file has been seleted for upload (necessary to detect when a new file has been selected but has not finished being uploaded)
+	observe({
+		if (!is.null(input$new_file_trigger)){
+			isolate({
+				new_file_flags[[input$new_file_trigger]] = TRUE
+			})
 		}
-		if (input$input_type == "run_picrust" & !is.null(input$funcLODselector_R)){
-			func_summary_level = input$funcLODselector_R
-		} else if (input$input_type == "contributions" & !is.null(input$funcLODselector_C)){
-			func_summary_level = input$funcLODselector_C
-		} else if (input$input_type == "annotations" & !is.null(input$funcLODselector_G)){
-			func_summary_level = input$funcLODselector_G
-		} else if (input$input_type == "example"){
-			func_summary_level = "SubPathway"
+	})
+
+	# Observers that update dropdown menu options when selected files change
+	observe({
+
+		# If a custom taxonomic hierarchy has been selected, we refer to it
+		if (!is.null(input$custom_taxonomic_hierarchy_table)){
+
+			# Read in the taxonomic hierarchy table
+			taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
+			taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
+			taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+
+			# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
+			if (ncol(taxonomic_hierarchy_table) > 1){
+				session$sendCustomMessage("taxonomic_hierarchy_labels", colnames(taxonomic_hierarchy_table)[c(2:ncol(taxonomic_hierarchy_table), 1)])
+
+			# Otherwise with a single column the order of the single label doesn't matter
+			} else {
+				session$sendCustomMessage("taxonomic_hierarchy_labels", list(colnames(taxonomic_hierarchy_table)))
+			}
+
+		# Otherwise, we use the default taxonomic hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
+		} else {
+			session$sendCustomMessage("taxonomic_hierarchy_labels", colnames(default_taxonomic_hierarchy_table)[c(2:ncol(default_taxonomic_hierarchy_table), 1)])
 		}
-		if (input$input_type == "run_picrust" & !is.null(input$sampgroupselector_R)){
-			samp_grouping = input$sampgroupselector_R
-		} else if (input$input_type == "contributions" & !is.null(input$sampgroupselector_C)){
-			samp_grouping = input$sampgroupselector_C
-		} else if (input$input_type == "annotations" & !is.null(input$sampgroupselector_G)){
-			samp_grouping = input$sampgroupselector_G
-		} else if (input$input_type == "example"){
-			samp_grouping = "Group"
+	})
+
+	observe({
+
+		# If a custom function hierarchy has been selected, we refer to it
+		if (!is.null(input$custom_function_hierarchy_table)){
+
+			# Read in the funciton hierarchy table
+			function_hierarchy_table_file = input$custom_function_hierarchy_table
+			function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
+			function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+
+			# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
+			if (ncol(function_hierarchy_table) > 1){
+				session$sendCustomMessage("function_hierarchy_labels", colnames(function_hierarchy_table)[c(2:ncol(function_hierarchy_table), 1)])
+
+			# Otherwise with a single column the order of the single label doesn't matter
+			} else {
+				session$sendCustomMessage("function_hierarchy_labels", list(colnames(function_hierarchy_table)))
+			}
+
+		# Otherwise, we use the default function hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
+		} else {
+			session$sendCustomMessage("function_hierarchy_labels", colnames(default_function_hierarchy_table)[2:ncol(default_function_hierarchy_table)])
+		}
+	})
+
+	observe({
+		if (!is.null(input$metadata_table)){
+			metadata_table_file = input$metadata_table
+			metadata_table_file_path = metadata_table_file$datapath
+			metadata_table = fread(metadata_table_file_path, header=T)
+			session$sendCustomMessage("metadata_table_labels", colnames(metadata_table)[2:ncol(metadata_table)])
+		}
+	})
+
+	# Observers that handle requests for sample data from the browser
+	observe({
+		if (!is.null(input$contribution_sample_request)){
+			isolate({
+				contribution_sample = input$contribution_sample_request
+				if (contribution_sample != previous_sample_indices[["contribution_table"]]){
+					previous_sample_indices[["contribution_table"]] = contribution_sample
+
+					# If the new sample exists in the table, then we can return it
+					if (contribution_sample >= 0 & contribution_sample < length(tracked_tables[["contribution_table"]])){
+						session$sendCustomMessage(type="contribution_sample_return", tracked_tables[["contribution_table"]][contribution_sample + 1])
+					}
+
+					# If we just sent the last sample, then we can get rid of the table to free up memory
+					if (contribution_sample == length(tracked_tables[["contribution_table"]]) + 1){
+						tracked_tables[["contribution_table"]] = NULL
+					}
+				}
+			})
+		}
+	})
+
+	observe({
+		if (!is.null(input$taxonomic_abundance_sample_request)){
+			isolate({
+				otu_sample = input$taxonomic_abundance_sample_request
+				if (otu_sample != previous_sample_indices[["otu_table"]]){
+					previous_sample_indices[["otu_table"]] = otu_sample
+
+					# If the new sample exists in the table, then we can return it
+					if (otu_sample >= 0 & otu_sample < length(tracked_tables[["otu_table"]])){
+						session$sendCustomMessage(type="taxonomic_abundance_sample_return", tracked_tables[["otu_table"]][otu_sample + 1])
+					}
+
+					# If we just sent the last sample, then we can get rid of the table to free up memory
+					if (otu_sample == length(tracked_tables[["otu_table"]]) + 1){
+						tracked_tables[["otu_table"]] = NULL
+					}
+				}
+			})
+		}
+	})
+
+	# Helper functions
+
+	# process_input_file(input_element)
+	#
+	# Checks if the input file associated with the specified html input element is available to read and if so then reads in the table and returns it
+	process_input_file = function(input_element){
+
+		input_table_file = input[[input_element]]
+		input_table_file_path = NULL
+
+		# If the file exists, grab the file path, otherwise send the signal to retry and return NULL
+		if (is.null(input_table_file)){
+
+			session$sendCustomMessage("retry_upload", "retry")
+			return(NULL)
+		}
+
+		# Otherwise, grab the file path
+		input_table_file_path = input_table_file$datapath
+
+		# If a new file has been selected and there was previously a file, check to see if the new file path is different
+		if (new_file_flags[[input_element]] & !is.null(old_file_paths[[input_element]])){
+
+			# If the new file path is the same as the old file path, then the file has not been updated and we send the signal to retry the upload process
+			if (input_table_file_path == old_file_paths[[input_element]]){
+
+				session$sendCustomMessage("retry_upload", "retry")
+				return(NULL)
+			}
+		}
+
+		# Reset the new file flag  and update the old file path since the file has updated correctly
+		new_file_flags[[input_element]] = FALSE
+		old_file_paths[[input_element]] = input_table_file_path
+
+		# Read the table and return it
+		input_table = fread(input_table_file_path, header = TRUE)
+		return(input_table)
+	}
+
+	# validate_unique_rows(input_table, id_column_names, element_name, table_name)
+	#
+	# Checks that no rows correspond to the same entity in the table as identified by the indicated ID columns. If there are any duplicates, send an abort signal and return FALSE
+	validate_unique_rows = function(input_table, id_column_names, element_name, table_name){
+
+		id_columns = input_table[,id_column_names]
+		duplicate_elements = duplicated(id_columns)
+
+		# If there are duplicated elements, send an abort signal and return FALSE
+		if (any(duplicate_elements)){
+
+			duplicate_id_columns = id_columns[duplicate_elements]
+			duplicate_element_ids = sapply(1:nrow(duplicate_id_columns), function(row){
+				return(paste(unlist(duplicate_id_columns[row]), collapse = "-"))
+			})
+			session$sendCustomMessage("abort", paste("The following ", element_name, " have multiple rows in the ", table_name, ": ", paste(unique(duplicate_element_ids), collapse = " "), sep=""))
+			return(FALSE)
 		}
 		
+		return(TRUE)
+	}
+
+	# validate_unique_columns(input_table, columns, element_name, table_name)
+	#
+	# Checks that no columns in the provided set of columns have the same name. If there are any duplicates, send an abort signal and return FALSE
+	validate_unique_columns = function(input_table, columns, element_name, table_name){
+
+		column_names_to_check = colnames(input_table)[columns]
+		duplicate_column_names = duplicated(column_names_to_check)
+
+		# If there are duplicated column names, send an abort signal and return FALSE
+		if (any(duplicate_column_names)){
+			session$sendCustomMessage("abort", paste("The following ", element_name, " have multiple columns in the ", table_name, ": ", paste(unique(column_names_to_check[duplicate_column_names]), collapse = " "), sep=""))
+			return(FALSE)
+		}
+		
+		return(TRUE)
+	}
+
+	# validate_elements_from_first_found_in_second(first_element_set, second_element_set, element_name, first_table_name, second_table_name)
+	#
+	# Checks that no elements are present in the first table and not in the second. If there are elements in the first table that are not in the second, send an abort signal and return FALSE
+	validate_elements_from_first_found_in_second = function(first_element_set, second_element_set, element_name, first_table_name, second_table_name){
+
+		extra_elements = !(first_element_set %in% second_element_set)
+
+		# If there are elements in the first set that are not in the second set, send an abort signal and return FALSE
+		if (any(extra_elements)){
+			session$sendCustomMessage("abort", paste("The following ", element_name, " are in the ", first_table_name, " but are not present in the ", second_table_name, ": ", paste(unique(first_element_set[extra_elements]), collapse = " ", sep="")))
+			return(FALSE)
+		}
+
+		return(TRUE)
+	}
+
+	# process_otu_table_file()
+	#
+	# Processes the otu table specified from the upload page
+	process_otu_table_file = function(){
+
+		otu_table_file = input$taxonomic_abundance_table
+
+		# If no file was ever selected, send an abort signal
+		if (is.null(otu_table_file) & !new_file_flags[["taxonomic_abundance_table"]]){
+			session$sendCustomMessage("abort", "No file was selected for the taxonomic abundance table. Please select one.")
+			return(NULL)
+		}
+
+		# Read the otu table
+		otu_table = process_input_file("taxonomic_abundance_table")
+
+		# If we were able to read the otu table, check for duplicate rows or duplicate samples
+		if (!is.null(otu_table)){
+
+			# Rename the OTU label column for consistency
+			colnames(otu_table)[1] = first_taxonomic_level()
+
+			unique_otus_validated = validate_unique_rows(otu_table, first_taxonomic_level(), "taxa", "OTU table")
+
+			# If there are duplicated OTUs, return NULL
+			if (!unique_otus_validated){
+				return(NULL)
+			}
+
+			unique_samples_validated = validate_unique_columns(otu_table, 2:ncol(otu_table), "samples", "OTU table")
+
+			# If there are duplicated samples, return NULL
+			if (!unique_samples_validated){
+				return(NULL)
+			}
+		}
+
+		return(otu_table)
+	}
+
+	# process_genomic_content_table_file()
+	#
+	# Processes the genomic content table specified from the upload page
+	process_genomic_content_table_file = function(){
+
+		genomic_content_table_file = input$genomic_content_table
+
+		# If no file was ever selected, send an abort signal
+		if (is.null(genomic_content_table_file) & !new_file_flags[["genomic_content_table"]]){
+			session$sendCustomMessage("abort", "The custom genomic content option was chosen, but no custom genomic content file was selected. Please select one or choose a different option.")
+			return(NULL)
+		}
+
+		# Read in the genomic content table
+		genomic_content_table = process_input_file("genomic_content_table")
+
+		# If we were able to read the genomic content table, check for duplicate rows
+		if (!is.null(genomic_content_table)){
+
+			# Rename the ID columns for consistency
+			colnames(genomic_content_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
+
+			unique_genomic_content_validated = validate_unique_rows(genomic_content_table, c(first_taxonomic_level(), first_function_level()), paste(first_taxonomic_level(), "-", first_function_level(), " pairs", sep=""), "genomic content table")
+
+			# If there is duplicated genomic content, return NULL
+			if (!unique_genomic_content_validated){
+				return(NULL)
+			}
+		}
+
+		return(genomic_content_table)
+	}
+
+	# process_contribution_table_file()
+	#
+	# Processes the contribution table specified from the upload page
+	process_contribution_table_file = function(){
+
+		contribution_table_file = input$contribution_table
+
+		# If no file was ever selected, send an abort signal
+		if (is.null(contribution_table_file) & !new_file_flags[["contribution_table"]]){
+			session$sendCustomMessage("abort", "The custom contribution option was chosen, but no custom contribution file was selected. Please select one or choose a different option.")
+			return(NULL)
+		}
+
+		# Read in the contribution table
+		contribution_table = process_input_file("contribution_table")
+
+		# If we were able to read the contribution table, check for duplicate rows
+		if (!is.null(contribution_table)){
+
+			# Reorder and drop columns to match internal contribution table format
+			contribution_table = contribution_table[,c(2,3,1,6),with=F]
+
+			# Rename columns for consistency
+			colnames(contribution_table) = c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution")
+
+			unique_contributions_validated = validate_unique_rows(contribution_table, c(first_metadata_level(), first_taxonomic_level(), first_function_level()), paste("contributions (combinations of ", first_metadata_level(), ", ", first_taxonomic_level(), ", and ", first_function_level(), ")", sep=""), "contribution table")
+
+			# If there are duplicate rows, return NULL
+			if (!unique_contributions_validated){
+				return(NULL)
+			}
+		}
+
+		return(contribution_table)
+	}
+
+	# process_function_abundance_table_file()
+	#
+	# Processes the function abundance table specified from the upload page
+	process_function_abundance_table_file = function(){
+
+		function_abundance_table_file = input$function_abundance_table
+
+		# If no file was ever selected, send an abort signal
+		if (is.null(function_abundance_table_file) & !new_file_flags[["function_abundance_table"]]){
+			session$sendCustomMessage("abort", "The option to upload function abundances for comparison was chosen, but no function abundance file was selected. Please select one or choose the option to upload no function abundances.")
+			return(NULL)
+		}
+
+		# Read in the function abundance table
+		function_abundance_table = process_input_file("function_abundance_table")
+
+		# If we were able to read the function abundance table, check for duplicate rows or duplicate samples
+		if (!is.null(function_abundance_table)){
+
+			# Rename columns for consistency
+			colnames(function_abundance_table)[1] = first_function_level()
+
+			unique_functions_validated = validate_unique_rows(function_abundance_table, first_function_level(), paste(first_function_level(), "s", sep=""), "function abundance table")
+
+			# If there are duplicate functions, return NULL
+			if (!unique_functions_validated){
+				return(NULL)
+			}
+
+			unique_samples_validated = validate_unique_columns(function_abundance_table, 2:ncol(function_abundance_table), "samples", "function abundance table")
+
+			# If there are duplicate samples, return NULL
+			if (!unique_samples_validated){
+				return(NULL)
+			}
+		}
+
+		return(function_abundance_table)
+	}
+
+	# process_custom_taxonomic_hierarchy_table_file()
+	#
+	# Processes the custom taxonomic hierarchy table specified from the upload page
+	process_custom_taxonomic_hierarchy_table_file = function(){
+
+		custom_taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
+
+		# If no file was ever selected, send an abort signal
+		if (is.null(custom_taxonomic_hierarchy_table_file) & !new_file_flags[["custom_taxonomic_hierarchy_table"]]){
+			session$sendCustomMessage("abort", "The option to upload a custom taxonomic hierarchy was chosen, but no custom taxonomic hierarchy file was selected. Please select one or choose the option to use the default taxonomic hierarchy.")
+			return(NULL)
+		}
+
+		# Read in the custom taxonomic hierarchy table
+		custom_taxonomic_hierarchy_table = process_input_file("custom_taxonomic_hierarchy_table")
+
+		# If we were able to read the custom taxnomic hierarchy table, check for duplicate rows or taxonomic hierarchy levels
+		if (!is.null(custom_taxonomic_hierarchy_table)){
+
+			unique_custom_taxonomic_hierarchy_entries_validated = validate_unique_rows(custom_taxonomic_hierarchy_table, first_taxonomic_level(), "taxa", "custom taxonomic hierarchy table")
+
+			# If there are duplicate rows, return NULL
+			if (!unique_custom_taxonomic_hierarchy_entries_validated){
+				return(NULL)
+			}
+
+			unique_custom_taxonomic_hierarchy_levels_validated = validate_unique_columns(custom_taxonomic_hierarchy_table, 1:ncol(custom_taxonomic_hierarchy_table), "taxonomic hierarchy levels", "custom taxonomic hierarchy table")
+
+			# If there are duplicate taxonomic hierarchy levels, return NULL
+			if (! unique_custom_taxonomic_hierarchy_levels_validated){
+				return(NULL)
+			}
+		}
+
+		return(custom_taxonomic_hierarchy_table)
+	}
+
+	# process_custom_function_hierarchy_table_file()
+	#
+	# Processes the custom function hierarchy table specified from the upload page
+	process_custom_function_hierarchy_table_file = function(){
+
+		custom_function_hierarchy_table_file = input$custom_function_hierarchy_table
+
+		# If no file was ever selected, send an abort signal
+		if (is.null(custom_function_hierarchy_table_file) & !new_file_flags[["custom_function_hierarchy_table"]]){
+			session$sendCustomMessage("abort", "The option to upload a custom function hierarchy was chosen, but no custom function hierarchy file was selected. Please select one or choose the option to use the default function hierarchy.")
+			return(NULL)
+		}
+
+		# Read in the custom function hierarchy table
+		custom_function_hierarchy_table = process_input_file("custom_function_hierarchy_table")
+
+		# If we were able to read the custom taxnomic hierarchy table, check for duplicate rows or function hierarchy levels
+		if (!is.null(custom_function_hierarchy_table)){
+
+			unique_custom_function_hierarchy_entries_validated = validate_unique_rows(custom_function_hierarchy_table, first_function_level(), "functions", "custom function hierarchy table")
+
+			# If there are duplicate rows, we return NULL
+			if (!unique_custom_function_hierarchy_entries_validated){
+				return(NULL)
+			}
+
+			unique_custom_function_hierarchy_levels_validated = validate_unique_columns(custom_function_hierarchy_table, 1:ncol(custom_function_hierarchy_table), "function hierarchy levels", "custom function hierarchy table")
+
+			# If there are duplicate function hierarchy levels, we return NULL
+			if (!unique_custom_function_hierarchy_levels_validated){
+				return(NULL)
+			}
+
+			# Replace empty function hierarchy level names with "unknown"
+			custom_function_hierarchy_table[,(colnames(custom_function_hierarchy_table)[2:ncol(custom_function_hierarchy_table)]) := lapply(.SD, function(col){
+					return(gsub("^$", "unknown", gsub("^.__", "", gsub(";$", "", col))))
+				}), .SDcols = 2:ncol(custom_function_hierarchy_table)]
+		}
+
+		return(custom_function_hierarchy_table)
+	}
+
+	# process_metadata_table_file()
+	#
+	# Processes the metadata table specified from the upload page
+	process_metadata_table_file = function(){
+
+		metadata_table_file = input$metadata_table
+
+		# If no file was ever selected, send an abort signal
+		if (is.null(metadata_table_file) & !new_file_flags[["metadata_table"]]){
+			session$sendCustomMessage("abort", "The option to upload metadata was chosen, but no metadata file was selected. Please select one or choose the option to upload no metadta.")
+			return(NULL)
+		}
+
+		# Read in the metadata table
+		metadata_table = process_input_file("metadata_table")
+
+		# If we were able to read the metadata table, check for duplicate rows
+		if (!is.null(metadata_table)){
+
+			unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "metadata table")
+
+			# If there are duplicate rows, return NULL
+			if (!unique_metadata_entries_validated){
+				return(NULL)
+			}
+		}
+
+		return(metadata_table)
+	}
+
+	# run_picrustgenerate_contribution_table_using_picrust(otu_table)
+	#
+	# Uses the provided OTU table to generate a contribution table based on the PICRUSt 16S normalization and genomic content tables
+	generate_contribution_table_using_picrust = function(otu_table){
+
+		# Rename columns for consistency
+		colnames(picrust_normalization_table) = c(first_taxonomic_level(), "norm_factor")
+		colnames(picrust_ko_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
+
+		# File checking
+		session$sendCustomMessage("upload_status", "Verifying OTUs are known to PICRUSt")
+		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICURSt table")
+
+		# If there are otus without genomic content, we return NULL
+		if (!otus_have_genomic_content_validated){
+			return(NULL)
+		}
+
+		session$sendCustomMessage("upload_status", "Running PICRUSt")
+
+		# Merge with the table of 16S normalization factors
+		otu_table_with_normalization = merge(otu_table, picrust_normalization_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
+
+		# Merge with the PICRUSt genomic content table
+		otu_table_with_normalization_and_content = merge(otu_table_with_normalization, picrust_ko_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
+		rm(otu_table_with_normalization)
+
+		# Make a contribution column by dividing the OTU abundances by the normalization factors and multiplying with the KO copy number
+		otu_table_with_normalization_and_content[,contribution := (abundance * copy_number) / norm_factor]
+
+		contribution_table = otu_table_with_normalization_and_content[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F]
+
+		return(contribution_table)
+	}
+
+	# generate_contribution_table_using_custom_genomic_content(otu_table, genomic_content_table)
+	#
+	# Uses the provided OTU table and genomic content table to to generate a contribution table
+	generate_contribution_table_using_custom_genomic_content = function(otu_table, genomic_content_table){
+
+		# File checking
+		session$sendCustomMessage("upload_status", "Verifying OTUs match between tables")
+		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], genomic_content_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "genomic content table")
+
+		# If there are otus without genomic content, we return NULL
+		if (!otus_have_genomic_content_validated){
+			return(NULL)
+		}
+
+		session$sendCustomMessage("upload_status", "Calculating function contributions from genomic content")
+
+		# Merge with the genomic content table
+		otu_table_with_content = merge(otu_table, genomic_content_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
+
+		# Make a contribution column by multiplying the OTU abundances with the gene copy number
+		otu_table_with_content[,contribution := abundance * copy_number]
+
+		return(otu_table_with_content[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F])
+	}
+
+	# generate_contribution_table_using_custom_contributions(otu_table, contribution_table)
+	#
+	# Uses the provided OTU table and contribution table to to generate a contribution table (currently just validating that OTUs and samples match between the two)
+	generate_contribution_table_using_custom_contributions = function(otu_table, contribution_table){
+
+		# File checking
+		session$sendCustomMessage("upload_status", "Verifying OTUs match between tables")
+
+		# Check that OTUs have contributions
+		otus_have_contributions_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "contribution table")
+
+		# If there are OTUs without contributions, we return NULL
+		if (!otus_have_contributions_validated){
+			return(NULL)
+		}
+
+		# Check that OTUs with contributions have abundance
+		contribution_otus_exist_validated = validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], otu_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "OTU table")
+
+		# If there are OTUs with contributions but no abundance, we return NULL
+		if (!contribution_otus_exist_validated){
+			return(NULL)
+		}
+
+		# Check that samples in the OTU table have contribution information
+		otu_table_samples_have_contributions_validated = validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], contribution_table[[first_metadata_level()]], "samples", "OTU table", "contribution table")
+
+		# If there are samples in the OTU table that don't have contribution information, we return NULL
+		if (!otu_table_samples_have_contributions_validated){
+			return(NULL)
+		}
+
+		# Check that samples in the contribution table have OTU abundance information
+		contribution_samples_have_otu_abundances_validated = validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], otu_table[[first_metadata_level()]], "samples", "contribution table", "OTU table")
+
+		# If there are samples in the contribution table that don't have OTU abundance information, we return NULL
+		if (!contribution_samples_have_otu_abundances_validated){
+			return(NULL)
+		}
+
+		# If all validation checks pass, then we can just return the contribution table
+		return(contribution_table)
+	}
+
+	# normalize_contribution_table(contribution_table)
+	#
+	# Normalizes the total function abundances per sample in the contribution table
+	normalize_contribution_table = function(contribution_table){
+
+		# Calculate total function abundances for each sample
+		total_function_abundances = contribution_table[,sum(contribution), by = eval(first_metadata_level())]
+		colnames(total_function_abundances)[ncol(total_function_abundances)] = "total_abundance"
+
+		# Merge the total function abundances
+		contribution_table = merge(contribution_table, total_function_abundances, by = first_metadata_level(), allow.cartesian = T)
+
+		# Normalize the contributions
+		contribution_table[,contribution := contribution / total_abundance]
+
+		return(contribution_table[,which(colnames(contribution_table) != "total_abundance"),with=F])
+	}
+
+	# normalize_otu_table(otu_table)
+	#
+	# Normalizes the total OTU abundances per sample in the otu table
+	normalize_otu_table = function(otu_table){
+
+		# Calculate total OTU abundances for each sample
+		total_otu_abundances = otu_table[,sum(abundance), by = eval(first_metadata_level())]
+		colnames(total_otu_abundances)[ncol(total_otu_abundances)] = "total_abundance"
+
+		# Merge the total OTU abundances
+		otu_table = merge(otu_table, total_otu_abundances, by = first_metadata_level(), allow.cartesian = T)
+
+		# Normalize the abundances
+		otu_table[,abundance := abundance / total_abundance]
+
+		return(otu_table[,which(colnames(otu_table) != "total_abundance"),with=F])
+	}
+
+	# format_otu_table(otu_table)
+	#
+	# Formats the otu table for further processing
+	format_otu_table = function(otu_table){
+
+		# Change zeros in OTU table to NAs so we can remove them when melting
+		otu_table[otu_table == 0] = NA
+
+		# Melt the OTU table to put it in an easier format to work with
+		otu_table = melt(otu_table, id.vars = first_taxonomic_level(), measure.vars = colnames(otu_table)[2:ncol(otu_table)], variable.name = first_metadata_level(), value.name = "abundance", na.rm = T)
+
+		return(otu_table)
+	}
+
+	# add_comparison_function_abundances_to_contribution_table(contribution_table, function_abundance_table)
+	#
+	# Adds the function abundances from the function abundance table to the contribution table for comparison
+	add_comparison_function_abundances_to_contribution_table = function(contribution_table, function_abundance_table){
+
+		# File checking
+		session$sendCustomMessage("upload_status", "Verifying samples match between the contribution table and the comparison function abundance table")
+
+		# Check that samples in the function abundance table are in the contribution table
+		function_abundance_samples_have_contributions_validated = validate_elements_from_first_found_in_second(colnames(function_abundance_table)[2:ncol(function_abundance_table)], contribution_table[[first_metadata_level()]], "samples", "function abundance table", "contribution table")
+
+		# If there are function abundances without contributions, we return NULL
+		if (!function_abundance_samples_have_contributions_validated){
+			return(NULL)
+		}
+
+		# Add a tag to the names of samples for comparison
+		colnames(function_abundance_table) = c(first_function_level(), paste(colnames(function_abundance_table)[2:ncol(function_abundance_table)], comparison_tag, sep=""))
+
+		# Set zero values to NA to remove them when melting and reduce the size of the contribtion table
+		function_abundance_table[function_abundance_table == 0] = NA
+
+		# Melt the function abundance table and add a dummy OTU
+		melted_function_abundance_table = melt(function_abundance_table, id.vars = first_function_level(), measure.vars = colnames(function_abundance_table)[2:ncol(function_abundance_table)], variable.name = first_metadata_level(), value.name = "contribution", na.rm = T)
+		melted_function_abundance_table[,(first_taxonomic_level() ) := rep(unlinked_name, nrow(melted_function_abundance_table))]
+
+		# Add the function abundances for comparison to the contribution table
+		contribution_table = rbind(contribution_table, melted_function_abundance_table, use.names=T)
+
+		return(contribution_table)
+	}
+
+	# summarize_table_to_selected_level(table_to_summarize, summary_map, summary_level, partial_contribution_table)
+	#
+	# Summarizes the provided table to the indicated summary level using the given summary map to map current factors to higher-level factors, and distributes partial contributions as necessary
+	summarize_table_to_selected_level = function(table_to_summarize, summary_map, summary_level, partial_contribution_table){
+
+		contribution_name = colnames(table_to_summarize)[ncol(table_to_summarize)]
+		first_level_name = colnames(summary_map)[1]
+
+		# The list of id column names that should exist in the summarized table, leaves out the contribution column name (not an id column) and the name of the column that is being summarized to a higher level, and includes the new summary level name
+		summarized_id_names = c(colnames(table_to_summarize)[which(!(colnames(table_to_summarize) %in% c(contribution_name, first_level_name)))], summary_level)
+		
+		# If the summary map has only one column or the summary level is the first column of the summary map, then we don't summarize
+		if (ncol(summary_map) == 1 | summary_level == first_level_name){
+			return(table_to_summarize)
+		}
+
+		# Filter the summary map to only include the columns for the levels we ned to map between
+		summary_map = summary_map[,c(first_level_name, summary_level),with=F]
+		
+		# Merge the table to summarize with the summary map by the first level, duplicating rows as necessary when first level elements have multiple entries
+		table_to_summarize = merge(table_to_summarize, summary_map, by = first_level_name, all.x = T, all.y = F, allow.cartesian = T)
+		
+		# Merge with the partial contribution table
+		table_to_summarize = merge(table_to_summarize, partial_contribution_table, by = first_level_name, all.y = F, allow.cartesian = T)
+		
+		# Set any NA entries to the unlinked name
+		table_to_summarize[,(summary_level) := ifelse(is.na(get(summary_level)), unlinked_name, get(summary_level))]
+		
+		# Create a partial contribution column
+		table_to_summarize[,partial_contribution := get(contribution_name)/partial_contribution_factor]
+		
+		# Sum the parital contributions for rows that match in id columns
+		table_to_summarize = table_to_summarize[,sum(partial_contribution),by=summarized_id_names]
+		
+		# Label the summed column for consistency
+		colnames(table_to_summarize)[ncol(table_to_summarize)] = contribution_name
+
+		return(table_to_summarize)
+	}
+
+	# format_and_truncate_hierarchy_table_to_selected_level(table_to_truncate, summary_level)
+	#
+	# Removes columns below the selected summary level from the hierarchy table
+	format_and_truncate_hierarchy_table_to_selected_level = function(table_to_truncate, summary_level){
+
+		# If there are multiple columns in the hierarchy table, reformat so that they go from highest to lowest level
+		if (ncol(table_to_truncate) > 1){
+			table_to_truncate = table_to_truncate[,c(2:ncol(table_to_truncate), 1),with=F]
+		}
+
+		# Truncate the hierarchy so that the selected summary level is now the lowest level
+		table_to_truncate = table_to_truncate[,1:(which(colnames(table_to_truncate) == summary_level)),with=F]
+		
+		return(table_to_truncate)
+	}
+
+	# filter_hierarchy_table_entries(table_to_filter, summary_level, entries_to_keep)
+	#
+	# Removes duplicate rows and rows corresponding to entries in the summary level column not in the provided list of entries to keep
+	filter_hierarchy_table_entries = function(table_to_filter, summary_level, entries_to_keep){
+
+		table_to_filter = unique(table_to_filter)
+		table_to_filter = table_to_filter[get(summary_level) %in% entries_to_keep]
+
+		return(table_to_filter)
+	}
+
+	# make_hierarchy_table_level_entries_unique(hierarchy_table, first_level)
+	#
+	# Makes all of the hierarchy entries except for the first column (because that needs to match with the taxonomic abundance and contribution tables) unique by prepending that entry's hierarchy level name to the entry, allowing for duplicated entry names between different labels
+	make_hierarchy_table_level_entries_unique = function(hierarchy_table, first_level){
+
+		# Concatenate ancestor level names in case similar names are shared at the same level in different branches (for example, if two different branches have an unknown node at the same level)
+		hierarchy_names = colnames(hierarchy_table)
+		hierarchy_table = cbind(hierarchy_table[[first_level]], as.data.table(t(apply(hierarchy_table[,2:ncol(hierarchy_table),with=F], 1, function(row){
+			return(sapply(1:length(row), function(col){
+				return(paste(row[1:col], collapse = "_"))
+			}))	
+		}))))
+		colnames(hierarchy_table) = hierarchy_names
+
+		return(hierarchy_table)
+	}
+
+	# convert_hierarchy_table_to_javascript_hierarchy(hierarchy_table, table_type, summary_level)
+	#
+	# Converts the R table format hierarchy to the javascript hierarchy format used in the visualization
+	convert_hierarchy_table_to_javascript_hierarchy = function(hierarchy_table, table_type, summary_level){
+
+		# Make all entries strings
+		hierarchy_table = hierarchy_table[,lapply(.SD, as.character)]
+
+		# Make the set of leaves, which are different from the internal nodes
+		leaves = lapply(1:nrow(hierarchy_table), function(row){
+
+			# A leaf value has 0 descendents, the provided type, and the names of all ancestor nodes
+			l = list("Ndescendents" = 0, "type" = table_type)
+			for (depth in 1:ncol(hierarchy_table)){
+				l[[colnames(hierarchy_table)[depth]]] = hierarchy_table[row, depth, with=F]
+			}
+
+			return(list("key" = paste(l[[summary_level]]), "level" = 0, "values" = list(l)))
+		})
+
+		# If there are multiple levels to the hierarchy, iteratively generate the next level up in the hierarchy, gropuing the previous level of nodes by their parent
+		lowest_level_nodes = leaves[order(sapply(leaves, function(leaf){return(leaf[["key"]])}))]
+		javascript_hierarchy = lowest_level_nodes
+		if (ncol(hierarchy_table) > 1){
+
+			# Iterate from the second lowest to highest level
+			for (depth in (ncol(hierarchy_table) - 1):1){
+
+				# Get the unique names for the nodes in the previous level
+				previous_names = sapply(lowest_level_nodes, function(node){return(node[["key"]])})
+				previous_names = previous_names[order(previous_names)]
+
+				# Get the mapping between parent nodes in the current level and children nodes in the previous level
+				curr_level_names = unname(unlist(sapply(previous_names, function(prev_level_name){
+
+					prev_depth = depth + 1
+					prev_depth_name = colnames(hierarchy_table)[prev_depth]
+
+					# Set the hierarchy table key as the names of the nodes in the previous level
+					hierarchy_table = setkeyv(hierarchy_table, prev_depth_name)
+
+					# Get the names of nodes at the current level that are parents of the previous level nodes
+					curr_level_names = unique(hierarchy_table[prev_level_name, depth, with=F][[1]])
+
+					return(curr_level_names)
+				})))
+				
+				# Create a new node for each node in the current level
+				javascript_hierarchy = lapply(levels(factor(curr_level_names)), function(curr_level_name){
+					return(list("key" = curr_level_name, "level" = ncol(hierarchy_table) - depth, "values" = lowest_level_nodes[which(curr_level_names == curr_level_name)]))
+				})
+				
+				# Set the list of lowest level nodes to the current list of nodes for the next iteration
+				lowest_level_nodes = javascript_hierarchy
+			}
+		}
+
+		return(javascript_hierarchy)
+	}
+
+	# calculate_average_function_abundances(contribution_table)
+	#
+	# Calculates the average abundance of each function across all samples
+	calculate_average_function_abundances = function(contribution_table, function_hierarchy_table){
+
+		# Identify the samples with contributions, not the ones used for comparison
+		relevant_samples = grep(paste(".*", comparison_tag, "$", sep=""), contribution_table[[first_metadata_level()]], invert=T)
+
+		# Sum over the contributions of all taxa in each sample
+		function_abundances = contribution_table[relevant_samples, sum(contribution), by=c(function_summary_level(), first_metadata_level())]
+
+		# Rename total abundance column for consistency
+		colnames(function_abundances)[ncol(function_abundances)] = "abundance"
+
+		# Convert to relative abundance
+		function_abundances[,abundance := abundance/sum(abundance),by=eval(first_metadata_level())]
+
+		# Merge with the function hierarchy so we can get average abundances for every function level
+		function_abundances_with_hierarchy = merge(function_abundances, function_hierarchy_table, by = unname(function_summary_level()))
+
+		# Melt the table so that we have each function's abundance by each sample and hierarchy level
+		function_abundances_with_hierarchy = melt(function_abundances_with_hierarchy, id.vars = c(first_metadata_level(), "abundance"), measure.vars = colnames(function_hierarchy_table), variable.name = "function_level", value.name = "Function")
+
+		# Sum the function abundances by sample and level name so that we have the total abundance of each function level in each sample
+		all_function_abundances = function_abundances_with_hierarchy[,sum(abundance), by = c(first_metadata_level(), "Function")]
+
+		# Rename the abundance column for consistency
+		colnames(all_function_abundances)[ncol(all_function_abundances)] = "abundance"
+
+		# Now calculate the mean of each function abundance across samples
+		all_function_mean_abundances = all_function_abundances[,mean(abundance), by = "Function"]
+
+		# Rename the mean abundance column for consistency
+		colnames(all_function_mean_abundances)[ncol(all_function_mean_abundances)] = "Mean"
+
+		return(all_function_mean_abundances)
+	}
+
+	# convert_otu_table_to_javascript_table(otu_table)
+	#
+	# Converts the R table format OTU abundance table to the javascript table used in the visualization
+	convert_otu_table_to_javascript_table = function(otu_table){
+
+		# Cast the otu table to a matrix for conversion
+		otu_table = dcast(otu_table, as.formula(paste(taxonomic_summary_level(), " ~ ", first_metadata_level(), sep="")), value.var = "abundance", fill = 0)
+		
+		# Convert to relative abundance
+		otu_table = cbind(otu_table[,taxonomic_summary_level(),with=F], as.data.table(scale(otu_table[,2:ncol(otu_table),with=F], scale = colSums(otu_table[,2:ncol(otu_table),with=F]), center = F)))
+		
+		# Create the javascript format OTU table
+		javascript_otu_table = lapply(2:ncol(otu_table), function(col){
+
+			sample_otu_abundance_list = split(unname(unlist(otu_table[,col,with=F])), seq(nrow(otu_table[,col,with=F])))
+			names(sample_otu_abundance_list) = otu_table[[taxonomic_summary_level()]]
+			sample_otu_abundance_list[[first_metadata_level()]] = colnames(otu_table)[col]
+			return(sample_otu_abundance_list)
+		})
+
+		return(javascript_otu_table)
+	}
+
+	# convert_contribution_table_to_javascript_table(contribution_table)
+	#
+	# Converts the R table format contribution table to the javascript table used in the visualization
+	convert_contribution_table_to_javascript_table = function(contribution_table){
+
+		# Calculate average contributions for each function for each taxon
+		average_contributions = contribution_table[,mean(contribution), by = c(taxonomic_summary_level(), function_summary_level())]
+		colnames(average_contributions)[ncol(average_contributions)] = "contribution"
+
+		# Add a sample called "Average_contrib" to the contribution table, include 0s for missing taxa/function combinations
+		average_contributions[,(first_metadata_level()) := rep("Average_contrib", nrow(average_contributions))]
+		contribution_table = rbind(contribution_table, average_contributions, use.names=T)
+
+		# Cast the table so that the columns are functions
+		javascript_contribution_table = dcast(contribution_table, as.formula(paste(first_metadata_level(), " + ", taxonomic_summary_level(), " ~ ", function_summary_level(), sep="")), value.var = "contribution")
+
+		# Create a single column for functions that contains a list of the functions for that row's sample and taxon while removing empty elements from those lists
+		javascript_contribution_table = data.table(first_metadata_level = javascript_contribution_table[[first_metadata_level()]], taxonomic_summary_level = javascript_contribution_table[[taxonomic_summary_level()]], function_summary_level = apply(javascript_contribution_table[,3:ncol(javascript_contribution_table),with=F], 1, function(row){
+			return(as.list(row[!is.na(row)]))
+		}))
+		colnames(javascript_contribution_table) = c(first_metadata_level(), taxonomic_summary_level(), function_summary_level())
+
+		# Cast the table so that the columns are taxa
+		javascript_contribution_table = dcast(javascript_contribution_table, as.formula(paste(first_metadata_level(), " ~ ", taxonomic_summary_level(), sep="")), value.var = function_summary_level())
+
+		# Create a single column for taxa that contains a list of taxa in the corresponding row's sample, and each element in that list is a list of the function contributions that taxon makes in that sample
+		javascript_contribution_table = data.table(first_metadata_level = javascript_contribution_table[[first_metadata_level()]], taxonomic_summary_level = apply(javascript_contribution_table[,2:ncol(javascript_contribution_table),with=F], 1, function(row){
+			return(as.list(row[sapply(row, function(element){
+				return(!is.null(element[[1]]))
+			})]))
+		}))
+		colnames(javascript_contribution_table) = c(first_metadata_level(), taxonomic_summary_level())
+
+		# Cast so that each column is a sample
+		javascript_contribution_table = dcast(javascript_contribution_table, as.formula(paste(". ~ ", first_metadata_level(), sep="")), value.var = taxonomic_summary_level())
+		javascript_contribution_table = javascript_contribution_table[,2:ncol(javascript_contribution_table),with=F]
+
+		# For mat so that the top level sample list s are nested properly
+		javascript_contribution_table = lapply(javascript_contribution_table, function(element){
+			return(element[[1]])
+		})
+
+		return(javascript_contribution_table)
+	}
+
+	# order_metadata_table_by_metadata_factor(metadata_table)
+	#
+	# Orders the samples in the metadata table by the selected metadata factor
+	order_metadata_table_by_metadata_factor = function(metadata_table){
+
+		metadata_table = metadata_table[order(get(metadata_factor()))]
+		return(metadata_table)
+	}
+
+	# convert_metadata_table_to_javascript_table(metadata_table)
+	#
+	# Converts the R table format metadata table to the javascript table used in the visualization, if a metadata table was provided
+	convert_metadata_table_to_javascript_table = function(metadata_table){
+
+		# If no metadata table was provided, return NULL
+		if (is.null(metadata_table)){
+			return(NULL)
+		}
+
+		# Create a text string table that can be parsed by the d3 parser
+		javascript_metadata_table = paste(paste(colnames(metadata_table), collapse="\t"), paste(sapply(1:nrow(metadata_table), function(row){return(paste(metadata_table[row,], collapse="\t"))}), collapse="\n"), sep="\n")
+
+		return(javascript_metadata_table)
+	}
+
+	# get_otu_table_sample_order(javascript_otu_table, metadata_table)
+	#
+	# Determines the order in which samples should be displayed for the taxonomic abundance barplot
+	get_otu_table_sample_order = function(javascript_otu_table, metadata_table){
+
+		# Get the set of relevant samples
+		samples = sapply(javascript_otu_table, function(element){
+			return(element[[first_metadata_level()]])
+		})
+
+		# If there is no metadata to order by, just return the samples
+		if (is.null(metadata_table)){
+			return(1:length(samples))
+		}
+
+		# Order all samples but the "Average_contrib" sample and the comparison samples by the metadata table order
+		otu_table_sample_order = sapply(metadata_table[[first_metadata_level()]], function(sample_name){
+			return(which(samples == sample_name))
+		})
+
+		# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample and the comparison samples
+		otu_table_sample_order = c(otu_table_sample_order, which(!(samples %in% metadata_table[[first_metadata_level()]]) & samples != "Average_contrib" & !grepl(comparison_tag, samples)))
+
+		return(otu_table_sample_order)
+	}
+
+	# get_function_table_sample_order(javascript_contribution_table, metadata_table)
+	#
+	# Determines the order in which samples should be displayed for the function abundance barplot
+	get_function_table_sample_order = function(javascript_contribution_table, metadata_table){
+
+		# Get the set of relevant samples
+		samples = names(javascript_contribution_table)
+
+		# If there is no metadata to order by, remove the average contribution sample and order the rest so comparison samples are next to the right sample
+		if (is.null(metadata_table)){
+
+			# If there are comparison samples, put them next to the correct samples
+			if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
+				return(unlist(sapply(samples[!grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
+					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+				})))
+			}
+
+			# Otherwise, just return the order of non-average contribution samples
+			return(which(samples != "Average_contrib"))
+		}
+
+		# Order all samples but the "Average_contrib" sample by the metadata table order
+		function_table_sample_order = unlist(sapply(metadata_table[[first_metadata_level()]], function(sample_name){
+
+			# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
+			if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
+				return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+			}
+
+			# Otherwise, just return the sample that matches
+			return(which(samples == sample_name))
+		}))
+
+		# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample
+		function_table_sample_order = c(function_table_sample_order, unlist(sapply(samples[which(!(samples %in% metadata_table[[first_metadata_level()]])) & !grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
+
+			# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
+			if (input$function_abundance_choice == "PRESENT"){
+				return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+			}
+
+			# Otherwise, just return the sample that matches
+			return(which(samples == sample_name))
+		})))
+
+		return(function_table_sample_order)
+	}
+
+	# The main observer, tied specifically to the update button that indicates the visualization should be generated. Runs the data validation and processing necessary to generate the javascript objects used in the visualization
+	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
+		
+		# Initializing important tables
 		otu_table = NULL
+		taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
+		contribution_table = NULL
+		function_hierarchy_table = default_function_hierarchy_table
+		metadata_table = NULL
 
 		session$sendCustomMessage("upload_status", "Starting input processing")
 
 		################################# Loading/calculating contribution table #################################
-		if (is.null(input$input_type)){ # If they somehow trigger the visualization without an input type, do nothing and send a warning
 
-			session$sendCustomMessage("abort", "Visualization trigger without input type.")
-			abort = TRUE
-
-		} else if(input$input_type == "example"){ # If they've chosen to view the example
+		# If they've chosen to view the example, we load the default OTU table and contribution table
+		if (input$example_visualization == "TRUE"){
 
 			session$sendCustomMessage("upload_status", "Loading default data")
 
 			otu_table = default_otu_table
-			output = default_contribution_table
+			contribution_table = default_contribution_table
+
+
+			# Format the otu table
+			otu_table = format_otu_table(otu_table)
 
 			# Remove the unnecessary columns (keep Sample, OTU, KO, and contribution)
-			output = output[,c(2,3,1,6), with=FALSE]
+			contribution_table = contribution_table[,c(2,3,1,6), with=FALSE]
 
-		} else if (input$input_type == "annotations"){ # If they've chosen the genome annotation option
+			# Rename the columns for consistency
+			colnames(contribution_table) = c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution")
 
-			otu_table_file = input$taxonomic_abundances_1
-			annotation_file = input$genome_annotations
-			if (is.null(otu_table_file) | is.null(annotation_file)){
-				session$sendCustomMessage("retry_upload", "retry")
-			} else {
-
-				otu_table_file_path = otu_table_file$datapath
-				annotation_file_path = annotation_file$datapath
-				if (!is.null(tracked_data$old_tax_abund_1_datapath)){
-					if (tracked_data$old_tax_abund_1_datapath == otu_table_file_path){
-						retry_upload = TRUE
-					}
-				}
-				if (!is.null(tracked_data$old_annotation_datapath)){
-					if (tracked_data$old_annotation_datapath == annotation_file_path){
-						retry_upload = TRUE
-					}
-				}
-
-				if (retry_upload){
-					session$sendCustomMessage("retry_upload", "retry")
-				} else {
-					session$sendCustomMessage("upload_status", "Reading OTU table")
-					tracked_data$old_tax_abund_1_datapath = otu_table_file_path
-					otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-					session$sendCustomMessage("upload_status", "Reading annotation table")
-					tracked_data$old_annotation_datapath = annotation_file_path
-					annotation = fread(annotation_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-					colnames(annotation) = c("OTU", "Gene", "CopyNumber")
-
-					# File checking
-					session$sendCustomMessage("upload_status", "Verifying OTUs match between tables")
-					otu_table_otus = unlist(otu_table[,1,with=F])
-					extra_otu_table_otus = !(otu_table_otus %in% annotation$OTU)
-					if (any(extra_otu_table_otus)){
-						session$sendCustomMessage("abort", paste("The following OTUs are in the OTU table without annotations: ", paste(unique(otu_table_otus[extra_otu_table_otus]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Checking for duplicate table rows")
-					otu_table_duplicates = duplicated(otu_table_otus)
-					if (any(otu_table_duplicates)){
-						session$sendCustomMessage("abort", paste("The folloing OTUs have multiple rows in the OTU table: ", paste(unique(otu_table_otus[otu_table_duplicates]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					annotation_duplicates = duplicated(annotation[,which(colnames(annotation) %in% c("OTU", "Gene")),with=F])
-					if (any(annotation_duplicates)){
-						session$sendCustomMessage("abort", paste("The following OTU-Gene pairs have multiple rows in the annotation table: ", paste(unique(paste(annotation[annotation_duplicates, which(colnames(annotation) == "OTU"),with=F], annotation[annotation_duplicates, which(colnames(annotation) == "Gene"),with=F], sep="-")), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Checking for duplicate samples")
-					sample_duplicates = duplicated(colnames(otu_table)[2:ncol(otu_table)])
-					if (any(sample_duplicates)){
-						session$sendCustomMessage("abort", paste("The following samples have multiple columns in the OTU table: ", paste(unique(colnames(otu_table)[sample_duplicates]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					if (!abort){
-						# Change zeros in abundance matrix to NAs so we can remove them when melting
-						otu_table[otu_table == 0] = NA
-
-						session$sendCustomMessage("upload_status", "Calculating function contributions from annotations")
-
-						# Melt the otu abundance table so we can merge with the annotations
-						melted_otu_table = melt(otu_table,id=colnames(otu_table)[1], na.rm=TRUE)
-
-						# Merge the melted otu abundances and annotations to a get a column for every Sample, OTU, KO set
-						merged_table = merge(melted_otu_table, annotation, by.x=c(colnames(melted_otu_table)[1]), by.y=c(colnames(annotation)[1]), allow.cartesian=TRUE, sort=FALSE)
-
-						# Make a contribution column by multiplying the OTU abundance by the KO count
-						merged_table$contribution = merged_table[,3,with=FALSE] * merged_table[,5,with=FALSE]
-
-						# Reorganize and reformat the table to standardize
-						output = merged_table[,c(2,1,4,6),with=FALSE]
-					}
-				}
-			}
-
-		} else if (input$input_type == "run_picrust"){ # If they've chosen the PICRUSt option
-
-			otu_table_file = input$read_counts
-			if (is.null(otu_table_file)){
-				session$sendCustomMessage("retry_upload", "retry")
-			} else {
-
-				otu_table_file_path = otu_table_file$datapath
-				if (!is.null(tracked_data$old_read_counts_datapath)){
-					if (tracked_data$old_read_counts_datapath == otu_table_file_path){
-						retry_upload = TRUE
-					}
-				}
-
-				if (retry_upload){
-					session$sendCustomMessage("retry_upload", "retry")
-				} else {
-					session$sendCustomMessage("upload_status", "Reading OTU table")
-					tracked_data$old_read_counts_datapath = otu_table_file_path
-					otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-					# # Get the PICRUSt normalization table
-					# picrust_normalization_table = data.table(read.csv(gzfile(picrust_normalization_table_filename), sep="\t", header=TRUE, stringsAsFactors=FALSE))
-
-					# File checking
-					session$sendCustomMessage("upload_status", "Verifying OTUs are known to PICRUSt") # Maybe be less stringent here, just ignore OTUs without PICRUSt annotations?
-					otu_table_otus = unlist(otu_table[,1,with=F])
-					normalization_otus = unlist(picrust_normalization_table[,1,with=F])
-					extra_otu_table_otus = !(otu_table_otus %in% normalization_otus)
-					if (any(extra_otu_table_otus)){
-						session$sendCustomMessage("abort", paste("The following OTUs in the OTU table are unrecognized by our version of PICRUSt: ", paste(unique(otu_table_otus[extra_otu_table_otus]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Checking for duplicate table rows")
-					otu_table_duplicates = duplicated(otu_table_otus)
-					if (any(otu_table_duplicates)){
-						session$sendCustomMessage("abort", paste("The folloing OTUs have multiple rows in the OTU table: ", paste(unique(otu_table_otus[otu_table_duplicates]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Checking for duplicate samples")
-					sample_duplicates = duplicated(colnames(otu_table)[2:ncol(otu_table)])
-					if (any(sample_duplicates)){
-						session$sendCustomMessage("abort", paste("The following samples have multiple columns in the OTU table: ", paste(unique(colnames(otu_table)[sample_duplicates]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					# Rename label columns to make it easier to work with later
-					colnames(otu_table)[1] = "OTU"
-					colnames(picrust_normalization_table) = c("OTU", "norm")
-
-					if (!abort){
-
-						# Change zeros in reads matrix to NAs so we can remove them when melting
-						otu_table[otu_table == 0] = NA
-
-						session$sendCustomMessage("upload_status", "Running PICRUSt")
-
-						# Melt the read count table so we can merge with the normalization table and ko table
-
-						melted_otu_table = melt(otu_table, id=colnames(otu_table)[1], na.rm=TRUE)
-
-						# Merge the column of normalization factors
-						otu_table_with_normalization = merge(melted_otu_table, picrust_normalization_table, by.x=c(colnames(otu_table)[1]), by.y=c(colnames(picrust_normalization_table)[1]), allow.cartesian=TRUE, sort=FALSE)
-						rm(melted_otu_table)
-
-						# Merge the column of ko counts
-						reads_norms_kos = merge(otu_table_with_normalization, picrust_ko_table, by.x=c(colnames(otu_table_with_normalization)[1]), by.y=c(colnames(picrust_ko_table)[1]), allow.cartesian=TRUE, sort=FALSE)
-						rm(otu_table_with_normalization)
-
-						# Make a contribution column by multiplying the read counts with normalization factors with ko counts
-						reads_norms_kos$contribution = reads_norms_kos[,3,with=FALSE] * reads_norms_kos[,6,with=FALSE] / reads_norms_kos[,4,with=FALSE]
-
-						# Reorganize and reformate the table to standardize
-						output = reads_norms_kos[,c(2, 1, 5, 7),with=FALSE]
-						rm(reads_norms_kos)
-					}
-				}
-			}
-
-		} else if (input$input_type == "contributions"){ # If they've chosen the contribution table option
-
-			otu_table_file = input$taxonomic_abundances_2
-			contribution_file = input$function_contributions
-			if (is.null(otu_table_file) | is.null(contribution_file)){
-				session$sendCustomMessage("retry_upload", "retry")
-			} else {
-
-				otu_table_file_path = otu_table_file$datapath
-				contribution_file_path = contribution_file$datapath
-				if (!is.null(tracked_data$old_tax_abund_2_datapath)){
-					if (tracked_data$old_tax_abund_2_datapath == otu_table_file_path){
-						retry_upload = TRUE
-					}
-				}
-				if (!is.null(tracked_data$old_contributions_datapath)){
-					if (tracked_data$old_contributions_datapath == contribution_file_path){
-						retry_upload = TRUE
-					}
-				}
-
-				if (retry_upload){
-					session$sendCustomMessage("retry_upload", "retry")
-				} else {
-					session$sendCustomMessage("upload_status", "Reading OTU table")
-					tracked_data$old_tax_abund_2_datapath = otu_table_file_path
-					otu_table = fread(otu_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-					session$sendCustomMessage("upload_status", "Reading contribution table")
-					tracked_data$old_contributions_datapath = contribution_file_path
-					contribution = fread(contribution_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-					# File checking
-					session$sendCustomMessage("upload_status", "Verifying OTUs match between the OTU table and the contributions")
-					otu_table_otus = unlist(otu_table[,1,with=F])
-					contribution_otus = unlist(contribution[,3,with=F])
-					extra_otu_table_otus = !(otu_table_otus %in% contribution_otus) # Maybe less stringent here, assume OTUs without listed contributions are just uncharacterized and we don't know what their contributions are?
-					if (any(extra_otu_table_otus)){
-						session$sendCustomMessage("abort", paste("The following OTUs in the OTU table do not have contributions in the contribution table: ", paste(unique(otu_table_otus[extra_otu_table_otus]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					extra_contribution_otus = !(contribution_otus %in% otu_table_otus)
-					if (any(extra_contribution_otus)){
-						session$sendCustomMessage("abort", paste("The following OTUs have contributions but do not appear in the OTU table: ", paste(unique(contribution_otus[extra_contribution_otus]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Verifying samples match between the OTU table and the contributions")
-					otu_table_samples = colnames(otu_table)[2:ncol(otu_table)]
-					contribution_samples = unlist(contribution[,2,with=F])
-					extra_otu_table_samples = !(otu_table_samples %in% contribution_samples)
-					if (any(extra_otu_table_samples)){
-						session$sendCustomMessage("abort", paste("The following samples in the OTU table have no listed contributions: ", paste(unique(otu_table_samples[extra_otu_table_samples]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					extra_contribution_samples = any(!(contribution_samples %in% otu_table_samples))
-					if (extra_contribution_samples){
-						session$sendCustomMessage("abort", paste("The following samples with contributions do not appear in the OTU table: ", paste(unique(contribution_samples[extra_contribution_samples]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Checking for duplicate table rows")
-					otu_table_duplicates = duplicated(otu_table_otus)
-					if (any(otu_table_duplicates)){
-						session$sendCustomMessage("abort", paste("The folloing OTUs have multiple rows in the OTU table: ", paste(unique(otu_table_otus[otu_table_duplicates]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Checking for duplicate samples")
-					sample_duplicates = duplicated(colnames(otu_table)[2:ncol(otu_table)])
-					if (any(sample_duplicates)){
-						session$sendCustomMessage("abort", paste("The following samples have multiple columns in the OTU table: ", paste(unique(colnames(otu_table)[sample_duplicates]), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					session$sendCustomMessage("upload_status", "Checking for duplicate contributions")
-					contribution_duplicates = duplicated(contribution[,1:3,with=F])
-					if (any(contribution_duplicates)){
-						session$sendCustomMessage("abort", paste("The following contributions (sample-OTU-function) have multiple rows in the contribution table: ", paste(unique(paste(contribution[contribution_duplicates,2,with=F], contribution[contribution_duplicates,3,with=F], contribution[contribution_duplicates,1,with=F], sep="-")), collapse = " "), sep=""))
-						abort = TRUE
-					}
-
-					if (!abort){
-						output = contribution[,c(2,3,1,6),with=FALSE]
-					}
-				}
-			}
-		}
-
-		if (!is.null(output) & !abort){ # If we have successfully generated a contribution table and there were no errors
-
-			colnames(output) = c("Sample", "OTU", "Gene", "CountContributedByOTU")
-
-			# If we have a table of function abundances for comparison, add that to the contribution table, tagging sample names as comparisons
-			comparison_table_file = NULL
-			if (input$input_type == "run_picrust" & !is.null(input$function_abundances_R)){
-				comparison_table_file = input$function_abundances_R
-			} else if (input$input_type == "contributions" & !is.null(input$function_abundances_C)){
-				comparison_table_file = input$function_abundances_C
-			} else if (input$input_type == "contributions" & !is.null(input$function_abundances_G)){
-				comparison_table_file = input$function_abundances_G
-			}
-
-			if (!is.null(comparison_table_file)){
-				comparison_table_file_path = comparison_table_file$datapath
-				if (!is.null(tracked_data$old_function_abundances_datapath)){
-					if (tracked_data$old_function_abundances_datapath == comparison_table_file_path){
-						retry_upload = TRUE
-					}
-				}
-
-				if (retry_upload){
-					session$sendCustomMessage("retry_upload", "retry")
-				} else {
-					session$sendCustomMessage("upload_status", "Reading comparison KO table")
-					tracked_data$old_function_abundances_datapath = comparison_table_file_path
-					comparison_table = fread(comparison_table_file_path, sep="\t", header=TRUE, stringsAsFactors=FALSE)
-
-					# Add comparison tag to sample names
-					colnames(comparison_table) = c(colnames(comparison_table)[1], paste(colnames(comparison_table)[2:ncol(comparison_table)], comparison_tag, sep=""))
-
-					# Melt the comparison table, add a column with a dummy OTU, and rearrange to match the contribution table
-					melted_comparison_table = melt(comparison_table, id=colnames(comparison_table)[1], na.rm=TRUE)
-					melted_comparison_table$OTU = rep(unlinked_taxon_name, nrow(melted_comparison_table))
-					melted_comparison_table = melted_comparison_table[,c(2,4,1,3),with=FALSE]
-					colnames(melted_comparison_table) = c("Sample", "OTU", "Gene", "CountContributedByOTU")
-
-					output = rbind(output, melted_comparison_table)
-				}
-			}
-
-			################################# Assigning partial KO Contributions to subpathways #################################
-
-			func_hierarchy = NULL
-			custom_func_hierarchy_present = FALSE
-			if (input$input_type == "run_picrust" & !is.null(input$function_hierarchy_R)){
-				func_hierarchy_file = input$function_hierarchy_R
-				custom_func_hierarchy_present = TRUE
-			} else if (input$input_type == "contributions" & !is.null(input$function_hierarchy_C)){
-				func_hierarchy_file = input$function_hierarchy_C
-				custom_func_hierarchy_present = TRUE
-			} else if (input$input_type == "annotations" & !is.null(input$function_hierarchy_G)){
-				func_hierarchy_file = input$function_hierarchy_G
-				custom_func_hierarchy_present = TRUE
-			}
-			
-			if (custom_func_hierarchy_present){
-				func_hierarchy_file_path = func_hierarchy_file$datapath
-				if (!is.null(tracked_data$old_func_hierarchy_datapath)){
-					if (tracked_data$old_func_hierarchy_datapath == func_hierarchy_file_path){
-						retry_upload = TRUE
-					}
-				}
-
-				if (retry_upload){
-					session$sendCustomMessage("retry_upload", "retry")
-				} else {
-					session$sendCustomMessage("upload_status", "Loading function hierarchy")
-					tracked_data$old_func_hierarchy_datapath = func_hierarchy_file_path
-					func_hierarchy = fread(func_hierarchy_file_path, header=TRUE, sep="\t", stringsAsFactors=FALSE)
-				}
-			}
-
-			if (is.null(func_hierarchy) | input$input_type == "example"){ # If there was no custom function hiearchy or they are looking at the example, read in the default
-				func_hierarchy = default_func_hierarchy_table
-			}
-
-			if (!retry_upload){
-
-				# File checking
-				session$sendCustomMessage("upload_status", "Verifying functions present in the abundance tables are in the provided function hierarchy")
-				output_functions = unlist(output[,3,with=F])
-				func_hierarchy_functions = unlist(func_hierarchy[,1,with=F])
-				extra_output_functions = !(output_functions %in% func_hierarchy_functions)
-				if (any(extra_output_functions)){
-					session$sendCustomMessage("warning", paste("The following functions in the contributions are not present in the function hierarchy: ", paste(unique(output_functions[extra_output_functions]), collapse=" "), sep=""))
-					# abort = TRUE
-					# Instead of aborting for now, we will just filter the KOs not present
-					output = output[unlist(output[,3,with=F]) %in% func_hierarchy_functions]
-				}
-
-				session$sendCustomMessage("upload_status", "Checking for duplicate hierarchy levels")
-				hierarchy_levels = colnames(func_hierarchy)
-				duplicate_levels = duplicated(hierarchy_levels)
-				if (any(duplicate_levels)){
-					session$sendCustomMessage("abort", paste("The following names are used for multiple levels in the function hierarchy: ", paste(unique(hierarchy_levels[duplicate_levels]), collapse = " "), sep=""))
-					abort = TRUE
-				}
-			}
-
-			taxa_hierarchy = NULL
-			custom_taxa_hierarchy_present = FALSE
-			if (input$input_type == "run_picrust" & !is.null(input$taxonomic_hierarchy_R)){
-				taxa_hierarchy_file = input$taxonomic_hierarchy_R
-				custom_taxa_hierarchy_present = TRUE
-			} else if (input$input_type == "contributions" & !is.null(input$taxonomic_hierarchy_C)){
-				taxa_hierarchy_file = input$taxonomic_hierarchy_C
-				custom_taxa_hierarchy_present = TRUE
-			} else if (input$input_type == "annotations" & !is.null(input$taxonomic_hierarchy_G)){
-				taxa_hierarchy_file = input$taxonomic_hierarchy_G
-				custom_taxa_hierarchy_present = TRUE
-			}
-			
-			if (custom_taxa_hierarchy_present){
-				taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
-				if (!is.null(tracked_data$old_tax_hierarchy_datapath)){
-					if (tracked_data$old_tax_hierarchy_datapath == taxa_hierarchy_file_path){
-						retry_upload = TRUE
-					}
-				}
-
-				if (retry_upload){
-					session$sendCustomMessage("retry_upload", "retry")
-				} else {
-					session$sendCustomMessage("upload_status", "Loading taxonomic hierarchy")
-					tracked_data$old_tax_hierarchy_datapath = taxa_hierarchy_file_path
-					taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-				}
-			}
-
-			if (is.null(taxa_hierarchy) | input$input_type == "example"){ # If there was no custom taxonomic hiearchy or they are looking at the example, read in the default
-				taxa_hierarchy = default_tax_hierarchy_table
-			}
-			
-			if (!retry_upload){
-				# File checking
-				session$sendCustomMessage("upload_status", "Verifying OTUs present in the abundance tables are in the provided taxonomic hierarchy")
-				output_otus = unlist(output[,2,with=F])
-				tax_hierarchy_otus = unlist(taxa_hierarchy[,1,with=F])
-				extra_output_otus = !(output_otus %in% tax_hierarchy_otus)
-				if (any(extra_output_otus)){
-					session$sendCustomMessage("abort", paste("The following OTUs in the contributions are not present in the taxonomic hierarchy: ", paste(unique(output_otus[extra_output_otus]), collapse = " "), sep=""))
-					abort = TRUE
-				}
-
-				otu_table_otus = unlist(otu_table[,1,with=F])
-				tax_hierarchy_otus = unlist(taxa_hierarchy[,1,with=F])
-				extra_otu_table_otus = !(otu_table_otus %in% tax_hierarchy_otus)
-				if (any(extra_otu_table_otus)){
-					session$sendCustomMessage("abort", paste("The following OTUs in the OTU table are not present in the taxonomic hierarchy: ", paste(unique(otu_table_otus[extra_otu_table_otus]), collapse = " "), sep=""))
-					abort = TRUE
-				}
-
-				session$sendCustomMessage("upload_status", "Checking for duplicate hierarchy levels")
-				hierarchy_levels = colnames(taxa_hierarchy)
-				duplicate_levels = duplicated(hierarchy_levels)
-				if (any(duplicate_levels)){
-					session$sendCustomMessage("abort", paste("The following names are used for multiple levels in the taxonomic hierarchy: ", paste(unique(hierarchy_levels[duplicate_levels]), collapse = " "), sep=""))
-					abort = TRUE
-				}
-			}
-
-			################################# Reading sample group mapping table for sample sorting later #################################
-
-			sample_map = NULL
-
-			custom_sample_map_present = FALSE
-			if (input$input_type == "run_picrust" & !is.null(input$sample_map_R)){
-				sample_map_file = input$sample_map_R
-				custom_sample_map_present = TRUE
-			} else if (input$input_type == "contributions" & !is.null(input$sample_map_C)){
-				sample_map_file = input$sample_map_C
-				custom_sample_map_present = TRUE
-			} else if (input$input_type == "annotations" & !is.null(input$sample_map_G)){
-				sample_map_file = input$sample_map_G
-				custom_sample_map_present = TRUE
-			}
-
-			if (custom_sample_map_present){
-				sample_map_file_path = sample_map_file$datapath
-				if (!is.null(tracked_data$old_samp_map_datapath)){
-					if (tracked_data$old_samp_map_datapath == sample_map_file_path){
-						retry_upload = TRUE
-					}
-				}
-
-				if (retry_upload){
-					session$sendCustomMessage("retry_upload", "retry")
-				} else {
-					session$sendCustomMessage("upload_status", "Reading sample metadta")
-					tracked_data$old_samp_map_datapath = sample_map_file_path
-					sample_map = fread(sample_map_file_path, sep="\t", header=T, stringsAsFactors = F)
-				}
-			}
-
-			if (input$input_type == "example") { # If they're looking at the example, we load the default sample map
-				sample_map = default_sample_map_table
-			}
-
-			if (!retry_upload & custom_sample_map_present){
-				# File checking
-				session$sendCustomMessage("upload_status", "Verifying samples in the abundance tables are present in the sample metadata")
-				output_samples = unlist(output[,1,with=F])
-				metadata_samples = unlist(sample_map[,1,with=F])
-				extra_output_samples = !(output_samples %in% metadata_samples)
-				if (any(extra_output_samples)){
-					session$sendCustomMessage("abort", paste("The following samples do not have metadata: ", paste(unique(output_samples[extra_output_samples]), collapse = " "), sep=""))
-					abort = TRUE
-				}
-
-				session$sendCustomMessage("upload_status", "Checking for duplicate metadata factors")
-				metadata_factors = colnames(sample_map)
-				duplicate_factors = duplicated(metadata_factors)
-				if (any(duplicate_factors)){
-					session$sendCustomMessage("abort", paste("The following names are used for multiple metadata factors: ", paste(unique(metadata_factors[duplicate_factors]), collapse = " "), sep=""))
-					abort = TRUE
-				}
-
-			}
-
-			if (!abort & !retry_upload){
-
-				session$sendCustomMessage("upload_status", "Summarizing function abundances to selected level")
-
-				if (ncol(func_hierarchy) > 1 & which(colnames(func_hierarchy) == func_summary_level) != 1){
-
-					# Get a table matching KOs to the selected summary levels they belong to
-					level_match_table = data.table(func_hierarchy[,c(1,which(colnames(func_hierarchy) == func_summary_level)), with=FALSE])
-
-					# For each row in the contribution table, copy the row for every selected summary level the KO for the row belongs to and label the rows accordingly
-					expanded_table = merge(output, level_match_table, by.x=c(colnames(output)[3]), by.y=c(colnames(level_match_table)[1]), all.y=FALSE, allow.cartesian=TRUE)
-
-					# Append a column including the normalization factor for each row based on the KO
-					expanded_table = merge(expanded_table, ko_normalization_table(), by.x=c(colnames(expanded_table)[1]), by.y=c(colnames(ko_normalization_table())[1]), all.y=FALSE, allow.cartesian=TRUE)
-
-					# Create a column for the normalized contributions of each row
-					expanded_table$normalized_contributions = expanded_table[,4,with=FALSE] / expanded_table[,6,with=FALSE]
-
-					# Sum normalized contributions for rows that match in Sample, KO, and selected summary level
-					output = expanded_table[,sum(normalized_contributions), by=eval(colnames(expanded_table)[c(2,3,5)])]
-
-				} else {
-					colnames(output)[which(colnames(output) == "Gene")] = func_summary_level
-					colnames(output)[which(colnames(output) == "CountContributedByOTU")] = "V1"
-				}
-
-				# Convert counts to relative abundances
-				output[,relative_contributions := V1/sum(V1), by=Sample]
-
-				################################# Formatting and returning the function hierarchy #################################
-
-				session$sendCustomMessage("upload_status", "Formatting the function hierarchy")
-
-				if (ncol(func_hierarchy) > 1 & which(colnames(func_hierarchy) == func_summary_level) != 1){
-					func_hierarchy = func_hierarchy[,2:(which(colnames(func_hierarchy) == func_summary_level)),with=F]
-				} else if (ncol(func_hierarchy) > 1){
-					func_hierarchy = func_hierarchy[,c(2:ncol(func_hierarchy), 1),with=F]
-				}
-
-				# Remove rows that correspond to selected summary levels not in the contribution table data
-				func_hierarchy = func_hierarchy[unlist(func_hierarchy[,colnames(func_hierarchy) == func_summary_level,with=F]) %in% unique(unlist(output[,colnames(output) == func_summary_level, with=F]))]
-
-				# Remove duplicate rows
-				func_hierarchy = unique(func_hierarchy)
-				id_levels = names(func_hierarchy)
-				for(j in 1:length(id_levels)){
-					func_hierarchy[[id_levels[j]]] = paste(id_levels[j],as.character(func_hierarchy[[id_levels[j]]]), sep = "_")
-				}
-				unique_func_hierarchy = func_hierarchy
-
-				# Creating the javascript version of the function hierarchy
-		        func_hierarchy = func_hierarchy[,lapply(.SD,as.character)]
-
-		        # Create the base set of objects which are structured differently from the internal nodes. The leaves contain all information for each parent node of the leaf
-		        base_objects = lapply(1:dim(func_hierarchy)[1], function(row){
-		        	l = list("Ndescendents" = 0, "type" = "function")
-		        	for (depth in 1:dim(func_hierarchy)[2]){
-		        		l[colnames(func_hierarchy)[depth]] = func_hierarchy[row,depth,with=F]
-		        	}
-		        	return(list("key" = paste(l[func_summary_level]), "level"=0, "values" = list(l)))
-		        })
-
-		        base_objects = base_objects[order(unlist(lapply(base_objects, function(obj){return(obj["key"])})))]
-		        # Iteratively generate the next layer up in the tree, grouping the previous level of nodes by their parent
-		        output_func_hierarchy = base_objects
-		        if (dim(func_hierarchy)[2] > 1){
-			        for (depth in (dim(func_hierarchy)[2] - 1):1){
-
-			        	# Get the label for the depth of the tree we're creating a layer for
-			        	depth_name = colnames(func_hierarchy)[depth][[1]]
-
-			        	# Get the labels for the nodes in the previous layer
-			        	vals = sapply(base_objects, function(obj){return(obj[["key"]])})
-
-			        	# Get the mapping between parent nodes in the new layer and children nodes in the previous layer
-			        	next_levels = sapply(vals, function(curr_level){
-			        		prev_depth = depth + 1
-			        		setkeyv(func_hierarchy, colnames(func_hierarchy)[prev_depth])
-			        		return(unique(func_hierarchy[curr_level,depth,with=F][[1]]))
-			        	})
-
-			        	# Create a new node for each parent node of the previous layer
-			        	output_func_hierarchy = lapply(levels(factor(next_levels)), function(level){
-			        		return(list("key" = level, "level" = dim(func_hierarchy)[2] - depth, "values" = base_objects[which(next_levels == level)]))
-			        	})
-
-			        	# Set the base objects list to the current state of the tree so we can group the current top layer in the next iteration
-			        	base_objects = output_func_hierarchy
-			        }
-			    }
-
-				session$sendCustomMessage(type='function_hierarchy', output_func_hierarchy)
-				
-				################################# Formatting and returning the function averages #################################
-
-				session$sendCustomMessage("upload_status", "Calculating average function abundances")
-				otu_matched_samples = grep(paste(".*", comparison_tag, "$", sep=""), output$Sample, invert=TRUE)
-				#Make sure to exclude average contributions
-				otu_matched_samples = otu_matched_samples[otu_matched_samples != average_contrib_sample_name] 
-				#sum over taxa
-				count_name = names(output)[!names(output) %in% c("Sample", "OTU", func_summary_level)]
-				total_funcs = output[otu_matched_samples,lapply(.SD, sum), by=c(func_summary_level, "Sample"), .SDcols=count_name] #whatever the count name is
-				total_funcs[,(func_summary_level):=paste(func_summary_level,unlist(total_funcs[,colnames(total_funcs) == func_summary_level,with=F]),sep="_")]
-				total_funcs[,V1:=V1/sum(V1),by=Sample] #Switch to relative abundance from read counts
-				#combine with func_hierarchy
-				total_funcs = merge(total_funcs, unique_func_hierarchy, by=func_summary_level)
-				#get average for every level of functions
-				func_means = data.table()
-				for(j in 1:ncol(unique_func_hierarchy)){
-					total_funcs_sum = total_funcs[,sum(V1), by=c("Sample", names(unique_func_hierarchy)[j])] #sum over this category, will not change SubPathway
-					func_means_lev =  total_funcs_sum[, mean(V1), by=eval(names(unique_func_hierarchy)[j])]
-					setnames(func_means_lev, c("Function", "Mean"))
-					if(ncol(func_means_lev)==2) func_means = rbind(func_means, func_means_lev)
-				}
-				output3 = func_means
-
-				session$sendCustomMessage(type="func_averages",paste(paste(colnames(output3), collapse="\t"), paste(sapply(1:nrow (output3), function(row){return(paste(output3[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
-
-				################################# Summarizing the contribution table to the desired taxonomic level #################################
-				# Read in the taxonomic hierachy and format it
-
-				session$sendCustomMessage("upload_status", "Summarizing contribution table to desired taxonomic level")
-			    
-		        # Filter OTUs not in contribution table
-		        taxa_hierarchy = taxa_hierarchy[taxa_hierarchy[,1,with=F][[1]] %in% unique(output[,OTU])]
-		        taxa_hierarchy = unique(taxa_hierarchy)
-		        taxa_hierarchy = taxa_hierarchy[,lapply(.SD,as.character)]
-
-		        if (ncol(taxa_hierarchy) > 1){
-			        taxa_hierarchy[,(colnames(taxa_hierarchy)[2:dim(taxa_hierarchy)[2]]):=lapply(.SD, function(col){
-			        	return(gsub("^$", "unknown", gsub("^.__", "", gsub(";$", "", col))))
-			        }), .SDcols=2:dim(taxa_hierarchy)[2]]
-					taxa_hierarchy[,(colnames(taxa_hierarchy)[2:dim(taxa_hierarchy)[2]]):=lapply(2:dim(taxa_hierarchy)[2], function(col){
-						sapply(1:dim(taxa_hierarchy)[1], function(row){
-							return(paste(taxa_hierarchy[row,2:col,with=F], collapse="_"))
-						})
-					})]
-				}
-
-		        output[,OTU:=as.character(OTU)]
-		        level_match_taxa_hierarchy = NULL
-		        if (which(colnames(taxa_hierarchy) == tax_summary_level) != 1){
-			        # Summarize contribution table to the correct taxonomic level
-			        level_match_taxa_hierarchy = taxa_hierarchy[,c(1,which(colnames(taxa_hierarchy) == tax_summary_level)),with=F]
-			        colnames(level_match_taxa_hierarchy) = c(colnames(level_match_taxa_hierarchy)[1], "new_summary_level")
-
-			        expanded_table = merge(output, level_match_taxa_hierarchy, by.x = c(colnames(output)[2]), by.y=c(colnames(level_match_taxa_hierarchy)[1]), all.x = T, all.y=F, allow.cartesian=T)
-			        expanded_table[,new_summary_level:=sapply(unlist(expanded_table[,ncol(expanded_table),with=F]), function(entry){if (is.na(entry)){return(unlinked_taxon_name)}else{return(entry)}})]
-			        output = expanded_table[,sum(relative_contributions), by=eval(colnames(expanded_table)[c(which(colnames(expanded_table) == "Sample"),which(colnames(expanded_table) == "new_summary_level"),which(colnames(expanded_table) == func_summary_level))])]
-			    }
-			    else {
-			    	output = output[,sum(relative_contributions), by=eval(colnames(output)[c(which(colnames(output) == "Sample"),which(colnames(output) == "OTU"),which(colnames(output) == func_summary_level))])]
-			    }
-		        colnames(output) = c("Sample", "OTU", "SubPathway", "relative_contributions")
-
-		        ################################# Summarizing the OTU table to the desired taxonomic level #################################
-
-		        session$sendCustomMessage("upload_status", "Summarizing OTU table to desired taxonomic level")
-		        otu_table[is.na(otu_table)] = 0
-		        colnames(otu_table)[1] = "OTU"
-		        otu_table[,OTU:=as.character(OTU)]
-		        otu_table_objects = NULL
-
-		        if (which(colnames(taxa_hierarchy) == tax_summary_level) != 1){
-			        expanded_table = merge(otu_table, level_match_taxa_hierarchy, by.x = c(colnames(otu_table)[1]), by.y = c(colnames(level_match_taxa_hierarchy)[1]), all.y=F, allow.cartesian=T)
-			        summarized_otu_table = expanded_table[,lapply(.SD[,2:dim(.SD)[2],with=F], sum), by=new_summary_level]
-
-			        summarized_otu_table_col_names = colnames(summarized_otu_table)
-			        summarized_otu_table[,(colnames(summarized_otu_table)[2:dim(summarized_otu_table)[2]]):=lapply(.SD, function(col){
-			        	return(col/sum(col))
-			        }), .SDcols=2:dim(summarized_otu_table)[2]]
-			        colnames(summarized_otu_table) = summarized_otu_table_col_names
-			        setkeyv(summarized_otu_table, colnames(summarized_otu_table)[1])
-			        otu_table_objects = lapply(2:dim(summarized_otu_table)[2], function(col){
-			        	l = setNames(split(unname(unlist(summarized_otu_table[,col,with=F])), seq(nrow(summarized_otu_table[,col,with=F]))), paste(tax_summary_level, unlist(summarized_otu_table[,1,with=F]), sep="_"))
-			        	l["Sample"] = colnames(summarized_otu_table)[col]
-			        	return(l)
-			        })
-				} else {
-					otu_table[,(colnames(otu_table)[2:dim(otu_table)[2]]):=lapply(.SD, function(col){
-			        	return(col/sum(col))
-			        }), .SDcols=2:dim(otu_table)[2]]
-					otu_table_objects = lapply(2:dim(otu_table)[2], function(col){
-			        	l = setNames(split(unname(unlist(otu_table[,col,with=F])), seq(nrow(otu_table[,col,with=F]))), paste(tax_summary_level, unlist(otu_table[,1,with=F]), sep="_"))
-			        	l["Sample"] = colnames(otu_table)[col]
-			        	return(l)
-			        })
-				}
-
-		        ################################# Organizing OTU table samples if grouping is chosen #################################
-
-		        if(!is.null(samp_grouping)){ # If they've chosen a metadata factor to group by
-		        	samples = sapply(otu_table_objects, function(obj){return(obj["Sample"])})
-		        	setkeyv(sample_map, c(samp_grouping, colnames(sample_map)[1]))
-		        	sample_order = sapply(unlist(sample_map[,1,with=F]), function(sample_name){
-		        		return(which(unlist(samples) == sample_name))
-		        	})
-		        	otu_table_objects = otu_table_objects[sample_order]
-		        }
-		        tracked_data$otu_table = otu_table_objects
-
-		        # Tell the browser we're ready to start sending otu table data
-				session$sendCustomMessage(type="otu_table_ready", length(otu_table_objects))
-
-		        id_levels = names(taxa_hierarchy)
-
-				for(j in 1:length(id_levels)){
-					taxa_hierarchy[[id_levels[j]]] = paste(id_levels[j],as.character(taxa_hierarchy[[id_levels[j]]]), sep = "_")
-				}
-
-		        output[,OTU:=sapply(unlist(output[,OTU]), function(otu){if (as.character(otu) != unlinked_taxon_name){return(paste(tax_summary_level,as.character(otu), sep = "_"))}else{return(unlinked_taxon_name)}})]
-
-		        ################################# Formatting and returning the taxonomic hierarchy #################################
-
-		        session$sendCustomMessage("upload_status", "Formatting the taxonomic hierarchy")
-
-		        summarized_taxa_hierarchy = NULL
-		        if (ncol(taxa_hierarchy) > 1 & which(colnames(taxa_hierarchy) == tax_summary_level) != 1){
-			        summarized_taxa_hierarchy = taxa_hierarchy[,c(2:dim(taxa_hierarchy)[2], 1),with=F]
-			        cutoff = which(colnames(summarized_taxa_hierarchy) == tax_summary_level)
-		    	    summarized_taxa_hierarchy = summarized_taxa_hierarchy[,1:cutoff,with=F]
-		        	summarized_taxa_hierarchy = unique(summarized_taxa_hierarchy)
-		        } else if (ncol(taxa_hierarchy) > 1){
-		        	summarized_taxa_hierarchy = taxa_hierarchy[,c(2:ncol(taxa_hierarchy), 1),with=F]
-		        } else {
-		        	summarized_taxa_hierarchy = taxa_hierarchy
-		        }
-
-		        # Create the base set of objects which are structured differently from the internal nodes. The leaves contain all information for each parent node of the leaf
-		        base_objects = lapply(1:dim(summarized_taxa_hierarchy)[1], function(row){
-		        	l = list("Ndescendents" = 0, "type" = "taxa")
-		        	for (depth in 1:dim(summarized_taxa_hierarchy)[2]){
-		        		l[colnames(summarized_taxa_hierarchy)[depth]] = summarized_taxa_hierarchy[row,depth,with=F]
-		        	}
-		        	return(list("key" = paste(l[colnames(summarized_taxa_hierarchy)[dim(summarized_taxa_hierarchy)[2]]]), "level"=0, "values" = list(l)))
-		        })
-
-		        # Iteratively generate the next layer up in the tree, grouping the previous level of nodes by their parent
-		        output_taxa_hierarchy = base_objects
-		        if (ncol(summarized_taxa_hierarchy) > 1){
-			        for (depth in (dim(summarized_taxa_hierarchy)[2] - 1):1){
-
-			        	# Get the label for the depth of the tree we're creating a layer for
-			        	depth_name = colnames(summarized_taxa_hierarchy)[depth][[1]]
-
-			        	# Get the labels for the nodes in the previous layer
-			        	vals = sapply(base_objects, function(obj){return(obj[["key"]])})
-
-			        	# Get the mapping between parent nodes in the new layer and children nodes in the previous layer
-			        	next_levels = sapply(vals, function(curr_level){
-		        			prev_depth = depth + 1
-			        		setkeyv(summarized_taxa_hierarchy, colnames(summarized_taxa_hierarchy)[prev_depth])
-			        		return(unique(summarized_taxa_hierarchy[curr_level,depth,with=F][[1]]))
-			        	})
-
-			        	# Create a new node for each parent node of the previous layer
-			        	output_taxa_hierarchy = lapply(levels(factor(next_levels)), function(level){
-			        		return(list("key" = level, "level" = dim(summarized_taxa_hierarchy)[2] - depth + 1, "values" = base_objects[which(next_levels == level)]))
-			        	})
-
-			        	# Set the base objects list to the current state of the tree so we can group the current top layer in the next iteration
-			        	base_objects = output_taxa_hierarchy
-			        }
-			    }
-
-				session$sendCustomMessage(type='tax_hierarchy', output_taxa_hierarchy)
-
-			    ################################# Formatting and returning the contribution table #################################
-
-			    session$sendCustomMessage("upload_status", "Formatting the contribution table")
-
-				# Format the contribution table to match the expected javascript array
-				# Reshape so there's a column for every SubPathway, rows correspond to unique Sample + OTU pairings
-
-				output[,SubPathway:=paste(func_summary_level,SubPathway,sep="_")]
-				
-				##add a sample called average_contrib_sample_name to the contribution table, include 0s for missing OTU/Pathway combos
-				foo = melt(dcast(output, Sample + OTU ~ SubPathway, value.var = "relative_contributions", fun.aggregate=sum), id.vars = c("Sample", "OTU"), variable.name = "SubPathway", value.name = "value")
-				num_samps = output[,length(unique(Sample))]			
-				averages = foo[,sum(value)/num_samps, by=list(OTU, SubPathway)]
-
-				averages[,Sample:=average_contrib_sample_name]
-				setnames(averages, "V1", "relative_contributions")
-				output = rbind(output, averages[,list(Sample, OTU, SubPathway, relative_contributions)])
-				
-				output = dcast(output, Sample + OTU ~ SubPathway, value.var="relative_contributions")
-				# Create a single column for SubPathways that contains a list of the SubPathways for that row's Sample and OTU, remove empty elements from those lists
-				output = data.table(Sample = output$Sample, OTU = output$OTU, SubPathways = apply(output[,3:dim(output)[2], with=FALSE], 1, function(row){return(as.list(row[!is.na(row)]))}))
-
-				# Reshape so there's a column for every OTU, rows correspond to Samples
-				output = dcast(output, Sample ~ OTU, value.var=colnames(output)[3])
-
-				# Create a single column for OTUs that contains a list of OTUs in the corresponding row's Sample, and each element in that list is a list of the SubPathway contributions that OTU makes in that Sample
-				output = data.table(Sample = output$Sample, OTUs = apply(output[,2:dim(output)[2], with=FALSE], 1, function(row){return(as.list(row[sapply(row, function(el){!is.null(el[[1]])})]))}))
-
-				# Reshape so there's a column for every Sample
-				output = dcast(output, . ~ Sample, value.var="OTUs")
-				output = output[,2:dim(output)[2],with=FALSE]
-
-				# Format so that the top level Sample lists are nested properly
-				output = lapply(output, function(el){return(el[[1]])})
-				
-				otu_sample_order = c()
-				func_sample_order = c()
-				samples = names(output)
-				if(!is.null(samp_grouping)){ # If they've chosen a metadata factor to group by
-		        	setkeyv(sample_map, c(samp_grouping, colnames(sample_map)[1]))
-		        }
-	        	otu_sample_order = unlist(sapply(unlist(sample_map[,1,with=F]), function(sample_name){
-	        		if (sample_name != average_contrib_sample_name){
-		        		return(which(unlist(samples) == sample_name))
-		        	}
-	        	}))
-	        	func_sample_order = unlist(sapply(unlist(sample_map[,1,with=F]), function(sample_name){
-	        		if (sample_name != average_contrib_sample_name){
-	        			if (!is.null(input$function_abundances)){
-	        				return(c(which(unlist(samples) == sample_name), which(unlist(samples) == paste(sample_name, comparison_tag, sep=""))))
-	       				} else {
-	       					return(which(unlist(samples) == sample_name))
-		        		}
-		        	}
-	        	}))
-	        	otu_sample_order = c(otu_sample_order, which(!(samples %in% unlist(sample_map[,1,with=F])) & samples != average_contrib_sample_name & !grepl(comparison_tag, samples)))
-	        	func_sample_order = c(func_sample_order, unlist(sapply(samples[which(!(samples %in% unlist(sample_map[,1,with=F])) & !grepl(comparison_tag, samples))], function(sample_name){
-	        		if (sample_name != average_contrib_sample_name){
-	        			if (!is.null(input$function_abundances)){
-	        				return(c(which(unlist(samples) == sample_name), which(unlist(samples) == paste(sample_name, comparison_tag, sep=""))))
-	        			} else {
-	        				return(which(unlist(samples) == sample_name))
-	        			}
-	        		}
-	        	})))
-		        session$sendCustomMessage("otu_sample_order", names(output)[otu_sample_order])
-		        session$sendCustomMessage("func_sample_order", names(output)[func_sample_order])
-
-				tracked_data$contribution_table = output
-
-				session$sendCustomMessage("number_of_samples_message", length(output))
-				
-
-				session$sendCustomMessage(type="contribution_table_ready", length(output))
-			}
-		}
-
-	})
-
-	# Listen for requests for contribution sample data from the browser
-	observe({
-		if (!is.null(input$contribution_sample_request)){
-			contribution_sample = input$contribution_sample_request
-			if (contribution_sample != tracked_data$previous_contribution_sample){
-				tracked_data$previous_contribution_sample = contribution_sample
-				if (contribution_sample >= 0 & contribution_sample < length(tracked_data$contribution_table)){
-					session$sendCustomMessage(type="contribution_sample_return", tracked_data$contribution_table[contribution_sample + 1])
-				}
-			}
-		}
-	})
-
-	# Listen for requests for otu sample data from the browser
-	observe({
-		if (!is.null(input$otu_sample_request)){
-			otu_sample = input$otu_sample_request
-			if (otu_sample != tracked_data$previous_otu_sample){
-				tracked_data$previous_otu_sample = otu_sample
-				if (otu_sample >= 0 & otu_sample < length(tracked_data$otu_table)){
-					session$sendCustomMessage(type="otu_sample_return", tracked_data$otu_table[otu_sample + 1])
-				}
-			}
-		}
-	})
-
-	# Return optional table labels when they are loaded
-	observe({
-		if (!is.null(input$taxonomic_hierarchy_R)){
-			taxa_hierarchy_file = input$taxonomic_hierarchy_R
-			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
-			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			if (ncol(taxa_hierarchy) > 1){
-				session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
-			} else {
-				session$sendCustomMessage("tax_hierarchy_labels", list(colnames(taxa_hierarchy)))
-			}
-			if ("Genus" %in% colnames(taxa_hierarchy)){
-				tracked_data$tax_summary_level = "Genus"
-			} else {
-				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
-			}
+		# Otherwise, we generate the OTU table and contribution table from uploaded data
 		} else {
-			taxa_hierarchy = default_tax_hierarchy_table
-			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
-		}
-	})
 
-	observe({
-		if (!is.null(input$taxonomic_hierarchy_C)){
-			taxa_hierarchy_file = input$taxonomic_hierarchy_C
-			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
-			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			if (ncol(taxa_hierarchy) > 1){
-				session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
-			} else {
-				session$sendCustomMessage("tax_hierarchy_labels", list(colnames(taxa_hierarchy)))
+			otu_table = process_otu_table_file()
+			# If the OTU table could not be processed, exit
+			if (is.null(otu_table)){
+				return()
 			}
-			if ("Genus" %in% colnames(taxa_hierarchy)){
-				tracked_data$tax_summary_level = "Genus"
-			} else {
-				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
+
+
+			# Format the otu table
+			otu_table = format_otu_table(otu_table)
+
+			# If we are not displaying the example and the option to upload a custom taxonomic hierarchy table is selected, read it in
+			if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "CUSTOM"){
+				taxonomic_hierarchy_table = process_custom_taxonomic_hierarchy_table_file()
 			}
+
+			# If the custom taxonomic hierarchy table could not be read, we exit
+			if (is.null(taxonomic_hierarchy_table)){
+				return()
+			}
+
+			# Check that the OTUs in the OTU table are present in the taxonomic hierarchy
+			otu_table_otus_in_taxonomic_hierarchy_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")
+
+			# If OTUs exist in the OTU table that are not in the taxonomic hierarchy, we exit
+			if (!otu_table_otus_in_taxonomic_hierarchy_validated){
+				return()
+			}
+
+			# If they've chosen the genomic content option
+			if (input$contribution_method_choice == "GENOMIC_CONTENT"){
+
+				genomic_content_table = process_genomic_content_table_file()
+
+				# If the genomic content table could not be processed, exit
+				if (is.null(genomic_content_table)){
+					return()
+
+				# Otherwise, generate a contribution table from the OTU table and genomic content table
+				} else {
+					contribution_table = generate_contribution_table_using_custom_genomic_content(otu_table, genomic_content_table)
+				}
+
+			# If they've chosen the PICRUSt option
+			} else if (input$contribution_method_choice == "PICRUST"){		
+				contribution_table = generate_contribution_table_using_picrust(otu_table)
+
+			# If they've chosen the contribution table option
+			} else if (input$contribution_method_choice == "CONTRIBUTION"){ 
+
+				contribution_table = process_contribution_table_file()
+
+				# If the contribution table could not be processed, exit
+				if (is.null(contribution_table)){
+					return()
+
+				# Otherwise, generate a contribution table from the OTU table and the contribution table
+				} else {
+					contribution_table = generate_contribution_table_using_custom_contributions(otu_table, contribution_table)
+				}
+			}
+
+			# If the contribution table could not be generated, we exit
+			if (is.null(contribution_table)){
+				return()
+			}
+
+			# If we are not displaying the example and the option to upload a custom function hierarchy table is selected, read it in
+			if (input$example_visualization != "TRUE" & input$function_hierarchy_choice == "CUSTOM"){
+				function_hierarchy_table = process_custom_function_hierarchy_table_file()
+			}
+
+			# If the custom function hierarchy table could not be read, we exit
+			if (is.null(function_hierarchy_table)){
+				return()
+			}
+
+			# Check that OTUs in the contribution table are present in the taxonomic hierarchy
+			contribution_table_otus_in_taxonomic_hierarchy_validated = validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")
+
+			# If OTUs exist in the contribution table that are not in the taxonomic hierarchy, we exit
+			if (!contribution_table_otus_in_taxonomic_hierarchy_validated){
+				return()
+			}
+
+			# Check that functions in the contribution table are present in the function hierarchy
+			contribution_table_functions_in_function_hierarchy_validated = validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "function hierarchy")
+
+			# If functions exist in the contribution table that are not in the function hierarchy, we exit
+			if (!contribution_table_functions_in_function_hierarchy_validated){
+				return()
+			}
+		}
+
+		# If the OTU table or contribution table could not be generated, we exit
+		if (is.null(otu_table) | is.null(contribution_table)){
+			return()
+		}
+
+		# If we are not displaying the example and the option to upload a table of function abundances for comparison is selected, add that to the contribution table, tagging sample names as comparisons
+		if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
+
+			function_abundance_table = process_function_abundance_table_file()
+
+			# If the function abundance table could not be processed, exit
+			if (is.null(function_abundance_table)){
+				return()
+			}
+
+			# Check that functions in the function abundance table are preset in the function hierarchy
+			function_abundance_table_functions_in_function_hierarchy_validated = validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "function hierarchy")
+
+			# If functions exist in the function abundance table that are not in the function hierarchy, we exit
+			if (!function_abundance_table_functions_in_function_hierarchy_validated){
+				return()
+			}
+
+			# Add the comparison samples to the contribution table
+			contribution_table = add_comparison_function_abundances_to_contribution_table(contribution_table, function_abundance_table)
+		}
+
+		# If we could not add the function abundances to the contribution table, we exit
+		if (is.null(contribution_table)){
+			return()
+		}
+
+		contribution_table = normalize_contribution_table(contribution_table)
+		otu_table = normalize_otu_table(otu_table)
+
+		# If we are displaying the example, set the metadata table to the default
+		if (input$example_visualization == "TRUE"){
+			metadata_table = default_metadata_table
+
+		# Otherwise, if we are not displaying the example and the option to upload a metadata table is selected, read it in
+		} else if (input$example_visualization != "TRUE" & input$metadata_choice == "PRESENT"){
+			metadata_table = process_metadata_table_file()
+
+			# If the metadata table could not be read, we exit
+			if (is.null(metadata_table)){
+				return()
+			}
+
+			# Check that the samples in the OTU table are in the metadata table
+			otu_table_samples_have_metadata_validated = validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "metadata table")
+
+			# If there are samples in the OTU table that are not in the metadata table, we exit
+			if (!otu_table_samples_have_metadata_validated){
+				return()
+			}
+
+			# Check that the samples in the contribution table are in the metadata table
+			contribution_table_samples_have_metadata_validated = validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "metadata_table")
+
+			# If there are samples in the contribution table that are not in the metadata table, we exit
+			if (!contribution_table_samples_have_metadata_validated){
+				return()
+			}
+		}
+
+		session$sendCustomMessage("upload_status", "Summarizing function abundances to selected level")
+
+		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
+
+		function_hierarchy_table = make_hierarchy_table_level_entries_unique(function_hierarchy_table, first_function_level())
+
+		contribution_table = summarize_table_to_selected_level(contribution_table, function_hierarchy_table, function_summary_level(), function_partial_contribution_table())
+
+		session$sendCustomMessage("upload_status", "Summarizing contribution table to desired taxonomic level")
+
+		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, first_taxonomic_level(), contribution_table[[first_taxonomic_level()]])
+
+		taxonomic_hierarchy_table = make_hierarchy_table_level_entries_unique(taxonomic_hierarchy_table, first_taxonomic_level())
+
+		contribution_table = summarize_table_to_selected_level(contribution_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
+
+		session$sendCustomMessage("upload_status", "Summarizing OTU table to desired taxonomic level")
+
+		otu_table = summarize_table_to_selected_level(otu_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
+
+		session$sendCustomMessage("upload_status", "Formatting the function hierarchy")
+
+		function_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(function_hierarchy_table, function_summary_level())
+
+		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, function_summary_level(), unique(contribution_table[[function_summary_level()]]))
+
+		javascript_function_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(function_hierarchy_table, "function", function_summary_level())
+
+		session$sendCustomMessage(type='function_hierarchy', javascript_function_hierarchy)
+
+		taxonomic_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(taxonomic_hierarchy_table, taxonomic_summary_level())
+
+		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, taxonomic_summary_level(), contribution_table[[taxonomic_summary_level()]])
+      	
+		javascript_taxonomic_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(taxonomic_hierarchy_table, "taxa", taxonomic_summary_level())
+		
+		session$sendCustomMessage(type='taxonomic_hierarchy', javascript_taxonomic_hierarchy)
+
+		session$sendCustomMessage("upload_status", "Calculating average function abundances")
+		
+		function_mean_abundance_table = calculate_average_function_abundances(contribution_table, function_hierarchy_table)
+
+		session$sendCustomMessage(type="function_averages",paste(paste(colnames(function_mean_abundance_table), collapse="\t"), paste(sapply(1:nrow (function_mean_abundance_table), function(row){return(paste(function_mean_abundance_table[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
+
+		javascript_otu_table = convert_otu_table_to_javascript_table(otu_table)
+
+		# Set the value of the tracked OTU table so that we can send it in pieces to the browser
+		tracked_tables[["otu_table"]] = javascript_otu_table
+		
+  		# Tell the browser we're ready to start sending otu table data
+		session$sendCustomMessage(type="taxonomic_abundance_table_ready", length(javascript_otu_table))
+
+		javascript_contribution_table = convert_contribution_table_to_javascript_table(contribution_table)
+
+		# If a metadata factor has been selected, order samples by the indicated metadata factor
+		if (!is.null(metadata_factor())){
+			metadata_table = order_metadata_table_by_metadata_factor(metadata_table)
+		}
+
+		javascript_metadata_table = convert_metadata_table_to_javascript_table(metadata_table)
+
+		# If no metadata table was provided, send a NULL signal
+		if (is.null(javascript_metadata_table)){
+			session$sendCustomMessage("metadata_table", "NULL")
+
+		# Otherwise, send the javascript metadata table
 		} else {
-			taxa_hierarchy = default_tax_hierarchy_table
-			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
+			session$sendCustomMessage("metadata_table", javascript_metadata_table)
 		}
-	})
+		
+		otu_table_sample_order = get_otu_table_sample_order(javascript_otu_table, metadata_table)
 
-	observe({
-		if (!is.null(input$taxonomic_hierarchy_G)){
-			taxa_hierarchy_file = input$taxonomic_hierarchy_G
-			taxa_hierarchy_file_path = taxa_hierarchy_file$datapath
-			taxa_hierarchy = fread(taxa_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			if (ncol(taxa_hierarchy) > 1){
-				session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
-			} else {
-				session$sendCustomMessage("tax_hierarchy_labels", list(colnames(taxa_hierarchy)))
-			}
-			if ("Genus" %in% colnames(taxa_hierarchy)){
-				tracked_data$tax_summary_level = "Genus"
-			} else {
-				tracked_data$tax_summary_level = colnames(taxa_hierarchy)[ncol(taxa_hierarchy)]
-			}
-		} else {
-			taxa_hierarchy = default_tax_hierarchy_table
-			session$sendCustomMessage("tax_hierarchy_labels", colnames(taxa_hierarchy)[c(2:ncol(taxa_hierarchy), 1)])
-		}
-	})
+		function_table_sample_order = get_function_table_sample_order(javascript_contribution_table, metadata_table)
 
-	observe({
-		if (!is.null(input$function_hierarchy_R)){
-			func_hierarchy_file = input$function_hierarchy_R
-			func_hierarchy_file_path = func_hierarchy_file$datapath
-			func_hierarchy = fread(func_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			if (ncol(func_hierarchy) > 1){
-				session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[c(2:ncol(func_hierarchy), 1)])
-			} else {
-				session$sendCustomMessage("func_hierarchy_labels", list(colnames(func_hierarchy)))
-			}
-			if ("SubPathway" %in% colnames(func_hierarchy)){
-				tracked_data$func_summary_level = "SubPathway"
-			} else {
-				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
-			}
-		} else {
-			func_hierarchy = default_func_hierarchy_table
-			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
-		}
-	})
+		session$sendCustomMessage("taxonomic_abundance_sample_order", sapply(javascript_otu_table, function(element){
+			return(element[[first_metadata_level()]])
+		})[otu_table_sample_order])
+   		session$sendCustomMessage("function_abundance_sample_order", names(javascript_contribution_table)[function_table_sample_order])
 
-	observe({
-		if (!is.null(input$function_hierarchy_C)){
-			func_hierarchy_file = input$function_hierarchy_C
-			func_hierarchy_file_path = func_hierarchy_file$datapath
-			func_hierarchy = fread(func_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			if (ncol(func_hierarchy) > 1){
-				session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[c(2:ncol(func_hierarchy), 1)])
-			} else {
-				session$sendCustomMessage("func_hierarchy_labels", list(colnames(func_hierarchy)))
-			}
-			if ("SubPathway" %in% colnames(func_hierarchy)){
-				tracked_data$func_summary_level = "SubPathway"
-			} else {
-				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
-			}
-		} else {
-			func_hierarchy = default_func_hierarchy_table
-			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
-		}
-	})
+		# Set the value of the tracked contribution table so that we can send it in pieces to the browser
+		tracked_tables[["contribution_table"]] = javascript_contribution_table
 
-	observe({
-		if (!is.null(input$function_hierarchy_G)){
-			func_hierarchy_file = input$function_hierarchy_G
-			func_hierarchy_file_path = func_hierarchy_file$datapath
-			func_hierarchy = fread(func_hierarchy_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			if (ncol(func_hierarchy) > 1){
-				session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[c(2:ncol(func_hierarchy), 1)])
-			} else {
-				session$sendCustomMessage("func_hierarchy_labels", list(colnames(func_hierarchy)))
-			}
-			if ("SubPathway" %in% colnames(func_hierarchy)){
-				tracked_data$func_summary_level = "SubPathway"
-			} else {
-				tracked_data$func_summary_level = colnames(func_hierarchy)[ncol(func_hierarchy)]
-			}
-		} else {
-			func_hierarchy = default_func_hierarchy_table
-			session$sendCustomMessage("func_hierarchy_labels", colnames(func_hierarchy)[2:ncol(func_hierarchy)])
-		}
-	})
+		# Tell the browser how many samples there are
+		session$sendCustomMessage("number_of_samples_message", length(javascript_contribution_table))
 
-	observe({
-		if (!is.null(input$sample_map_R)){
-			sample_map_file = input$sample_map_R
-			sample_map_file_path = sample_map_file$datapath
-			sample_map = fread(sample_map_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			session$sendCustomMessage("sample_map_labels", colnames(sample_map)[2:ncol(sample_map)])
-		}
-	})
-
-	observe({
-		if (!is.null(input$sample_map_C)){
-			sample_map_file = input$sample_map_C
-			sample_map_file_path = sample_map_file$datapath
-			sample_map = fread(sample_map_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			session$sendCustomMessage("sample_map_labels", colnames(sample_map)[2:ncol(sample_map)])
-		}
-	})
-
-	observe({
-		if (!is.null(input$sample_map_G)){
-			sample_map_file = input$sample_map_G
-			sample_map_file_path = sample_map_file$datapath
-			sample_map = fread(sample_map_file_path, sep = "\t", header=T, stringsAsFactors = F)
-			session$sendCustomMessage("sample_map_labels", colnames(sample_map)[2:ncol(sample_map)])
-		}
+		# Tell the browser we're read to start sending contribution table data
+		session$sendCustomMessage(type="contribution_table_ready", length(javascript_contribution_table))
 	})
 })

@@ -26,11 +26,6 @@ draw_svg = function() {
 
 		trees.SetUp(navDims);
 		
-// 		patternSVG = d3.select("#patternsvg")
-// 			.attr("viewBox","0 0 " + width + " " + height + "")
-// 			.attr("preserveAspectRatio","none");
-// 
-// 		console.log("modified patternsvg")
 		d3.select("body").attr("class","svgBody");
 
 		MainSVG = d3.select("#mainplot").append("svg")
@@ -269,15 +264,6 @@ Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples)
 Shiny.addCustomMessageHandler("abort", function(message){
 	d3.select("#mainsvg").remove();
 	alert(message);
-	document.getElementById("taxonomic_abundances_1").value = null
-	document.getElementById("taxonomic_abundances_2").value = null
-	document.getElementById("read_counts").value = null
-	document.getElementById("genome_annotations").value = null
-	document.getElementById("function_contributions").value = null
-	document.getElementById("function_abundances").value = null
-	document.getElementById("taxonomic_hierarchy").value = null
-	document.getElementById("function_hierarchy").value = null
-	document.getElementById("sample_map").value = null
 })
 
 update_progress = function(curr_sample, total_samples){
@@ -294,13 +280,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var grouping = null;
 	if (mainui.uploadMode == "example"){
 		grouping = "Group";
-	} else if (mainui.uploadMode == "Read"){
-		grouping = document.getElementById("sampgroupselector_R").value;
-	} else if (mainui.uploadMode == "Contribution"){
-		grouping = document.getElementById("sampgroupselector_C").value;
-	} else if (mainui.uploadMode == "Genome"){
-		grouping = document.getElementById("sampgroupselector_G").value;
+	} else {
+		grouping = document.getElementById("metadata_factor_selector").value;
 	}
+	
 	// Find the new window size, adjust the aspect ratio
 	aspecrat = window.innerWidth / window.innerHeight;
 	width = 1000 * aspecrat;
@@ -362,21 +345,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	
 	func_averages = d3.tsv.parse(func_averages);
 	samplemap = d3.tsv.parse(samp_map_text);
-
-	/*	otu_abundance_data_transpose = d3.tsv.parse(tax_abund_text);
-	var fix_otus = function(otu_data, samples){
-		new_otu_data = []
-		for(j=0; j < samples.length; j++){
-			new_otu_data[j] = {}
-			new_otu_data[j]["Sample"] = samples[j]
-			for(k=0; k < otu_data.length; k++){
-				new_key = "OTU_ID_"+otu_data[k]["OTU_ID"] // Can we key anonymously? Maybe set name of column ourselves so it always matches
-				new_otu_data[j][new_key] = +otu_data[k][samples[j]]
-			}
-		}	
-		return new_otu_data;
-	}
-	otu_abundance_data = fix_otus(otu_abundance_data_transpose, d3.keys(contribution_table).sort()) //this puts samples in alphabetical order currently*/
 	
 	otu_abundance_data = otu_table
 
@@ -392,14 +360,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var color_option = null;
 	if (mainui.uploadMode == "example"){
 		color_option = "Categories";
-	} else if (mainui.uploadMode == "Read"){
-		color_option = d3.select("#color_option_selector_R").property("value")	
-	} else if (mainui.uploadMode == "Contribution"){
-		color_option = d3.select("#color_option_selector_C").property("value")	
-	} else if (mainui.uploadMode == "Genome"){
-		color_option = d3.select("#color_option_selector_G").property("value")	
+	} else {
+		color_option = d3.select("#color_option_selector").property("value");
 	}
-	
+
 // 	var changeAlpha = function(color, alphaVal){ 
 // 		color = d3.rgb(color.toString())
 // 		color["r"] = alphaVal * color["r"]
@@ -512,7 +476,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      }
 		return color_scale;
 	}
-
 	if(color_option == "Categories"){
 	
 		//set up colors using data cube
@@ -563,8 +526,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 		taxa_colors.domain(main_taxa)
 		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
-		console.log(main_taxa)
-		console.log(taxa_colors.range())
 
 		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
 		col1 = d3.rgb("black") //.brighter()
@@ -720,7 +681,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	//draw the stacked bar
 
 	var stackData = getFuncBarData();
-
 	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping);
 
 
@@ -756,32 +716,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
     //d3.select(self.frameElement).style("height", "800px");
 
 	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall, taxa_colors, func_colors, function() {
-		//updateFunc when a node is clicked
-		//update other tree (dehighlight)
-				//dehighlight everything
-// 		data_cube.displayed_taxa.map(function(e){
-// 			console.log(e)
-// 			var treedatainterest = trees.treestructure["taxa"].nodes(roots["taxa"]).filter( function(f) {
-// 				return f.key == e;
-// 			});
-// 			var data = treedatainterest[0];
-// 			console.log(data.thisandparents)
-// 			console.log(data.thisandparents==null)
-// 			if(data.thisandparents !== null){ //if it has ever been highlighted
-// 				dehighlightOverall(e, "", 1); 
-// 			}
-// 			});
-// 				
-// 		data_cube.displayed_funcs.map(function(e){
-// 			console.log(e)
-// 			var treedatainterest = trees.treestructure["func"].nodes(roots["func"]).filter( function(f) {
-// 				return f.key == e;
-// 			});
-// 			var data = treedatainterest[0];
-// 			if(data.thisandparents !== null){
-// 				dehighlightOverall("", e, 2); 
-// 			}
-// 			});		
+	
 		for (var i=0; i < data_cube.displayed_taxa; i++){
 			dehighlightOverall(data_cube.displayed_taxa[i], "", 1)
 			for (var j=0; j < data_cube.displayed_funcs; j++){

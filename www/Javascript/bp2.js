@@ -7,16 +7,7 @@
 	bP.partData = function(data, displayed_taxa, displayed_funcs){
 		var sData={};
 		var cat1 = d3.keys(data[0])[0], cat2 = d3.keys(data[0])[1], num3 = d3.keys(data[0])[2];
-		//console.log(displayed_taxa.toSource());
-		//console.log(displayed_funcs.toSource());
 		sData.keys=[displayed_taxa, displayed_funcs];
-		// sData.keys=[
-		// 	// d3.set(d3.keys(data)).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
-		// 	// d3.set(d3.keys(data).map(function(d){ return data[d].values})).values().sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})
-		// 	d3.set(data.map(function(d){ return d[cat1];})).values(),//.sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);}),
-		// 	d3.set(data.map(function(d){ return d[cat2];})).values() //.sort(function(a,b){ return ( a<b? -1 : a>b ? 1 : 0);})		
-		// ];
-		// need to get to match in tree order so may want another way to get unique values
 		
 		sData.data = [	sData.keys[0].map( function(d){ return sData.keys[1].map( function(v){ return 0; }); }),
 						sData.keys[1].map( function(d){ return sData.keys[0].map( function(v){ return 0; }); }) 
@@ -32,11 +23,6 @@
 		function visualize(data){
 		var vis ={};
 		function calculatePosition(a, s, e, b, m){
-			// console.log("a"+a);
-			// console.log("s"+s);
-			// console.log("e"+e);
-			// console.log("b"+b);
-			// console.log("m"+m);
 
 			var total=a.length;
 
@@ -65,7 +51,6 @@
 					d.percent = (total == 0 ? 0 : d.value/total);
 					sum+=2*b+d.height;
 					d.wid=d.value;
-					//console.log(d.wid);
 				}
 			);
 			return ret;
@@ -95,8 +80,6 @@
 				return (a.key1 < b.key1 ? -1 : a.key1 > b.key1 ? 
 						1 : a.key2 < b.key2 ? -1 : a.key2 > b.key2 ? 1: 0 )});
 		});
-
-		//console.log(vis.subBars[0].toSource());
 		
 		vis.edges = vis.subBars[0].map(function(p,i){
 
@@ -111,11 +94,7 @@
 				wid:p.value
 			};
 		});
-		//console.log(vis.edges.length);
-		//console.log(vis.edges[0].val);
 		vis.edges = vis.edges.filter(function(d){ return d.val!==0});
-		//console.log(vis.edges[0].toSource());
-		//console.log(vis.edges.length);
 		vis.keys=data.keys;
 		return vis;
 	}
@@ -141,11 +120,6 @@
 		}else if (nbar < 11) {padding = 10;
 		}else if (nbar < 25) {padding = 5;
 		}else { nbar = 4;}
-// 		console.log(nbar)
-// 		console.log(padding)
-// 		console.log(nbar*10+padding*12)
-// 		console.log(b)
-
 		
 		saveLegBar = d3.select("#"+id).select(".part"+p).append("svg")
 			.attr("id","saveLegBar"+p)			
@@ -180,8 +154,7 @@
 			.attr("x", 0)
 			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
 			.attr("width",extra_width - bb)
-			.attr("height",function(d){ 
-				//console.log(d.height)
+			.attr("height",function(d){
 				return (d.height - padding); })
 			.style("fill-opacity",0).style("stroke-opacity",0)
 
@@ -189,12 +162,10 @@
 			.attr("x", p == 0 ? (extra_width -bb - b) : 0)//0)
 			.attr("y",function(d){ return (d.middle-d.height/2 + (padding/2)); })
 			.attr("width",b)
-			.attr("height",function(d){ 
-				//console.log(d.height)
+			.attr("height",function(d){
 				return (d.height - padding); })
 			.style("shape-rendering","auto")
 			.style("fill", function(d) {return colors(data.keys[p][d["key"]])} )
-			//.style("fill-opacity",.75)
 			.style("stroke-width","0.5")
 			.style("stroke","black").style("stroke-opacity",0)
 			.transition().duration(300);
@@ -205,30 +176,14 @@
 			fontSize = 24/Math.log(data.keys[p].length) + 2;
 		}
 		mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
-		
-	
-/*		mainbar.append("rect")               //Uncomment this to help with aligning the text to the middle
-			.attr("x". p == 0 ? (extra_width -bb - b) : 0)//0)
-			.attr("y",function(d){ return (d.middle-1); })
-			.attr("width",extra_width - bb)
-			.attr("height",2)
-			.style("fill","black");*/
  		
-		//console.log('----------------------')
 		if (p == 1) { //only split function labels into multiline if too long
 			mainbar.selectAll("text").each( function(d,i) {
 				var thistxt = d3.select(this);
-				//console.log(thistxt.text());
-				var thisbbox = thistxt[0][0].getBBox();	
-				//console.log('bboxw: ' + (c1[p] + thisbbox.width) + ' , barw: ' + (extra_width - bb - (d.height - padding)/2));
+				var thisbbox = thistxt[0][0].getBBox();
 				if ((c1[p] + thisbbox.width) > (extra_width - bb - b)) {
-					//console.log(thistxt.text());
 					var txt = thistxt.text();
-					//console.log('editing ' + txt);
-					//var lastsp = (txt.length - 1) - txt.split('').reverse().join('').indexOf(' ');
 					var lastsp = Math.ceil(txt.length/2) + txt.substring(Math.ceil(txt.length/2),txt.length).indexOf(' ');
-					//console.log('last space at : ' + lastsp);
-					//console.log('substring: ' + txt.substring(0,lastsp));
 					thistxt.text(txt.substring(0,lastsp));
 					thistxt.attr("y", d.middle - ((thisbbox.height + 0.2*(d.height - 25)) / 2.5))
 					thistxt.append("tspan")
@@ -282,14 +237,6 @@
 				})
 			.on("mouseover", function(d,i){ 
 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
-					//var current_data = this._current;
-					//highlightall(displayed_taxa[current_data.key0], displayed_funcs[current_data.key1], 3)
-					//bP.selectEdge(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall);
-					//console.log(d3.select("#"+id+"0"+displayed_taxa[current_data.key0]))
-
-// 				} else if(d3.select(this).attr("visibility") !== "hidden"){
-// 					bP.selectEdge(id, i, current_data, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall);					
-// 				}
 			})
 			.on("mouseout", function(d,i){ 
 				current_data = this._current
@@ -305,19 +252,6 @@
 								return 0.8;
 							}
 							});//.style("fill", "grey");
-// 					var current_data = this._current;
-// 					if(d3.select("#Genomes0"+displayed_taxa[(current_data.key0).replace(/ /g, "_")]).attr("highlighted")=="true"){
-// 						//restore to before mouseover
-// 						highlightall(displayed_taxa[current_data.key0], "", 1)
-// 					} else if(d3.select("#Genomes1"+displayed_funcs[(current_data.key1).replace(/ /g, "_")]).attr("highlighted")=="true"){
-// 						highlightall("", displayed_funcs[current_data.key1], 2)
-// 					}
-					//bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);
-// 				} else if(d3.select(this).attr("visibility") !== "hidden"){
-// 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",0.8);//.style("fill", "grey");
-// 					var current_data = this._current;
-// 					bP.deselectEdge(id, i, current_data, displayed_taxa, displayed_funcs, dehighlightall, taxa_colors, func_colors);					
-// 				}
 			})
 			.on("click", function(d,i){
 				current_data = this._current
@@ -466,34 +400,7 @@
 		svg.append("g")
 			.attr("id", bip.id);
 
-		// var brush = svg.append("g")
-  //     		.datum(function() { return {selected: false, previouslySelected: false}; })
-  //     		.attr("class", "brush")
-  //     		.call(d3.svg.brush()
-	 //       		.x(d3.scale.identity().domain([0, width]))
-  //   	    	.y(d3.scale.identity().domain([0, height]))
-		// 		.on("brush", function(){
-		// 			var extent = brush.extent();
-  // 					edges.classed("selected", function(d) {
-  // 						selectEdge(id, i, current_data);
-  // 						console.log(d.toSource());
-  //   					is_brushed = extent[0] <= d.index && d.index <= extent[1];
-  //   					return is_brushed;
-  // 					});
-		// 		})
-		// 		.on("brushend", function(){
-
-		// 		}));
-
-		// svg.append("g")
-		// 	.attr("class", "brush")
-		// 	.call(brush)
-		// 	.selectAll('rect')
-		// 	.attr('height', height);
-
 		height = dims.height - dims.header;
-				//.attr("transform","translate("+ (550*s)+",0)");
-		//console.log(bip.data.data.toSource());		
 		var visData = visualize(bip.data);
 		visData["edges"] = visData.edges.map(function(d){
 			sub_contrib = avg_contrib_data[displayed_taxa[d.key1]][displayed_funcs[d.key2]]
@@ -506,7 +413,6 @@
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
 		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
-//		drawHeader(bip.header, bip.id);
 
 			
 		[0,1].forEach(function(p){			
@@ -540,7 +446,6 @@
 				})
 				.on("click", function(d,i){
 					if(d3.select(this).classed("highlighted") == "false"){
-						//console.log(d3.select(this).attr("highlighted") == "false")
 						current_id = d3.select(this).attr("id")
 						//Unselect things currently clicked
 						displayed_taxa.map(function(e){
@@ -588,19 +493,6 @@
 		svg.select("#"+bip.id).remove(); //.transition();
 		svg.append("g")
 			.attr("id", bip.id);
-			
-		console.log(displayed_taxa)
-
-// var svg = d3.select('#barChart')
-//        .append('svg')
-//        .attr('width', width + margins.left + margins.right)
-//        .attr('height', height + margins.top + margins.bottom)
-//        .append('g')
-//        .attr('transform', 'translate(' + margins.left + ',' + margins.top + ')');
-
-// 		d3.select(#+bip.id).select("svg").remove();
-// 		svg.select(#+bip.id).transition();
-// 		//or .remove()?
 
 		var visData = visualize(bip.data);
 		visData["edges"] = visData.edges.map(function(d){
@@ -611,13 +503,9 @@
 			return {h1: d.h1, h2: d.h2, key1: d.key1, key2: d.key2, val: d.val, wid: 100*sub_contrib/d3.sum(all_func), y1: d.y1, y2:d.y2 };
 			})
 
-		//updatePart(visData, bip.id, 0);
-		//updatePart(visData, bip.id, 1);
-
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
 		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
-		//drawHeader(bip.header, bip.id);
 		
 			
 		[0,1].forEach(function(p){			
@@ -631,7 +519,6 @@
 					if(p == 0){ //get rid of spaces
 						return bip.id+p+displayed_taxa[i].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_");
 						} else {
-						//console.log(bip.id+p+displayed_funcs[i].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_"))
 						return bip.id+p+displayed_funcs[i].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_");
 					}
 				})
@@ -691,16 +578,11 @@
 				})
 				.on("click", function(d,i){
 					if(d3.select(this).classed("clicked") == false){ //if not already clicked
-						//console.log(d3.select(this).attr("highlighted") == "false")
 						current_id = d3.select(this).attr("id")
-						console.log(current_id)
 						//Unselect things currently clicked
 						displayed_taxa.map(function(e,j){
 							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
 							if(d_id !== current_id){ //if not currently selected thing
-								console.log(e)
-								console.log(current_id) 
-								console.log(d3.select("#"+d_id))
 								if(d3.select("#"+d_id).classed("highlighted")==true){
 									d3.select("#"+d_id).classed("highlighted",false)
 									d3.select("#"+d_id).classed("clicked",false)
@@ -810,7 +692,6 @@
 			} else {
 				var trimstr = displayed_taxa[s].replace(/\W+/g,'') + "_tx";
 				current_color = taxa_colors(displayed_taxa[s]);
-				console.log(current_color)
 			}
 			
 
@@ -839,7 +720,6 @@
 			if(no_edges == false){
 			var selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 				.filter(function(d,i){ return (d["key"+(m+1)]==s); });
-			//console.log(selectedEdges.toSource());
 
 
 			selectedEdges.attr("points", bP.edgePolygon2)

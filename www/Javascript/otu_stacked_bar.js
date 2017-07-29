@@ -209,7 +209,6 @@
       	//need to de-highlight everything first
         current_rectangle_data = d3.select(this).datum();
         current_id = "Genomes0"+current_rectangle_data.name.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
-        console.log(current_id)
       	clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   		clickedTaxaBars = d3.select("#Genomes").select(".part0").selectAll(".mainbars").select(".clicked")
   		clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
