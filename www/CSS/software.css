@@ -78,7 +78,6 @@
 
 .tt {
     position:relative;
-    z-index:24;
 }
 
 .tt span{ display: none; }
