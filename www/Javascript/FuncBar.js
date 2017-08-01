@@ -76,7 +76,7 @@
 
 
 
-  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping){
+  fB.Draw = function(stackdata, sampledata, colors, svglink, dims, highlight_overall, dehighlight_overall, sampleColor, sample_order, grouping, displayed_taxa, displayed_funcs, clickResponse){
 
   d3.select("#func_bar_y_label").remove()
   d3.select("#func_bar_x_label").remove()
@@ -267,6 +267,11 @@
 				return tooltip.style("visibility", "hidden");
 			}
 		}
+  })
+  .on("click", function(d,i){
+    	current_rectangle_data = d3.select(this).datum();
+        current_id = "Genomes1"+current_rectangle_data.func.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+		clickResponse(current_id, current_rectangle_data.func, "funcs", displayed_taxa, displayed_funcs)
   });
 
       //get the x axis set

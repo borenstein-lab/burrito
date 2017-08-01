@@ -323,7 +323,6 @@
 				current_data = this._current
 				if(d3.select(this).classed("highlighted")==false){
 				//unselect other edges
-					console.log("Not highlighted??")
 				} 
 				if(d3.select(this).classed("clicked")==true){ //edge already clicked
 					d3.select(this).style("opacity", 0.8)
@@ -455,7 +454,7 @@
 		//
 	}	
 	
-	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
+	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse){
 		
 		bb = dims.width * .075;
 		b = dims.width / 50;
@@ -463,133 +462,21 @@
 		extra_width = (dims.width /2) - dims.treewidth;
 		//add parameters here once I figure out ideal
 		
-		svg.append("g")
-			.attr("id", bip.id);
-
-		// var brush = svg.append("g")
-  //     		.datum(function() { return {selected: false, previouslySelected: false}; })
-  //     		.attr("class", "brush")
-  //     		.call(d3.svg.brush()
-	 //       		.x(d3.scale.identity().domain([0, width]))
-  //   	    	.y(d3.scale.identity().domain([0, height]))
-		// 		.on("brush", function(){
-		// 			var extent = brush.extent();
-  // 					edges.classed("selected", function(d) {
-  // 						selectEdge(id, i, current_data);
-  // 						console.log(d.toSource());
-  //   					is_brushed = extent[0] <= d.index && d.index <= extent[1];
-  //   					return is_brushed;
-  // 					});
-		// 		})
-		// 		.on("brushend", function(){
-
-		// 		}));
-
-		// svg.append("g")
-		// 	.attr("class", "brush")
-		// 	.call(brush)
-		// 	.selectAll('rect')
-		// 	.attr('height', height);
-
 		height = dims.height - dims.header;
-				//.attr("transform","translate("+ (550*s)+",0)");
-		//console.log(bip.data.data.toSource());		
-		var visData = visualize(bip.data);
-		visData["edges"] = visData.edges.map(function(d){
-			sub_contrib = avg_contrib_data[displayed_taxa[d.key1]][displayed_funcs[d.key2]]
-			//divided by all the things with that function
-			all_func = d3.keys(avg_contrib_data).map(function(e){ 
-				return avg_contrib_data[e][displayed_funcs[d.key2]]; })					
-			return {h1: d.h1, h2: d.h2, key1: d.key1, key2: d.key2, val: d.val, wid: 300*sub_contrib/d3.sum(all_func), y1: d.y1, y2:d.y2 };
-		})
 
-		drawPart(visData, bip.id, 0, taxa_colors);
-		drawPart(visData, bip.id, 1, func_colors); 
-		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
-//		drawHeader(bip.header, bip.id);
+		bP.updateGraph(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse) //bip id has to be the same
 
-			
-		[0,1].forEach(function(p){			
-			d3.select("#"+bip.id)
-				.select(".part"+p)
-				.select(".mainbars")
-				.selectAll(".mainbar")
-				.classed("highlighted",false)
-				.attr("id",function(d,i){
-					if(p == 0){
-						return bip.id+p+displayed_taxa[i].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_");
-						} else {
-						return bip.id+p+displayed_funcs[i].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_");
-					}
-				})
-				.on("mouseover",function(d, i){ 
-					if (p == 0) {
-						return highlightall(displayed_taxa[i],"",1);
-					} else {
-					return highlightall("", displayed_funcs[i],2);
-				} 
-				})						
-				.on("mouseout",function(d, i){ 
-					if(d3.select(this).classed("highlighted") =="false"){
-					if (p == 0) {
-						return dehighlightall(displayed_taxa[i],"",1);
-					} else {
-						return dehighlightall("", displayed_funcs[i],2);
-					}
-					}
-				})
-				.on("click", function(d,i){
-					if(d3.select(this).classed("highlighted") == "false"){
-						//console.log(d3.select(this).attr("highlighted") == "false")
-						current_id = d3.select(this).attr("id")
-						//Unselect things currently clicked
-						displayed_taxa.map(function(e){
-							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
-							if(d_id != current_id){
-								if(d3.select("#"+d_id).classed("highlighted")=="true"){
-									d3.select("#"+d_id).classed("highlighted",false)
-									dehighlightall(e,"",1);
-								}}})
-						displayed_funcs.map(function(e){
-							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
-							if(d_id != current_id){
-								if(d3.select("#"+d_id).classed("highlighted")=="true"){
-									d3.select("#"+d_id).classed("highlighted",false)
-									dehighlightall(e,"",2)
-								}}})
-
-						d3.select(this).attr("highlighted",true)
-						d3.select("#Genomes").select(".edges").selectAll(".edge")
-							.filter(function(d,i){ 
-								return (d["key"+(p+1)]==i); })
-							.classed("highlighted", true);
-					if (p == 0) {
-							return highlightall(displayed_taxa[i],"",1);
-						} else {
-							return highlightall("", displayed_funcs[i],2);						
-						}
-					} else {
-						d3.select(this).classed("highlighted",false)
-						if (p == 0) {
-							return dehighlightall(displayed_taxa[i],"",1);
-						} else {
-							return dehighlightall("", displayed_funcs[i],2);
-						}					
-					}
-				});	
-						});
 
 	}
 		
 
-	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
 		svg.append("g")
 			.attr("id", bip.id);
 			
-		console.log(displayed_taxa)
 
 // var svg = d3.select('#barChart')
 //        .append('svg')
@@ -690,95 +577,100 @@
 				}
 				})
 				.on("click", function(d,i){
-					if(d3.select(this).classed("clicked") == false){ //if not already clicked
-						//console.log(d3.select(this).attr("highlighted") == "false")
-						current_id = d3.select(this).attr("id")
-						console.log(current_id)
-						//Unselect things currently clicked
-						displayed_taxa.map(function(e,j){
-							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
-							if(d_id !== current_id){ //if not currently selected thing
-								console.log(e)
-								console.log(current_id) 
-								console.log(d3.select("#"+d_id))
-								if(d3.select("#"+d_id).classed("highlighted")==true){
-									d3.select("#"+d_id).classed("highlighted",false)
-									d3.select("#"+d_id).classed("clicked",false)
-									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-										.filter(function(f,k){ 
-										return (f["key1"]==j); })
-									assocEdges.select(".clicked").each(function(m){
-										dehighlightall(m.key1, m.key2, 3)
-									})
-									assocEdges.classed("highlighted", false)
-									assocEdges.classed("clicked", false)
-									assocEdges.style("opacity", 0)
-									dehighlightall(e,"",1);
-								}}})
-						
-						displayed_funcs.map(function(e,j){
-							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
-							if(d_id !== current_id){
-								if(d3.select("#"+d_id).classed("highlighted")==true){
-									d3.select("#"+d_id).classed("highlighted",false)
-									d3.select("#"+d_id).classed("clicked",false)
-									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge").filter(function(f,k){ 
-										return (f["key2"]==j); })
-									assocEdges.select(".clicked").each(function(m){
-										dehighlightall(m.key1, m.key2, 3)
-									})
-
-									assocEdges.classed("highlighted", false)
-									assocEdges.classed("clicked", false);
-																			
-									assocEdges.attr("visibility", "hidden")
-									assocEdges.style("opacity", 0)
-									dehighlightall("", e, 2)
-								}}})
-
-						d3.select("#"+current_id).classed("highlighted",true)
-						d3.select("#"+current_id).classed("clicked",true)
-						
-						//connecting edges
-						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-							.filter(function(e,j){ 
-								return (e["key"+(p+1)]==i); })
-						selectedEdges.classed("highlighted", true);
-						if (p == 0) {
-							return highlightall(displayed_taxa[i],"",1);
-						} else {
-							return highlightall("", displayed_funcs[i],2);						
-						}
-					} else { //if already clicked
-						d3.select(this).classed("highlighted",false)
-						d3.select(this).classed("clicked",false)
-						//dehighlight everything for good measure
-						d3.select("#Genomes").select(".part"+m).selectAll(".mainbars").classed("highlighted", false).classed("clicked",false)
-						//clicked edges
-						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
-							.filter(function(e,j){ 
-								return (e["key"+(p+1)]==i); })
-						clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
-						selectedEdges.classed("highlighted", false)
-						selectedEdges.classed("clicked", false);
-						//dehighlight bar on other side assoicated with edge
-						
-						if(clickedEdges.empty() == false){
-						if(p ==0){
-							edgeOtherSide = clickedEdges.datum().key2
-							dehighlightall("", displayed_funcs[edgeOtherSide], 2)
-							} else {
-							edgeOtherSide = clickedEdges.datum().key1
-							dehighlightall(displayed_taxa[edgeOtherSide], "", 1)
-						}
-						}
-						
-						if (p == 0) {
-							return dehighlightall(displayed_taxa[i],"",1);
-						} else {
-							return dehighlightall("", displayed_funcs[i],2);
-						}					
+					current_id = d3.select(this).attr("id")
+					if (p == 0){
+						current_name = displayed_taxa[i]
+						list_type = "taxa"
+					} else {
+						current_name = displayed_funcs[i]
+						list_type = "funcs"
 					}
+					clickResponse(current_id, current_name, list_type, displayed_taxa, displayed_funcs)
+// 					if(d3.select(this).classed("clicked") == false){ //if not already clicked
+// 						//console.log(d3.select(this).attr("highlighted") == "false")
+// 						current_id = d3.select(this).attr("id")
+// 						//Unselect things currently clicked
+// 						displayed_taxa.map(function(e,j){
+// 							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+// 							if(d_id !== current_id){ //if not currently selected thing
+// 								if(d3.select("#"+d_id).classed("highlighted")==true){
+// 									d3.select("#"+d_id).classed("highlighted",false)
+// 									d3.select("#"+d_id).classed("clicked",false)
+// 									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+// 										.filter(function(f,k){ 
+// 										return (f["key1"]==j); })
+// 									assocEdges.select(".clicked").each(function(m){
+// 										dehighlightall(m.key1, m.key2, 3)
+// 									})
+// 									assocEdges.classed("highlighted", false)
+// 									assocEdges.classed("clicked", false)
+// 									assocEdges.style("opacity", 0)
+// 									dehighlightall(e,"",1);
+// 								}}})
+// 						
+// 						displayed_funcs.map(function(e,j){
+// 							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+// 							if(d_id !== current_id){
+// 								if(d3.select("#"+d_id).classed("highlighted")==true){
+// 									d3.select("#"+d_id).classed("highlighted",false)
+// 									d3.select("#"+d_id).classed("clicked",false)
+// 									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge").filter(function(f,k){ 
+// 										return (f["key2"]==j); })
+// 									assocEdges.select(".clicked").each(function(m){
+// 										dehighlightall(m.key1, m.key2, 3)
+// 									})
+// 
+// 									assocEdges.classed("highlighted", false)
+// 									assocEdges.classed("clicked", false);
+// 																			
+// 									assocEdges.attr("visibility", "hidden")
+// 									assocEdges.style("opacity", 0)
+// 									dehighlightall("", e, 2)
+// 								}}})
+// 
+// 						d3.select("#"+current_id).classed("highlighted",true)
+// 						d3.select("#"+current_id).classed("clicked",true)
+// 						
+// 						//connecting edges
+// 						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+// 							.filter(function(e,j){ 
+// 								return (e["key"+(p+1)]==i); })
+// 						selectedEdges.classed("highlighted", true);
+// 						if (p == 0) {
+// 							return highlightall(displayed_taxa[i],"",1);
+// 						} else {
+// 							return highlightall("", displayed_funcs[i],2);						
+// 						}
+// 					} else { //if already clicked
+// 						d3.select(this).classed("highlighted",false)
+// 						d3.select(this).classed("clicked",false)
+// 						//dehighlight everything for good measure
+// 						d3.select("#Genomes").select(".part"+m).selectAll(".mainbars").classed("highlighted", false).classed("clicked",false)
+// 						//clicked edges
+// 						selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+// 							.filter(function(e,j){ 
+// 								return (e["key"+(p+1)]==i); })
+// 						clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
+// 						selectedEdges.classed("highlighted", false)
+// 						selectedEdges.classed("clicked", false);
+// 						//dehighlight bar on other side assoicated with edge
+// 						
+// 						if(clickedEdges.empty() == false){
+// 						if(p ==0){
+// 							edgeOtherSide = clickedEdges.datum().key2
+// 							dehighlightall("", displayed_funcs[edgeOtherSide], 2)
+// 							} else {
+// 							edgeOtherSide = clickedEdges.datum().key1
+// 							dehighlightall(displayed_taxa[edgeOtherSide], "", 1)
+// 						}
+// 						}
+// 						
+// 						if (p == 0) {
+// 							return dehighlightall(displayed_taxa[i],"",1);
+// 						} else {
+// 							return dehighlightall("", displayed_funcs[i],2);
+// 						}					
+// 					}
 				});		
 		});
 		
@@ -810,7 +702,6 @@
 			} else {
 				var trimstr = displayed_taxa[s].replace(/\W+/g,'') + "_tx";
 				current_color = taxa_colors(displayed_taxa[s]);
-				console.log(current_color)
 			}
 			
 

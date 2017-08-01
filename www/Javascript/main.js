@@ -507,8 +507,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 		taxa_colors.domain(main_taxa)
 		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
-		console.log(main_taxa)
-		console.log(taxa_colors.range())
 
 		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
 		col1 = d3.rgb("black") //.brighter()
@@ -665,36 +663,36 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	var stackData = getFuncBarData();
 
-	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping);
+	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 
 
 	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, otu_sample_order);
 
-	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping);
+	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 
 
-	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall, avg_contrib_data);
+	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
 
 
 	function update_otu_bar(){
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
 		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, otu_sample_order);
-		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping);
+		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 	}
 
 	function update_func_bar(){
 		//remove old graph before redrawing new
 			FunctionBar.selectAll("g").remove();
 			var func_data = getFuncBarData();
-			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping);
+			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 
 	}
 
 	//data_cube.expand_func("Metabolism");
 	var bpData = getLinkData();
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data);
+	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
 
 
     //d3.select(self.frameElement).style("height", "800px");
@@ -811,7 +809,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	}
 
 	function dehighlightOverall(taxonName, functionName, highlightwhat, bars_only = false) {
-
 		if (highlightwhat == 1) {
 			// dehighlight tree
 			trees.dehighlightTree(taxonName, 'taxa');
@@ -863,33 +860,37 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 	}
 	
-	function unclickEverything(taxon_id, list_type){ //unclick everything not associated with a particular taxon or function
-		////IN PROGRESS
-			display_taxa.map(function(e,j){
-			d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
-			if(d_id !== current_id){
+	function clickResponse(id, name, list_type, displayed_taxa, displayed_funcs){ //unclick everything not associated with a particular taxon or function
+		      	if(d3.select("#"+id).classed("clicked") == false){ //if not already clicked
+						//Unselect things currently clicked
+						displayed_taxa.map(function(e,j){
+							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+							//if(d_id !== current_id){ //if not currently selected thing
 								if(d3.select("#"+d_id).classed("highlighted")==true){
 									d3.select("#"+d_id).classed("highlighted",false)
 									d3.select("#"+d_id).classed("clicked",false)
 									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 										.filter(function(f,k){ 
 										return (f["key1"]==j); })
+									assocEdges.select(".clicked").each(function(m){
+										dehighlightOverall(m.key1, m.key2, 3)
+									})
 									assocEdges.classed("highlighted", false)
 									assocEdges.classed("clicked", false)
 									assocEdges.style("opacity", 0)
-									dehighlightall(e,"",1);
-								}}})
+									dehighlightOverall(e,"",1);
+								//}
+								}})
 						
 						displayed_funcs.map(function(e,j){
 							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
-							if(d_id !== current_id){
 								if(d3.select("#"+d_id).classed("highlighted")==true){
 									d3.select("#"+d_id).classed("highlighted",false)
 									d3.select("#"+d_id).classed("clicked",false)
 									assocEdges = d3.select("#Genomes").select(".edges").selectAll(".edge").filter(function(f,k){ 
 										return (f["key2"]==j); })
 									assocEdges.select(".clicked").each(function(m){
-										dehighlightall(m.key1, m.key2, 3)
+										dehighlightOverall(m.key1, m.key2, 3)
 									})
 
 									assocEdges.classed("highlighted", false)
@@ -897,15 +898,72 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 																			
 									assocEdges.attr("visibility", "hidden")
 									assocEdges.style("opacity", 0)
-									dehighlightall("", e, 2)
-								}}})
+									dehighlightOverall("", e, 2)
+								}})
+
+						d3.select("#"+id).classed("highlighted",true)
+						d3.select("#"+id).classed("clicked",true)
+						
+						//connecting edges
+						if(list_type == "taxa"){
+							selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+								.filter(function(e,j){ 
+								return (e["key1"]==displayed_taxa.indexOf(name)) })
+						} else {
+							selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+								.filter(function(e,j){ 
+								return (e["key2"]==displayed_funcs.indexOf(name)) })
+						}
+						selectedEdges.classed("highlighted", true);
+						if(list_type == "taxa"){
+							return highlightOverall(name,"",1);
+						} else {
+							return highlightOverall("", name, 2);
+						}
+				} else { //if already clicked
+						d3.select("#"+id).classed("highlighted",false)
+						d3.select("#"+id).classed("clicked",false)
+						//dehighlight everything for good measure
+						d3.select("#Genomes").select(".part0").selectAll(".mainbars").classed("highlighted", false).classed("clicked",false)
+						//clicked edges
+						if(list_type == "taxa"){
+							selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+								.filter(function(e,j){ 
+								return (e["key1"]==displayed_taxa.indexOf(name)) })
+						} else {
+							selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
+								.filter(function(e,j){ 
+								return (e["key2"]==displayed_funcs.indexOf(name)) })
+						}
+
+						clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
+						selectedEdges.classed("highlighted", false)
+						selectedEdges.classed("clicked", false);
+						//dehighlight bar on other side assoicated with edge
+						
+						if(clickedEdges.empty() == false){
+							if(list_type=="taxa"){
+								edgeOtherSide = clickedEdges.datum().key2
+								dehighlightOverall("", displayed_funcs[edgeOtherSide], 2)
+							} else {
+								edgeOtherSide = clickedEdges.datum().key1
+								dehighlightOverall("", displayed_taxa[edgeOtherSide], 2)
+							}
+						}
+						
+						if(list_type == "taxa"){
+							return dehighlightOverall(name,"",1);
+						} else {
+							return dehighlightOverall("", name, 2);
+						}
+					}
 	}
 	
 	// Update the bipartite graph after changes to data_cube
 	function updateBPgraph() {
 		var bpData = getLinkData();
 		var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data);
+		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
 		return visdata;
 	}
 }

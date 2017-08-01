@@ -153,7 +153,6 @@
 	// Expands or collapses the source node, depending on whether it is currently open or closed
 	trees.update = function(source) {
 	
-		console.log(source)
 		
 		// Compute the new tree layout.
 		var nodes = trees.treestructure[source.type].nodes(roots[source.type]).reverse();
@@ -657,7 +656,6 @@
 
 	trees.highlightTree = function( name, type) {
 		//first, de-highlight everything else in the tree
-		
 		var treedatainterest = trees.treestructure[type].nodes(roots[type]).filter( function(d) {
 			return d.key == name;
 		} );
@@ -726,8 +724,8 @@
 			return d.key == name;
 		} );
 		var data = treedatainterest[0];
-		console.log(data.thisandparents)
-		if(data.thisandparents == null){ //do nothing if the thing has never been highlighted
+		//console.log(data.thisandparents)
+		if(data.hasOwnProperty('thisandparents') == false){ //do nothing if the thing has never been highlighted
 			var treedatainterest = trees.treestructure[type].nodes(roots[type]).filter( function(d) {
 			return d.key == name;
 			} );
