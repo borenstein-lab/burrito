@@ -130,10 +130,12 @@ path.link {
 	//cursor:default;
 }
 #sidebar_hide:hover {
-	opacity:1;
+	stroke:black;
+	cursor:pointer;
 }
 #sidebar_hide {
 	stroke:none;
+	stroke-width:2;
 }
 table.ExampleTable {
 	border: 1px solid black;
@@ -199,5 +201,14 @@ h2 {
 #tooLongTable {
 	width:100%;
 	overflow:auto;
+}
+#help_button {
+	cursor:default;
+}
+#help_background {
+	pointer-events:none;
+}
+#help_items {
+	pointer-events:none;
 }
 white-space: pre-line;

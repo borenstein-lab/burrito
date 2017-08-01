@@ -503,11 +503,6 @@
 
       // Create array of sample names from contributions file
       this.samples = d3.keys(contribution_table)
-      // for (sample in contribution_table){
-      //   if (this.samples.indexOf(sample) == -1){
-      //     this.samples.push(sample);
-      //   }
-      // }
 
       /////////////////////////////////////////////////////////////////////// taxa_tree /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -528,16 +523,19 @@
       for (var i = 0; i < this.taxa_tree.length; i++){
         curr_taxa.push(this.taxa_tree[i]);
       }
+
       for (; curr_taxa.length > 0;){
         curr_taxon = curr_taxa.shift();
         this.taxa_lookup[curr_taxon.key] = curr_taxon;
         level = 0
+
         //assign how far up from children this is
         if (!this.is_leaf(curr_taxon)){
           for (var i = 0; i < curr_taxon.values.length; i++){
             curr_taxa.push(curr_taxon.values[i]);
           }
           curr_taxon_level_count = curr_taxon
+          
           while(!this.is_leaf(curr_taxon_level_count)){
             level += 1
             curr_taxon_level_count = curr_taxon_level_count.values[0]
@@ -686,10 +684,8 @@
       //return no_cube_calculate_new_contribution(sample, taxon, func);
     }
 
-
     return data_cube;
-
-    }
+  }
 
   this.data_cube_wrapper = data_cube_wrapper;
 })();

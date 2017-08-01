@@ -1,956 +1,291 @@
-<!DOCTYPE html>
+<html>
+
 <head>
-<meta charset="utf-8">
-
-<title>Burrito Visualization</title>
-
-<script src="shared/jquery.js" type="text/javascript"></script>
-<script src="shared/shiny.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="shared/shiny.css"/>
-<script src="__assets__/shiny-server.js"></script>
-<link rel="stylesheet" type="text/css" href="CSS/burritostyle.css"/>
+	<title>Burrito [Elhanan Borenstein Lab]</title>
+	<!-- <link rel=stylesheet type="text/css" href="https://elbo.gs.washington.edu/css/styles.css"> -->
+	<script src="shared/jquery.js" type="text/javascript"></script>
+	<script src="shared/shiny.js" type="text/javascript"></script>
+	<link rel="stylesheet" type="text/css" href="shared/shiny.css"/>
+	<link rel="stylesheet" type="text/css" href="CSS/software.css">
+	<script src="__assets__/shiny-server.js"></script>
+	<link rel="stylesheet" type="text/css" href="CSS/burritostyle.css"/>
+	<meta charset="utf-8">
 
 </head>
 
-<body onresize="resizeRedraw()">
+<body topmargin="0" leftmargin="0" marginwidth="0" marginheight="0" onresize="resizeRedraw()">
 <div id="mainthing" style="overflow-x:auto">
 
+<!-- JUST FOR CENTERING - START -->
+<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">
+<tr valign="top" align="center"><td>
+<!-- JUST FOR CENTERING - END -->
 
-<img class="menuEl" border="0" src="images/title_lab_800.jpg"></img>
+<!-- PAGE TITLE - START-->
+	  <table border="0" width=640 cellspacing="0" cellpadding="0" class="normalTxt">
+	  <tr><td><img border="0" src="images/pixel.gif" width=1 height=5></td></tr>
+	  <tr><td><img border="0" src="images/title_lab_800.jpg"></td></tr>
+	  <tr><td><img border="0" src="images/pixel.gif" width=1 height=5></td></tr>
+	  <tr><td><img border="0" src="images/pixel.gif" width=1 height=5></td></tr>
+	  <tr><td>
+      <tr><td><span class="titleTxt">Burrito</span></td></tr>
+      <tr><td><img style="border-width:0" src="images/pixel.gif" height="15" hspace="0" vspace="0"></td></tr>
 
-<h2>Burrito: A Marriage of Taxonomy and Function</h2> 
-<img class="menuEl" border="1" src="images/bEXnotext.jpg" width="400"></img>		
 
-<p>This is a tool to visualize the relationship between taxonomy and function. You can view sample data or upload your own data.</p>
-<p>Source code available <a href="https://github.com/borenstein-lab/burrito">here</a></p>
-<p>Preview the tool with an example data set: <button type="button" name="example_button" id="example_button">Taste the burrito</button></p>
-<p>Or upload your own data, choosing one of the three upload options below:<p>
 
-<button class="inputSelectorB" id="ReadOption">
-	<b>OTU table</b>
-	<br/><br/>
-	Choose this option if you have an OTU table from 16S reads, like from QIIME.
-</button>
-<div id="ReadMenu" class="hidexp">
 
-<table class="uploadtable" width=100%>
-	<col>
-	<col>
-	<col align="right">
+<tr><td colspan=4>
+Burrito is a tool for visualizing the relationship between microbiome taxonomy and function. A detailed description of the input parameters and options is available in the <a href="http://elbo.gs.washington.edu/software_burrito/BurritoManual.pdf" class="normalLinkTxt">user manual</a>. Source code is available <a href="https://github.com/borenstein-lab/burrito">here</a><br><br>
+Want to try it out? Check this preview (using an example data set): <button type="button" name="example_button" id="example_button">Preview</button><br><br>
+
+If you are using Burrito please cite the following paper:<br>
+<em>In progress</em>
+<!-- Rogan Carr and Elhanan Borenstein (2012) <a class="normalLinkTxt" href="https://bioinformatics.oxfordjournals.org/content/28/5/734.abstract">NetSeed: A network-based reverse-ecology tool for calculating the metabolic interface of an organism with its environment.</a> <em>Bioinformatics</em>, 28(5): 734-735. (<a class="normalLinkTxt" href="https://elbo.gs.washington.edu/pub/netseed_carr_bioinf.pdf">PDF</a>) -->
+</td></tr>
+
+<tr><td colspan=4 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr>
+
+<!-- TAXONOMIC BLOCK -->
+<tr><td colspan=4>
+<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
 	<tr>
-		<td colspan=3>
-			<b>File Upload</b>
-		</td>
+	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Taxonomic Data</td>
+	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://elbo.gs.washington.edu/software_burito/BurritoManual.pdf">Manual&gt;Taxonomy</a></td>
 	</tr>
+	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td>
-			<div id="read_counts_g">
-				<b>16S rRNA OTU Table<b>
-				<br>
-				<input type="file" name="read_counts" id="read_counts">
+	<td>
+		Taxonomic abundance table: <input type="file" name="taxonomic_abundance_table" id="taxonomic_abundance_table">
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Upload a taxonomic abundance table<br>(can be raw read counts or relative abundances).</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td><a href="XXXX"><img src="images/example.png" style="vertical-align: middle;"></a></td>
+	</tr>
+
+	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
+	<tr>
+	<td>
+		<div id="taxonomic_hierarchy_choice" class="shiny-input-radiogroup">
+			Taxonomy:<br>
+			<div class="radio">
+				<input type="radio" name="taxonomic_hierarchy_choice" id="gg_taxonomic_hierarchy" value="DEFAULT" checked="checked"> Greengenes taxonomy (default; compatible with PICRUSt)<br>
 			</div>
-		</td>
-		<td>
-			A file containing abundances of each taxon in each sample. See documentation for an example.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>OTU</th>
-					<th>Sample1_Name</th>
-					<th>Sample2_Name</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>10</td>
-					<td>5</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>OTU2_ID</td>
-					<td>0</td>
-					<td>5</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Taxonomic Hierarchy
-			<input type="file" name="taxonomic_hierarchy_R" id="taxonomic_hierarchy_R">
-		</td>
-		<td>
-			A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>OTU</th>
-					<th>Taxa_Level_1</th>
-					<th>Taxa_Level_2</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>Bacteria</td>
-					<td>Firmicutes</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>OTU2_ID</td>
-					<td>Bacteria</td>
-					<td>Proteobacteria</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function Hierarchy
-			<input type="file" name="function_hierarchy_R" id="function_hierarchy_R">
-		</td>
-		<td>
-			A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Gene</th>
-					<th>Level_0</th>
-					<th>Level_1</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Gene1_Name</td>
-					<td>Metabolism</td>
-					<td>Lipid Metabolism</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Gene2_Name</td>
-					<td>Cellular Processes</td>
-					<td>Cell Motility</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Sample Map
-			<input type="file" name="sample_map_R" id="sample_map_R">
-		</td>
-		<td>
-			A file describing the relationship between samples, i.e. which ones are the same treatment condition.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Sample</th>
-					<th>Grouping_1</th>
-					<th>Grouping_2</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Sample1_Name</td>
-					<td>Case</td>
-					<td>Human</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Sample2_Name</td>
-					<td>Control</td>
-					<td>Mouse</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function Abundances
-			<input type="file" name="function_abundances_R" id="function_abundances_R">
-		</td>
-		<td>
-			A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Gene</th>
-					<th>Sample1_Name</th>
-					<th>Sample2_Name</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Gene1_Name</td>
-					<td>0.1</td>
-					<td>0.2</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Gene2_Name</td>
-					<td>0.3</td>
-					<td>0.25</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
+			<div class="radio">
+				<input type="radio" name="taxonomic_hierarchy_choice" id="custom_taxonomic_hierarchy" value="CUSTOM"> Custom taxonomy: <input type="file" name="custom_taxonomic_hierarchy_table" id="custom_taxonomic_hierarchy_table"><br>
+			</div>
+		</div>
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose a taxonomy for hierarchically displaying OTU relationships.</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td><a href="XXXX"><img src="images/example.png" style="vertical-align: middle;"></a></td>
 	</tr>
 
+	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td colspan=3>
-			<b>Visualization Options</b>
-		</td>
+	<td>
+		Minimum taxonomic resolution: <select name="taxonomic_level_of_detail_selector" id="taxonomic_level_of_detail_selector"></select>
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the minimum taxonomic resolution to view<br>(lower resolution may improve performance for large datasets).</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td></td>
 	</tr>
-	<tr>
-		<td>
-			Taxonomic level of detail
-			<br>
-			<select name="taxlevelofdetail_R" id="taxLODselector_R"></select>
-		</td>
-		<td colspan=2>
-			Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function level of detail
-			<br>
-			<select name="funclevelofdetail_R" id="funcLODselector_R"></select>
-		</td>
-		<td colspan=2>
-			Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Sample grouping
-			<br>
-			<select name="sampgroup_R" id="sampgroupselector_R"></select>
-		</td>
-		<td colspan=2>
-			Select a grouping for samples if desired. Requires uploading a sample map.
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Color scale
-			<br>
-			<select name="color_option_selector_R" id="color_option_selector_R">
-			<option value="Categories">Hierarchical color scale</option>
-			<option value="Random">Random color scale</option>
-			</select>
-		</td>
-		<td colspan=2>
-			Color scheme. Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.
-		</td>
-	</tr>
-	<tr>
-		<td colspan=3>
-			<h4>Draw the burrito</h4>
-		</td>
-	</tr>
-	<tr>
-		<td colspan=3>
-			<button id="update_button_R" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-		</td>
-	</tr>
+
 </table>
+</tr>
 
-</div>
+<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="10"  hspace="0" vspace="0"></td></tr>
 
-<button class="inputSelectorB" id="ContributionOption">
-	<b>Functional contributions</b>
-	<br/><br/>
-	Choose this option if you have an OTU table from 16S reads and have run PICRUST yourself.
-</button>
 
-<div id="ContributionMenu" class="hidexp">
-<table class="uploadtable" width=100%>
-	<col>
-	<col>
-	<col align="right">
+<!-- FUNCTIONAL BLOCK -->
+<tr><td colspan=4>
+<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
 	<tr>
-		<td colspan=3>
-			<b>File Upload</b>
-		</td>
+	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Functional Data</td>
+	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://elbo.gs.washington.edu/software_burito/BurritoManual.pdf">Manual&gt;Function</a></td>
 	</tr>
+	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td>
-			<div id="tax_counts_g">
-				<b>16S rRNA OTU Table<b>
-				<br>
-				<input type="file" name="taxonomic_abundances_2" id="taxonomic_abundances_2">
+	<td>
+		<div id="function_abundance_choice" class="shiny-input-radiogroup">
+			Metagenomics-based function abundances:<br>
+			<div class="radio">
+				<input type="radio" name="function_abundance_choice" id="no_function_abundance" value="ABSENT" checked="checked"> No metagenomic function abundances available (default)<br>
 			</div>
-		</td>
-		<td>
-			A file containing abundances of each taxon in each sample. See documentation for an example.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>OTU</th>
-					<th>Sample1_Name</th>
-					<th>Sample2_Name</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>10</td>
-					<td>5</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>OTU2_ID</td>
-					<td>0</td>
-					<td>5</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div id="func_contribution_g">
-				<b>Function Contributions<b>
-				<br>
-				<input type="file" name="function_contributions" id="function_contributions">
+			<div class="radio">
+				<input type="radio" name="function_abundance_choice" id="function_abundance" value="PRESENT"> Metagenomic function abundance table: <input type="file" name="function_abundance_table" id="function_abundance_table"><br>
 			</div>
-		</td>
-		<td>
-			An output file from PiCRUST, containing the contribution each taxa makes to each function.
-		</td>
-		<td>
-			<div id="tooLongTableDiv">
-				<div id="tooLongTable">
-					<table class="ExampleTable">
-						<tr>
-							<th>Gene</th>
-							<th>Sample</th>
-							<th>OTU</th>
-							<th>GeneCountPerGenome</th>
-							<th>OTUAbundanceInSample</th>
-							<th>CountContributedByOTU</th>
-							<th>ContributionPercentOfSample</th>
-							<th>ContributionPercentOfAllSamples</th>
-						</tr>
-						<tr>
-							<td>Gene1_Name</td>
-							<td>Sample1_Name</td>
-							<td>OTU1_ID</td>
-							<td>1.0</td>
-							<td>10.0</td>
-							<td>10.0</td>
-							<td>0.5</td>
-							<td>0.0002</td>
-						</tr>
-						<tr>
-							<td>Gene1_Name</td>
-							<td>Sample1_Name</td>
-							<td>OTU2_ID</td>
-							<td>2.0</td>
-							<td>5.0</td>
-							<td>10.0</td>
-							<td>0.5</td>
-							<td>0.0002</td>
-						</tr>
-						<tr>
-							<td>etc.</td>
-							<td>etc.</td>
-							<td>etc.</td>
-							<td>etc.</td>
-							<td>etc.</td>
-							<td>etc.</td>
-							<td>etc.</td>
-							<td>etc.</td>
-						</tr>
-					</table>
-				</div>
-			</div>
-		</td>
-	</tr>
-	
-	
-	
-	<tr>
-		<td>
-			Taxonomic Hierarchy
-			<input type="file" name="taxonomic_hierarchy_C" id="taxonomic_hierarchy_C">
-		</td>
-		<td>
-			A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>OTU</th>
-					<th>Taxa_Level_1</th>
-					<th>Taxa_Level_2</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>Bacteria</td>
-					<td>Firmicutes</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>OTU2_ID</td>
-					<td>Bacteria</td>
-					<td>Proteobacteria</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function Hierarchy
-			<input type="file" name="function_hierarchy_C" id="function_hierarchy_C">
-		</td>
-		<td>
-			A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Gene</th>
-					<th>Level_0</th>
-					<th>Level_1</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Gene1_Name</td>
-					<td>Metabolism</td>
-					<td>Lipid Metabolism</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Gene2_Name</td>
-					<td>Cellular Processes</td>
-					<td>Cell Motility</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Sample Map
-			<input type="file" name="sample_map_C" id="sample_map_C">
-		</td>
-		<td>
-			A file describing the relationship between samples, i.e. which ones are the same treatment condition.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Sample</th>
-					<th>Grouping_1</th>
-					<th>Grouping_2</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Sample1_Name</td>
-					<td>Case</td>
-					<td>Human</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Sample2_Name</td>
-					<td>Control</td>
-					<td>Mouse</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function Abundances
-			<input type="file" name="function_abundances_C" id="function_abundances_C">
-		</td>
-		<td>
-			A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Gene</th>
-					<th>Sample1_Name</th>
-					<th>Sample2_Name</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Gene1_Name</td>
-					<td>0.1</td>
-					<td>0.2</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Gene2_Name</td>
-					<td>0.3</td>
-					<td>0.25</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
+		</div>
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose whether you will be providing metagenomics-based functional data<br>to compare to the taxonomy-based function abundances.</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td><a href="XXXX"><img src="images/example.png" style="vertical-align: middle;"></a></td>
 	</tr>
 
+	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td colspan=3>
-			<b>Visualization Options</b>
-		</td>
+	<td>
+		<div id="contribution_method_choice" class="shiny-input-radiogroup">
+			Taxonomy-function linking method:<br>
+			<div class="radio">
+				<input type="radio" name="contribution_method_choice" id="picrust" value="PICRUST" checked="checked"> Run PICRUSt (default)<br>
+			</div>
+			<div class="radio">
+				<input type="radio" name="contribution_method_choice" id="genomic_content" value="GENOMIC_CONTENT"> Genomic content table: <input type="file" name="genomic_content_table" id="genomic_content_table"><br>
+			</div>
+			<div class="radio">
+				<input type="radio" name="contribution_method_choice" id="function_contribution" value="CONTRIBUTION"> Function contribution table: <input type="file" name="contribution_table" id="contribution_table"><br>
+			</div>
+		</div>
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the method for linking taxonomic abundances to metagenomic content.</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td><a href="XXXX"><img src="images/example.png" style="vertical-align: middle;"></a></td>
 	</tr>
+
+	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td>
-			Taxonomic level of detail
-			<br>
-			<select name="taxlevelofdetail_C" id="taxLODselector_C"></select>
-		</td>
-		<td colspan=2>
-			Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.
-		</td>
+	<td>
+		<div id="function_hierarchy_choice" class="shiny-input-radiogroup">
+			Function hierarchy:<br>
+			<div class="radio">
+				<input type="radio" name="function_hierarchy_choice" id="brite_hierarchy" value="DEFAULT" checked="checked"> BRITE function hierarchy (default, compatible with PICRUSt)<br>
+			</div>
+			<div class="radio">
+				<input type="radio" name="function_hierarchy_choice" id="custom_function_hierarchy" value="CUSTOM"> Custom function hierarchy: <input type="file" name="custom_function_hierarchy_table" id="custom_function_hierarchy_table"><br>
+			</div>
+		</div>
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose a functional hierarchy for hierarchically displaying function relationships.</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td><a href="XXXX"><img src="images/example.png" style="vertical-align: middle;"></a></td>
 	</tr>
+
+	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td>
-			Function level of detail
-			<br>
-			<select name="funclevelofdetail_C" id="funcLODselector_C"></select>
-		</td>
-		<td colspan=2>
-			Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.
-		</td>
+	<td>
+		Minimum function resolution: <select name="function_level_of_detail_selector" id="function_level_of_detail_selector"></select><br>
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the minimum function resolution to view<br>(lower resolution may improve performance for large datasets).</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td></td>
 	</tr>
-	<tr>
-		<td>
-			Sample grouping
-			<br>
-			<select name="sampgroup_C" id="sampgroupselector_C"></select>
-		</td>
-		<td colspan=2>
-			Select a grouping for samples if desired. Requires uploading a sample map.
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Color scale
-			<br>
-			<select name="color_option_selector_C" id="color_option_selector_C">
-			<option value="Categories">Hierarchical color scale</option>
-			<option value="Random">Random color scale</option>
-			</select>
-		</td>
-		<td colspan=2>
-			Color scheme. Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.
-		</td>
-	</tr>
-	<tr>
-		<td colspan=3>
-			<h4>Draw the burrito</h4>
-		</td>
-	</tr>
-	<tr>
-		<td colspan=3>
-			<button id="update_button_C" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-		</td>
-	</tr>
+
 </table>
+</tr>
 
-</div>
-<button class="inputSelectorB" id="GenomeOption">
-	<b>Genome Annotations</b>
-	<br/><br/>
-	Choose this option if you have an OTU table from 16S reads, and genome content for each OTU.
-</button>
+<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="10"  hspace="0" vspace="0"></td></tr>
 
-<div id="GenomeMenu" class="hidexp">
-<table class="uploadtable" width=100%>
-	<col>
-	<col>
-	<col align="right">
+<!-- GROUPING BLOCK -->
+<tr><td colspan=4>
+<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
 	<tr>
-		<td colspan=3>
-			<b>File Upload</b>
-		</td>
+	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Sample grouping</td>
+	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://elbo.gs.washington.edu/software_burito/BurritoManual.pdf">Manual&gt;Grouping</a></td>
 	</tr>
+	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td>
-			<b>Genome Abundances<b>
-			<br>
-			<input type="file" name="taxonomic_abundances_1" id="taxonomic_abundances_1">
-		</td>
-		<td>
-			A file containing abundances of each taxon in each sample. See documentation for an example.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>OTU</th>
-					<th>Sample1_Name</th>
-					<th>Sample2_Name</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>10</td>
-					<td>5</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>OTU2_ID</td>
-					<td>0</td>
-					<td>5</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<div id="read_counts_g">
-				<b>Genome Annotations<b>
-				<br>
-				<input type="file" name="genome_annotations" id="genome_annotations">
+	<td>
+		<div id="metadata_choice" class="shiny-input-radiogroup">
+			Sample labels:<br>
+			<div class="radio">
+				<input type="radio" name="metadata_choice" id="no_metadata" value="ABSENT" checked="checked"> No sample labels (default)<br>
 			</div>
-		</td>
-		<td>
-			A file containing abundances of each taxon in each sample. See documentation for an example.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>OTU</th>
-					<th>Gene</th>
-					<th>CopyNumber</th>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>Gene1_Name</td>
-					<td>1</td>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>Gene2_Name</td>
-					<td>2</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>etc.</td>
-					<td>etc.</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Taxonomic Hierarchy
-			<input type="file" name="taxonomic_hierarchy_G" id="taxonomic_hierarchy_G">
-		</td>
-		<td>
-			A file containing all taxa in your abundance file, in a hierarchy showing their relatedness. See documentation for a format example. Uses greengenes by default if no file uploaded.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>OTU</th>
-					<th>Taxa_Level_1</th>
-					<th>Taxa_Level_2</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>OTU1_ID</td>
-					<td>Bacteria</td>
-					<td>Firmicutes</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>OTU2_ID</td>
-					<td>Bacteria</td>
-					<td>Proteobacteria</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function Hierarchy
-			<input type="file" name="function_hierarchy_G" id="function_hierarchy_G">
-		</td>
-		<td>
-			A file containing the functions in your contribution or genome content file, in a hierarchy showing their relatedness. See documentation for a format example. Uses BRITE by default if no file is uploaded.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Gene</th>
-					<th>Level_0</th>
-					<th>Level_1</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Gene1_Name</td>
-					<td>Metabolism</td>
-					<td>Lipid Metabolism</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Gene2_Name</td>
-					<td>Cellular Processes</td>
-					<td>Cell Motility</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Sample Map
-			<input type="file" name="sample_map_G" id="sample_map_G">
-		</td>
-		<td>
-			A file describing the relationship between samples, i.e. which ones are the same treatment condition.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Sample</th>
-					<th>Grouping_1</th>
-					<th>Grouping_2</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Sample1_Name</td>
-					<td>Case</td>
-					<td>Human</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Sample2_Name</td>
-					<td>Control</td>
-					<td>Mouse</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function Abundances
-			<input type="file" name="function_abundances_G" id="function_abundances_G">
-		</td>
-		<td>
-			A file containing measured abundances of each function in each sample for comparison to function abundances predicted from taxonomic abundances.
-		</td>
-		<td>
-			<table class="ExampleTable">
-				<tr>
-					<th>Gene</th>
-					<th>Sample1_Name</th>
-					<th>Sample2_Name</th>
-					<th>etc.</th>
-				</tr>
-				<tr>
-					<td>Gene1_Name</td>
-					<td>0.1</td>
-					<td>0.2</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>Gene2_Name</td>
-					<td>0.3</td>
-					<td>0.25</td>
-					<td>...</td>
-				</tr>
-				<tr>
-					<td>etc.</td>
-					<td>...</td>
-					<td>...</td>
-					<td>...</td>
-				</tr>
-			</table>
-		</td>
+			<div class="radio">
+				<input type="radio" name="metadata_choice" id="metadata" value="PRESENT"> Sample labels: <input type="file" name="metadata_table" id="metadata_table"><br>
+			</div>
+		</div>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose whether you will be providing sample labels.</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td><a href="XXXX"><img src="images/example.png" style="vertical-align: middle;"></a></td>
 	</tr>
 
+	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
 	<tr>
-		<td colspan=3>
-			<b>Visualization Options</b>
-		</td>
+	<td>
+		Group by label: <select name="metadata_factor_selector" id="metadata_factor_selector"></select><br>
+	</td>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the label to be used for grouping samples.</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td></td>
 	</tr>
-	<tr>
-		<td>
-			Taxonomic level of detail
-			<br>
-			<select name="taxlevelofdetail_G" id="taxLODselector_G"></select>
-		</td>
-		<td colspan=2>
-			Select the lowest level of taxonomic detail to be displayed. Going to the OTU level will significantly slow down the program.
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Function level of detail
-			<br>
-			<select name="funclevelofdetail_G" id="funcLODselector_G"></select>
-		</td>
-		<td colspan=2>
-			Select the lowest level of function detail to be displayed. Going to the KO level is not recommended as single KOs can be mapped to multiple higher levels of function detail in the default hierarchy.
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Sample grouping
-			<br>
-			<select name="sampgroup_G" id="sampgroupselector_G"></select>
-		</td>
-		<td colspan=2>
-			Select a grouping for samples if desired. Requires uploading a sample map.
-		</td>
-	</tr>
-	<tr>
-		<td>
-			Color scale
-			<br>
-			<select name="color_option_selector_G" id="color_option_selector_G">
-			<option value="Categories">Hierarchical color scale</option>
-			<option value="Random">Random color scale</option>
-			</select>
-		</td>
-		<td colspan=2>
-			Color scheme. Random color scale will help discern closely related taxa but hierarchical color scale will look more pleasing.
-		</td>
-	</tr>
-	<tr>
-		<td colspan=3>
-			<h4>Draw the burrito</h4>
-		</td>
-	</tr>
-	<tr>
-		<td colspan=3>
-			<button id="update_button_G" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-		</td>
-	</tr>
+
 </table>
+</tr>
 
-</div>
+<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0"></td></tr>
 
-<br>
-<span class="error" id="upload_message"></span>
-<button id="update_button" type="button" style="display:none" class="btn action-button btn-large btn-primary"></button>
+<!-- VISUALIZATION BLOCK -->
+<tr><td colspan=4>
+<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
+	<tr>
+	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Visualization</td>
+	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://elbo.gs.washington.edu/software_burito/BurritoManual.pdf">Manual&gt;Visualization</a></td>
+	</tr>
+	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
+
+	<tr>
+	<td>
+		Color scheme:<br>
+		<select name="color_option_selector" id="color_option_selector">
+		<option value="Categories">Hierarchical color scale</option>
+		<option value="Random">Random color scale</option>
+		</select>
+	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the type of color scale used during display.</span></span></span><img src="images/pixel.gif" width="10"></td>
+	<td><img src="images/pixel.gif" width="74" height="1"></td>
+	</tr>
+
+</table>
+</tr>
+
+<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0"></td></tr>
+
+<!-- ACTIVATION BLOCK -->
+<tr><td colspan=4>
+	<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
+</td></tr>
+
+<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0"></td></tr>
+
+<!-- END BLOCKS -->
+
+<tr><td colspan=4 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr>
+
+<tr><td>Back to <a class="normalLinkTxt" href="http://elbo.gs.washington.edu/">the Borenstein Lab</a><br></td></tr>
+
+</table>
+<!-- PAGE TITLE - END -->
+<!-- JUST FOR CENTERING - START-->
+</td></tr>
+<tr valign="middle" align="center"><td height="30"><img border="0" src="images/pixel.gif" width="1" height="30"  hspace="0" vspace="0"></td></tr>
+</table>
+<!-- JUST FOR CENTERING - END -->
+
 </div>
 <div style="float:left" id="button_holder"><br><br><br><br><br><br><br><br></div>
 
 <div id="mainplot">
 
-<svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
-  <defs>
-    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="4" height="4">
-      <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==" x="0" y="0" width="4" height="4">
-      </image>
-    </pattern>
-	
-	<pattern id="rarrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
-	    <rect x="0" y="0" width="20" height="20" fill="none" />
-		<path d="M 0 10 L 17 10 L 10 17 L 17 10 L 10 3" fill="none" stroke="#D7764A" stroke-width="4" />
-	</pattern>
-	<pattern id="larrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
-	    <rect x="0" y="0" width="30" height="30" fill="none" />
-		<path d="M 20 10 L 3 10 L 10 17 L 3 10 L 10 3" fill="none" stroke="#D7764A" stroke-width="4" />
-	</pattern>
-  </defs>
-</svg>
+	<svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
+	  <defs>
+	    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="4" height="4">
+	      <image xlink:href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4JyBoZWlnaHQ9JzgnPgogIDxyZWN0IHdpZHRoPSc4JyBoZWlnaHQ9JzgnIGZpbGw9JyNmZmYnLz4KICA8cGF0aCBkPSdNMCAwTDggOFpNOCAwTDAgOFonIHN0cm9rZS13aWR0aD0nMC41JyBzdHJva2U9JyNhYWEnLz4KPC9zdmc+Cg==" x="0" y="0" width="4" height="4">
+	      </image>
+	    </pattern>
+		
+		<pattern id="rarrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
+		    <rect x="0" y="0" width="20" height="20" fill="none" />
+			<path d="M 0 10 L 17 10 L 10 17 L 17 10 L 10 3" fill="none" stroke="#D7764A" stroke-width="4" />
+		</pattern>
+		<pattern id="larrowspat" patternUnits="userSpaceOnUse" width="30" height = "20">
+		    <rect x="0" y="0" width="30" height="30" fill="none" />
+			<path d="M 20 10 L 3 10 L 10 17 L 3 10 L 10 3" fill="none" stroke="#D7764A" stroke-width="4" />
+		</pattern>
+	  </defs>
+	</svg>
 
 </div>
 
+<!-- Loading javascript libraries -->
 <script src="Javascript/constants.js"></script>
 <script src="Javascript/textures.js"></script>
 <script src="Javascript/d3.v3.min.js"></script>
@@ -963,7 +298,8 @@
 <script src="Javascript/mainui.js"></script>
 <script src="Javascript/saveSvgAsPng.js"></script>
 <script src="Javascript/trees.js"></script>
+<script src="Javascript/helpOverlay.js"></script>
 <script src="Javascript/main.js"></script>
 
-
 </body>
+</html>

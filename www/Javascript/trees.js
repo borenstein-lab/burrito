@@ -152,7 +152,6 @@
 	// Update the tree graphs
 	// Expands or collapses the source node, depending on whether it is currently open or closed
 	trees.update = function(source) {
-	
 		
 		// Compute the new tree layout.
 		var nodes = trees.treestructure[source.type].nodes(roots[source.type]).reverse();
@@ -267,29 +266,6 @@
 			.data(nodes, function (d) {
 			return d.id || (d.id = ++nodeIndex);
 		});
-		
-// 		var treedatainterest = trees.treestructure[source.type].nodes(roots[source.type])
-// 		console.log(treedatainterest)
-// 		var data = treedatainterest[0];
-// 		var thisnode = data;
-// 		var thisNparents = [];
-// 		thisNparents.push(thisnode);
-// 		while (thisnode.parent) {
-// 			thisnode = thisnode.parent;
-// 			thisNparents.push(thisnode);
-// 		}
-// 		data.thisandparents = node.filter(function (d2) { 
-// 			var good = false;
-// 			thisNparents.forEach( function (d4) {
-// 				if (d2.id == d4.id) {
-// 					good = true;} 
-// 					});
-// 			return good;
-// 		})
-// 		console.log(data.thisandparents)
-
-
-		//data.thisandparents.selectAll("text").remove(); 
 
 		// Enter any new nodes at the parent's previous position.
 		var nodeEnter = node.enter().append("g")
@@ -724,7 +700,7 @@
 			return d.key == name;
 		} );
 		var data = treedatainterest[0];
-		//console.log(data.thisandparents)
+
 		if(data.hasOwnProperty('thisandparents') == false){ //do nothing if the thing has never been highlighted
 			var treedatainterest = trees.treestructure[type].nodes(roots[type]).filter( function(d) {
 			return d.key == name;
