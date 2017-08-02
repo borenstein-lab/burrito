@@ -142,7 +142,9 @@
 		getAvgs(roots["func"])
 		trees.update(roots['func']);
 
-		trees.click(roots['taxa'].values[0])
+		for(j=0; j < roots['taxa'].values.length;j++){
+			trees.click(roots['taxa'].values[j])
+		}
 	}
 	
 	

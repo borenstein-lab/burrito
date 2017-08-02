@@ -384,7 +384,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				var leaves = data_cube.get_leaves(main_list[j], data_cube.func_lookup)
 			}
 		    color_range = leaves.length //number of colors to expand in each direction depends on # of leaves
-
+			console.log(color_range)
 			//generate variations of core color
 		    var core_color = d3.hcl(color_scale(main_list[j]))
 	    	new_colors = []
@@ -403,6 +403,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      		flip *= -1
 	      	}
 			new_colors = new_colors.sort(function(a,b){ return a.l - b.l })
+			
 			
 	      	if(list_type=="taxa"){
 	      		layer1 = data_cube.taxa_lookup[main_list[j]]
@@ -490,7 +491,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				num_taxa_categories += data_cube.taxa_tree[j].values.length
 			}
 		}
-
+		console.log(num_taxa_categories)
+		console.log(d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop())
 		//taxa colors
 		if(num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many taxa categories, colors will repeat")
@@ -499,12 +501,13 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			taxa_palette = colorbrewer["Set3"][num_taxa_categories]
 			//taxa_palette = taxa_palette.reverse()
 		} else if (num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()){
-			taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop()-1)].concat(colorbrewer["Dark2"][num_taxa_categories -  d3.keys(colorbrewer["Set3"]).pop()])
+			taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop())].concat(colorbrewer["Dark2"][num_taxa_categories -  d3.keys(colorbrewer["Set3"]).pop()])
 		} else if (num_taxa_categories == 2){
 			taxa_palette = ["#8dd3c7", "#ffffb3"]
 		} else {
 			taxa_palette = ["#8dd3c7"]
 		}
+		console.log(taxa_palette)
 		if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many function categories, colors will repeat")
 		}
@@ -525,20 +528,27 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				main_taxa = data_cube.taxa_tree.map(function(d){ return d.key})
 			}
 		}
+		
 		taxa_colors.domain(main_taxa)
+		console.log(taxa_colors.domain().length)
+		console.log(taxa_colors.range().length)
 		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
 
 		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
-		col1 = d3.rgb("black") //.brighter()
+		col1 = d3.hcl("black") //.brighter()
 		//if there are other kingdoms besides Bacteria, shades of grey
 		if (data_cube.taxa_tree[0].level != 0){
 			for(j=0; j < kingdoms.length; j++){
-				taxa_colors.range().push(col1)
+				col1.l = col1.l + 20
+				taxa_colors.range().push(col1.toString())
 				taxa_colors(kingdoms[j])
-				col1["l"] +=  (j+1)/(kingdoms.length + 1)
+				console.log(taxa_colors.range())
+				console.log(taxa_colors.domain())
 			}
 		}
-		taxa_colors.range().push(d3.rgb("black"))//.brighter())
+		console.log(col1.toString())
+		console.log(kingdoms)
+		taxa_colors.range().push(d3.hcl("black").toString())//.brighter())
 		taxa_colors("All Taxa")
 
 		//func colors
@@ -547,7 +557,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		main_funcs = data_cube.func_tree.map(function(d){ return d.key;})
 		func_colors.domain(main_funcs)
 		func_colors = setUpColorScale(main_funcs, "funcs", func_colors)
-		func_colors.range().push(d3.rgb("black"))//.brighter())
+		func_colors.range().push(d3.hcl("black").toString())//.brighter())
 		func_colors("All Functions")
 	
 		
@@ -712,7 +722,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var bpData = getLinkData();
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
-
 
     //d3.select(self.frameElement).style("height", "800px");
 
