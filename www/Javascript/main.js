@@ -384,7 +384,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				var leaves = data_cube.get_leaves(main_list[j], data_cube.func_lookup)
 			}
 		    color_range = leaves.length //number of colors to expand in each direction depends on # of leaves
-			console.log(color_range)
 			//generate variations of core color
 		    var core_color = d3.hcl(color_scale(main_list[j]))
 	    	new_colors = []
@@ -491,8 +490,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				num_taxa_categories += data_cube.taxa_tree[j].values.length
 			}
 		}
-		console.log(num_taxa_categories)
-		console.log(d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop())
 		//taxa colors
 		if(num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many taxa categories, colors will repeat")
@@ -507,7 +504,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		} else {
 			taxa_palette = ["#8dd3c7"]
 		}
-		console.log(taxa_palette)
 		if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
 			console.log("too many function categories, colors will repeat")
 		}
@@ -530,8 +526,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		}
 		
 		taxa_colors.domain(main_taxa)
-		console.log(taxa_colors.domain().length)
-		console.log(taxa_colors.range().length)
 		taxa_colors = setUpColorScale(main_taxa, "taxa", taxa_colors)
 
 		kingdoms = data_cube.taxa_tree.map(function(d){ return d.key})
@@ -542,12 +536,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				col1.l = col1.l + 20
 				taxa_colors.range().push(col1.toString())
 				taxa_colors(kingdoms[j])
-				console.log(taxa_colors.range())
-				console.log(taxa_colors.domain())
 			}
 		}
-		console.log(col1.toString())
-		console.log(kingdoms)
 		taxa_colors.range().push(d3.hcl("black").toString())//.brighter())
 		taxa_colors("All Taxa")
 
