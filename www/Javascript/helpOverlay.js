@@ -37,7 +37,7 @@
 	helpOverlay.redraw = function() {
 		d3.select("#help_svg").attr("width", width).attr("height", height);
 		d3.select("#help_background").attr("width", width).attr("height", height);
-		d3.select("#help_button").attr("transform", "translate(" + 0.97 * width + ", " + 0.03 * height + ")");
+		d3.select("#help_button").attr("transform", "translate(" + (width - margin.right) + ", " + 0.03 * height + ")");
 		
 		d3.select("#help_items").selectAll("text, rect").remove();
 		helpOverlay.createItems();
