@@ -491,28 +491,16 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			}
 		}
 		//taxa colors
-		if(num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
-			console.log("too many taxa categories, colors will repeat")
-		}
-		if(num_taxa_categories <= d3.keys(colorbrewer["Set3"]).pop() & num_taxa_categories >= d3.keys(colorbrewer["Set3"]).shift()){
-			taxa_palette = colorbrewer["Set3"][num_taxa_categories]
-			//taxa_palette = taxa_palette.reverse()
-		} else if (num_taxa_categories > d3.keys(colorbrewer["Set3"]).pop()){
-			taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop())].concat(colorbrewer["Dark2"][num_taxa_categories -  d3.keys(colorbrewer["Set3"]).pop()])
-		} else if (num_taxa_categories == 2){
-			taxa_palette = ["#8dd3c7", "#ffffb3"]
-		} else {
-			taxa_palette = ["#8dd3c7"]
-		}
-		if(num_function_categories > d3.keys(colorbrewer["Set1"]).pop()+d3.keys(colorbrewer["Dark2"]).pop()){
+		//91 for the max # of phyla in GG
+		taxa_palette = colorbrewer["Set3"][(d3.keys(colorbrewer["Set3"]).pop())].concat(colorbrewer["Dark2"][(d3.keys(colorbrewer["Dark2"]).pop())]).concat(colorbrewer["Accent"][d3.keys(colorbrewer["Accent"]).pop()]).concat(d3.shuffle(colorbrewer["Paired"][d3.keys(colorbrewer["Paired"]).pop()])).concat(d3.shuffle(colorbrewer["YlGnBu"][6].concat(colorbrewer["PuOr"][6]).concat(colorbrewer["RdYlBu"][6]).concat(colorbrewer["Spectral"][11]).concat(colorbrewer["RdPu"][6]).concat(colorbrewer["Greys"][5]).concat(colorbrewer["PiYG"][6]).concat(colorbrewer["BrBG"][5])))
+		taxa_palette = taxa_palette.slice(0,num_taxa_categories)
+
+		func_palette = colorbrewer["Set1"][(d3.keys(colorbrewer["Set1"]).pop())].concat(colorbrewer["Dark2"][d3.keys(colorbrewer["Dark2"]).pop()]).concat(colorbrewer["Accent"][d3.keys(colorbrewer["Accent"]).pop()]).concat(d3.shuffle(colorbrewer["Paired"][d3.keys(colorbrewer["Paired"]).pop()])).concat(d3.shuffle(colorbrewer["YlGnBu"][6].concat(colorbrewer["PuOr"][6]).concat(colorbrewer["RdYlBu"][6]).concat(colorbrewer["Spectral"][11]).concat(colorbrewer["RdPu"][6]).concat(colorbrewer["Greys"][5]).concat(colorbrewer["PiYG"][6]).concat(colorbrewer["BrBG"][5])))
+		
+		if(num_function_categories > func_palette.length){
 			console.log("too many function categories, colors will repeat")
 		}
-		
-		if(num_function_categories <= d3.keys(colorbrewer["Set1"]).pop()){
-			func_palette = colorbrewer["Set1"][num_function_categories]
-		} else {
-			func_palette = colorbrewer["Set1"][(d3.keys(colorbrewer["Set1"]).pop()-1)].concat(colorbrewer["Dark2"][num_function_categories - d3.keys(colorbrewer["Set1"]).pop()])
-		}
+		func_palette = func_palette.slice(0, num_function_categories)
 		
 		var taxa_colors = d3.scale.ordinal()
 		taxa_colors.range(taxa_palette)
