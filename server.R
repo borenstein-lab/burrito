@@ -310,21 +310,21 @@ shinyServer(function(input, output, session) {
 
 				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
 				if (ncol(taxonomic_hierarchy_table) > 1){
-					session$sendCustomMessage("taxonomic_hierarchy_labels", colnames(taxonomic_hierarchy_table)[c(2:ncol(taxonomic_hierarchy_table), 1)])
+					session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", colnames(taxonomic_hierarchy_table)[c(2:ncol(taxonomic_hierarchy_table), 1)])
 
 				# Otherwise with a single column the order of the single label doesn't matter
 				} else {
-					session$sendCustomMessage("taxonomic_hierarchy_labels", list(colnames(taxonomic_hierarchy_table)))
+					session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", list(colnames(taxonomic_hierarchy_table)))
 				}
 
 			# Otherwise, we send the N/A string
 			} else {
-				session$sendCustomMessage("taxonomic_hierarchy_labels", list("N/A"))
+				session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", list("N/A"))
 			}
 
 		# Otherwise, we use the default taxonomic hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
 		} else {
-			session$sendCustomMessage("taxonomic_hierarchy_labels", colnames(default_taxonomic_hierarchy_table)[c(2:ncol(default_taxonomic_hierarchy_table), 1)])
+			session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", colnames(default_taxonomic_hierarchy_table)[c(2:ncol(default_taxonomic_hierarchy_table), 1)])
 		}
 	})
 
@@ -343,21 +343,21 @@ shinyServer(function(input, output, session) {
 
 				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
 				if (ncol(function_hierarchy_table) > 1){
-					session$sendCustomMessage("function_hierarchy_labels", colnames(function_hierarchy_table)[c(2:ncol(function_hierarchy_table), 1)])
+					session$sendCustomMessage("function_hierarchy_dropdown_labels", colnames(function_hierarchy_table)[c(2:ncol(function_hierarchy_table), 1)])
 
 				# Otherwise with a single column the order of the single label doesn't matter
 				} else {
-					session$sendCustomMessage("function_hierarchy_labels", list(colnames(function_hierarchy_table)))
+					session$sendCustomMessage("function_hierarchy_dropdown_labels", list(colnames(function_hierarchy_table)))
 				}
 
 			# Otherwise, we send the N/A string
 			} else {
-				session$sendCustomMessage("function_hierarchy_labels", list("N/A"))
+				session$sendCustomMessage("function_hierarchy_dropdown_labels", list("N/A"))
 			}
 
 		# Otherwise, we use the default function hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
 		} else {
-			session$sendCustomMessage("function_hierarchy_labels", colnames(default_function_hierarchy_table)[2:ncol(default_function_hierarchy_table)])
+			session$sendCustomMessage("function_hierarchy_dropdown_labels", colnames(default_function_hierarchy_table)[2:ncol(default_function_hierarchy_table)])
 		}
 	})
 
@@ -1541,6 +1541,8 @@ shinyServer(function(input, output, session) {
 
 		function_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(function_hierarchy_table, function_summary_level())
 
+		session$sendCustomMessage(type='function_hierarchy_labels', colnames(function_hierarchy_table))
+
 		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, function_summary_level(), unique(contribution_table[[function_summary_level()]]))
 
 		javascript_function_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(function_hierarchy_table, "function", function_summary_level())
@@ -1548,6 +1550,8 @@ shinyServer(function(input, output, session) {
 		session$sendCustomMessage(type='function_hierarchy', javascript_function_hierarchy)
 
 		taxonomic_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(taxonomic_hierarchy_table, taxonomic_summary_level())
+
+		session$sendCustomMessage(type='taxonomic_hierarchy_labels', colnames(taxonomic_hierarchy_table))
 
 		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, taxonomic_summary_level(), contribution_table[[taxonomic_summary_level()]])
       	

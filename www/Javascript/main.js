@@ -276,7 +276,7 @@ update_progress = function(curr_sample, total_samples){
 	document.getElementById("progress_bar").setAttribute("width", (width / 4.5) * (curr_sample / total_samples))
 }
 
-draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order){
+draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
 	
 	var grouping = null;
 	if (mainui.uploadMode == "example"){
@@ -703,7 +703,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
     //d3.select(self.frameElement).style("height", "800px");
 
-	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall, taxa_colors, func_colors, function() {
+	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall, taxonomic_levels, function_levels, taxa_colors, func_colors, function() {
 	
 		for (var i=0; i < data_cube.displayed_taxa; i++){
 			dehighlightOverall(data_cube.displayed_taxa[i], "", 1)

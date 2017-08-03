@@ -58,7 +58,7 @@
 		bpBarHeight[0] = 50; bpBarHeight[1] = 50;	
 	}
 	
-	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall, taxa_cols, func_cols, updateFunc) {
+	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall, taxonomic_levels, function_levels, taxa_cols, func_cols, updateFunc) {
 		data_cube = datcube;
 		bpvisdata = bpvd;
 		highlightOverall = highloverall;
@@ -67,27 +67,12 @@
 		func_colors = func_cols;
 		updateOtherThings = updateFunc;
 
-		levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "OTU"];
-		levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+		levelNames['taxa'] = taxonomic_levels;
+		levelNames['func'] = function_levels;
 		curlevelNames['taxa'] = levelNames['taxa'];
 		curlevelNames['func'] = levelNames['func'];
 
 		var taxa_data = jQuery.extend(true, [], trees.taxa_tree_data);
-		
-		/*var curr_taxa = [];
-		for (var i = 0; i < taxa_data.length; i++){
-			curr_taxa.push(taxa_data[i]);
-		}
-
-		for (; curr_taxa.length > 0;){
-			curr_taxon = curr_taxa.shift();
-			if (!data_cube.is_leaf(curr_taxon)){
-				curr_taxon.values.sort(sort_nest);
-				for (var i = 0; i < curr_taxon.values.length; i++){
-					curr_taxa.push(curr_taxon.values[i]);
-				}
-			}
-		} */
 
 		var newTaxaData = {
 			"key": "All Taxa",
