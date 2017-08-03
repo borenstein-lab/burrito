@@ -56,7 +56,7 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			
+
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < uploader.load_flags.length; i++){
 				if (!uploader.load_flags[i]){

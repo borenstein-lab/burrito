@@ -6,6 +6,13 @@ mainui.createUI();
 var aspecrat, width, height, hidewidth, margin;
 var barDimensions, navDims, bpdims;
 var duration; //used in trees to set animation speed
+var data_cube;
+var currently_displayed_taxa = [];
+var currently_displayed_functions = [];
+var resize_timeout;
+var curr_window_width = window.innerWidth;
+var curr_window_height = window.innerHeight;
+
 
 var MainSVG, plotSVG, sidebarSVG;
 
@@ -299,10 +306,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	d3.select("#navbar").remove()
 	d3.select("#taxa_bars").remove()
 	d3.select("#func_bars").remove()
-	d3.select("#loadingG").remove()	
-/*	d3.select("#navbar").remove()
-	d3.select("#taxa_bars").remove()
-	d3.select("#func_bars").remove()*/
+	d3.select("#loadingG").remove()
 
 	helpOverlay.redraw();
 
@@ -349,11 +353,22 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	
 	otu_abundance_data = otu_table
 
-	//initialize display cube
-	var data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
+	// If the data cube already exists, use it to determine the current tree state before re-initializing so we can open back up to the right state
+	if (data_cube){
+		currently_displayed_taxa = [];
+		currently_displayed_functions = [];
+		for (var i = 0; i < data_cube.displayed_taxa.length; i++){
+			currently_displayed_taxa.push(data_cube.displayed_taxa[i])
+		}
+		for (var i = 0; i < data_cube.displayed_funcs.length; i++){
+			currently_displayed_functions.push(data_cube.displayed_funcs[i])
+		}
+	}
 
+
+	//initialize display cube
+	data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, trees.getTaxaTreeData(), trees.getFuncTreeData(), func_averages);
-			
 	//if( not expand to OTU level
 	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
 	////////////////////////// Colors
@@ -365,13 +380,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		color_option = d3.select("#color_option_selector").property("value");
 	}
 
-// 	var changeAlpha = function(color, alphaVal){ 
-// 		color = d3.rgb(color.toString())
-// 		color["r"] = alphaVal * color["r"]
-// 		color["g"] = alphaVal * color["g"]
-// 		color["b"] = alphaVal * color["b"]
-// 		return color;
-// 	}
 	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
 		//color scale already has core colors set up
 		//1st - divide up color space into number of leaves
@@ -553,22 +561,15 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		
 	} else if(color_option == "Random"){
 		taxa_colors_palette = (d3.scale.category20()).range()
-// 		for(j=0; j < taxa_colors_palette.length; j++){
-// 			taxa_colors_palette[j] = d3.rgb(taxa_colors_palette[j]).brighter()
-// 		}
 		taxa_colors = d3.scale.ordinal()
 		taxa_colors.range(taxa_colors_palette)
 		taxa_colors.domain(d3.keys(data_cube.taxa_tree_lookup))
 		
-		func_colors_palette = colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"])
-// 		for(j=0; j < func_colors_palette.length; j++){
-// 			func_colors_palette[j] = d3.rgb(func_colors_palette[j]).brighter()
-// 		}		
+		func_colors_palette = colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"])	
 		func_colors = d3.scale.ordinal()
 		func_colors.range(func_colors_palette)
 		func_colors.domain(d3.keys(data_cube.func_tree_lookup))
 	}
-
 
 	//sample colors
 	groupValsAll = samplemap.map(function(d,i){ 
@@ -708,14 +709,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	}
 
-	//data_cube.expand_func("Metabolism");
 	var bpData = getLinkData();
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
-
-    //d3.select(self.frameElement).style("height", "800px");
-
-	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall, taxonomic_levels, function_levels, taxa_colors, func_colors, function() {
+	trees.SetUp3(height, data_cube, otu_abundance_data, bpvisdata, highlightOverall, dehighlightOverall, taxonomic_levels, function_levels, currently_displayed_taxa, currently_displayed_functions, taxa_colors, func_colors, function() {
 	
 		for (var i=0; i < data_cube.displayed_taxa; i++){
 			dehighlightOverall(data_cube.displayed_taxa[i], "", 1)
@@ -730,25 +727,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		update_otu_bar();
 		update_func_bar();
 	});
-
-
-	/*
-    var curr_funcs = [];
-    for (var i = 0; i < function_data.length; i++){
-	    curr_funcs.push(function_data[i]);
-	}
-    for (; curr_funcs.length > 0;){
-    	curr_func = curr_funcs.shift();
-    	if (!data_cube.is_leaf(curr_func)){
-    		curr_func.values.sort(sort_nest);
-    		for (var i = 0; i < curr_func.values.length; i++){
-    			curr_funcs.push(curr_func.values[i]);
-    		}
-    	}
-    } */  
-
-    
-
 		
 	function highlightOverall(taxonName, functionName, highlightwhat) {
 		if (highlightwhat == 1) {
@@ -962,7 +940,16 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 }
 
 function resizeRedraw() {
-	uploader.update_plots();
+	if (resize_timeout){
+		clearTimeout(resize_timeout);
+	}
+	resize_timeout = setTimeout(function(){
+		if (curr_window_width != window.innerWidth | curr_window_height != window.innerHeight){
+			uploader.update_plots();
+			curr_window_width = window.innerWidth;
+			curr_window_height = window.innerHeight;
+		}
+	}, 100)
 }
 
 var uploader = uploader_wrapper.make_uploader(draw_everything, update_progress);
