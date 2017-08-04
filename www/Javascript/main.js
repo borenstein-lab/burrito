@@ -820,7 +820,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	}
 	
 	function clickResponse(id, name, list_type, displayed_taxa, displayed_funcs){ //unclick everything not associated with a particular taxon or function
-		      	if(d3.select("#"+id).classed("clicked") == false){ //if not already clicked
+		    if(d3.select("#"+id).classed("clicked") == false){ //if not already clicked
 						//Unselect things currently clicked
 						displayed_taxa.map(function(e,j){
 							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
@@ -880,12 +880,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 							return highlightOverall("", name, 2);
 						}
 				} else { //if already clicked
-						d3.select("#"+id).classed("highlighted",false)
-						d3.select("#"+id).classed("clicked",false)
-						//dehighlight everything for good measure
-						d3.select("#Genomes").select(".part0").selectAll(".mainbars").classed("highlighted", false).classed("clicked",false)
-						//clicked edges
-						if(list_type == "taxa"){
+					clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
+					if(list_type == "taxa"){
 							selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 								.filter(function(e,j){ 
 								return (e["key1"]==displayed_taxa.indexOf(name)) })
@@ -893,27 +889,45 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 							selectedEdges = d3.select("#Genomes").select(".edges").selectAll(".edge")
 								.filter(function(e,j){ 
 								return (e["key2"]==displayed_funcs.indexOf(name)) })
-						}
+					}
+					if(clickedEdges.empty()==false && list_type=="funcs"){
+						//special case
+						//Revert to original highlighting
 
-						clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
+						clickedEdges.classed("clicked", false)
+						dehighlightOverall(displayed_taxa[clickedEdges.datum().key1], displayed_funcs[clickedEdges.datum().key2], 3, bars_only = false)
+						d3.select("#Genomes0"+displayed_taxa[clickedEdges.datum().key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")).classed("highlighted", false)
+						d3.select("#Genomes0"+displayed_taxa[clickedEdges.datum().key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")).classed("clicked", false)
+						dehighlightOverall(displayed_taxa[clickedEdges.datum().key1], "", 1) //bP.deSelectSegment(0, clickedEdges.datum().key1, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
+						highlightOverall("", name, 2)
+					} else{
+						//do normal stuff
+						d3.select("#"+id).classed("highlighted",false)
+						d3.select("#"+id).classed("clicked",false)
+						//dehighlight everything for good measure
+						d3.select("#Genomes").select(".part0").selectAll(".mainbars").classed("highlighted", false).classed("clicked",false)
+						//clicked edges
+
 						selectedEdges.classed("highlighted", false)
 						selectedEdges.classed("clicked", false);
 						//dehighlight bar on other side assoicated with edge
-						
-						if(clickedEdges.empty() == false){
-							if(list_type=="taxa"){
+						clickedEdges.classed("clicked", false)
+						if(clickedEdges.empty()==false){
+						if(list_type=="taxa"){
 								edgeOtherSide = clickedEdges.datum().key2
 								dehighlightOverall("", displayed_funcs[edgeOtherSide], 2)
-							} else {
+						} else {
 								edgeOtherSide = clickedEdges.datum().key1
-								dehighlightOverall("", displayed_taxa[edgeOtherSide], 2)
-							}
+								dehighlightOverall(displayed_taxa[edgeOtherSide],"", 1)
 						}
-						
+						}
+												
 						if(list_type == "taxa"){
 							return dehighlightOverall(name,"",1);
 						} else {
 							return dehighlightOverall("", name, 2);
+						}
+
 						}
 					}
 	}
