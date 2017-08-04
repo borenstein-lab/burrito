@@ -14,7 +14,9 @@
 			METADATA_TABLE : 4,
 			TAXONOMIC_ABUNDANCE_TABLE : 5,
 			TAXONOMIC_ABUNDANCE_SAMPLE_ORDER : 6,
-			FUNCTION_ABUNDANCE_SAMPLE_ORDER : 7
+			FUNCTION_ABUNDANCE_SAMPLE_ORDER : 7,
+			TAXONOMIC_LEVELS : 8,
+			FUNCTION_LEVELS : 9
 		};
 
 		uploader.load_flags = [];
@@ -54,7 +56,7 @@
 		*/
 		uploader.update_plots = function(){
 			var all_loaded = true;
-			
+
 			// Check each flag to see if the file has been loaded
 			for (var i = 0; i < uploader.load_flags.length; i++){
 				if (!uploader.load_flags[i]){
@@ -71,7 +73,9 @@
 					uploader.data_objects[uploader.attribute_enum.METADATA_TABLE],
 					uploader.data_objects[uploader.attribute_enum.FUNCTION_AVERAGES],
 					uploader.data_objects[uploader.attribute_enum.TAXONOMIC_ABUNDANCE_SAMPLE_ORDER],
-					uploader.data_objects[uploader.attribute_enum.FUNCTION_ABUNDANCE_SAMPLE_ORDER]);
+					uploader.data_objects[uploader.attribute_enum.FUNCTION_ABUNDANCE_SAMPLE_ORDER],
+					uploader.data_objects[uploader.attribute_enum.TAXONOMIC_LEVELS],
+					uploader.data_objects[uploader.attribute_enum.FUNCTION_LEVELS]);
 			}
 		}
 
@@ -251,11 +255,22 @@
 		});
 
 		/*
-		taxonomic_hierarchy_lables handler
+		taxonomic_hierarchy_labels handler
 
-		Updates the taxonomic hierarchy level-of-detail dropdown labels based on the taxonomic hierarchy being used. Default to the default taxonomic hierarchy labels with Genus selected.
+		Updates the the taxonomic hierarchy labels for the visualization.
 		*/
 		Shiny.addCustomMessageHandler("taxonomic_hierarchy_labels", function(labels){
+			uploader.load_flags[uploader.attribute_enum.TAXONOMIC_LEVELS] = false;
+			uploader.data_objects[uploader.attribute_enum.TAXONOMIC_LEVELS] = labels;
+			uploader.load_flags[uploader.attribute_enum.TAXONOMIC_LEVELS] = true;
+		});
+
+		/*
+		taxonomic_hierarchy_dropdown_labels handler
+
+		Updates the the taxonomic hierarchy level-of-detail dropdown labels based on the taxonomic hierarchy being used. Default to the default taxonomic hierarchy labels with Genus selected.
+		*/
+		Shiny.addCustomMessageHandler("taxonomic_hierarchy_dropdown_labels", function(labels){
 
 			// Grab the dropdown element to modify
 			tax_dropdown = document.getElementById("taxonomic_level_of_detail_selector");
@@ -287,9 +302,20 @@
 		/*
 		function_hierarchy_labels handler
 
-		Updates the function hierarchy level-of-detail dropdown labels based on the function hierarchy being used. Default to the default function hierarchy labels with SubPathway selected.
+		Updates the the function hierarchy labels for the visualization.
 		*/
 		Shiny.addCustomMessageHandler("function_hierarchy_labels", function(labels){
+			uploader.load_flags[uploader.attribute_enum.FUNCTION_LEVELS] = false;
+			uploader.data_objects[uploader.attribute_enum.FUNCTION_LEVELS] = labels;
+			uploader.load_flags[uploader.attribute_enum.FUNCTION_LEVELS] = true;
+		});
+
+		/*
+		function_hierarchy_dropdown_labels handler
+
+		Updates the function hierarchy level-of-detail dropdown labels based on the function hierarchy being used. Default to the default function hierarchy labels with SubPathway selected.
+		*/
+		Shiny.addCustomMessageHandler("function_hierarchy_dropdown_labels", function(labels){
 
 			// Grab the dropdown element to modify
 			func_dropdown = document.getElementById("function_level_of_detail_selector");

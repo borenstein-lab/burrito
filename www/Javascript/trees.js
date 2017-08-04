@@ -58,7 +58,7 @@
 		bpBarHeight[0] = 50; bpBarHeight[1] = 50;	
 	}
 	
-	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall, taxa_cols, func_cols, updateFunc) {
+	trees.SetUp3 = function(height, datcube, otu_abundance_data, bpvd, highloverall, dehighloverall, taxonomic_levels, function_levels, currently_displayed_taxa, currently_displayed_functions, taxa_cols, func_cols, updateFunc) {
 		data_cube = datcube;
 		bpvisdata = bpvd;
 		highlightOverall = highloverall;
@@ -67,27 +67,12 @@
 		func_colors = func_cols;
 		updateOtherThings = updateFunc;
 
-		levelNames['taxa'] = ["Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species", "OTU"];
-		levelNames['func'] = ["Category", "SuperPathway", "SubPathway"];
+		levelNames['taxa'] = taxonomic_levels;
+		levelNames['func'] = function_levels;
 		curlevelNames['taxa'] = levelNames['taxa'];
 		curlevelNames['func'] = levelNames['func'];
 
 		var taxa_data = jQuery.extend(true, [], trees.taxa_tree_data);
-		
-		/*var curr_taxa = [];
-		for (var i = 0; i < taxa_data.length; i++){
-			curr_taxa.push(taxa_data[i]);
-		}
-
-		for (; curr_taxa.length > 0;){
-			curr_taxon = curr_taxa.shift();
-			if (!data_cube.is_leaf(curr_taxon)){
-				curr_taxon.values.sort(sort_nest);
-				for (var i = 0; i < curr_taxon.values.length; i++){
-					curr_taxa.push(curr_taxon.values[i]);
-				}
-			}
-		} */
 
 		var newTaxaData = {
 			"key": "All Taxa",
@@ -142,8 +127,80 @@
 		getAvgs(roots["func"])
 		trees.update(roots['func']);
 
-		for(j=0; j < roots['taxa'].values.length;j++){
-			trees.click(roots['taxa'].values[j])
+		// If there are no currently displayed taxa or functions, open to the second level of the taxonomic hierarchy and the first level of the function hierarchy
+		if (currently_displayed_taxa.length == 0){
+			for (var i = 0; i < roots['taxa'].values.length; i++){
+				// If values isn't null, use them
+				if (roots['taxa'].values[i].values){
+					for (var j = 0; j < roots['taxa'].values[i].values.length; j++){
+						currently_displayed_taxa.push(roots['taxa'].values[i].values[j].key);
+					}
+
+				// Otherwise, look at _values
+				} else if (roots['taxa'].values[i]._values){
+					for (var j = 0; j < roots['taxa'].values[i]._values.length; j++){
+						currently_displayed_taxa.push(roots['taxa'].values[i]._values[j].key);
+					}
+
+				// Otherwise, just use the top level values
+				} else {
+					currently_displayed_taxa.push(roots['taxa'].values[i].key)
+				}
+			}
+		}
+		if (currently_displayed_functions.length == 0){
+			for (var i = 0; i < roots['func'].values.length; i++){
+				currently_displayed_functions.push(roots['func'].values[i].key);
+			}
+		}
+
+		// Do a BFS to open up the taxonomy and function trees to the current level (handles saving state when the plot gets redrawn dynamically, for example when resizing the window)
+		var taxa_to_check = [];
+		for (var i = 0; i < roots['taxa'].values.length; i++){
+			taxa_to_check.push(roots['taxa'].values[i]);
+		}
+		while (taxa_to_check.length > 0){
+
+			var curr_taxon = taxa_to_check.shift();
+
+			var taxon_in_currently_displayed_taxa = false;
+			for (var i = 0; i < currently_displayed_taxa.length; i++){
+				if (curr_taxon.key == currently_displayed_taxa[i]){
+					taxon_in_currently_displayed_taxa = true;
+					break;
+				}
+			}
+
+			if (!taxon_in_currently_displayed_taxa){
+				trees.click(curr_taxon);
+				for (var i = 0; i < curr_taxon.values.length; i++){
+					taxa_to_check.push(curr_taxon.values[i]);
+				}
+			}
+		}
+
+		var funcs_to_check = [];
+		for (var i = 0; i < roots['func'].values.length; i++){
+			funcs_to_check.push(roots['func'].values[i]);
+		}
+		while (funcs_to_check.length > 0){
+
+			var curr_func = funcs_to_check.shift();
+
+			var func_in_currently_displayed_functions = false;
+			for (var i = 0; i < currently_displayed_functions.length; i++){
+				if (curr_func.key == currently_displayed_functions[i]){
+					func_in_currently_displayed_functions = true;
+					break;
+				}
+			}
+
+			if (!func_in_currently_displayed_functions){
+				trees.click(curr_func);
+				for (var i = 0; i < curr_func.values.length; i++){
+					funcs_to_check.push(curr_func.values[i]);
+				}
+			}
 		}
 	}
 	
@@ -334,31 +391,11 @@
 				 } })
 			.style("stroke-width", "1") //make them unhighlighted style to start
 			.style("stroke", "grey");
-
-
-	/*								return d._values ? "lightsteelblue" : "#fff";
-		});
-	*/							
+							
 		node.filter( function (d) {
 			return (~d.values) })
 				.filter( function(d) { return d3.select(this).select("rect").empty(); })
 				.append("rect");
-
-		/*
-		nodeEnter.append("text")
-			.attr("x", function (d) {
-			return source.type == 'taxa' ? 10 : -10;
-		})
-			.attr("dy", ".35em")
-			.attr("text-anchor", function (d) {
-			return source.type == 'taxa' ? "start" : "end";
-		})
-			.text(function (d) {
-			   if(d.key != null)
-				   return d.key;
-		})
-			.style("fill-opacity", 1e-6);
-		*/
 		
 		// Transition nodes to their new position.
 		var nodeUpdate = node.transition()
@@ -406,35 +443,6 @@
 				 } })
 			.style("stroke-width", "1")
 			.style("stroke", "grey");
-
-
-	/*								.style("fill", function (d) {
-				if (d.values) {
-				return "#fff";
-				} else {  // has d._values
-					if (d._values[0].hasOwnProperty("key")) {
-						return "lightsteelblue";
-					} else {
-						return "#000"
-					}
-				}
-			});
-	*/
-		/*
-		nodeUpdate.select("text")
-			.style("fill-opacity", function(d) {
-				return d.values ? 0 : 1;
-			})
-			.text(function (d) {
-				if( d.values) {
-					return "";
-				} else {
-					if(d.key != null)
-				   return d.key;
-				}
-			}); */
-			
-			
 
 		// Transition exiting nodes to the parent's new position.
 		var nodeExit = node.exit().transition()
@@ -549,17 +557,13 @@
 			if (d.values) { //collapse
 				if (d.depth > 0) {//don't collapse the root
 					trees.collapseTree(d);
-					d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);
-					//d3.selectAll(".clicked").classed("clicked", false) //wipe all clicking and highlighting
-					//d3.selectAll(".highlighted").classed("highlighted", false)			
+					d.type == 'taxa' ? data_cube.collapse_taxon(d.key) : data_cube.collapse_func(d.key);		
 				}
 			} else { //expand
 				if (d._values[0].hasOwnProperty('key')) {
 					d.values = d._values;
 					d._values = null;
 					d.type == 'taxa' ? data_cube.expand_taxon(d.key) : data_cube.expand_func(d.key);
-					//d3.selectAll(".clicked").classed("clicked", false)
-					//d3.selectAll(".highlighted").classed("highlighted", false)
 				} else {
 				}			
 			}
