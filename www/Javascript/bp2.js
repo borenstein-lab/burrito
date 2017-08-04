@@ -229,6 +229,20 @@
 			.attr("class","edge")
 			.attr("points", bP.edgePolygon2)
 			.classed("highlighted", false);
+			
+		var tooltip = d3.select("body")
+  			.append("div")
+  			.style("position", "absolute")
+  			.style("z-index", "10")
+  			.style("visibility", "hidden")
+  			.style("background", "lightgrey")
+  			.style("opacity", "1")
+  			.style("border", "0px")    
+  			.style("border-radius", "4px")  
+  			.style("padding","2px")
+			.text("a simple tooltip");
+
+
 
 		edgeBar.style("fill", "white") //function(d){ return taxa_colors(data.keys[0][d.key1]) ;})
 			.style("opacity",0).each(function(d) { this._current = d; })
@@ -237,6 +251,14 @@
 				})
 			.on("mouseover", function(d,i){ 
 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
+					clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
+					if(clickedEdges.empty()||d3.select(this).classed("clicked")==true){
+						tooltip.html("Avg contribution to function:<br>"+ Math.round(d.wid) + "%")
+						tooltip.style("visibility", "visible")
+					}
+			})
+			.on("mousemove", function(d){
+				return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 			})
 			.on("mouseout", function(d,i){ 
 				current_data = this._current
@@ -252,9 +274,11 @@
 								return 0.8;
 							}
 							});//.style("fill", "grey");
+				tooltip.style("visibility", "hidden")
 			})
 			.on("click", function(d,i){
 				current_data = this._current
+				tooltip.style("visibility","visible")
 				if(d3.select(this).classed("highlighted")==false){
 				//unselect other edges
 				} 
@@ -276,6 +300,7 @@
 					
 				}else{ //if this edge is not already clicked
 					d3.select(this).style("opacity",1)
+					tooltip.style("visibility", "visible")
 															//dehighlight other taxa
 				displayed_taxa.map(function(e,j){
 					if(j != current_data.key1){ //if this should not be highlighted
@@ -389,7 +414,7 @@
 	}	
 	
 	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse){
-		
+
 		bb = dims.width * .075;
 		b = dims.width / 50;
 		c1 = [-(5 + 0.005*dims.width), b + (5 + 0.005*dims.width)];
@@ -417,7 +442,7 @@
 				sub_contrib = avg_contrib_data[displayed_taxa[d.key1]][displayed_funcs[d.key2]]
 			//divided by all the things with that function
 				all_func = d3.keys(avg_contrib_data).map(function(e){ 
-					return avg_contrib_data[e][displayed_funcs[d.key2]]; })					
+					return avg_contrib_data[e][displayed_funcs[d.key2]]; })
 			return {h1: d.h1, h2: d.h2, key1: d.key1, key2: d.key2, val: d.val, wid: 100*sub_contrib/d3.sum(all_func), y1: d.y1, y2:d.y2 };
 			})
 
