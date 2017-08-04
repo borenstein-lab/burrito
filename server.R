@@ -3,7 +3,7 @@
 library(shiny)
 library(data.table)
 
-# Default files, tables for contribution calculations, and a file of shared constants
+# Default files, tables for contribution calculations, a file of shared constants, and the html input elements we interact with
 default_taxonomic_hierarchy_table_filename = "www/Data/97_otu_taxonomy_split_with_header.txt"
 default_function_hierarchy_table_filename = "www/Data/classes_parsed2.tsv"
 default_metadata_table_filename = "www/Data/mice_samplemap.txt"
@@ -12,6 +12,7 @@ default_otu_table_filename = "www/Data/otu_table_even_2.txt"
 picrust_normalization_table_filename = "www/Data/16S_13_5_precalculated.tab.gz"
 picrust_ko_table_filename = "www/Data/melted_filtered_picrust_ko_table.txt.gz"
 constants_filename = "www/Javascript/constants.js"
+html_elements = c("taxonomic_abundance_table", "genomic_content_table", "contribution_table", "function_abundance_table", "custom_taxonomic_hierarchy_table", "custom_function_hierarchy_table", "metadata_table")
 
 # Read the shared constants table
 constants_table = fread(constants_filename, header=F)
@@ -531,6 +532,57 @@ shinyServer(function(input, output, session) {
 		return(TRUE)
 	}
 
+	# validate_tables_match(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table)
+	#
+	# Checks whether the tables match with consistent labels and samples
+	validate_tables_match = function(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table){
+
+		# Check that OTUs in the OTU table are present in the taxonomic hierarchy
+		if (!validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")){
+			return(FALSE)
+		}
+
+		# Check that OTUs in the contribution table are present in the taxonomic hierarchy
+		if (!validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")){
+			return(FALSE)
+		}
+
+		# Check that functions in the contribution table are present in the function hierarchy
+		if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "function hierarchy")){
+			return(FALSE)
+		}
+
+		# If the function abundance table is not empty, check that functions in the function abundance table are in the function hierarchy
+		if (nrow(function_abundance_table) > 0){
+			if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "function hierarchy")){
+				return(FALSE)
+			}
+		}
+		
+		# If the function abundance table is not empty, check that samples in the function abundance table are in the contribution table
+		if (nrow(function_abundance_table) > 0){
+			if (!validate_elements_from_first_found_in_second(colnames(function_abundance_table)[2:ncol(function_abundance_table)], contribution_table[[first_metadata_level()]], "samples", "function abundance table", "contribution table")){
+				return(FALSE)
+			}
+		}
+
+		# If the metadata table is not empty, check that samples in the OTU table are in the metadata table
+		if (nrow(metadata_table) > 0){
+			if (!validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "metadata table")){
+				return(FALSE)
+			}
+		}
+
+		# If the metadat table is not empty, check that samples in the contribution table are in the metadata table
+		if (nrow(metadata_table) > 0){
+			if (!validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "metadata_table")){
+				return(FALSE)
+			}
+		}
+
+		return(TRUE)
+	}
+
 	# process_otu_table_file()
 	#
 	# Processes the otu table specified from the upload page
@@ -567,6 +619,9 @@ shinyServer(function(input, output, session) {
 				return(NULL)
 			}
 		}
+
+		# Format the OTU table
+		otu_table = format_otu_table(otu_table)
 
 		return(otu_table)
 	}
@@ -645,46 +700,59 @@ shinyServer(function(input, output, session) {
 	# Processes the function abundance table specified from the upload page
 	process_function_abundance_table_file = function(){
 
-		function_abundance_table_file = input$function_abundance_table
+		# If the option to upload a table of function abundances for comparison is selected, read it in
+		if (input$function_abundance_choice == "PRESENT"){
 
-		# If no file was ever selected, send an abort signal
-		if (is.null(function_abundance_table_file) & !new_file_flags[["function_abundance_table"]]){
-			session$sendCustomMessage("abort", "The option to upload function abundances for comparison was chosen, but no function abundance file was selected. Please select one or choose the option to upload no function abundances.")
-			return(NULL)
-		}
+			function_abundance_table_file = input$function_abundance_table
 
-		# Read in the function abundance table
-		function_abundance_table = process_input_file("function_abundance_table")
-
-		# If we were able to read the function abundance table, check for duplicate rows or duplicate samples
-		if (!is.null(function_abundance_table)){
-
-			# Rename columns for consistency
-			colnames(function_abundance_table)[1] = first_function_level()
-
-			unique_functions_validated = validate_unique_rows(function_abundance_table, first_function_level(), paste(first_function_level(), "s", sep=""), "function abundance table")
-
-			# If there are duplicate functions, return NULL
-			if (!unique_functions_validated){
+			# If no file was ever selected, send an abort signal
+			if (is.null(function_abundance_table_file) & !new_file_flags[["function_abundance_table"]]){
+				session$sendCustomMessage("abort", "The option to upload function abundances for comparison was chosen, but no function abundance file was selected. Please select one or choose the option to upload no function abundances.")
 				return(NULL)
 			}
 
-			unique_samples_validated = validate_unique_columns(function_abundance_table, 2:ncol(function_abundance_table), "samples", "function abundance table")
+			# Read in the function abundance table
+			function_abundance_table = process_input_file("function_abundance_table")
 
-			# If there are duplicate samples, return NULL
-			if (!unique_samples_validated){
-				return(NULL)
+			# If we were able to read the function abundance table, check for duplicate rows or duplicate samples
+			if (!is.null(function_abundance_table)){
+
+				# Rename columns for consistency
+				colnames(function_abundance_table)[1] = first_function_level()
+
+				unique_functions_validated = validate_unique_rows(function_abundance_table, first_function_level(), paste(first_function_level(), "s", sep=""), "function abundance table")
+
+				# If there are duplicate functions, return NULL
+				if (!unique_functions_validated){
+					return(NULL)
+				}
+
+				unique_samples_validated = validate_unique_columns(function_abundance_table, 2:ncol(function_abundance_table), "samples", "function abundance table")
+
+				# If there are duplicate samples, return NULL
+				if (!unique_samples_validated){
+					return(NULL)
+				}
 			}
+
+			return(function_abundance_table)
 		}
 
-		return(function_abundance_table)
+		# Othwerise, return a default empty table
+		return(data.table())
 	}
 
-	# process_custom_taxonomic_hierarchy_table_file()
+	# process_taxonomic_hierarchy_table_file()
 	#
-	# Processes the custom taxonomic hierarchy table specified from the upload page
-	process_custom_taxonomic_hierarchy_table_file = function(){
+	# Processes the taxonomic hierarchy table specified from the upload page
+	process_taxonomic_hierarchy_table_file = function(){
 
+		# If the option to use the default taxonomic hierarchy table is selected, then return the default
+		if (input$taxonomic_hierarchy_choice == "DEFAULT"){
+			return(default_taxonomic_hierarchy_table)
+		}
+
+		# Othwerise, we read the custom taxonomic hierarchy table
 		custom_taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
 
 		# If no file was ever selected, send an abort signal
@@ -717,11 +785,17 @@ shinyServer(function(input, output, session) {
 		return(custom_taxonomic_hierarchy_table)
 	}
 
-	# process_custom_function_hierarchy_table_file()
+	# process_function_hierarchy_table_file()
 	#
-	# Processes the custom function hierarchy table specified from the upload page
-	process_custom_function_hierarchy_table_file = function(){
+	# Processes the function hierarchy table specified from the upload page
+	process_function_hierarchy_table_file = function(){
 
+		# If the option to use the default function hierarchy is selected, then return the default
+		if (input$function_hierarchy_choice == "DEFAULT"){
+			return(default_function_hierarchy_table)
+		}
+
+		# Otherwise, we read the custom function hierarchy table
 		custom_function_hierarchy_table_file = input$custom_function_hierarchy_table
 
 		# If no file was ever selected, send an abort signal
@@ -764,29 +838,35 @@ shinyServer(function(input, output, session) {
 	# Processes the metadata table specified from the upload page
 	process_metadata_table_file = function(){
 
-		metadata_table_file = input$metadata_table
+		# If the option to upload a table of metadata is selected, read it in
+		if (input$metadata_choice == "PRESENT"){
+			metadata_table_file = input$metadata_table
 
-		# If no file was ever selected, send an abort signal
-		if (is.null(metadata_table_file) & !new_file_flags[["metadata_table"]]){
-			session$sendCustomMessage("abort", "The option to upload metadata was chosen, but no metadata file was selected. Please select one or choose the option to upload no metadta.")
-			return(NULL)
-		}
-
-		# Read in the metadata table
-		metadata_table = process_input_file("metadata_table")
-
-		# If we were able to read the metadata table, check for duplicate rows
-		if (!is.null(metadata_table)){
-
-			unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "metadata table")
-
-			# If there are duplicate rows, return NULL
-			if (!unique_metadata_entries_validated){
+			# If no file was ever selected, send an abort signal
+			if (is.null(metadata_table_file) & !new_file_flags[["metadata_table"]]){
+				session$sendCustomMessage("abort", "The option to upload metadata was chosen, but no metadata file was selected. Please select one or choose the option to upload no metadta.")
 				return(NULL)
 			}
+
+			# Read in the metadata table
+			metadata_table = process_input_file("metadata_table")
+
+			# If we were able to read the metadata table, check for duplicate rows
+			if (!is.null(metadata_table)){
+
+				unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "metadata table")
+
+				# If there are duplicate rows, return NULL
+				if (!unique_metadata_entries_validated){
+					return(NULL)
+				}
+			}
+
+			return(metadata_table)
 		}
 
-		return(metadata_table)
+		# Otherwise, return a default empty table
+		return(data.table())
 	}
 
 	# run_picrustgenerate_contribution_table_using_picrust(otu_table)
@@ -824,10 +904,17 @@ shinyServer(function(input, output, session) {
 		return(contribution_table)
 	}
 
-	# generate_contribution_table_using_custom_genomic_content(otu_table, genomic_content_table)
+	# generate_contribution_table_using_custom_genomic_content(otu_table)
 	#
-	# Uses the provided OTU table and genomic content table to to generate a contribution table
-	generate_contribution_table_using_custom_genomic_content = function(otu_table, genomic_content_table){
+	# Uses the provided OTU table to generate a contribution table
+	generate_contribution_table_using_custom_genomic_content = function(otu_table){
+
+		genomic_content_table = process_genomic_content_table_file()
+
+		# If the genomic content table could not be processed, we return NULL
+		if (is.null(genomic_content_table)){
+			return(NULL)
+		}
 
 		# File checking
 		session$sendCustomMessage("upload_status", "Verifying OTUs match between tables")
@@ -849,10 +936,17 @@ shinyServer(function(input, output, session) {
 		return(otu_table_with_content[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F])
 	}
 
-	# generate_contribution_table_using_custom_contributions(otu_table, contribution_table)
+	# generate_contribution_table_using_custom_contributions(otu_table)
 	#
-	# Uses the provided OTU table and contribution table to to generate a contribution table (currently just validating that OTUs and samples match between the two)
-	generate_contribution_table_using_custom_contributions = function(otu_table, contribution_table){
+	# Uses the provided OTU table to generate a contribution table (currently just validating that OTUs and samples match between the two)
+	generate_contribution_table_using_custom_contributions = function(otu_table){
+
+		contribution_table = process_contribution_table_file()
+
+		# If the contribution table could not be processed, we return NULL
+		if (is.null(contribution_table)){
+			return(NULL)
+		}
 
 		# File checking
 		session$sendCustomMessage("upload_status", "Verifying OTUs match between tables")
@@ -890,6 +984,29 @@ shinyServer(function(input, output, session) {
 		}
 
 		# If all validation checks pass, then we can just return the contribution table
+		return(contribution_table)
+	}
+
+	# generate_contribution_table(otu_table)
+	#
+	# Generates a contribution table depending on the method selected
+	generate_contribution_table = function(otu_table){
+
+		contribution_table = NULL
+
+		# If they've chosen the genomic content option
+		if (input$contribution_method_choice == "GENOMIC_CONTENT"){
+			contribution_table = generate_contribution_table_using_custom_genomic_content(otu_table)
+
+		# If they've chosen the PICRUSt option
+		} else if (input$contribution_method_choice == "PICRUST"){		
+			contribution_table = generate_contribution_table_using_picrust(otu_table)
+
+		# If they've chosen the contribution table option
+		} else if (input$contribution_method_choice == "CONTRIBUTION"){
+			contribution_table = generate_contribution_table_using_custom_contributions(otu_table)
+		}
+
 		return(contribution_table)
 	}
 
@@ -934,6 +1051,9 @@ shinyServer(function(input, output, session) {
 	# Formats the otu table for further processing
 	format_otu_table = function(otu_table){
 
+		# Set the name for the first column to match with the taxonoimc hierarchy table
+		colnames(otu_table)[1] = first_taxonomic_level()
+
 		# Change zeros in OTU table to NAs so we can remove them when melting
 		otu_table[otu_table == 0] = NA
 
@@ -943,20 +1063,28 @@ shinyServer(function(input, output, session) {
 		return(otu_table)
 	}
 
+	# format_default_contribution_table(contribution_table)
+	#
+	# Formats the default contribution table
+	format_default_contribution_table = function(contribution_table){
+
+		# Remove the unnecessary columns (keep Sample, OTU, KO, and contribution)
+		contribution_table = contribution_table[,c(2,3,1,6),with=F]
+
+		# Rename the columns for consistency
+		colnames(contribution_table) = c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution")
+
+		return(contribution_table)
+	}
+
 	# add_comparison_function_abundances_to_contribution_table(contribution_table, function_abundance_table)
 	#
 	# Adds the function abundances from the function abundance table to the contribution table for comparison
 	add_comparison_function_abundances_to_contribution_table = function(contribution_table, function_abundance_table){
 
-		# File checking
-		session$sendCustomMessage("upload_status", "Verifying samples match between the contribution table and the comparison function abundance table")
-
-		# Check that samples in the function abundance table are in the contribution table
-		function_abundance_samples_have_contributions_validated = validate_elements_from_first_found_in_second(colnames(function_abundance_table)[2:ncol(function_abundance_table)], contribution_table[[first_metadata_level()]], "samples", "function abundance table", "contribution table")
-
-		# If there are function abundances without contributions, we return NULL
-		if (!function_abundance_samples_have_contributions_validated){
-			return(NULL)
+		# If the function abundance table is empty, just return the contribution table
+		if (nrow(function_abundance_table) == 0){
+			return(contribution_table)
 		}
 
 		# Add a tag to the names of samples for comparison
@@ -1230,7 +1358,11 @@ shinyServer(function(input, output, session) {
 	# Orders the samples in the metadata table by the selected metadata factor
 	order_metadata_table_by_metadata_factor = function(metadata_table){
 
-		metadata_table = metadata_table[order(get(metadata_factor()))]
+		# If the metadata table is not empty, order the rows
+		if (nrow(metadata_table) > 0){
+			metadata_table = metadata_table[order(get(metadata_factor()))]
+		}
+
 		return(metadata_table)
 	}
 
@@ -1239,8 +1371,8 @@ shinyServer(function(input, output, session) {
 	# Converts the R table format metadata table to the javascript table used in the visualization, if a metadata table was provided
 	convert_metadata_table_to_javascript_table = function(metadata_table){
 
-		# If no metadata table was provided, return NULL
-		if (is.null(metadata_table)){
+		# If the metadata table is empty, return NULL
+		if (nrow(metadata_table) == 0){
 			return(NULL)
 		}
 
@@ -1250,330 +1382,136 @@ shinyServer(function(input, output, session) {
 		return(javascript_metadata_table)
 	}
 
-	# get_otu_table_sample_order(javascript_otu_table, metadata_table)
+	# format_hierarchy_table_for_summarizing(hierarchy_table)
 	#
-	# Determines the order in which samples should be displayed for the taxonomic abundance barplot
-	get_otu_table_sample_order = function(javascript_otu_table, metadata_table){
+	# Formats the input hierarchy table for summarizing the OTU and/or contribution tables
+	format_hierarchy_table_for_summarizing = function(hierarchy_table, filtering_level, entries_to_keep){
 
-		# Get the set of relevant samples
-		samples = sapply(javascript_otu_table, function(element){
-			return(element[[first_metadata_level()]])
-		})
+		# Filter the hierarchy entries
+		filtered_hierarchy = filter_hierarchy_table_entries(hierarchy_table, filtering_level, entries_to_keep)
 
-		# If there is no metadata to order by, just return the samples
-		if (is.null(metadata_table)){
-			return(1:length(samples))
-		}
+		# Make the entries of the hierarchy unique
+		uniqueified_hierarchy = make_hierarchy_table_level_entries_unique(hierarchy_table, filtering_level)
 
-		# Order all samples but the "Average_contrib" sample and the comparison samples by the metadata table order
-		otu_table_sample_order = sapply(metadata_table[[first_metadata_level()]], function(sample_name){
-			return(which(samples == sample_name))
-		})
-
-		# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample and the comparison samples
-		otu_table_sample_order = c(otu_table_sample_order, which(!(samples %in% metadata_table[[first_metadata_level()]]) & samples != "Average_contrib" & !grepl(comparison_tag, samples)))
-
-		return(otu_table_sample_order)
+		return(uniqueified_hierarchy)
 	}
 
-	# get_function_table_sample_order(javascript_contribution_table, metadata_table)
+	# prepare_and_send_contribution_table_for_visualization(contribution_table, taxonomic_hierarchy_table, function_hierarchy_table)
 	#
-	# Determines the order in which samples should be displayed for the function abundance barplot
-	get_function_table_sample_order = function(javascript_contribution_table, metadata_table){
+	# Performs the necessary formatting to prepare the contribution table to be sent to the browser for visualization
+	prepare_and_send_contribution_table_for_visualization = function(contribution_table, taxonomic_hierarchy_table, function_hierarchy_table){
 
-		# Get the set of relevant samples
-		samples = names(javascript_contribution_table)
-
-		# If there is no metadata to order by, remove the average contribution sample and order the rest so comparison samples are next to the right sample
-		if (is.null(metadata_table)){
-
-			# If there are comparison samples, put them next to the correct samples
-			if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
-				return(unlist(sapply(samples[!grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
-					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
-				})))
-			}
-
-			# Otherwise, just return the order of non-average contribution samples
-			return(which(samples != "Average_contrib"))
-		}
-
-		# Order all samples but the "Average_contrib" sample by the metadata table order
-		function_table_sample_order = unlist(sapply(metadata_table[[first_metadata_level()]], function(sample_name){
-
-			# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
-			if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
-				return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
-			}
-
-			# Otherwise, just return the sample that matches
-			return(which(samples == sample_name))
-		}))
-
-		# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample
-		function_table_sample_order = c(function_table_sample_order, unlist(sapply(samples[which(!(samples %in% metadata_table[[first_metadata_level()]])) & !grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
-
-			# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
-			if (input$function_abundance_choice == "PRESENT"){
-				return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
-			}
-
-			# Otherwise, just return the sample that matches
-			return(which(samples == sample_name))
-		})))
-
-		return(function_table_sample_order)
-	}
-
-	# The main observer, tied specifically to the update button that indicates the visualization should be generated. Runs the data validation and processing necessary to generate the javascript objects used in the visualization
-	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
-		
-		# Initializing important tables
-		otu_table = NULL
-		taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
-		contribution_table = NULL
-		function_hierarchy_table = default_function_hierarchy_table
-		metadata_table = NULL
-
-		session$sendCustomMessage("upload_status", "Starting input processing")
-
-		################################# Loading/calculating contribution table #################################
-
-		# If they've chosen to view the example, we load the default OTU table and contribution table
-		if (input$example_visualization == "TRUE"){
-
-			session$sendCustomMessage("upload_status", "Loading default data")
-
-			otu_table = default_otu_table
-			contribution_table = default_contribution_table
-
-
-			# Format the otu table
-			otu_table = format_otu_table(otu_table)
-
-			# Remove the unnecessary columns (keep Sample, OTU, KO, and contribution)
-			contribution_table = contribution_table[,c(2,3,1,6), with=FALSE]
-
-			# Rename the columns for consistency
-			colnames(contribution_table) = c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution")
-
-		# Otherwise, we generate the OTU table and contribution table from uploaded data
-		} else {
-
-			otu_table = process_otu_table_file()
-			# If the OTU table could not be processed, exit
-			if (is.null(otu_table)){
-				return()
-			}
-
-
-			# Format the otu table
-			otu_table = format_otu_table(otu_table)
-
-			# If we are not displaying the example and the option to upload a custom taxonomic hierarchy table is selected, read it in
-			if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "CUSTOM"){
-				taxonomic_hierarchy_table = process_custom_taxonomic_hierarchy_table_file()
-			}
-
-			# If the custom taxonomic hierarchy table could not be read, we exit
-			if (is.null(taxonomic_hierarchy_table)){
-				return()
-			}
-
-			# Check that the OTUs in the OTU table are present in the taxonomic hierarchy
-			otu_table_otus_in_taxonomic_hierarchy_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")
-
-			# If OTUs exist in the OTU table that are not in the taxonomic hierarchy, we exit
-			if (!otu_table_otus_in_taxonomic_hierarchy_validated){
-				return()
-			}
-
-			# If they've chosen the genomic content option
-			if (input$contribution_method_choice == "GENOMIC_CONTENT"){
-
-				genomic_content_table = process_genomic_content_table_file()
-
-				# If the genomic content table could not be processed, exit
-				if (is.null(genomic_content_table)){
-					return()
-
-				# Otherwise, generate a contribution table from the OTU table and genomic content table
-				} else {
-					contribution_table = generate_contribution_table_using_custom_genomic_content(otu_table, genomic_content_table)
-				}
-
-			# If they've chosen the PICRUSt option
-			} else if (input$contribution_method_choice == "PICRUST"){		
-				contribution_table = generate_contribution_table_using_picrust(otu_table)
-
-			# If they've chosen the contribution table option
-			} else if (input$contribution_method_choice == "CONTRIBUTION"){ 
-
-				contribution_table = process_contribution_table_file()
-
-				# If the contribution table could not be processed, exit
-				if (is.null(contribution_table)){
-					return()
-
-				# Otherwise, generate a contribution table from the OTU table and the contribution table
-				} else {
-					contribution_table = generate_contribution_table_using_custom_contributions(otu_table, contribution_table)
-				}
-			}
-
-			# If the contribution table could not be generated, we exit
-			if (is.null(contribution_table)){
-				return()
-			}
-
-			# If we are not displaying the example and the option to upload a custom function hierarchy table is selected, read it in
-			if (input$example_visualization != "TRUE" & input$function_hierarchy_choice == "CUSTOM"){
-				function_hierarchy_table = process_custom_function_hierarchy_table_file()
-			}
-
-			# If the custom function hierarchy table could not be read, we exit
-			if (is.null(function_hierarchy_table)){
-				return()
-			}
-
-			# Check that OTUs in the contribution table are present in the taxonomic hierarchy
-			contribution_table_otus_in_taxonomic_hierarchy_validated = validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")
-
-			# If OTUs exist in the contribution table that are not in the taxonomic hierarchy, we exit
-			if (!contribution_table_otus_in_taxonomic_hierarchy_validated){
-				return()
-			}
-
-			# Check that functions in the contribution table are present in the function hierarchy
-			contribution_table_functions_in_function_hierarchy_validated = validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "function hierarchy")
-
-			# If functions exist in the contribution table that are not in the function hierarchy, we exit
-			if (!contribution_table_functions_in_function_hierarchy_validated){
-				return()
-			}
-		}
-
-		# If the OTU table or contribution table could not be generated, we exit
-		if (is.null(otu_table) | is.null(contribution_table)){
-			return()
-		}
-
-		# If we are not displaying the example and the option to upload a table of function abundances for comparison is selected, add that to the contribution table, tagging sample names as comparisons
-		if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
-
-			function_abundance_table = process_function_abundance_table_file()
-
-			# If the function abundance table could not be processed, exit
-			if (is.null(function_abundance_table)){
-				return()
-			}
-
-			# Check that functions in the function abundance table are preset in the function hierarchy
-			function_abundance_table_functions_in_function_hierarchy_validated = validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "function hierarchy")
-
-			# If functions exist in the function abundance table that are not in the function hierarchy, we exit
-			if (!function_abundance_table_functions_in_function_hierarchy_validated){
-				return()
-			}
-
-			# Add the comparison samples to the contribution table
-			contribution_table = add_comparison_function_abundances_to_contribution_table(contribution_table, function_abundance_table)
-		}
-
-		# If we could not add the function abundances to the contribution table, we exit
-		if (is.null(contribution_table)){
-			return()
-		}
-
+		# Normalize the contributions by sample
 		contribution_table = normalize_contribution_table(contribution_table)
-		otu_table = normalize_otu_table(otu_table)
 
-		# If we are displaying the example, set the metadata table to the default
-		if (input$example_visualization == "TRUE"){
-			metadata_table = default_metadata_table
-
-		# Otherwise, if we are not displaying the example and the option to upload a metadata table is selected, read it in
-		} else if (input$example_visualization != "TRUE" & input$metadata_choice == "PRESENT"){
-			metadata_table = process_metadata_table_file()
-
-			# If the metadata table could not be read, we exit
-			if (is.null(metadata_table)){
-				return()
-			}
-
-			# Check that the samples in the OTU table are in the metadata table
-			otu_table_samples_have_metadata_validated = validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "metadata table")
-
-			# If there are samples in the OTU table that are not in the metadata table, we exit
-			if (!otu_table_samples_have_metadata_validated){
-				return()
-			}
-
-			# Check that the samples in the contribution table are in the metadata table
-			contribution_table_samples_have_metadata_validated = validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "metadata_table")
-
-			# If there are samples in the contribution table that are not in the metadata table, we exit
-			if (!contribution_table_samples_have_metadata_validated){
-				return()
-			}
-		}
-
-		session$sendCustomMessage("upload_status", "Summarizing function abundances to selected level")
-
-		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
-
-		function_hierarchy_table = make_hierarchy_table_level_entries_unique(function_hierarchy_table, first_function_level())
-
+		# Summarize the contribution table functions to the user-selected level
 		contribution_table = summarize_table_to_selected_level(contribution_table, function_hierarchy_table, function_summary_level(), function_partial_contribution_table())
 
-		session$sendCustomMessage("upload_status", "Summarizing contribution table to desired taxonomic level")
-
-		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, first_taxonomic_level(), contribution_table[[first_taxonomic_level()]])
-
-		taxonomic_hierarchy_table = make_hierarchy_table_level_entries_unique(taxonomic_hierarchy_table, first_taxonomic_level())
+		# Summarize the contribution table OTUs to the user-selected level
 		contribution_table = summarize_table_to_selected_level(contribution_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
 
-		session$sendCustomMessage("upload_status", "Summarizing OTU table to desired taxonomic level")
+		# Convert the contribution table to a javascript-friendly format
+		javascript_contribution_table = convert_contribution_table_to_javascript_table(contribution_table)
 
+		# Set the value of the tracked contribution table so that we can send it in pieces to the browser
+		tracked_tables[["contribution_table"]] = javascript_contribution_table
+
+		# Tell the browser how many samples there are
+		session$sendCustomMessage("number_of_samples_message", length(javascript_contribution_table))
+
+		# Tell the browser we're read to start sending contribution table data
+		session$sendCustomMessage(type="contribution_table_ready", length(javascript_contribution_table))
+
+		return(contribution_table)
+	}
+
+	# prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
+	#
+	# Performs the necessary formatting to prepare the otu table to be sent to the browser for visualization
+	prepare_and_send_otu_table_for_visualization = function(otu_table, taxonomic_hierarchy_table){
+
+		# Normalize the OTU abundances per sample
+		otu_table = normalize_otu_table(otu_table)
+
+		# Summarize the OTU table OTUS to the user-selected level
 		otu_table = summarize_table_to_selected_level(otu_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
 
-		session$sendCustomMessage("upload_status", "Formatting the function hierarchy")
-
-		function_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(function_hierarchy_table, function_summary_level())
-
-		session$sendCustomMessage(type='function_hierarchy_labels', colnames(function_hierarchy_table))
-
-		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, function_summary_level(), unique(contribution_table[[function_summary_level()]]))
-
-		javascript_function_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(function_hierarchy_table, "function", function_summary_level())
-
-		session$sendCustomMessage(type='function_hierarchy', javascript_function_hierarchy)
-
-		taxonomic_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(taxonomic_hierarchy_table, taxonomic_summary_level())
-
-		session$sendCustomMessage(type='taxonomic_hierarchy_labels', colnames(taxonomic_hierarchy_table))
-
-		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, taxonomic_summary_level(), contribution_table[[taxonomic_summary_level()]])
-      	
-		javascript_taxonomic_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(taxonomic_hierarchy_table, "taxa", taxonomic_summary_level())
-		
-		session$sendCustomMessage(type='taxonomic_hierarchy', javascript_taxonomic_hierarchy)
-
-		session$sendCustomMessage("upload_status", "Calculating average function abundances")
-		
-		function_mean_abundance_table = calculate_average_function_abundances(contribution_table, function_hierarchy_table)
-
-		session$sendCustomMessage(type="function_averages",paste(paste(colnames(function_mean_abundance_table), collapse="\t"), paste(sapply(1:nrow (function_mean_abundance_table), function(row){return(paste(function_mean_abundance_table[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
-
+		# Convert the OTU table to a javascript-friendly format
 		javascript_otu_table = convert_otu_table_to_javascript_table(otu_table)
 
 		# Set the value of the tracked OTU table so that we can send it in pieces to the browser
 		tracked_tables[["otu_table"]] = javascript_otu_table
-		
-  		# Tell the browser we're ready to start sending otu table data
-		session$sendCustomMessage(type="taxonomic_abundance_table_ready", length(javascript_otu_table))
 
-		javascript_contribution_table = convert_contribution_table_to_javascript_table(contribution_table)
+		# Tell the browser we're ready to start sending otu table data
+		session$sendCustomMessage("taxonomic_abundance_table_ready", length(javascript_otu_table))
+
+		return(otu_table)
+	}
+
+	# prepare_and_send_taxonomic_hierarchy_table_for_visualization(taxonomic_hierarchy_table, contribution_table)
+	#
+	# Performs the necessary formatting to prepare the taxonomic hierarchy table to be sent to the browser for visualization
+	prepare_and_send_taxonomic_hierarchy_table_for_visualization = function(taxonomic_hierarchy_table, contribution_table){
+
+		# Remove columns from the taxonomic hierarchy table taht are below the resolution selected by the user
+		taxonomic_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(taxonomic_hierarchy_table, taxonomic_summary_level())
+
+		# Send a list of the taxonomic level names
+		session$sendCustomMessage(type='taxonomic_hierarchy_labels', colnames(taxonomic_hierarchy_table))
+
+		# Re-filter the table now that we have summarized tables
+		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, taxonomic_summary_level(), unique(contribution_table[[taxonomic_summary_level()]]))
+
+		# Convert the taxonomic hierarchy table to a javascript-friendly format
+		javascript_taxonomic_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(taxonomic_hierarchy_table, "taxa", taxonomic_summary_level())
+
+		# Send the formatted taxonomic hierarchy to the browser
+		session$sendCustomMessage(type='taxonomic_hierarchy', javascript_taxonomic_hierarchy)
+
+		return(taxonomic_hierarchy_table)
+	}
+
+	# prepare_and_send_function_hierarchy_table_for_visualization(function_hierarchy_table, contribution_table)
+	#
+	# Performs the necessary formatting to prepare the function hierarchy table to be sent to the browser for visualization
+	prepare_and_send_function_hierarchy_table_for_visualization = function(function_hierarchy_table, contribution_table){
+
+		# Remove columns from the function hierarchy table taht are below the resolution selected by the user
+		function_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(function_hierarchy_table, function_summary_level())
+
+		# Send a list of the function level names
+		session$sendCustomMessage(type='function_hierarchy_labels', colnames(function_hierarchy_table))
+
+		# Re-filter the table now that we have summarized tables
+		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, function_summary_level(), unique(contribution_table[[function_summary_level()]]))
+
+		# Convert the function hierarchy table to a javascript-friendly format
+		javascript_function_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(function_hierarchy_table, "function", function_summary_level())
+
+		# Send the formatted function hierarchy to the browser
+		session$sendCustomMessage(type='function_hierarchy', javascript_function_hierarchy)
+
+		return(function_hierarchy_table)
+	}
+
+	# prepare_and_send_average_function_abundance_table_for_visualization(contribution_table, function_hierarchy_table)
+	#
+	# Performs the necessary calculations and formatting to generate the average function abundance table and send it to the browser for visualization
+	prepare_and_send_average_function_abundance_table_for_visualization = function(contribution_table, function_hierarchy_table){
+
+		# Calculate the average abundances
+		function_mean_abundance_table = calculate_average_function_abundances(contribution_table, function_hierarchy_table)
+
+		# Send the table to the browser
+		session$sendCustomMessage("function_averages",paste(paste(colnames(function_mean_abundance_table), collapse="\t"), paste(sapply(1:nrow(function_mean_abundance_table), function(row){return(paste(function_mean_abundance_table[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
+
+		return(function_mean_abundance_table)
+	}
+
+	# prepare_and_send_metadata_table_for_visualization(metadata_table)
+	#
+	# Performs the necessary formatting to prepare the metadata table to be sent to the browser for visualization
+	prepare_and_send_metadata_table_for_visualization = function(metadata_table){
 
 		# If a metadata factor has been selected, order samples by the indicated metadata factor
 		if (!is.null(metadata_factor())){
@@ -1590,23 +1528,178 @@ shinyServer(function(input, output, session) {
 		} else {
 			session$sendCustomMessage("metadata_table", javascript_metadata_table)
 		}
+
+		return(metadata_table)
+	}
+
+	# prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table)
+	#
+	# Determines the order in which samples should be displayed for the taxonomic abundance barplot
+	prepare_and_send_otu_table_sample_order_for_visualization = function(otu_table, metadata_table){
+
+		# Get the set of relevant samples
+		samples = levels(factor(otu_table[[first_metadata_level()]]))
+
+		# By default, just use the order of the samples from the otu table
+		otu_table_sample_order = 1:length(samples)
+
+		# If there is metadata to order by, use that order instead
+		if (nrow(metadata_table) > 0){
+
+			# Order all samples but the "Average_contrib" sample and the comparison samples by the metadata table order
+			otu_table_sample_order = sapply(metadata_table[[first_metadata_level()]], function(sample_name){
+				return(which(samples == sample_name))
+			})
+
+			# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample and the comparison samples
+			otu_table_sample_order = c(otu_table_sample_order, which(!(samples %in% metadata_table[[first_metadata_level()]]) & samples != "Average_contrib" & !grepl(comparison_tag, samples)))
+		}
+
+		# Send the sample order to the browser
+		session$sendCustomMessage("taxonomic_abundance_sample_order", samples[otu_table_sample_order])
+
+		return(otu_table_sample_order)
+	}
+
+	# prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table)
+	#
+	# Determines the order in which samples should be displayed for the function abundance barplot
+	prepare_and_send_function_table_sample_order_for_visualization = function(contribution_table, metadata_table){
+
+		# Get the set of relevant samples
+		samples = levels(factor(contribution_table[[first_metadata_level()]]))
+
+		# By default, remove the average contribution sample and order the rest so comparison samples are next to the right sample
+		function_table_sample_order = unlist(sapply(samples[!grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
+					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+				}))
+
+		# If there is metadata to order by, use that order instead
+		if (nrow(metadata_table) > 0){
+
+			# Order all samples but the "Average_contrib" sample by the metadata table order
+			function_table_sample_order = unlist(sapply(metadata_table[[first_metadata_level()]], function(sample_name){
+
+				# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
+				if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
+					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+				}
+
+				# Otherwise, just return the sample that matches
+				return(which(samples == sample_name))
+			}))
+
+			# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample
+			function_table_sample_order = c(function_table_sample_order, unlist(sapply(samples[which(!(samples %in% metadata_table[[first_metadata_level()]])) & !grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
+
+				# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
+				if (input$function_abundance_choice == "PRESENT"){
+					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+				}
+
+				# Otherwise, just return the sample that matches
+				return(which(samples == sample_name))
+			})))
+		}
+
+		# Send the function table sample order to the browser
+   		session$sendCustomMessage("function_abundance_sample_order", samples[function_table_sample_order])
+
+		return(function_table_sample_order)
+	}
+
+
+	# remove_temp_files()
+	#
+	# Deletes the temporary files made by users uploading data from the server
+	remove_temp_files = function(){
+
+		for (file_input_name in html_elements){
+			if (!is.null(input[[file_input_name]])){
+				file.remove(input[[file_input_name]]$datapath)
+			}
+		}
+	}
+
+	# The main observer, tied specifically to the update button that indicates the visualization should be generated. Runs the data validation and processing necessary to generate the javascript objects used in the visualization
+	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
 		
-		otu_table_sample_order = get_otu_table_sample_order(javascript_otu_table, metadata_table)
+		# Set the default tables
+		otu_table = format_otu_table(default_otu_table)
+		taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
+		contribution_table = format_default_contribution_table(default_contribution_table)
+		function_hierarchy_table = default_function_hierarchy_table
+		metadata_table = default_metadata_table
 
-		function_table_sample_order = get_function_table_sample_order(javascript_contribution_table, metadata_table)
+		# If they're not viewing the example, then we try to load data
+		if (input$example_visualization != "TRUE"){
 
-		session$sendCustomMessage("taxonomic_abundance_sample_order", sapply(javascript_otu_table, function(element){
-			return(element[[first_metadata_level()]])
-		})[otu_table_sample_order])
-   		session$sendCustomMessage("function_abundance_sample_order", names(javascript_contribution_table)[function_table_sample_order])
+			session$sendCustomMessage("upload_status", "Processing OTU table")
+			otu_table = process_otu_table_file()
+			session$sendCustomMessage("upload_status", "Processing taxonomic hierarchy")
+			taxonomic_hierarchy_table = process_taxonomic_hierarchy_table_file()
+			session$sendCustomMessage("upload_status", "Processing function hierarchy")
+			function_hierarchy_table = process_function_hierarchy_table_file()
+			session$sendCustomMessage("upload_status", "Processing function abundance comparison table")
+			function_abundance_table = process_function_abundance_table_file()
+			session$sendCustomMessage("upload_status", "Processing metadata")
+			metadata_table = process_metadata_table_file()
 
-		# Set the value of the tracked contribution table so that we can send it in pieces to the browser
-		tracked_tables[["contribution_table"]] = javascript_contribution_table
+			# If any tables could not be processed, we exit
+			if (is.null(otu_table) | is.null(taxonomic_hierarchy_table) | is.null(function_hierarchy_table) | is.null(function_abundance_table) | is.null(metadata_table)){
+				return()
+			}
 
-		# Tell the browser how many samples there are
-		session$sendCustomMessage("number_of_samples_message", length(javascript_contribution_table))
+			# Generate the contribution table
+			session$sendCustomMessage("upload_status", "Generating contribution table")
+			contribution_table = generate_contribution_table(otu_table)
 
-		# Tell the browser we're read to start sending contribution table data
-		session$sendCustomMessage(type="contribution_table_ready", length(javascript_contribution_table))
+			# If the contribution table could not be generated, we exit
+			if (is.null(contribution_table)){
+				return()
+			}
+
+			# Validate that all files have consistent labels and samples, and if not then exit
+			session$sendCustomMessage("upload_status", "Validating tables")
+			if (!validate_tables_match(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table)){
+				return()
+			}
+
+			# Add the comparison samples to the contribution table
+			session$sendCustomMessage("upload_status", "Incorporating function abundance comparisons")
+			contribution_table = add_comparison_function_abundances_to_contribution_table(contribution_table, function_abundance_table)
+
+			# If we could not add the function abundances to the contribution table, we exit
+			if (is.null(contribution_table)){
+				return()
+			}
+		}
+
+		# Format the hierarchy tables so that we can summarize the OTU and contribution tables with them
+		session$sendCustomMessage("upload_status", "Preparing to format data")
+		taxonomic_hierarchy_table = format_hierarchy_table_for_summarizing(taxonomic_hierarchy_table, first_taxonomic_level(), unique(contribution_table[[first_taxonomic_level()]]))
+		function_hierarchy_table = format_hierarchy_table_for_summarizing(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
+
+		# Prepare data and send it to the browser
+		session$sendCustomMessage("upload_status", "Formatting contribution table")
+		contribution_table = prepare_and_send_contribution_table_for_visualization(contribution_table, taxonomic_hierarchy_table, function_hierarchy_table)
+		session$sendCustomMessage("upload_status", "Formatting OTU table")
+		otu_table = prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
+		session$sendCustomMessage("upload_status", "Formatting taxonomic hierarchy")
+		taxonomic_hierarchy_table = prepare_and_send_taxonomic_hierarchy_table_for_visualization(taxonomic_hierarchy_table, contribution_table)
+		session$sendCustomMessage("upload_status", "Formatting function hierarchy")
+		function_hierarchy_table = prepare_and_send_function_hierarchy_table_for_visualization(function_hierarchy_table, contribution_table)
+		session$sendCustomMessage("upload_status", "Formatting abundance averages")
+		average_function_abundance_table = prepare_and_send_average_function_abundance_table_for_visualization(contribution_table, function_hierarchy_table)
+		session$sendCustomMessage("upload_status", "Formatting metadata")
+		metadata_table = prepare_and_send_metadata_table_for_visualization(metadata_table)
+		session$sendCustomMessage("upload_status", "Setting OTU abundance plot sample order")
+		otu_table_sample_order = prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table)
+		session$sendCustomMessage("upload_status", "Setting function abundance plot sample order")
+		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table)
+
+		# Remove temp files from the server
+		session$sendCustomMessage("upload_status", "Deleting temporary files")
+		remove_temp_files()
 	})
 })
