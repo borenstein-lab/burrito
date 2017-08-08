@@ -67,7 +67,7 @@
       .style("border", "0px")    
       .style("border-radius", "4px")  
       .style("padding","2px")
-      .text("a simple tooltip");
+      .text("");
 
     var normalized = true;
 
@@ -198,9 +198,13 @@
     	}
       })
       .on("click", function(d){
-              current_rectangle_data = d3.select(this).datum();
+        current_rectangle_data = d3.select(this).datum();
         current_id = "Genomes0"+current_rectangle_data.name.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+        name_split = (current_rectangle_data.name.split('_')).pop()
+        tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+		tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 		clickResponse(current_id, current_rectangle_data.name, "taxa", displayed_taxa, displayed_funcs)
+		return tooltip.style("visibility", "visible")
       });
 
     svglink.append("svg")

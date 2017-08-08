@@ -152,7 +152,7 @@
   .style("border-radius", "4px")  
   .style("padding","2px")
 
-  .text("a simple tooltip");
+  .text("");
 
 
 
@@ -270,7 +270,17 @@
   .on("click", function(d,i){
     	current_rectangle_data = d3.select(this).datum();
         current_id = "Genomes1"+current_rectangle_data.func.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+    	selected = d3.select("#func_" + current_rectangle_data.Sample)
+			.selectAll("rect").data()
+			.filter(function(e){ 
+				return e.func == current_rectangle_data.func; })
+     	total_abund = d3.sum(selected.map(function(e){ return e.contributions; }))
+    	name_split = (current_rectangle_data.func.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split  + "<br>" 
+        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
+		tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 		clickResponse(current_id, current_rectangle_data.func, "funcs", displayed_taxa, displayed_funcs)
+		return tooltip.style("visibility", "visible")
+		
   });
 
       //get the x axis set
