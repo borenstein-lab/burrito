@@ -31,7 +31,7 @@ default_contribution_table = fread(default_contribution_table_filename, header=T
 default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
 picrust_normalization_table = NULL
 picrust_ko_table = NULL
-if (basename(getwd()) %in% c("burrito")){
+if (basename(getwd()) %in% c("burrito", "burrito-cecilia")){
 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
 }
@@ -1532,19 +1532,17 @@ shinyServer(function(input, output, session) {
 		return(metadata_table)
 	}
 
-	# prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table)
+	# prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table, alphabetical = F)
 	#
 	# Determines the order in which samples should be displayed for the taxonomic abundance barplot
-	prepare_and_send_otu_table_sample_order_for_visualization = function(otu_table, metadata_table){
+	prepare_and_send_otu_table_sample_order_for_visualization = function(otu_table, metadata_table, alphabetical = F){
 
 		# Get the set of relevant samples
 		samples = levels(factor(otu_table[[first_metadata_level()]]))
 
-		# By default, just use the order of the samples from the otu table
-		otu_table_sample_order = 1:length(samples)
-
-		# If there is metadata to order by, use that order instead
-		if (nrow(metadata_table) > 0){
+		if(alphabetical){
+			otu_table_sample_order = rank(samples)
+		} else if (nrow(metadata_table) > 0){ # If there is metadata to order by, use that order instead
 
 			# Order all samples but the "Average_contrib" sample and the comparison samples by the metadata table order
 			otu_table_sample_order = sapply(metadata_table[[first_metadata_level()]], function(sample_name){
@@ -1553,7 +1551,12 @@ shinyServer(function(input, output, session) {
 
 			# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample and the comparison samples
 			otu_table_sample_order = c(otu_table_sample_order, which(!(samples %in% metadata_table[[first_metadata_level()]]) & samples != "Average_contrib" & !grepl(comparison_tag, samples)))
+		} else {
+			# By default, just use the order of the samples from the otu table
+			otu_table_sample_order = 1:length(samples)
 		}
+
+
 
 		# Send the sample order to the browser
 		session$sendCustomMessage("taxonomic_abundance_sample_order", samples[otu_table_sample_order])
@@ -1561,21 +1564,26 @@ shinyServer(function(input, output, session) {
 		return(otu_table_sample_order)
 	}
 
-	# prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table)
+	# prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, alphabetical = F)
 	#
 	# Determines the order in which samples should be displayed for the function abundance barplot
-	prepare_and_send_function_table_sample_order_for_visualization = function(contribution_table, metadata_table){
+	prepare_and_send_function_table_sample_order_for_visualization = function(contribution_table, metadata_table, alphabetical = F){
 
 		# Get the set of relevant samples
 		samples = levels(factor(contribution_table[[first_metadata_level()]]))
 
 		# By default, remove the average contribution sample and order the rest so comparison samples are next to the right sample
-		function_table_sample_order = unlist(sapply(samples[!grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
-					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+		if(alphabetical){
+			orig_samps = samples[!grepl(comparison_tag,samples) & samples != "Average_contrib"]
+			if(any(grepl(comparison_tag, samples))){
+				new_samp_order = c(sapply(sort(orig_samps), function(samp){
+					return(c(samp, paste0(samp, comparison_tag)))
 				}))
-
-		# If there is metadata to order by, use that order instead
-		if (nrow(metadata_table) > 0){
+				function_table_sample_order = match(new_samp_order, samples)
+			} else {
+				function_table_sample_order = rank(samples)
+			}
+		} else if (nrow(metadata_table) > 0){ # If there is metadata to order by, use that order instead
 
 			# Order all samples but the "Average_contrib" sample by the metadata table order
 			function_table_sample_order = unlist(sapply(metadata_table[[first_metadata_level()]], function(sample_name){
@@ -1600,6 +1608,10 @@ shinyServer(function(input, output, session) {
 				# Otherwise, just return the sample that matches
 				return(which(samples == sample_name))
 			})))
+		} else {
+				function_table_sample_order = unlist(sapply(samples[!grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
+					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+				}))
 		}
 
 		# Send the function table sample order to the browser
@@ -1692,11 +1704,11 @@ shinyServer(function(input, output, session) {
 		session$sendCustomMessage("upload_status", "Formatting abundance averages")
 		average_function_abundance_table = prepare_and_send_average_function_abundance_table_for_visualization(contribution_table, function_hierarchy_table)
 		session$sendCustomMessage("upload_status", "Formatting metadata")
-		metadata_table = prepare_and_send_metadata_table_for_visualization(metadata_table)
+		metadata_table = prepare_and_send_metadata_table_for_visualization(metadata_table) 
 		session$sendCustomMessage("upload_status", "Setting OTU abundance plot sample order")
-		otu_table_sample_order = prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table)
+		otu_table_sample_order = prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table, input$sort_samples)
 		session$sendCustomMessage("upload_status", "Setting function abundance plot sample order")
-		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table)
+		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, input$sort_samples)
 
 		# Remove temp files from the server
 		session$sendCustomMessage("upload_status", "Deleting temporary files")
