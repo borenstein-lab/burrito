@@ -52,8 +52,8 @@
     d3.select("#otu_bar_xtick_svg").remove()
 
 	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8}
-    x.rangeRoundBands([0, graphdims.width], .2);
-    y.rangeRound([graphdims.height, 0]);
+    x.rangeBands([0, graphdims.width], .2);
+    y.range([graphdims.height, 0]);
     xAxis.scale(x);
     yAxis.scale(y);
     
