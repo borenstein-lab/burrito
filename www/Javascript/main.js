@@ -852,7 +852,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		    if(d3.select("#"+id).classed("clicked") == false){ //if not already clicked
 						//Unselect things currently clicked
 						displayed_taxa.map(function(e,j){
-							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+							d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")
 							//if(d_id !== current_id){ //if not currently selected thing
 								if(d3.select("#"+d_id).classed("highlighted")==true){
 									d3.select("#"+d_id).classed("highlighted",false)
@@ -871,7 +871,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 								}})
 						
 						displayed_funcs.map(function(e,j){
-							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+							d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")
 								if(d3.select("#"+d_id).classed("highlighted")==true){
 									d3.select("#"+d_id).classed("highlighted",false)
 									d3.select("#"+d_id).classed("clicked",false)
@@ -925,8 +925,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 						clickedEdges.classed("clicked", false)
 						dehighlightOverall(displayed_taxa[clickedEdges.datum().key1], displayed_funcs[clickedEdges.datum().key2], 3, bars_only = false)
-						d3.select("#Genomes0"+displayed_taxa[clickedEdges.datum().key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")).classed("highlighted", false)
-						d3.select("#Genomes0"+displayed_taxa[clickedEdges.datum().key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")).classed("clicked", false)
+						d3.select("#Genomes0"+displayed_taxa[clickedEdges.datum().key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", false)
+						d3.select("#Genomes0"+displayed_taxa[clickedEdges.datum().key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked", false)
 						dehighlightOverall(displayed_taxa[clickedEdges.datum().key1], "", 1) //bP.deSelectSegment(0, clickedEdges.datum().key1, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
 						highlightOverall("", name, 2)
 					} else{

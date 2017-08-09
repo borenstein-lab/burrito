@@ -147,13 +147,13 @@
         	return tooltip.style("visibility", "visible");
         }
         if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
-    		if(displayed_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
+    		if(displayed_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
         	name_split = (current_rectangle_data.name.split('_')).pop()
         	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           	return tooltip.style("visibility", "visible");
     		}
     	} else if(clickedEdges.empty() == false){ //if an edge is clicked
-    		if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){ //if relevant edge is clicked
+    		if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){ //if relevant edge is clicked
     		    name_split = (current_rectangle_data.name.split('_')).pop()
         		tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
           		return tooltip.style("visibility", "visible");
@@ -168,11 +168,11 @@
   		if(clickedBars.empty()){
 	        return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
         } else if(clickedTaxaBars.empty() == false){
-         	if(displayed_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
+         	if(displayed_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
          		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
          	}
          } else if(clickedEdges.empty() == false){
-         	if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
+         	if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
          		return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
          	}
          }
@@ -188,18 +188,18 @@
         	return tooltip.style("visibility", "hidden");
         }  
         if(clickedTaxaBars.empty() == false){
-    		if(displayed_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
+    		if(displayed_taxa[clickedTaxaBars.datum().key] == (d.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
 	    		return tooltip.style("visibility", "hidden");
     		} 
     	} else if(clickedEdges.empty() == false){
-    		if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")){
+    		if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
     			return tooltip.style("visibility", "hidden");
     		}
     	}
       })
       .on("click", function(d){
         current_rectangle_data = d3.select(this).datum();
-        current_id = "Genomes0"+current_rectangle_data.name.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+        current_id = "Genomes0"+current_rectangle_data.name.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")
         name_split = (current_rectangle_data.name.split('_')).pop()
         tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
 		tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");

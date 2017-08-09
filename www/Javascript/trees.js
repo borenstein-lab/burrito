@@ -572,7 +572,7 @@
 		trees.update(d);
 		//dehighlight everything 	
 		data_cube.displayed_taxa.map(function(e,j){
-			d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+			d_id = "Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")
 // 			if(d3.select("#"+d_id).classed("highlighted")==true){
 				d3.select("#"+d_id).classed("highlighted",false)
 				d3.select("#"+d_id).classed("clicked",false)
@@ -590,7 +590,7 @@
 					})
 						
 		data_cube.displayed_funcs.map(function(e,j){
-			d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\])/g, "_")
+			d_id = "Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")
 // 				if(d3.select("#"+d_id).classed("highlighted")==true){
 					d3.select("#"+d_id).classed("highlighted",false)
 					d3.select("#"+d_id).classed("clicked",false)
