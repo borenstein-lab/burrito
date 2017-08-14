@@ -18,6 +18,8 @@
     var y1 = 0;
     var total = 0;
 
+
+
     data.forEach(function(d) {
       var length = d.data.length;
       var y0 = 0;
@@ -125,7 +127,7 @@
     .text("Relative Abundance (%)");
 
   //x-axis label
-    svglink.append("text")
+   /* svglink.append("text")
     .attr("class", "x label")
     .attr("id", "func_bar_x_label")
     .attr("text-anchor", "middle")
@@ -134,7 +136,7 @@
     .attr("font-size",18)
     .attr("dy", ".75em")
     .text("Samples");
-
+*/ //removed to make room for group labels
 
 
 
@@ -290,15 +292,16 @@
     .attr("x", 0)
     .attr("y",graphdims.height + graphdims.height_buffer)
     .attr("width", last_sample_x - first_sample_x + graphdims.x_axis_x_buffer + x.rangeBand())
-    .attr("height", dims.height-25 - graphdims.height - graphdims.height_buffer)
+    .attr("height", dims.height - graphdims.height - graphdims.height_buffer)
     .style("font-family", "Verdana");
 
 
   d3.select("#func_bar_xtick_svg").append("g")
-    .attr("class", "x axis")
+    .attr("class", "x_axis")
     .attr("transform", "translate(" + graphdims.x_axis_x_buffer + ",0)")
     .call(xAxis)
     .selectAll("text")
+	.style("alignment-baseline","middle")
     .style("text-anchor", "end")
     .attr("dx", 0)
     .attr("dy", 0)
@@ -319,14 +322,61 @@
   .attr("dy", ".71em")
   .style("text-anchor", "end")
   .attr("class", "y_label");
+  
+  if (grouping != null) {
+	var groupnames = sampledata.map(function(e) { return e.Group; });
+	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });
+	var groups = [];
+	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
+	d3.selectAll("#func_bars").selectAll(".g").each( function(d) {
+		var curg = fB.getSampleGroup(d.Sample, sampledata, grouping);
+		var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
+		var xpos = this.getAttribute("transform");
+		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
+		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
+		if (xpos > groups[gindex].Max) { groups[gindex].Max = xpos; }
+		});
 
-  svglink.selectAll("text").style("fill",function(m){
+
+	d3.select("#func_bar_xtick_svg").select("g.x_axis").selectAll("rect")
+		.data(groups)
+		.enter()
+		.insert("rect",".tick")
+			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
+			.attr("y", 0)
+			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
+			.attr("height", dims.height - graphdims.height - graphdims.height_buffer)
+			.attr("fill", function(d) { return sampleColor(d.Name); });
+
+	d3.select("#func_bar_xtick_svg").select("g.x_axis").selectAll("g.x_samp_g_label")
+		.data(groups)
+		.enter()
+		.append("g")
+		.attr("class","func_x_g_label")
+		.append("rect")
+			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
+			.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 20)
+			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
+			.attr("height", 30)
+			.attr("fill", function(d) { return sampleColor(d.Name); });
+
+
+	d3.selectAll("g.func_x_g_label")
+		.append("text")
+		.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer + (d.Max - d.Min + x.rangeBand())/2 })
+		.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 4)
+		.attr("text-anchor","middle")
+		.attr("font-size", 17)
+		.text(function(d) { return d.Name; });
+	
+	}
+  /*svglink.selectAll("text").style("fill",function(m){
     if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1 & grouping != ""){
       return sampleColor(fB.getSampleGroup(m, sampledata, grouping));        
     } else {
       return "#000000";
-    }
-  });
+    } 
+  }); */
 
 
 
@@ -348,6 +398,7 @@ fB.select_bars = function(func, colors){
        .background(colors(func).brighter(0.2))
        .id(trimstr)
        .stroke("white");
+
 
      d3.select("#patternsvg").call(t);
   }
