@@ -278,6 +278,7 @@
 			})
 			.on("click", function(d,i){
 				current_data = this._current
+				tooltip.html("Avg contribution to function:<br>"+ Math.round(d.wid) + "%")
 				tooltip.style("visibility","visible")
 				if(d3.select(this).classed("highlighted")==false){
 				//unselect other edges
@@ -300,7 +301,7 @@
 					
 				}else{ //if this edge is not already clicked
 					d3.select(this).style("opacity",1)
-					tooltip.style("visibility", "visible")
+// 					tooltip.style("visibility", "visible")
 															//dehighlight other taxa
 				displayed_taxa.map(function(e,j){
 					if(j != current_data.key1){ //if this should not be highlighted
