@@ -98,7 +98,8 @@ draw_svg = function() {
 			"<br><br><button id='save_taxa_bar' class='savebutton' type='button'>Save taxonomy plot</button>" +	
 			"<br><br><button id='save_taxonomy_leg' class='savebutton' type='button'>Save taxonomy legend</button>" +	
 			"<br><br><button id='save_func_bar' class='savebutton' type='button'>Save function plot</button>" +
-			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>");
+			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>" +
+			"<br><br><br><br><button id='return_to_upload' type='button'>Return to the upload page</button>");
 
 	
 	document.getElementById('save_screenshot').addEventListener('click', function() {
@@ -172,6 +173,13 @@ draw_svg = function() {
 			}
 			uploader.update_plots();
 		});
+
+		document.getElementById('return_to_upload').addEventListener('click', function(){
+			d3.select("#mainsvg").remove();
+			d3.select("body").classed("svgBody", false);
+			mainui.uploadMode = "";
+			uploader.reset_load_flags();
+		})
 
 		// Make the help svg overlay and mouseover trigger
 		

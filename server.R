@@ -31,7 +31,7 @@ default_contribution_table = fread(default_contribution_table_filename, header=T
 default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
 picrust_normalization_table = NULL
 picrust_ko_table = NULL
-if (basename(getwd()) %in% c("burrito")){
+if (basename(getwd()) %in% c("burrito", "burrito-alex")){
 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
 }
@@ -1710,8 +1710,9 @@ shinyServer(function(input, output, session) {
 		session$sendCustomMessage("upload_status", "Setting function abundance plot sample order")
 		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, input$sort_samples)
 
-		# Remove temp files from the server
-		session$sendCustomMessage("upload_status", "Deleting temporary files")
-		remove_temp_files()
+		# Currently not removing temporary files so users can return to the upload page and maintain files on the server
+		# # Remove temp files from the server
+		#session$sendCustomMessage("upload_status", "Deleting temporary files")
+		#remove_temp_files()
 	})
 })
