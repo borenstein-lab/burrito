@@ -31,7 +31,7 @@ default_contribution_table = fread(default_contribution_table_filename, header=T
 default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
 picrust_normalization_table = NULL
 picrust_ko_table = NULL
-if (basename(getwd()) %in% c("burrito")){
+if (basename(getwd()) %in% c("burrito", "burrito-alex")){
 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
 }
@@ -90,9 +90,7 @@ shinyServer(function(input, output, session) {
 		} else {
 
 			# Read in the taxonomic hierarchy table
-			taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
-			taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
-			taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+			taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
 
 			# Return the name of the first column
 			return(colnames(taxonomic_hierarchy_table)[1])
@@ -109,9 +107,7 @@ shinyServer(function(input, output, session) {
 		} else {
 
 			# Read in the function hierarchy table
-			function_hierarchy_table_file = input$custom_function_hierarchy_table
-			function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
-			function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+			function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
 
 			# Return the name of the first column
 			return(colnames(function_hierarchy_table)[1])
@@ -128,9 +124,7 @@ shinyServer(function(input, output, session) {
 		} else {
 
 			# Read in the metadata table
-			metadata_table_file = input$metadata_table
-			metadata_table_file_path = metadata_table_file$datapath
-			metadata_table = fread(metadata_table_file_path, header=T)
+			metadata_table = process_input_file('metadata_table')
 
 			# Return the name of the first column
 			return(colnames(metadata_table)[1])
@@ -154,9 +148,7 @@ shinyServer(function(input, output, session) {
 					if (!is.null(input$custom_taxonomic_hierarchy_table)){
 
 						# Read in the taxonomic hierarchy table
-						taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
-						taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
-						taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+						taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
 
 						# If the default exists, use it
 						if (default_taxonomic_summary_level %in% colnames(taxonomic_hierarchy_table)){
@@ -200,9 +192,7 @@ shinyServer(function(input, output, session) {
 					if (!is.null(input$custom_function_hierarchy_table)){
 
 						# Read in the function hierarchy table
-						function_hierarchy_table_file = input$custom_function_hierarchy_table
-						function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
-						function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+						function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
 
 						# If the default exists, use it
 						if (default_function_summary_level %in% colnames(function_hierarchy_table)){
@@ -259,9 +249,7 @@ shinyServer(function(input, output, session) {
 
     	taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
     	if (input$example_visualization != "TRUE" & !is.null(input$custom_taxonomic_hierarchy_table)){
-    		taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
-    		taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
-    		taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+    		taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
     	}
 
 		# Sum the occurrences of each element in the first column
@@ -276,9 +264,7 @@ shinyServer(function(input, output, session) {
 
     	function_hierarchy_table = default_function_hierarchy_table
     	if (input$example_visualization != "TRUE" & !is.null(input$custom_function_hierarchy_table)){
-    		function_hierarchy_table_file = input$custom_function_hierarchy_table
-    		function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
-    		function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+    		function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
     	}
 
 		# Sum the occurrences of each element in the first column
@@ -308,9 +294,7 @@ shinyServer(function(input, output, session) {
 			if (!is.null(input$custom_taxonomic_hierarchy_table)){
 
 				# Read in the taxonomic hierarchy table
-				taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
-				taxonomic_hierarchy_table_file_path = taxonomic_hierarchy_table_file$datapath
-				taxonomic_hierarchy_table = fread(taxonomic_hierarchy_table_file_path, header=T)
+				taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
 
 				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
 				if (ncol(taxonomic_hierarchy_table) > 1){
@@ -341,9 +325,7 @@ shinyServer(function(input, output, session) {
 			if (!is.null(input$custom_function_hierarchy_table)){
 
 				# Read in the funciton hierarchy table
-				function_hierarchy_table_file = input$custom_function_hierarchy_table
-				function_hierarchy_table_file_path = function_hierarchy_table_file$datapath
-				function_hierarchy_table = fread(function_hierarchy_table_file_path, header=T)
+				function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
 
 				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
 				if (ncol(function_hierarchy_table) > 1){
@@ -373,9 +355,7 @@ shinyServer(function(input, output, session) {
 			# If the metadata table has been uploaded, we refer to it
 			if (!is.null(input$metadata_table)){
 
-				metadata_table_file = input$metadata_table
-				metadata_table_file_path = metadata_table_file$datapath
-				metadata_table = fread(metadata_table_file_path, header=T)
+				metadata_table = process_input_file('metadata_table')
 
 				# If there is only one column, then we send the N/A string
 				if (ncol(metadata_table) < 2){
@@ -448,7 +428,6 @@ shinyServer(function(input, output, session) {
 	process_input_file = function(input_element){
 
 		input_table_file = input[[input_element]]
-		input_table_file_path = NULL
 
 		# If the file exists, grab the file path, otherwise send the signal to retry and return NULL
 		if (is.null(input_table_file)){
@@ -457,7 +436,8 @@ shinyServer(function(input, output, session) {
 			return(NULL)
 		}
 
-		# Otherwise, grab the file path
+		# Otherwise, grab the name and file path'
+		input_table_file_name = input_table_file$name
 		input_table_file_path = input_table_file$datapath
 
 		# If a new file has been selected and there was previously a file, check to see if the new file path is different
@@ -471,12 +451,19 @@ shinyServer(function(input, output, session) {
 			}
 		}
 
-		# Reset the new file flag  and update the old file path since the file has updated correctly
+		# Reset the new file flag and update the old file path since the file has updated correctly
 		new_file_flags[[input_element]] = FALSE
 		old_file_paths[[input_element]] = input_table_file_path
 
 		# Read the table and return it
-		input_table = fread(input_table_file_path, header = TRUE)
+		input_table = NULL
+
+		# If the file is gzipped, we unzip and read it, otherwise just read it normally
+		if (grepl("gz$", input_table_file_name)){
+		  input_table = fread(paste('zcat ', input_table_file_path, sep=""), header=TRUE)
+		} else {
+		  input_table = fread(input_table_file_path, header=TRUE)
+		}
 		return(input_table)
 	}
 
