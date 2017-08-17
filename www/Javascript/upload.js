@@ -396,32 +396,46 @@
 
 		// Set up the event handlers for loading files when they get chosen for upload
 		document.getElementById("taxonomic_abundance_table").addEventListener('change', function(e){
-			mainui.fileloading("taxonomic_abundance_table", this.files[0].name);
-			Shiny.onInputChange("new_file_trigger", "taxonomic_abundance_table");
+			if (this.hasOwnProperty('files')){
+				mainui.fileloading("taxonomic_abundance_table", this.files[0].name);
+				Shiny.onInputChange("new_file_trigger", "taxonomic_abundance_table");
+			}
 		})
 		document.getElementById("metadata_table").addEventListener('change', function(e){
-			mainui.fileloading("metadata_table", this.files[0].name);
-			Shiny.onInputChange("new_file_trigger", "metadata_table");
+			if (this.hasOwnProperty('files')){
+				mainui.fileloading("metadata_table", this.files[0].name);
+				Shiny.onInputChange("new_file_trigger", "metadata_table");
+			}
 		});
 		document.getElementById("contribution_table").addEventListener('change', function(e) {
-			mainui.fileloading("contribution_table",this.files[0].name);
-			Shiny.onInputChange("new_file_trigger", "contribution_table");
+			if (this.hasOwnProperty('files')){
+				mainui.fileloading("contribution_table",this.files[0].name);
+				Shiny.onInputChange("new_file_trigger", "contribution_table");
+			}
 		});
 		document.getElementById("genomic_content_table").addEventListener('change', function(e) {
-			mainui.fileloading("genomic_content_table",this.files[0].name);
-			Shiny.onInputChange("new_file_trigger", "genomic_content_table");
+			if (this.hasOwnProperty('files')){
+				mainui.fileloading("genomic_content_table",this.files[0].name);
+				Shiny.onInputChange("new_file_trigger", "genomic_content_table");
+			}
 		});
 		document.getElementById("custom_taxonomic_hierarchy_table").addEventListener('change', function(e){
-			mainui.fileloading("custom_taxonomic_hierarchy_table", this.files[0].name);
-			Shiny.onInputChange("new_file_trigger", "custom_taxonomic_hierarchy_table");
+			if (this.hasOwnProperty('files')){
+				mainui.fileloading("custom_taxonomic_hierarchy_table", this.files[0].name);
+				Shiny.onInputChange("new_file_trigger", "custom_taxonomic_hierarchy_table");
+			}
 		})
 		document.getElementById("custom_function_hierarchy_table").addEventListener('change', function(e){
-			mainui.fileloading("custom_function_hierarchy_table", this.files[0].name);
-			Shiny.onInputChange("new_file_trigger", "custom_function_hierarchy_table");
+			if (this.hasOwnProperty('files')){
+				mainui.fileloading("custom_function_hierarchy_table", this.files[0].name);
+				Shiny.onInputChange("new_file_trigger", "custom_function_hierarchy_table");
+			}
 		})
 		document.getElementById("function_abundance_table").addEventListener('change', function(e){
-			mainui.fileloading("function_abundance_table", this.files[0].name);
-			Shiny.onInputChange("new_file_trigger", "function_abundance_table");
+			if (this.hasOwnProperty('files')){
+				mainui.fileloading("function_abundance_table", this.files[0].name);
+				Shiny.onInputChange("new_file_trigger", "function_abundance_table");
+			}
 		})
 			
 		return(uploader);

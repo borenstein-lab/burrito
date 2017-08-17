@@ -171,7 +171,8 @@
 				}
 			}
 
-			if (!taxon_in_currently_displayed_taxa){
+			// Keep looking if this is not one of the currently displayed taxa and it is not a leaf
+			if (!taxon_in_currently_displayed_taxa & curr_taxon.hasOwnProperty('values')){
 				trees.click(curr_taxon);
 				for (var i = 0; i < curr_taxon.values.length; i++){
 					taxa_to_check.push(curr_taxon.values[i]);
@@ -195,7 +196,8 @@
 				}
 			}
 
-			if (!func_in_currently_displayed_functions){
+			// Keep looking if this is not one of the the currently displayed functions and it is not a leaf
+			if (!func_in_currently_displayed_functions & curr_func.hasOwnProperty('values')){
 				trees.click(curr_func);
 				for (var i = 0; i < curr_func.values.length; i++){
 					funcs_to_check.push(curr_func.values[i]);

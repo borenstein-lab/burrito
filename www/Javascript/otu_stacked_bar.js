@@ -241,50 +241,50 @@
 	
 	if (grouping != "N/A") {
 
-	var groupnames = sampledata.map(function(e) { return e.Group; });
-	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });
-	var groups = [];
-	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
-	d3.selectAll("#taxa_bars").selectAll(".g").each( function(d) {
-		var curg = otu_bar.getSampleGroup(d.Sample, sampledata, grouping);
-		var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
-		var xpos = this.getAttribute("transform");
-		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
-		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
-		if (xpos > groups[gindex].Max) { groups[gindex].Max = xpos; }
-		});
+  	var groupnames = sampledata.map(function(e) { return e[grouping]; });
+  	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });
+  	var groups = [];
+  	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
+  	d3.selectAll("#taxa_bars").selectAll(".g").each( function(d) {
+  		var curg = otu_bar.getSampleGroup(d.Sample, sampledata, grouping);
+  		var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
+  		var xpos = this.getAttribute("transform");
+  		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
+  		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
+  		if (xpos > groups[gindex].Max) { groups[gindex].Max = xpos; }
+  		});
 
 
-	d3.select("#otu_bar_xtick_svg").select("g.x_axis").selectAll("rect")
-		.data(groups)
-		.enter()
-		.insert("rect",".tick")
-			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
-			.attr("y", 0)
-			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
-			.attr("height", dims.height - graphdims.height - graphdims.height_buffer)
-			.attr("fill", function(d) { return sampleColor(d.Name); });
+  	d3.select("#otu_bar_xtick_svg").select("g.x_axis").selectAll("rect")
+  		.data(groups)
+  		.enter()
+  		.insert("rect",".tick")
+  			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
+  			.attr("y", 0)
+  			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
+  			.attr("height", dims.height - graphdims.height - graphdims.height_buffer)
+  			.attr("fill", function(d) { return sampleColor(d.Name); });
 
-	d3.select("#otu_bar_xtick_svg").select("g.x_axis").selectAll("g.x_samp_g_label")
-		.data(groups)
-		.enter()
-		.append("g")
-		.attr("class","otu_x_g_label")
-		.append("rect")
-			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
-			.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 20)
-			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
-			.attr("height", 30)
-			.attr("fill", function(d) { return sampleColor(d.Name); });
+  	d3.select("#otu_bar_xtick_svg").select("g.x_axis").selectAll("g.x_samp_g_label")
+  		.data(groups)
+  		.enter()
+  		.append("g")
+  		.attr("class","otu_x_g_label")
+  		.append("rect")
+  			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
+  			.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 20)
+  			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
+  			.attr("height", 30)
+  			.attr("fill", function(d) { return sampleColor(d.Name); });
 
 
-	d3.selectAll("g.otu_x_g_label")
-		.append("text")
-		.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer + (d.Max - d.Min + x.rangeBand())/2 })
-		.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 4)
-		.attr("text-anchor","middle")
-		.attr("font-size", 17)
-		.text(function(d) { return d.Name; });
+  	d3.selectAll("g.otu_x_g_label")
+  		.append("text")
+  		.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer + (d.Max - d.Min + x.rangeBand())/2 })
+  		.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 4)
+  		.attr("text-anchor","middle")
+  		.attr("font-size", 17)
+  		.text(function(d) { return d.Name; });
 	
 	}
     /*svglink.selectAll("text").style("fill",function(m){

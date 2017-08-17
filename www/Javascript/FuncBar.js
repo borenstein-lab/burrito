@@ -29,7 +29,10 @@
       //assign values for size of bars
       d.data.forEach(function(e){
         e.y0 = y0*100;
-        e.y1= (y0 += e.contributions) * 100;
+        e.y1= (y0 += +e.contributions)*100; 
+
+
+
       })
 
       total = d.data[length-1].y1;
@@ -37,8 +40,8 @@
       d.data.forEach(function(e){
         e.total = total;
 
-        e.y0 = Math.round(e.y0/e.total*100 * 100)/100;
-        e.y1 = Math.round(e.y1/e.total*100 * 100)/100;
+        e.y0 = Math.round(e.y0/e.total*100*100)/100;
+        e.y1 = Math.round(e.y1/e.total*100*100)/100;
 
 
       })
@@ -162,7 +165,7 @@
   var Sample = svglink.selectAll(".Sample")
   .data(viz.filter(function(d){ return d.Sample != average_contrib_sample_name}))
   .enter().append("g")
-  .classed("func_column", true)
+  .attr("class", "g")
   .attr("id", function(d){ return "func_"+d.Sample })
   .attr("transform", function(d) { return "translate(" + (graphdims.sample_buffer - first_sample_x + x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
 
@@ -178,9 +181,8 @@
   .attr("taxon", function(d) { return d.Taxa})
   .attr("width", x.rangeBand())
   .attr("y", function(d) {return y(d.y1); })
-  .attr("height", function(d) {return y(d.y0) - y(d.y1);} )
+  .attr("height", function(d) {return y(d.y0) - y(d.y1) + 1;} )
   .style("fill", function(d) { return colors(d.func); })
-  .style("visibility", function(d) { if ((y(d.y0) - y(d.y1)) == 0) { return "hidden"; } else { return "visible";} })
   //.style("opacity", 0.75)
   .on("mouseover", function(d){
 	current_rectangle_data = d3.select(this).datum();
@@ -322,50 +324,50 @@
   .attr("class", "y_label");
   
   if (grouping != "N/A") {
-	var groupnames = sampledata.map(function(e) { return e.Group; });
-	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });
-	var groups = [];
-	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
-	d3.selectAll("#func_bars").selectAll(".func_column").each( function(d) {
-		var curg = fB.getSampleGroup(d.Sample, sampledata, grouping);
-		var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
-		var xpos = this.getAttribute("transform");
-		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
-		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
-		if (xpos > groups[gindex].Max) { groups[gindex].Max = xpos; }
-		});
+  	var groupnames = sampledata.map(function(e) { return e[grouping]; });
+  	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });
+  	var groups = [];
+  	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
+  	d3.selectAll("#func_bars").selectAll(".g").each( function(d) {
+  		var curg = fB.getSampleGroup(d.Sample, sampledata, grouping);
+  		var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
+  		var xpos = this.getAttribute("transform");
+  		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
+  		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
+  		if (xpos > groups[gindex].Max) { groups[gindex].Max = xpos; }
+  		});
 
 
-	d3.select("#func_bar_xtick_svg").select("g.x_axis").selectAll("rect")
-		.data(groups)
-		.enter()
-		.insert("rect",".tick")
-			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
-			.attr("y", 0)
-			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
-			.attr("height", dims.height - graphdims.height - graphdims.height_buffer)
-			.attr("fill", function(d) { return sampleColor(d.Name); });
+  	d3.select("#func_bar_xtick_svg").select("g.x_axis").selectAll("rect")
+  		.data(groups)
+  		.enter()
+  		.insert("rect",".tick")
+  			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
+  			.attr("y", 0)
+  			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
+  			.attr("height", dims.height - graphdims.height - graphdims.height_buffer)
+  			.attr("fill", function(d) { return sampleColor(d.Name); });
 
-	d3.select("#func_bar_xtick_svg").select("g.x_axis").selectAll("g.x_samp_g_label")
-		.data(groups)
-		.enter()
-		.append("g")
-		.attr("class","func_x_g_label")
-		.append("rect")
-			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
-			.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 20)
-			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
-			.attr("height", 30)
-			.attr("fill", function(d) { return sampleColor(d.Name); });
+  	d3.select("#func_bar_xtick_svg").select("g.x_axis").selectAll("g.x_samp_g_label")
+  		.data(groups)
+  		.enter()
+  		.append("g")
+  		.attr("class","func_x_g_label")
+  		.append("rect")
+  			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
+  			.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 20)
+  			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
+  			.attr("height", 30)
+  			.attr("fill", function(d) { return sampleColor(d.Name); });
 
 
-	d3.selectAll("g.func_x_g_label")
-		.append("text")
-		.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer + (d.Max - d.Min + x.rangeBand())/2 })
-		.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 4)
-		.attr("text-anchor","middle")
-		.attr("font-size", 17)
-		.text(function(d) { return d.Name; });
+  	d3.selectAll("g.func_x_g_label")
+  		.append("text")
+  		.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer + (d.Max - d.Min + x.rangeBand())/2 })
+  		.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 4)
+  		.attr("text-anchor","middle")
+  		.attr("font-size", 17)
+  		.text(function(d) { return d.Name; });
 	
 	}
   /*svglink.selectAll("text").style("fill",function(m){
@@ -383,7 +385,7 @@
 
 fB.select_bars = function(func, colors){
   selected = d3.select("#func_bars")
-    .selectAll(".func_column")
+    .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func;
@@ -410,7 +412,7 @@ fB.select_bars = function(func, colors){
 
 fB.deselect_bars = function(func, colors){
   d3.select("#func_bars")
-    .selectAll(".func_column")
+    .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func;
@@ -421,7 +423,7 @@ fB.deselect_bars = function(func, colors){
 
 fB.select_contribution = function(taxon, colors, changeAlpha){
   var selected = d3.select("#func_bars")
-    .selectAll(".func_column")
+    .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.Taxa == taxon;
@@ -447,7 +449,7 @@ fB.select_contribution = function(taxon, colors, changeAlpha){
 
 fB.deselect_contribution = function(taxon, colors){
   selected = d3.select("#func_bars")
-    .selectAll(".func_column")
+    .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.Taxa == taxon;
@@ -457,7 +459,7 @@ fB.deselect_contribution = function(taxon, colors){
 
 fB.select_single_contribution = function(taxon, func, colors, changeAlpha){
   selected = d3.select("#func_bars")
-    .selectAll(".func_column")
+    .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;
@@ -479,7 +481,7 @@ fB.select_single_contribution = function(taxon, func, colors, changeAlpha){
 
 fB.deselect_single_contribution = function(taxon, func, colors){
   selected = d3.select("#func_bars")
-    .selectAll(".func_column")
+    .selectAll(".g")
     .selectAll("rect")
     .filter(function(d) {
       return d.func == func && d.Taxa == taxon;

@@ -684,6 +684,102 @@
       //return no_cube_calculate_new_contribution(sample, taxon, func);
     }
 
+    /////////////////////////////////////////////////////////////////////// get_function_abundance_table_text /////////////////////////////////////////////////////////////////////////////////////////////    
+
+    // Returns the text-format function abundance table
+    data_cube.get_function_abundance_table_text = function(function_level_name){
+      
+      // Set the name of the column of functions by the header used in the function hierarchy
+      var table_text = function_level_name;
+
+      // Add the sample names as column headers
+      var samples = Object.keys(this.original_contribution_cube);
+      for (var i = 0; i < samples.length; i++){
+        if (samples[i] != average_contrib_sample_name){
+          table_text += "\t" + samples[i];
+        }
+      }
+
+      table_text += "\n";
+
+      // Now grab all function names
+      var function_set = new Set();
+      for (var i = 0; i < samples.length; i++){
+
+        var taxa = Object.keys(this.original_contribution_cube[samples[i]]);
+        for (var j = 0; j < taxa.length; j++){
+
+          var functions = Object.keys(this.original_contribution_cube[samples[i]][taxa[j]]);
+          for (var k = 0; k < functions.length; k++){
+            function_set.add(functions[k]);
+          }
+        }
+      }
+
+      // Now for each function, add a row to the table
+      function_set.forEach(function(function_name){
+
+        // Add the name of the function as the row name
+        table_text += function_name;
+
+        // Add the function's abundance in each sample
+        for (var i = 0; i < samples.length; i++){
+
+          if (samples[i] != average_contrib_sample_name){
+
+            // Sum up all contributions to this function by each taxon in this sample
+            var total_abundance = 0;
+            var taxa = Object.keys(this.original_contribution_cube[samples[i]]);
+            for (var j = 0; j < taxa.length; j++){
+
+              // Only try to add if this taxon encodes the function
+              if (function_name in this.original_contribution_cube[samples[i]][taxa[j]]){
+                total_abundance += this.original_contribution_cube[samples[i]][taxa[j]][function_name];
+              }
+            }
+
+            table_text += "\t" + total_abundance;
+          }
+        }
+
+        table_text += "\n";
+      }, this);
+
+      return table_text;
+    }
+
+    /////////////////////////////////////////////////////////////////////// get_contribution_table_text /////////////////////////////////////////////////////////////////////////////////////////////    
+
+    // Returns the text-format contribution table
+    data_cube.get_contribution_table_text = function(taxonomy_level_name, function_level_name){
+      
+      // Set the column names
+      var table_text = "Sample\t" + taxonomy_level_name + "\t" + function_level_name + "\t" + "Contribution\n";
+
+      // Iterate through each sample
+      var samples = Object.keys(this.original_contribution_cube);
+      for (var i = 0; i < samples.length; i++){
+
+        if (samples[i] != average_contrib_sample_name){
+
+          // Iterate through each taxon in this sample
+          var taxa = Object.keys(this.original_contribution_cube[samples[i]]);
+          for (var j = 0; j < taxa.length; j++){
+
+            // Iterate through each function contributed by this taxon in this sample
+            var functions = Object.keys(this.original_contribution_cube[samples[i]][taxa[j]]);
+            for (var k = 0; k < functions.length; k++){
+
+              // Add a row for this contribution
+              table_text += samples[i] + "\t" + taxa[j] + "\t" + functions[k] + "\t" + this.original_contribution_cube[samples[i]][taxa[j]][functions[k]] + "\n";
+            }
+          }
+        }
+      }
+
+      return table_text;
+    }
+
     return data_cube;
   }
 

@@ -1356,7 +1356,24 @@ shinyServer(function(input, output, session) {
 
 		# If the metadata table is not empty, order the rows
 		if (nrow(metadata_table) > 0){
-			metadata_table = metadata_table[order(get(metadata_factor()))]
+
+			# Determine the order of the factor by order of first appearance in the factor's column
+			metadata_factor_order = c()
+			for (row in 1:nrow(metadata_table)){
+				row_factor = metadata_table[[metadata_factor()]][row]
+				if (!(row_factor %in% metadata_factor_order)){
+					metadata_factor_order = c(metadata_factor_order, row_factor)
+				}
+			}
+
+			# Set the factor column to use the determined ordering
+			metadata_table[[metadata_factor()]] = factor(metadata_table[[metadata_factor()]], levels = metadata_factor_order, ordered = T)
+
+			# Now order the metadata table by the factor
+			metadata_table = metadata_table[order(metadata_table[[metadata_factor()]])]
+
+			# Convert the factor column into a character column
+			metadata_table[,(metadata_factor()) := as.character(get(metadata_factor()))]
 		}
 
 		return(metadata_table)
@@ -1605,8 +1622,6 @@ shinyServer(function(input, output, session) {
 			# By default, just use the order of the samples from the otu table
 			otu_table_sample_order = 1:length(samples)
 		}
-
-
 
 		# Send the sample order to the browser
 		session$sendCustomMessage("taxonomic_abundance_sample_order", samples[otu_table_sample_order])
