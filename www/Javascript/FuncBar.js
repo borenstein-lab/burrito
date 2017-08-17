@@ -321,7 +321,7 @@
   .style("text-anchor", "end")
   .attr("class", "y_label");
   
-  if (grouping != null) {
+  if (grouping != "N/A") {
 	var groupnames = sampledata.map(function(e) { return e.Group; });
 	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });
 	var groups = [];

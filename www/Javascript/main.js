@@ -16,6 +16,12 @@ var curr_window_height = window.innerHeight;
 
 var MainSVG, plotSVG, sidebarSVG;
 
+var upload_steps = ["file_upload", "contribution_calculation", "data_validation", "hierarchy_processing", "contribution_formatting", "taxonomic_abundance_formatting", "hierarchy_formatting", "average_function_abundance_formatting", "metadata_formatting"]
+
+var upload_step_text = ["File upload", "Contribution calculation", "Data validation", "Hierarchy processing", "Contribution formatting", "Taxonomic abundance formatting", "Hierarchy formatting", "Average function abundance formatting", "Metadata formatting"]
+
+var upload_step_message_text = ["Uploading files", "Calculating contributions", "Validating data", "Processing hierarchies", "Formatting contributions", "Formatting taxonomic abundances", "Formatting hierarchies", "Formatting average function abundances", "Formatting metadata"]
+
 draw_svg = function() {
 	if (d3.select("#mainsvg")[0][0] === null) {
 		aspecrat = window.innerWidth / window.innerHeight;
@@ -98,7 +104,8 @@ draw_svg = function() {
 			"<br><br><button id='save_taxa_bar' class='savebutton' type='button'>Save taxonomy plot</button>" +	
 			"<br><br><button id='save_taxonomy_leg' class='savebutton' type='button'>Save taxonomy legend</button>" +	
 			"<br><br><button id='save_func_bar' class='savebutton' type='button'>Save function plot</button>" +
-			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>");
+			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>" +
+			"<br><br><br><br><button id='return_to_upload' type='button'>Return to the upload page</button>");
 
 	
 	document.getElementById('save_screenshot').addEventListener('click', function() {
@@ -173,6 +180,13 @@ draw_svg = function() {
 			uploader.update_plots();
 		});
 
+		document.getElementById('return_to_upload').addEventListener('click', function(){
+			d3.select("#mainsvg").remove();
+			d3.select("body").classed("svgBody", false);
+			mainui.uploadMode = "";
+			uploader.reset_load_flags();
+		})
+
 		// Make the help svg overlay and mouseover trigger
 		
 		helpSVG = d3.select("#mainsvg").append("svg")
@@ -227,73 +241,149 @@ draw_svg = function() {
 	}
 }
 
+add_upload_step = function(upload_step_name, initial_text, step_number, upload_stepsg, last_step){
+
+	var xpos = width * step_number / (upload_steps.length + 1)
+	var ypos = height / 3
+
+	var upload_stepg = upload_stepsg.append("g")
+		.attr("id", upload_step_name)
+		.attr("class", "pending")
+
+	if (!last_step){
+		upload_stepg.append("rect")
+			.attr("x", xpos)
+			.attr("y", ypos)
+			.attr("width", width / (upload_steps.length + 1))
+	}
+
+	upload_stepg.append("circle")
+		.attr("cx", xpos)
+		.attr("cy", ypos)
+
+	// Uncomment to add text underneath the circle for each step
+	// var upload_text = upload_stepsg.append("text")
+	// 		.attr("id", upload_step_name + "_text_" + word_index)
+	// 		.attr("x", xpos)
+	// 		.attr("y", ypos + (width / 49))
+
+	// var text_words = initial_text.split(" ")
+	// for (var word_index = 0; word_index < text_words.length; word_index++){
+	// 	upload_text.append("tspan")
+	// 		.attr("x", xpos)
+	// 		.attr("text-anchor", "middle")
+	// 		.attr("dy", "1.4em")
+	// 		.text(text_words[word_index])
+	// }
+}
+
+add_table_loading_bar = function(loading_bar_name, loading_text_name, table_name, ypos, loadg){
+	
+	var bar_width = width / 2
+	var bar_height = height / 40
+	var xpos = (width / 2) - (bar_width / 2)
+
+	loadg.append("text")
+		.attr("x", width / 2)
+		.attr("y", ypos)
+		.attr("text-anchor", "middle")
+		.text(table_name)
+
+	loadg.append("rect")
+		.attr("class", "background_bar")
+		.attr("x", xpos)
+		.attr("y", ypos + 6)
+		.attr("width", bar_width)
+		.attr("height", bar_height)
+
+	loadg.append("rect")
+		.attr("id", loading_bar_name)
+		.attr("class", "load_bar")
+		.attr("x", xpos)
+		.attr("y", ypos + 6)
+		.attr("width", 0)
+		.attr("height", bar_height)
+
+	loadg.append("text")
+		.attr("id", loading_text_name)
+		.attr("x", width / 2)
+		.attr("y", ypos + 6 + bar_height + 18)
+		.attr("text-anchor", "middle")
+		.attr("No samples loaded")
+}
+
 draw_loading = function() {
 	var loadg = MainSVG.append("g")
 		.attr("id","loadingG");
 	
-	loadg.append("text")
-		.attr("id", "main_loading_text")
-		.attr("x",width / 2)
-		.attr("y", height / 3)
-		.attr("text-anchor","middle")
-		.text("Loading");
+	var upload_stepsg = loadg.append("g")
+		.attr("id", "upload_stepsG")
+		.attr("class", "upload_steps")
+
+	for (var upload_step_index = 0; upload_step_index < upload_steps.length; upload_step_index++){
+
+		var last_step = !(upload_step_index < upload_steps.length - 1)
+		add_upload_step(upload_steps[upload_step_index], upload_step_text[upload_step_index], upload_step_index + 1, upload_stepsg, last_step)
+	}
 
 	loadg.append("text")
-		.attr("id", "loading_sample_text")
+		.attr("id", "upload_step_message")
 		.attr("x", width / 2)
-		.attr("y", height * 2 / 3)
+		.attr("y", (height / 3) + (width / 15))
 		.attr("text-anchor", "middle")
-		.text("Determining number of samples")
 
-/*	var loadspin = loadg.append("ellipse")
-		.attr("id","loadcirc")
-		.attr("cx",(width / 2) - 100)
-		.attr("cy",height / 2)
-		.attr("rx", 30)
-		.attr("ry", 30)
-		.attr("fill","red")
-		.attr("stroke","none")*/
+	var loading_barsg = loadg.append("g")
+		.attr("id", "loading_barsG")
+		.attr("class", "loading_bars")
 
-	loadg.append("rect")
-		.attr("x", (width / 2) - (width / 8))
-		.attr("y", (height / 2) - (height / 20))
-		.attr("width", width / 4)
-		.attr("height", height / 10)
-		.attr("fill", "grey")
+	add_table_loading_bar("taxonomic_abundance_loading_bar", "taxonomic_abundance_loading_text", "Taxonomic abundance table", (height / 2) - (height / 20), loading_barsg)
 
-	loadg.append("rect")
-		.attr("id", "progress_bar")
-		.attr("x", (width / 2) - (width / 9))
-		.attr("y", (height / 2) - (height / 22))
-		.attr("width", 0)
-		.attr("height", height / 11)
-		.attr("fill", "blue")
+	add_table_loading_bar("contribution_loading_bar", "contribution_loading_text", "Contribution table", (height / 2) + (height / 20), loading_barsg)
 }
-Shiny.addCustomMessageHandler("upload_status", function(message){
-	message_element = document.getElementById("loading_sample_text")
-	if (message_element){
-		message_element.innerHTML = message
+
+Shiny.addCustomMessageHandler("upload_status", function(step){
+	var upload_done = true
+	for (var upload_step_index = 0; upload_step_index < upload_steps.length; upload_step_index++){
+		if (step != upload_steps[upload_step_index]){
+			document.getElementById(upload_steps[upload_step_index]).setAttribute("class", "complete")
+		} else if (step == upload_steps[upload_step_index]){
+			document.getElementById(step).setAttribute("class", "in_progress")
+			document.getElementById("upload_step_message").innerHTML = upload_step_message_text[upload_step_index]
+			upload_done = false
+			break
+		}
+	}
+
+	if (upload_done){
+		document.getElementById("upload_step_message").innerHTML = "Downloading tables"
 	}
 })
+
 Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples){
-	message_element = document.getElementById("loading_sample_text")
-	if (message_element){
-		message_element.innerHTML = "Formatting " + num_samples + " samples"
-	}
+	document.getElementById("taxonomic_abundance_loading_text").innerHTML = "0/" + num_samples + "samples loaded"
+	document.getElementById("contribution_loading_text").innerHTML = "0/" + num_samples + "samples loaded"
 })
+
 Shiny.addCustomMessageHandler("abort", function(message){
 	d3.select("#mainsvg").remove();
 	d3.select("body").classed("svgBody", false);
 	alert(message);
 })
 
-update_progress = function(curr_sample, total_samples){
-	if(curr_sample==1){
-		document.getElementById("loading_sample_text").innerHTML = "Sample averages loaded"	
- 	} else{
-		document.getElementById("loading_sample_text").innerHTML = "Samples loaded " + (curr_sample-1) + "/" + (total_samples-1)
- 	}
-	document.getElementById("progress_bar").setAttribute("width", (width / 4.5) * (curr_sample / total_samples))
+update_progress = function(curr_sample, total_samples, table_name){
+	if (table_name == "contribution"){
+		curr_sample = curr_sample - 1
+		total_samples = total_samples-1
+	}
+	if (curr_sample > 0){
+		document.getElementById(table_name + "_loading_text").innerHTML = curr_sample + "/" + (total_samples) + " samples loaded"
+		if (curr_sample <= total_samples){
+			document.getElementById(table_name + "_loading_bar").setAttribute("width", (width / 2) * (curr_sample / total_samples))
+		}
+		if (curr_sample == total_samples){
+			document.getElementById(table_name + "_loading_bar").setAttribute("class", "complete")
+		}
+	}
 }
 
 draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
