@@ -1400,12 +1400,8 @@ shinyServer(function(input, output, session) {
 		# Determine the maximum relative abundance of each taxon
 		taxa_maximum_relative_abundances = otu_table[,max(abundance),by=eval(taxonomic_summary_level())]
 
-		session$sendCustomMessage("shiny_test", taxa_maximum_relative_abundances)
-
 		# Get the names of taxa with a high enough maximum relative abundance
 		filtered_taxa = taxa_maximum_relative_abundances[V1 >= relative_abundance_cutoff][[taxonomic_summary_level()]]
-
-		session$sendCustomMessage("shiny_test", filtered_taxa)
 
 		# Filter the OTU table
 		otu_table = otu_table[get(taxonomic_summary_level()) %in% filtered_taxa]
