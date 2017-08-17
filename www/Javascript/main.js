@@ -105,6 +105,8 @@ draw_svg = function() {
 			"<br><br><button id='save_taxonomy_leg' class='savebutton' type='button'>Save taxonomy legend</button>" +	
 			"<br><br><button id='save_func_bar' class='savebutton' type='button'>Save function plot</button>" +
 			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>" +
+			"<br><br><br><br><button id='save_function_abundance_table' class='savebutton' type='button'>Download function relative abundance table</button>" +
+			"<br><br><button id='save_contribution_table' class='savebutton' type='button'>Download contribution table</button>" +
 			"<br><br><br><br><button id='return_to_upload' type='button'>Return to the upload page</button>");
 
 	
@@ -180,11 +182,44 @@ draw_svg = function() {
 			uploader.update_plots();
 		});
 
+		document.getElementById('save_function_abundance_table').addEventListener('click', function() {
+			var fileString = d3.select("#saveFileNameInput").property("value") + "_function_abundances.tab";
+			var function_level_name;
+			if (mainui.uploadMode == "example"){
+				function_level_name = "SubPathway";
+			} else {
+				var function_level_of_detail_selector = document.getElementById('function_level_of_detail_selector');
+      			var function_level_name = function_level_of_detail_selector.options[function_level_of_detail_selector.selectedIndex].text;
+			}
+			var blob = new Blob([data_cube.get_function_abundance_table_text(function_level_name)], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, fileString);
+		})
+
+		document.getElementById('save_contribution_table').addEventListener('click', function() {
+			var fileString = d3.select("#saveFileNameInput").property("value") + "_contributions.tab";
+			var taxonomy_level_name;
+			var function_level_name;
+			if (mainui.uploadMode == "example"){
+				taxonomy_level_name = "Genus";
+				function_level_name = "SubPathway";
+			} else {
+				var taxonomic_level_of_detail_selector = document.getElementById('taxonomic_level_of_detail_selector');
+				var function_level_of_detail_selector = document.getElementById('function_level_of_detail_selector');
+				var taxonomy_level_name = taxonomic_level_of_detail_selector.options[taxonomic_level_of_detail_selector.selectedIndex].text;
+				var function_level_name = function_level_of_detail_selector.options[function_level_of_detail_selector.selectedIndex].text;
+			}
+			var blob = new Blob([data_cube.get_contribution_table_text(taxonomy_level_name, function_level_name)], {type: "text/plain;charset=utf-8"});
+			saveAs(blob, fileString);
+		})
+
 		document.getElementById('return_to_upload').addEventListener('click', function(){
 			d3.select("#mainsvg").remove();
 			d3.select("body").classed("svgBody", false);
 			mainui.uploadMode = "";
 			uploader.reset_load_flags();
+			currently_displayed_taxa = [];
+			currently_displayed_functions = [];
+			data_cube = null;
 		})
 
 		// Make the help svg overlay and mouseover trigger
