@@ -1,0 +1,33 @@
+#upload_stepsG circle {
+	r: 1vw;
+	stroke-width: 0;
+}
+
+#upload_stepsG rect {
+	height: 0.5vw;
+	transform: translateY(-0.25vw);
+}
+
+.upload_steps .pending {
+	fill: #9e9e9e;
+}
+
+.upload_steps .in_progress {
+	fill: #4287ff;
+}
+
+.upload_steps .complete {
+	fill: #2aed51;
+}
+
+.loading_bars .background_bar {
+	fill: #9e9e9e;
+}
+
+.loading_bars .load_bar {
+	fill: #4287ff;
+}
+
+.loading_bars .complete {
+	fill: #2aed51;
+}
