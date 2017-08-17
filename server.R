@@ -31,7 +31,7 @@ default_contribution_table = fread(default_contribution_table_filename, header=T
 default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
 picrust_normalization_table = NULL
 picrust_ko_table = NULL
-if (basename(getwd()) %in% c("burrito", "burrito-alex")){
+if (basename(getwd()) %in% c("burrito")){
 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
 }
@@ -879,15 +879,12 @@ shinyServer(function(input, output, session) {
 		colnames(picrust_ko_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
 
 		# File checking
-		session$sendCustomMessage("upload_status", "Verifying OTUs are known to PICRUSt")
 		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICURSt table")
 
 		# If there are otus without genomic content, we return NULL
 		if (!otus_have_genomic_content_validated){
 			return(NULL)
 		}
-
-		session$sendCustomMessage("upload_status", "Running PICRUSt")
 
 		# Merge with the table of 16S normalization factors
 		otu_table_with_normalization = merge(otu_table, picrust_normalization_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
@@ -917,15 +914,12 @@ shinyServer(function(input, output, session) {
 		}
 
 		# File checking
-		session$sendCustomMessage("upload_status", "Verifying OTUs match between tables")
 		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], genomic_content_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "genomic content table")
 
 		# If there are otus without genomic content, we return NULL
 		if (!otus_have_genomic_content_validated){
 			return(NULL)
 		}
-
-		session$sendCustomMessage("upload_status", "Calculating function contributions from genomic content")
 
 		# Merge with the genomic content table
 		otu_table_with_content = merge(otu_table, genomic_content_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
@@ -949,7 +943,6 @@ shinyServer(function(input, output, session) {
 		}
 
 		# File checking
-		session$sendCustomMessage("upload_status", "Verifying OTUs match between tables")
 
 		# Check that OTUs have contributions
 		otus_have_contributions_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "contribution table")
@@ -1635,26 +1628,23 @@ shinyServer(function(input, output, session) {
 
 	# The main observer, tied specifically to the update button that indicates the visualization should be generated. Runs the data validation and processing necessary to generate the javascript objects used in the visualization
 	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
+
+		session$sendCustomMessage("upload_status", "file_upload")
 		
 		# Set the default tables
 		otu_table = format_otu_table(default_otu_table)
 		taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
-		contribution_table = format_default_contribution_table(default_contribution_table)
 		function_hierarchy_table = default_function_hierarchy_table
 		metadata_table = default_metadata_table
+		contribution_table = format_default_contribution_table(default_contribution_table)
 
 		# If they're not viewing the example, then we try to load data
 		if (input$example_visualization != "TRUE"){
 
-			session$sendCustomMessage("upload_status", "Processing OTU table")
 			otu_table = process_otu_table_file()
-			session$sendCustomMessage("upload_status", "Processing taxonomic hierarchy")
 			taxonomic_hierarchy_table = process_taxonomic_hierarchy_table_file()
-			session$sendCustomMessage("upload_status", "Processing function hierarchy")
 			function_hierarchy_table = process_function_hierarchy_table_file()
-			session$sendCustomMessage("upload_status", "Processing function abundance comparison table")
 			function_abundance_table = process_function_abundance_table_file()
-			session$sendCustomMessage("upload_status", "Processing metadata")
 			metadata_table = process_metadata_table_file()
 
 			# If any tables could not be processed, we exit
@@ -1663,7 +1653,7 @@ shinyServer(function(input, output, session) {
 			}
 
 			# Generate the contribution table
-			session$sendCustomMessage("upload_status", "Generating contribution table")
+			session$sendCustomMessage("upload_status", "contribution_calculation")
 			contribution_table = generate_contribution_table(otu_table)
 
 			# If the contribution table could not be generated, we exit
@@ -1672,13 +1662,12 @@ shinyServer(function(input, output, session) {
 			}
 
 			# Validate that all files have consistent labels and samples, and if not then exit
-			session$sendCustomMessage("upload_status", "Validating tables")
+			session$sendCustomMessage("upload_status", "data_validation")
 			if (!validate_tables_match(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table)){
 				return()
 			}
 
 			# Add the comparison samples to the contribution table
-			session$sendCustomMessage("upload_status", "Incorporating function abundance comparisons")
 			contribution_table = add_comparison_function_abundances_to_contribution_table(contribution_table, function_abundance_table)
 
 			# If we could not add the function abundances to the contribution table, we exit
@@ -1688,26 +1677,24 @@ shinyServer(function(input, output, session) {
 		}
 
 		# Format the hierarchy tables so that we can summarize the OTU and contribution tables with them
-		session$sendCustomMessage("upload_status", "Preparing to format data")
+		session$sendCustomMessage("upload_status", "hierarchy_processing")
 		taxonomic_hierarchy_table = format_hierarchy_table_for_summarizing(taxonomic_hierarchy_table, first_taxonomic_level(), unique(contribution_table[[first_taxonomic_level()]]))
 		function_hierarchy_table = format_hierarchy_table_for_summarizing(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
 
 		# Prepare data and send it to the browser
-		session$sendCustomMessage("upload_status", "Formatting contribution table")
+		session$sendCustomMessage("upload_status", "contribution_formatting")
 		contribution_table = prepare_and_send_contribution_table_for_visualization(contribution_table, taxonomic_hierarchy_table, function_hierarchy_table)
-		session$sendCustomMessage("upload_status", "Formatting OTU table")
+		session$sendCustomMessage("upload_status", "taxonomic_abundance_formatting")
 		otu_table = prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
-		session$sendCustomMessage("upload_status", "Formatting taxonomic hierarchy")
+		session$sendCustomMessage("upload_status", "hierarchy_formatting")
 		taxonomic_hierarchy_table = prepare_and_send_taxonomic_hierarchy_table_for_visualization(taxonomic_hierarchy_table, contribution_table)
-		session$sendCustomMessage("upload_status", "Formatting function hierarchy")
 		function_hierarchy_table = prepare_and_send_function_hierarchy_table_for_visualization(function_hierarchy_table, contribution_table)
-		session$sendCustomMessage("upload_status", "Formatting abundance averages")
+		session$sendCustomMessage("upload_status", "averate_function_abundance_formatting")
 		average_function_abundance_table = prepare_and_send_average_function_abundance_table_for_visualization(contribution_table, function_hierarchy_table)
-		session$sendCustomMessage("upload_status", "Formatting metadata")
+		session$sendCustomMessage("upload_status", "metadata_formatting")
 		metadata_table = prepare_and_send_metadata_table_for_visualization(metadata_table) 
-		session$sendCustomMessage("upload_status", "Setting OTU abundance plot sample order")
+		session$sendCustomMessage("upload_status", "done")
 		otu_table_sample_order = prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table, input$sort_samples)
-		session$sendCustomMessage("upload_status", "Setting function abundance plot sample order")
 		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, input$sort_samples)
 
 		# Currently not removing temporary files so users can return to the upload page and maintain files on the server

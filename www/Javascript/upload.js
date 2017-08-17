@@ -107,6 +107,9 @@
 			uploader.data_objects[uploader.attribute_enum.TAXONOMIC_ABUNDANCE_TABLE].push(taxonomic_abundance_sample[0]);
 			++uploader.current_taxonomic_abundance_sample_index;
 
+			// Update the progress bar
+			update_progress(uploader.current_taxonomic_abundance_sample_index, uploader.taxonomic_abundance_table_length, "taxonomic_abundance");
+
 			// Fixes the disconnect issue by requesting pieces of the data rather than the full table
 			setTimeout(function(){
 
@@ -136,9 +139,6 @@
 			uploader.contribution_table_length = size;
 			uploader.current_contribution_sample_index = 0;
 
-			// Update the upload progress bar
-			update_progress(uploader.current_contribution_sample_index, uploader.contribution_table_length);
-
 			// After initializing the data structure and updating the progress bar, request the first sample
 			Shiny.onInputChange("contribution_sample_request", 0);
 		})
@@ -156,7 +156,7 @@
 			++uploader.current_contribution_sample_index;
 
 			// Update the progress bar
-			update_progress(uploader.current_contribution_sample_index, uploader.contribution_table_length);
+			update_progress(uploader.current_contribution_sample_index, uploader.contribution_table_length, "contribution");
 
 			// Fixes the disconnect issue by requesting pieces of the data rather than the full table
 			setTimeout(function(){
