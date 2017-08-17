@@ -211,4 +211,7 @@ h2 {
 #help_items {
 	pointer-events:none;
 }
+.func_column rect {
+	shape-rendering: crispEdges;
+}
 white-space: pre-line;
