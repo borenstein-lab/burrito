@@ -39,6 +39,9 @@ if (basename(getwd()) %in% c("burrito")){
 # Constant to mark entries for comparison in the contribution table
 comparison_tag = "_comparison"
 
+# Filtering constants
+relative_abundance_cutoff = 0.005
+
 ### Shiny server session code ###
 shinyServer(function(input, output, session) {
 
@@ -1389,10 +1392,89 @@ shinyServer(function(input, output, session) {
 		return(uniqueified_hierarchy)
 	}
 
-	# prepare_and_send_contribution_table_for_visualization(contribution_table, taxonomic_hierarchy_table, function_hierarchy_table)
+	# filter_otu_table_by_relative_abundance(otu_table)
+	#
+	# Filters the OTU table to remove any taxon whose maximum relative abundance across all samples is below a given threshold
+	filter_otu_table_by_relative_abundance = function(otu_table){
+
+		# Determine the maximum relative abundance of each taxon
+		taxa_maximum_relative_abundances = otu_table[,max(abundance),by=eval(taxonomic_summary_level())]
+
+		session$sendCustomMessage("shiny_test", taxa_maximum_relative_abundances)
+
+		# Get the names of taxa with a high enough maximum relative abundance
+		filtered_taxa = taxa_maximum_relative_abundances[V1 >= relative_abundance_cutoff][[taxonomic_summary_level()]]
+
+		session$sendCustomMessage("shiny_test", filtered_taxa)
+
+		# Filter the OTU table
+		otu_table = otu_table[get(taxonomic_summary_level()) %in% filtered_taxa]
+
+		# Renormalize the filtered table
+		otu_table = normalize_otu_table(otu_table)
+
+		return(otu_table)
+	}
+
+	# prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
+	#
+	# Performs the necessary formatting to prepare the otu table to be sent to the browser for visualization
+	prepare_and_send_otu_table_for_visualization = function(otu_table, taxonomic_hierarchy_table){
+
+		# Normalize the OTU abundances per sample
+		otu_table = normalize_otu_table(otu_table)
+
+		# Summarize the OTU table OTUS to the user-selected level
+		otu_table = summarize_table_to_selected_level(otu_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
+
+		# Filter out taxa based on their relative abundance
+		otu_table = filter_otu_table_by_relative_abundance(otu_table)
+
+		# Convert the OTU table to a javascript-friendly format
+		javascript_otu_table = convert_otu_table_to_javascript_table(otu_table)
+
+		# Set the value of the tracked OTU table so that we can send it in pieces to the browser
+		tracked_tables[["otu_table"]] = javascript_otu_table
+
+		# Tell the browser we're ready to start sending otu table data
+		session$sendCustomMessage("taxonomic_abundance_table_ready", length(javascript_otu_table))
+
+		return(otu_table)
+	}
+
+	# filter_contribution_table_by_relative_abundance(contribution_table, otu_table)
+	#
+	# Filters the contribution table to remove any function whose maximum relative abundance across all samples is below a given threshold
+	filter_contribution_table_by_relative_abundance = function(contribution_table, otu_table){
+
+		# Filter the contribution table to only contain taxa still in the otu table
+		contribution_table = contribution_table[get(taxonomic_summary_level()) %in% otu_table[[taxonomic_summary_level()]]]
+
+		# Renormalize the contribution table
+		contribution_table = normalize_contribution_table(contribution_table)
+
+		# Determine the relative abundance of each funtion in each sample
+		function_abundances = contribution_table[,sum(contribution),by=c(first_metadata_level(), function_summary_level())]
+
+		# Determine the maximum relative abundance of each function across all samples
+		maximum_function_abundances = function_abundances[,max(V1),by=eval(function_summary_level())]
+
+		# Get the names of functions with a high enough maximum relative abundance
+		filtered_functions = maximum_function_abundances[V1 >= relative_abundance_cutoff][[function_summary_level()]]
+
+		# Filter the contribution table to only contain functions with a high enough maximum relative abundance
+		contribution_table = contribution_table[get(function_summary_level()) %in% filtered_functions]
+
+		# Renormalize the contribution table
+		contribution_table = normalize_contribution_table(contribution_table)
+
+		return(contribution_table)
+	}
+
+	# prepare_and_send_contribution_table_for_visualization(contribution_table, otu_table, taxonomic_hierarchy_table, function_hierarchy_table)
 	#
 	# Performs the necessary formatting to prepare the contribution table to be sent to the browser for visualization
-	prepare_and_send_contribution_table_for_visualization = function(contribution_table, taxonomic_hierarchy_table, function_hierarchy_table){
+	prepare_and_send_contribution_table_for_visualization = function(contribution_table, otu_table, taxonomic_hierarchy_table, function_hierarchy_table){
 
 		# Normalize the contributions by sample
 		contribution_table = normalize_contribution_table(contribution_table)
@@ -1402,6 +1484,8 @@ shinyServer(function(input, output, session) {
 
 		# Summarize the contribution table OTUs to the user-selected level
 		contribution_table = summarize_table_to_selected_level(contribution_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
+
+		contribution_table = filter_contribution_table_by_relative_abundance(contribution_table, otu_table)
 
 		# Convert the contribution table to a javascript-friendly format
 		javascript_contribution_table = convert_contribution_table_to_javascript_table(contribution_table)
@@ -1416,29 +1500,6 @@ shinyServer(function(input, output, session) {
 		session$sendCustomMessage(type="contribution_table_ready", length(javascript_contribution_table))
 
 		return(contribution_table)
-	}
-
-	# prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
-	#
-	# Performs the necessary formatting to prepare the otu table to be sent to the browser for visualization
-	prepare_and_send_otu_table_for_visualization = function(otu_table, taxonomic_hierarchy_table){
-
-		# Normalize the OTU abundances per sample
-		otu_table = normalize_otu_table(otu_table)
-
-		# Summarize the OTU table OTUS to the user-selected level
-		otu_table = summarize_table_to_selected_level(otu_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
-
-		# Convert the OTU table to a javascript-friendly format
-		javascript_otu_table = convert_otu_table_to_javascript_table(otu_table)
-
-		# Set the value of the tracked OTU table so that we can send it in pieces to the browser
-		tracked_tables[["otu_table"]] = javascript_otu_table
-
-		# Tell the browser we're ready to start sending otu table data
-		session$sendCustomMessage("taxonomic_abundance_table_ready", length(javascript_otu_table))
-
-		return(otu_table)
 	}
 
 	# prepare_and_send_taxonomic_hierarchy_table_for_visualization(taxonomic_hierarchy_table, contribution_table)
@@ -1682,10 +1743,10 @@ shinyServer(function(input, output, session) {
 		function_hierarchy_table = format_hierarchy_table_for_summarizing(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
 
 		# Prepare data and send it to the browser
-		session$sendCustomMessage("upload_status", "contribution_formatting")
-		contribution_table = prepare_and_send_contribution_table_for_visualization(contribution_table, taxonomic_hierarchy_table, function_hierarchy_table)
 		session$sendCustomMessage("upload_status", "taxonomic_abundance_formatting")
 		otu_table = prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
+		session$sendCustomMessage("upload_status", "contribution_formatting")
+		contribution_table = prepare_and_send_contribution_table_for_visualization(contribution_table, otu_table, taxonomic_hierarchy_table, function_hierarchy_table)
 		session$sendCustomMessage("upload_status", "hierarchy_formatting")
 		taxonomic_hierarchy_table = prepare_and_send_taxonomic_hierarchy_table_for_visualization(taxonomic_hierarchy_table, contribution_table)
 		function_hierarchy_table = prepare_and_send_function_hierarchy_table_for_visualization(function_hierarchy_table, contribution_table)

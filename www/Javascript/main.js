@@ -16,11 +16,11 @@ var curr_window_height = window.innerHeight;
 
 var MainSVG, plotSVG, sidebarSVG;
 
-var upload_steps = ["file_upload", "contribution_calculation", "data_validation", "hierarchy_processing", "contribution_formatting", "taxonomic_abundance_formatting", "hierarchy_formatting", "average_function_abundance_formatting", "metadata_formatting"]
+var upload_steps = ["file_upload", "contribution_calculation", "data_validation", "hierarchy_processing", "taxonomic_abundance_formatting", "contribution_formatting", "hierarchy_formatting", "average_function_abundance_formatting", "metadata_formatting"]
 
-var upload_step_text = ["File upload", "Contribution calculation", "Data validation", "Hierarchy processing", "Contribution formatting", "Taxonomic abundance formatting", "Hierarchy formatting", "Average function abundance formatting", "Metadata formatting"]
+var upload_step_text = ["File upload", "Contribution calculation", "Data validation", "Hierarchy processing", "Taxonomic abundance formatting", "Contribution formatting", "Hierarchy formatting", "Average function abundance formatting", "Metadata formatting"]
 
-var upload_step_message_text = ["Uploading files", "Calculating contributions", "Validating data", "Processing hierarchies", "Formatting contributions", "Formatting taxonomic abundances", "Formatting hierarchies", "Formatting average function abundances", "Formatting metadata"]
+var upload_step_message_text = ["Uploading files", "Calculating contributions", "Validating data", "Processing hierarchies", "Formatting taxonomic abundances", "Formatting contributions", "Formatting hierarchies", "Formatting average function abundances", "Formatting metadata"]
 
 draw_svg = function() {
 	if (d3.select("#mainsvg")[0][0] === null) {
