@@ -31,7 +31,7 @@ default_contribution_table = fread(default_contribution_table_filename, header=T
 default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
 picrust_normalization_table = NULL
 picrust_ko_table = NULL
-if (basename(getwd()) %in% c("burrito", "burrito-alex")){
+if (basename(getwd()) %in% c("burrito")){
 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
 }
@@ -252,6 +252,9 @@ shinyServer(function(input, output, session) {
     		taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
     	}
 
+    	# Make rows of the taxonomic hierarchy table unique
+    	taxonomic_hierarchy_table = taxonomic_hierarchy_table[!duplicated(taxonomic_hierarchy_table)]
+
 		# Sum the occurrences of each element in the first column
 		output = taxonomic_hierarchy_table[,.N, by = eval(first_taxonomic_level())]
 
@@ -266,6 +269,9 @@ shinyServer(function(input, output, session) {
     	if (input$example_visualization != "TRUE" & !is.null(input$custom_function_hierarchy_table)){
     		function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
     	}
+
+    	# Make rows of the function hierarchy table unique
+    	function_hierarchy_table = function_hierarchy_table[!duplicated(function_hierarchy_table)]
 
 		# Sum the occurrences of each element in the first column
 		output = function_hierarchy_table[,.N, by = eval(first_function_level())]
