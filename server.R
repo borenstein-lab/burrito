@@ -478,7 +478,7 @@ shinyServer(function(input, output, session) {
 	# Checks that no rows correspond to the same entity in the table as identified by the indicated ID columns. If there are any duplicates, send an abort signal and return FALSE
 	validate_unique_rows = function(input_table, id_column_names, element_name, table_name){
 
-		id_columns = input_table[,id_column_names]
+		id_columns = input_table[,id_column_names,with=F]
 		duplicate_elements = duplicated(id_columns)
 
 		# If there are duplicated elements, send an abort signal and return FALSE
@@ -532,22 +532,22 @@ shinyServer(function(input, output, session) {
 	#
 	# Checks whether the tables match with consistent labels and samples
 	validate_tables_match = function(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table){
-
+		
 		# Check that OTUs in the OTU table are present in the taxonomic hierarchy
 		if (!validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")){
 			return(FALSE)
 		}
-
+		
 		# Check that OTUs in the contribution table are present in the taxonomic hierarchy
 		if (!validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")){
 			return(FALSE)
 		}
-
+		
 		# Check that functions in the contribution table are present in the function hierarchy
 		if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "function hierarchy")){
 			return(FALSE)
 		}
-
+		
 		# If the function abundance table is not empty, check that functions in the function abundance table are in the function hierarchy
 		if (nrow(function_abundance_table) > 0){
 			if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "function hierarchy")){
@@ -561,14 +561,14 @@ shinyServer(function(input, output, session) {
 				return(FALSE)
 			}
 		}
-
+		
 		# If the metadata table is not empty, check that samples in the OTU table are in the metadata table
 		if (nrow(metadata_table) > 0){
 			if (!validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "metadata table")){
 				return(FALSE)
 			}
 		}
-
+		
 		# If the metadat table is not empty, check that samples in the contribution table are in the metadata table
 		if (nrow(metadata_table) > 0){
 			if (!validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "metadata_table")){
@@ -594,7 +594,7 @@ shinyServer(function(input, output, session) {
 
 		# Read the otu table
 		otu_table = process_input_file("taxonomic_abundance_table")
-
+		
 		# If we were able to read the otu table, check for duplicate rows or duplicate samples
 		if (!is.null(otu_table)){
 
@@ -618,7 +618,7 @@ shinyServer(function(input, output, session) {
 
 		# Format the OTU table
 		otu_table = format_otu_table(otu_table)
-
+		
 		return(otu_table)
 	}
 
@@ -1043,12 +1043,15 @@ shinyServer(function(input, output, session) {
 		# Set the name for the first column to match with the taxonoimc hierarchy table
 		colnames(otu_table)[1] = first_taxonomic_level()
 
-		# Change zeros in OTU table to NAs so we can remove them when melting
-		otu_table[otu_table == 0] = NA
-
 		# Melt the OTU table to put it in an easier format to work with
-		otu_table = melt(otu_table, id.vars = first_taxonomic_level(), measure.vars = colnames(otu_table)[2:ncol(otu_table)], variable.name = first_metadata_level(), value.name = "abundance", na.rm = T)
+		otu_table = melt(otu_table, id.vars = first_taxonomic_level(), measure.vars = names(otu_table)[2:ncol(otu_table)], variable.name = first_metadata_level(), value.name = "abundance")
 
+		# Change the sample column to be character instead of factor
+		otu_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
+
+		# Filter out rows with zero abundance
+		otu_table = otu_table[abundance > 0]
+		
 		return(otu_table)
 	}
 
@@ -1079,12 +1082,15 @@ shinyServer(function(input, output, session) {
 		# Add a tag to the names of samples for comparison
 		colnames(function_abundance_table) = c(first_function_level(), paste(colnames(function_abundance_table)[2:ncol(function_abundance_table)], comparison_tag, sep=""))
 
-		# Set zero values to NA to remove them when melting and reduce the size of the contribtion table
-		function_abundance_table[function_abundance_table == 0] = NA
-
 		# Melt the function abundance table and add a dummy OTU
-		melted_function_abundance_table = melt(function_abundance_table, id.vars = first_function_level(), measure.vars = colnames(function_abundance_table)[2:ncol(function_abundance_table)], variable.name = first_metadata_level(), value.name = "contribution", na.rm = T)
+		melted_function_abundance_table = melt(function_abundance_table, id.vars = first_function_level(), measure.vars = colnames(function_abundance_table)[2:ncol(function_abundance_table)], variable.name = first_metadata_level(), value.name = "contribution")
 		melted_function_abundance_table[,(first_taxonomic_level() ) := rep(unlinked_name, nrow(melted_function_abundance_table))]
+
+		# Change the sample column to be character instead of factor
+		function_abundance_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
+
+		# Filter out rows with zero abundance
+		function_abundance_table = function_abundance_table[contribution > 0]
 
 		# Add the function abundances for comparison to the contribution table
 		contribution_table = rbind(contribution_table, melted_function_abundance_table, use.names=T)
@@ -1600,19 +1606,23 @@ shinyServer(function(input, output, session) {
 		# Get the set of relevant samples
 		samples = levels(factor(otu_table[[first_metadata_level()]]))
 
+		# If specified, we sort alphabetically
 		if(alphabetical){
 			otu_table_sample_order = rank(samples)
-		} else if (nrow(metadata_table) > 0){ # If there is metadata to order by, use that order instead
+
+		# Otherwise, if there is metadata to order by, use that order instead
+		} else if (nrow(metadata_table) > 0){ 
 
 			# Order all samples but the "Average_contrib" sample and the comparison samples by the metadata table order
-			otu_table_sample_order = sapply(metadata_table[[first_metadata_level()]], function(sample_name){
+			otu_table_sample_order = sapply(metadata_table[get(first_metadata_level()) %in% samples][[first_metadata_level()]], function(sample_name){
 				return(which(samples == sample_name))
 			})
 
 			# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample and the comparison samples
-			otu_table_sample_order = c(otu_table_sample_order, which(!(samples %in% metadata_table[[first_metadata_level()]]) & samples != "Average_contrib" & !grepl(comparison_tag, samples)))
+			otu_table_sample_order = c(otu_table_sample_order, which(!(samples %in% metadata_table[get(first_metadata_level()) %in% samples][[first_metadata_level()]]) & samples != "Average_contrib" & !grepl(comparison_tag, samples)))
+
+		# Otherwise, by default just use the order of the samples from the otu table
 		} else {
-			# By default, just use the order of the samples from the otu table
 			otu_table_sample_order = 1:length(samples)
 		}
 
@@ -1629,7 +1639,7 @@ shinyServer(function(input, output, session) {
 
 		# Get the set of relevant samples
 		samples = levels(factor(contribution_table[[first_metadata_level()]]))
-
+		
 		# By default, remove the average contribution sample and order the rest so comparison samples are next to the right sample
 		if(alphabetical){
 			orig_samps = samples[!grepl(comparison_tag,samples) & samples != "Average_contrib"]
@@ -1644,7 +1654,7 @@ shinyServer(function(input, output, session) {
 		} else if (nrow(metadata_table) > 0){ # If there is metadata to order by, use that order instead
 
 			# Order all samples but the "Average_contrib" sample by the metadata table order
-			function_table_sample_order = unlist(sapply(metadata_table[[first_metadata_level()]], function(sample_name){
+			function_table_sample_order = unlist(sapply(metadata_table[get(first_metadata_level()) %in% samples][[first_metadata_level()]], function(sample_name){
 
 				# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
 				if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
