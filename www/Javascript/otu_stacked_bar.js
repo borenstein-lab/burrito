@@ -217,6 +217,7 @@
 
       d3.select("#otu_bar_xtick_svg").append("g")
       .attr("class", "x_axis")
+	  .attr("clip-path","url(#otu_samp_clip)")
       .attr("transform", "translate(" + graphdims.x_axis_x_buffer + ",0)")
       .call(xAxis)
       .selectAll("text")
@@ -227,6 +228,15 @@
       .attr("transform", function(d) {
         return "translate(-" + (first_sample_x + (x.rangeBand()/2)) + "," + graphdims.sample_label_buffer + ") rotate(-90)"
       });
+
+	svglink.select("#otu_bar_xtick_svg")
+		.append("clipPath")
+		.attr("id", "otu_samp_clip")
+		.append("rect")
+			.attr("x",0)
+			.attr("y",0)
+			.attr("width", graphdims.width)
+			.attr("height",dims.height - graphdims.height - graphdims.height_buffer - 20 )
 
     svglink.append("g")
       .attr("class", "y axis")
@@ -255,32 +265,21 @@
   		});
 
 
-  	d3.select("#otu_bar_xtick_svg").select("g.x_axis").selectAll("rect")
+  	d3.select("#otu_bar_xtick_svg").selectAll("g.x_samp_g_label")
   		.data(groups)
   		.enter()
-  		.insert("rect",".tick")
-  			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
+  		.insert("g","g.x_axis")
+			.classed("x_samp_g_label",true)
+			.append("rect")
+  			.attr("x", function(d) { return d.Min; } )
   			.attr("y", 0)
   			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
   			.attr("height", dims.height - graphdims.height - graphdims.height_buffer)
   			.attr("fill", function(d) { return sampleColor(d.Name); });
 
-  	d3.select("#otu_bar_xtick_svg").select("g.x_axis").selectAll("g.x_samp_g_label")
-  		.data(groups)
-  		.enter()
-  		.append("g")
-  		.attr("class","otu_x_g_label")
-  		.append("rect")
-  			.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer; } )
-  			.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 20)
-  			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
-  			.attr("height", 30)
-  			.attr("fill", function(d) { return sampleColor(d.Name); });
-
-
-  	d3.selectAll("g.otu_x_g_label")
+  	d3.select("#otu_bar_xtick_svg").selectAll(".x_samp_g_label")
   		.append("text")
-  		.attr("x", function(d) { return d.Min - graphdims.x_axis_x_buffer + (d.Max - d.Min + x.rangeBand())/2 })
+  		.attr("x", function(d) { return d.Min + (d.Max - d.Min + x.rangeBand())/2 })
   		.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 4)
   		.attr("text-anchor","middle")
   		.attr("font-size", 17)

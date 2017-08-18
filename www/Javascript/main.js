@@ -364,7 +364,7 @@ draw_loading = function() {
 	loadg.append("text")
 		.attr("id", "upload_step_message")
 		.attr("x", width / 2)
-		.attr("y", (height / 3) + (width / 15))
+		.attr("y", (height / 3) + (width / 25))
 		.attr("text-anchor", "middle")
 
 	var loading_barsg = loadg.append("g")
