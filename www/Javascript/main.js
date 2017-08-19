@@ -395,8 +395,8 @@ Shiny.addCustomMessageHandler("upload_status", function(step){
 })
 
 Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples){
-	document.getElementById("taxonomic_abundance_loading_text").innerHTML = "0/" + num_samples + "samples loaded"
-	document.getElementById("contribution_loading_text").innerHTML = "0/" + num_samples + "samples loaded"
+	document.getElementById("taxonomic_abundance_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
+	document.getElementById("contribution_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
 })
 
 Shiny.addCustomMessageHandler("abort", function(message){
