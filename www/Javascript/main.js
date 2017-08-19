@@ -1099,6 +1099,39 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 }
 
 function resizeRedraw() {
+	d3.select("#help_background").attr("fill-opacity", "0.1");
+
+	if (!document.getElementById("resizing_message")) {
+		rsmsgg = d3.select("#help_svg").append("g")
+			.attr("id", "resizing_message")
+			.attr("visibility", "visibile");
+		rsmsgg.append("rect")
+			.attr("x", width/2 - 60)
+			.attr("y", height/2 - 30)
+			.attr("width", 120)
+			.attr("height", 60)
+			.attr("fill","#191817")
+			.attr("rx", 15)
+			.attr("ry", 15);
+		rsmsgg.append("text")
+			.attr("x", width/2)
+			.attr("y", height/2 + 10)
+			.attr("text-anchor", "middle")
+			.attr("font-size", 25)
+			.attr("fill", "#ffffff")
+			.attr("stroke", "none")
+			.text("Busy...");
+
+	} else {
+		d3.select("#resizing_message").attr("visibility","visibile")
+			.select("rect")
+			.attr("x", width / 2 - 60)
+			.attr("y", height/2 - 30);
+		d3.select("#resizing_message").select("text")
+			.attr("x", width/2)
+			.attr("y", height/2 + 10);
+	}
+
 	if (resize_timeout){
 		clearTimeout(resize_timeout);
 	}
@@ -1107,6 +1140,9 @@ function resizeRedraw() {
 			uploader.update_plots();
 			curr_window_width = window.innerWidth;
 			curr_window_height = window.innerHeight;
+
+			d3.select("#help_background").attr("fill-opacity", "0");
+			d3.select("#resizing_message").attr("visibility","hidden");
 		}
 	}, 100)
 }
@@ -1136,7 +1172,7 @@ function drawScale() {
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
-		.text("Taxa node scale");
+		.text("Taxa average abundance");
 
 	for (scalei = 0; scalei < sampAv.length; scalei++) {
 		TaxaNodes.append("circle")
@@ -1164,7 +1200,7 @@ function drawScale() {
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
-		.text("Function node scale");
+		.text("Func average abundance");
 
 	for (scalei = 0; scalei < sampAv.length; scalei++) {
 		FuncNodes.append("circle")
@@ -1190,7 +1226,7 @@ function drawScale() {
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
-		.text("Edge bar width");
+		.text("Contrib to function");
 
 	for (scalei = 0; scalei < sampAv.length; scalei++) {
 		EdgeBars.append("rect")
