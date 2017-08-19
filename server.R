@@ -883,16 +883,15 @@ shinyServer(function(input, output, session) {
 		}
 
 		# Merge with the table of 16S normalization factors
-		otu_table_with_normalization = merge(otu_table, picrust_normalization_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
+		contribution_table = merge(otu_table, picrust_normalization_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
 
 		# Merge with the PICRUSt genomic content table
-		otu_table_with_normalization_and_content = merge(otu_table_with_normalization, picrust_ko_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
-		rm(otu_table_with_normalization)
+		contribution_table = merge(contribution_table, picrust_ko_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
 
 		# Make a contribution column by dividing the OTU abundances by the normalization factors and multiplying with the KO copy number
-		otu_table_with_normalization_and_content[,contribution := (abundance * copy_number) / norm_factor]
+		contribution_table[,contribution := (abundance * copy_number) / norm_factor]
 
-		contribution_table = otu_table_with_normalization_and_content[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F]
+		contribution_table = contribution_table[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F]
 
 		return(contribution_table)
 	}
@@ -918,12 +917,15 @@ shinyServer(function(input, output, session) {
 		}
 
 		# Merge with the genomic content table
-		otu_table_with_content = merge(otu_table, genomic_content_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
+		contribution_table = merge(otu_table, genomic_content_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
 
 		# Make a contribution column by multiplying the OTU abundances with the gene copy number
-		otu_table_with_content[,contribution := abundance * copy_number]
+		contribution_table[,contribution := abundance * copy_number]
 
-		return(otu_table_with_content[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F])
+		# Subset to only the relevant columsn
+		contribution_table = contribution_table[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F]
+
+		return(contribution_table)
 	}
 
 	# generate_contribution_table_using_custom_contributions(otu_table)
@@ -1005,16 +1007,16 @@ shinyServer(function(input, output, session) {
 	normalize_contribution_table = function(contribution_table){
 
 		# Calculate total function abundances for each sample
-		total_function_abundances = contribution_table[,sum(contribution), by = eval(first_metadata_level())]
-		colnames(total_function_abundances)[ncol(total_function_abundances)] = "total_abundance"
+		table_with_total_function_abundances = contribution_table[,sum(contribution), by = eval(first_metadata_level())]
+		colnames(table_with_total_function_abundances)[ncol(table_with_total_function_abundances)] = "total_abundance"
 
 		# Merge the total function abundances
-		contribution_table = merge(contribution_table, total_function_abundances, by = first_metadata_level(), allow.cartesian = T)
+		table_with_total_function_abundances = merge(contribution_table, table_with_total_function_abundances, by = first_metadata_level(), allow.cartesian = T)
 
 		# Normalize the contributions
-		contribution_table[,contribution := contribution / total_abundance]
+		table_with_total_function_abundances[,contribution := contribution / total_abundance]
 
-		return(contribution_table[,which(colnames(contribution_table) != "total_abundance"),with=F])
+		return(table_with_total_function_abundances[,which(colnames(table_with_total_function_abundances) != "total_abundance"),with=F])
 	}
 
 	# normalize_otu_table(otu_table)
@@ -1023,16 +1025,16 @@ shinyServer(function(input, output, session) {
 	normalize_otu_table = function(otu_table){
 
 		# Calculate total OTU abundances for each sample
-		total_otu_abundances = otu_table[,sum(abundance), by = eval(first_metadata_level())]
-		colnames(total_otu_abundances)[ncol(total_otu_abundances)] = "total_abundance"
+		table_with_total_otu_abundances = otu_table[,sum(abundance), by = eval(first_metadata_level())]
+		colnames(table_with_total_otu_abundances)[ncol(table_with_total_otu_abundances)] = "total_abundance"
 
 		# Merge the total OTU abundances
-		otu_table = merge(otu_table, total_otu_abundances, by = first_metadata_level(), allow.cartesian = T)
+		table_with_total_otu_abundances = merge(otu_table, table_with_total_otu_abundances, by = first_metadata_level(), allow.cartesian = T)
 
 		# Normalize the abundances
-		otu_table[,abundance := abundance / total_abundance]
+		table_with_total_otu_abundances[,abundance := abundance / total_abundance]
 
-		return(otu_table[,which(colnames(otu_table) != "total_abundance"),with=F])
+		return(table_with_total_otu_abundances[,which(colnames(table_with_total_otu_abundances) != "total_abundance"),with=F])
 	}
 
 	# format_otu_table(otu_table)
@@ -1083,8 +1085,8 @@ shinyServer(function(input, output, session) {
 		colnames(function_abundance_table) = c(first_function_level(), paste(colnames(function_abundance_table)[2:ncol(function_abundance_table)], comparison_tag, sep=""))
 
 		# Melt the function abundance table and add a dummy OTU
-		melted_function_abundance_table = melt(function_abundance_table, id.vars = first_function_level(), measure.vars = colnames(function_abundance_table)[2:ncol(function_abundance_table)], variable.name = first_metadata_level(), value.name = "contribution")
-		melted_function_abundance_table[,(first_taxonomic_level() ) := rep(unlinked_name, nrow(melted_function_abundance_table))]
+		function_abundance_table = melt(function_abundance_table, id.vars = first_function_level(), measure.vars = colnames(function_abundance_table)[2:ncol(function_abundance_table)], variable.name = first_metadata_level(), value.name = "contribution")
+		function_abundance_table[,(first_taxonomic_level() ) := rep(unlinked_name, nrow(function_abundance_table))]
 
 		# Change the sample column to be character instead of factor
 		function_abundance_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
@@ -1093,9 +1095,9 @@ shinyServer(function(input, output, session) {
 		function_abundance_table = function_abundance_table[contribution > 0]
 
 		# Add the function abundances for comparison to the contribution table
-		contribution_table = rbind(contribution_table, melted_function_abundance_table, use.names=T)
+		function_abundance_table = rbind(contribution_table, function_abundance_table, use.names=T)
 
-		return(contribution_table)
+		return(function_abundance_table)
 	}
 
 	# summarize_table_to_selected_level(table_to_summarize, summary_map, summary_level, partial_contribution_table)
@@ -1118,24 +1120,24 @@ shinyServer(function(input, output, session) {
 		summary_map = summary_map[,c(first_level_name, summary_level),with=F]
 		
 		# Merge the table to summarize with the summary map by the first level, duplicating rows as necessary when first level elements have multiple entries
-		table_to_summarize = merge(table_to_summarize, summary_map, by = first_level_name, all.x = T, all.y = F, allow.cartesian = T)
+		summary_map = merge(table_to_summarize, summary_map, by = first_level_name, all.x = T, all.y = F, allow.cartesian = T)
 		
 		# Merge with the partial contribution table
-		table_to_summarize = merge(table_to_summarize, partial_contribution_table, by = first_level_name, all.y = F, allow.cartesian = T)
+		summary_map = merge(summary_map, partial_contribution_table, by = first_level_name, all.y = F, allow.cartesian = T)
 		
 		# Set any NA entries to the unlinked name
-		table_to_summarize[,(summary_level) := ifelse(is.na(get(summary_level)), unlinked_name, get(summary_level))]
+		summary_map[,(summary_level) := ifelse(is.na(get(summary_level)), unlinked_name, get(summary_level))]
 		
 		# Create a partial contribution column
-		table_to_summarize[,partial_contribution := get(contribution_name)/partial_contribution_factor]
+		summary_map[,partial_contribution := get(contribution_name)/partial_contribution_factor]
 		
 		# Sum the parital contributions for rows that match in id columns
-		table_to_summarize = table_to_summarize[,sum(partial_contribution),by=summarized_id_names]
+		summary_map = summary_map[,sum(partial_contribution),by=summarized_id_names]
 		
 		# Label the summed column for consistency
-		colnames(table_to_summarize)[ncol(table_to_summarize)] = contribution_name
+		colnames(summary_map)[ncol(summary_map)] = contribution_name
 
-		return(table_to_summarize)
+		return(summary_map)
 	}
 
 	# format_and_truncate_hierarchy_table_to_selected_level(table_to_truncate, summary_level)
@@ -1186,9 +1188,6 @@ shinyServer(function(input, output, session) {
 	#
 	# Converts the R table format hierarchy to the javascript hierarchy format used in the visualization
 	convert_hierarchy_table_to_javascript_hierarchy = function(hierarchy_table, table_type, summary_level){
-
-		# Make all entries strings
-		hierarchy_table = hierarchy_table[,lapply(.SD, as.character)]
 
 		# Make the set of leaves, which are different from the internal nodes
 		leaves = lapply(1:nrow(hierarchy_table), function(row){
@@ -1260,24 +1259,24 @@ shinyServer(function(input, output, session) {
 		function_abundances[,abundance := abundance/sum(abundance),by=eval(first_metadata_level())]
 
 		# Merge with the function hierarchy so we can get average abundances for every function level
-		function_abundances_with_hierarchy = merge(function_abundances, function_hierarchy_table, by = unname(function_summary_level()))
+		function_abundances = merge(function_abundances, function_hierarchy_table, by = unname(function_summary_level()))
 
 		# Melt the table so that we have each function's abundance by each sample and hierarchy level
-		function_abundances_with_hierarchy = melt(function_abundances_with_hierarchy, id.vars = c(first_metadata_level(), "abundance"), measure.vars = colnames(function_hierarchy_table), variable.name = "function_level", value.name = "Function")
+		function_abundances = melt(function_abundances, id.vars = c(first_metadata_level(), "abundance"), measure.vars = colnames(function_hierarchy_table), variable.name = "function_level", value.name = "Function")
 
 		# Sum the function abundances by sample and level name so that we have the total abundance of each function level in each sample
-		all_function_abundances = function_abundances_with_hierarchy[,sum(abundance), by = c(first_metadata_level(), "Function")]
+		function_abundances = function_abundances[,sum(abundance), by = c(first_metadata_level(), "Function")]
 
 		# Rename the abundance column for consistency
-		colnames(all_function_abundances)[ncol(all_function_abundances)] = "abundance"
+		colnames(function_abundances)[ncol(function_abundances)] = "abundance"
 
 		# Now calculate the mean of each function abundance across samples
-		all_function_mean_abundances = all_function_abundances[,mean(abundance), by = "Function"]
+		function_abundances = function_abundances[,mean(abundance), by = "Function"]
 
 		# Rename the mean abundance column for consistency
-		colnames(all_function_mean_abundances)[ncol(all_function_mean_abundances)] = "Mean"
+		colnames(function_abundances)[ncol(function_abundances)] = "Mean"
 
-		return(all_function_mean_abundances)
+		return(function_abundances)
 	}
 
 	# convert_otu_table_to_javascript_table(otu_table)
@@ -1286,17 +1285,17 @@ shinyServer(function(input, output, session) {
 	convert_otu_table_to_javascript_table = function(otu_table){
 
 		# Cast the otu table to a matrix for conversion
-		otu_table = dcast(otu_table, as.formula(paste(taxonomic_summary_level(), " ~ ", first_metadata_level(), sep="")), value.var = "abundance", fill = 0)
+		javascript_otu_table = dcast(otu_table, as.formula(paste(taxonomic_summary_level(), " ~ ", first_metadata_level(), sep="")), value.var = "abundance", fill = 0)
 		
 		# Convert to relative abundance
-		otu_table = cbind(otu_table[,taxonomic_summary_level(),with=F], as.data.table(scale(otu_table[,2:ncol(otu_table),with=F], scale = colSums(otu_table[,2:ncol(otu_table),with=F]), center = F)))
+		javascript_otu_table = cbind(javascript_otu_table[,taxonomic_summary_level(),with=F], as.data.table(scale(javascript_otu_table[,2:ncol(javascript_otu_table),with=F], scale = colSums(javascript_otu_table[,2:ncol(javascript_otu_table),with=F]), center = F)))
 		
 		# Create the javascript format OTU table
-		javascript_otu_table = lapply(2:ncol(otu_table), function(col){
+		javascript_otu_table = lapply(2:ncol(javascript_otu_table), function(col){
 
-			sample_otu_abundance_list = split(unname(unlist(otu_table[,col,with=F])), seq(nrow(otu_table[,col,with=F])))
-			names(sample_otu_abundance_list) = otu_table[[taxonomic_summary_level()]]
-			sample_otu_abundance_list[[first_metadata_level()]] = colnames(otu_table)[col]
+			sample_otu_abundance_list = split(unname(unlist(javascript_otu_table[,col,with=F])), seq(nrow(javascript_otu_table[,col,with=F])))
+			names(sample_otu_abundance_list) = javascript_otu_table[[taxonomic_summary_level()]]
+			sample_otu_abundance_list[[first_metadata_level()]] = colnames(javascript_otu_table)[col]
 			return(sample_otu_abundance_list)
 		})
 
@@ -1314,10 +1313,10 @@ shinyServer(function(input, output, session) {
 
 		# Add a sample called "Average_contrib" to the contribution table, include 0s for missing taxa/function combinations
 		average_contributions[,(first_metadata_level()) := rep("Average_contrib", nrow(average_contributions))]
-		contribution_table = rbind(contribution_table, average_contributions, use.names=T)
+		javascript_contribution_table = rbind(contribution_table, average_contributions, use.names=T)
 
 		# Cast the table so that the columns are functions
-		javascript_contribution_table = dcast(contribution_table, as.formula(paste(first_metadata_level(), " + ", taxonomic_summary_level(), " ~ ", function_summary_level(), sep="")), value.var = "contribution")
+		javascript_contribution_table = dcast(javascript_contribution_table, as.formula(paste(first_metadata_level(), " + ", taxonomic_summary_level(), " ~ ", function_summary_level(), sep="")), value.var = "contribution")
 
 		# Create a single column for functions that contains a list of the functions for that row's sample and taxon while removing empty elements from those lists
 		javascript_contribution_table = data.table(first_metadata_level = javascript_contribution_table[[first_metadata_level()]], taxonomic_summary_level = javascript_contribution_table[[taxonomic_summary_level()]], function_summary_level = apply(javascript_contribution_table[,3:ncol(javascript_contribution_table),with=F], 1, function(row){
@@ -1394,20 +1393,6 @@ shinyServer(function(input, output, session) {
 		return(javascript_metadata_table)
 	}
 
-	# format_hierarchy_table_for_summarizing(hierarchy_table)
-	#
-	# Formats the input hierarchy table for summarizing the OTU and/or contribution tables
-	format_hierarchy_table_for_summarizing = function(hierarchy_table, filtering_level, entries_to_keep){
-
-		# Filter the hierarchy entries
-		filtered_hierarchy = filter_hierarchy_table_entries(hierarchy_table, filtering_level, entries_to_keep)
-
-		# Make the entries of the hierarchy unique
-		uniqueified_hierarchy = make_hierarchy_table_level_entries_unique(hierarchy_table, filtering_level)
-
-		return(uniqueified_hierarchy)
-	}
-
 	# filter_otu_table_by_relative_abundance(otu_table)
 	#
 	# Filters the OTU table to remove any taxon whose maximum relative abundance across all samples is below a given threshold
@@ -1421,35 +1406,6 @@ shinyServer(function(input, output, session) {
 
 		# Filter the OTU table
 		otu_table = otu_table[get(taxonomic_summary_level()) %in% filtered_taxa]
-
-		# Renormalize the filtered table
-		otu_table = normalize_otu_table(otu_table)
-
-		return(otu_table)
-	}
-
-	# prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
-	#
-	# Performs the necessary formatting to prepare the otu table to be sent to the browser for visualization
-	prepare_and_send_otu_table_for_visualization = function(otu_table, taxonomic_hierarchy_table){
-
-		# Normalize the OTU abundances per sample
-		otu_table = normalize_otu_table(otu_table)
-
-		# Summarize the OTU table OTUS to the user-selected level
-		otu_table = summarize_table_to_selected_level(otu_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
-
-		# Filter out taxa based on their relative abundance
-		otu_table = filter_otu_table_by_relative_abundance(otu_table)
-
-		# Convert the OTU table to a javascript-friendly format
-		javascript_otu_table = convert_otu_table_to_javascript_table(otu_table)
-
-		# Set the value of the tracked OTU table so that we can send it in pieces to the browser
-		tracked_tables[["otu_table"]] = javascript_otu_table
-
-		# Tell the browser we're ready to start sending otu table data
-		session$sendCustomMessage("taxonomic_abundance_table_ready", length(javascript_otu_table))
 
 		return(otu_table)
 	}
@@ -1481,121 +1437,6 @@ shinyServer(function(input, output, session) {
 		contribution_table = normalize_contribution_table(contribution_table)
 
 		return(contribution_table)
-	}
-
-	# prepare_and_send_contribution_table_for_visualization(contribution_table, otu_table, taxonomic_hierarchy_table, function_hierarchy_table)
-	#
-	# Performs the necessary formatting to prepare the contribution table to be sent to the browser for visualization
-	prepare_and_send_contribution_table_for_visualization = function(contribution_table, otu_table, taxonomic_hierarchy_table, function_hierarchy_table){
-
-		# Normalize the contributions by sample
-		contribution_table = normalize_contribution_table(contribution_table)
-
-		# Summarize the contribution table functions to the user-selected level
-		contribution_table = summarize_table_to_selected_level(contribution_table, function_hierarchy_table, function_summary_level(), function_partial_contribution_table())
-
-		# Summarize the contribution table OTUs to the user-selected level
-		contribution_table = summarize_table_to_selected_level(contribution_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
-
-		contribution_table = filter_contribution_table_by_relative_abundance(contribution_table, otu_table)
-
-		# Convert the contribution table to a javascript-friendly format
-		javascript_contribution_table = convert_contribution_table_to_javascript_table(contribution_table)
-
-		# Set the value of the tracked contribution table so that we can send it in pieces to the browser
-		tracked_tables[["contribution_table"]] = javascript_contribution_table
-
-		# Tell the browser how many samples there are
-		session$sendCustomMessage("number_of_samples_message", length(javascript_contribution_table))
-
-		# Tell the browser we're read to start sending contribution table data
-		session$sendCustomMessage(type="contribution_table_ready", length(javascript_contribution_table))
-
-		return(contribution_table)
-	}
-
-	# prepare_and_send_taxonomic_hierarchy_table_for_visualization(taxonomic_hierarchy_table, contribution_table)
-	#
-	# Performs the necessary formatting to prepare the taxonomic hierarchy table to be sent to the browser for visualization
-	prepare_and_send_taxonomic_hierarchy_table_for_visualization = function(taxonomic_hierarchy_table, contribution_table){
-
-		# Remove columns from the taxonomic hierarchy table taht are below the resolution selected by the user
-		taxonomic_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(taxonomic_hierarchy_table, taxonomic_summary_level())
-
-		# Send a list of the taxonomic level names
-		session$sendCustomMessage(type='taxonomic_hierarchy_labels', colnames(taxonomic_hierarchy_table))
-
-		# Re-filter the table now that we have summarized tables
-		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, taxonomic_summary_level(), unique(contribution_table[[taxonomic_summary_level()]]))
-
-		# Convert the taxonomic hierarchy table to a javascript-friendly format
-		javascript_taxonomic_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(taxonomic_hierarchy_table, "taxa", taxonomic_summary_level())
-
-		# Send the formatted taxonomic hierarchy to the browser
-		session$sendCustomMessage(type='taxonomic_hierarchy', javascript_taxonomic_hierarchy)
-
-		return(taxonomic_hierarchy_table)
-	}
-
-	# prepare_and_send_function_hierarchy_table_for_visualization(function_hierarchy_table, contribution_table)
-	#
-	# Performs the necessary formatting to prepare the function hierarchy table to be sent to the browser for visualization
-	prepare_and_send_function_hierarchy_table_for_visualization = function(function_hierarchy_table, contribution_table){
-
-		# Remove columns from the function hierarchy table taht are below the resolution selected by the user
-		function_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(function_hierarchy_table, function_summary_level())
-
-		# Send a list of the function level names
-		session$sendCustomMessage(type='function_hierarchy_labels', colnames(function_hierarchy_table))
-
-		# Re-filter the table now that we have summarized tables
-		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, function_summary_level(), unique(contribution_table[[function_summary_level()]]))
-
-		# Convert the function hierarchy table to a javascript-friendly format
-		javascript_function_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(function_hierarchy_table, "function", function_summary_level())
-
-		# Send the formatted function hierarchy to the browser
-		session$sendCustomMessage(type='function_hierarchy', javascript_function_hierarchy)
-
-		return(function_hierarchy_table)
-	}
-
-	# prepare_and_send_average_function_abundance_table_for_visualization(contribution_table, function_hierarchy_table)
-	#
-	# Performs the necessary calculations and formatting to generate the average function abundance table and send it to the browser for visualization
-	prepare_and_send_average_function_abundance_table_for_visualization = function(contribution_table, function_hierarchy_table){
-
-		# Calculate the average abundances
-		function_mean_abundance_table = calculate_average_function_abundances(contribution_table, function_hierarchy_table)
-
-		# Send the table to the browser
-		session$sendCustomMessage("function_averages",paste(paste(colnames(function_mean_abundance_table), collapse="\t"), paste(sapply(1:nrow(function_mean_abundance_table), function(row){return(paste(function_mean_abundance_table[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
-
-		return(function_mean_abundance_table)
-	}
-
-	# prepare_and_send_metadata_table_for_visualization(metadata_table)
-	#
-	# Performs the necessary formatting to prepare the metadata table to be sent to the browser for visualization
-	prepare_and_send_metadata_table_for_visualization = function(metadata_table){
-
-		# If a metadata factor has been selected, order samples by the indicated metadata factor
-		if (!is.null(metadata_factor())){
-			metadata_table = order_metadata_table_by_metadata_factor(metadata_table)
-		}
-
-		javascript_metadata_table = convert_metadata_table_to_javascript_table(metadata_table)
-
-		# If no metadata table was provided, send a NULL signal
-		if (is.null(javascript_metadata_table)){
-			session$sendCustomMessage("metadata_table", "NULL")
-
-		# Otherwise, send the javascript metadata table
-		} else {
-			session$sendCustomMessage("metadata_table", javascript_metadata_table)
-		}
-
-		return(metadata_table)
 	}
 
 	# prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table, alphabetical = F)
@@ -1753,21 +1594,146 @@ shinyServer(function(input, output, session) {
 
 		# Format the hierarchy tables so that we can summarize the OTU and contribution tables with them
 		session$sendCustomMessage("upload_status", "hierarchy_processing")
-		taxonomic_hierarchy_table = format_hierarchy_table_for_summarizing(taxonomic_hierarchy_table, first_taxonomic_level(), unique(contribution_table[[first_taxonomic_level()]]))
-		function_hierarchy_table = format_hierarchy_table_for_summarizing(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
+		# Filter the hierarchy entries
+		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, first_taxonomic_level(), unique(c(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]])))
+		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
+
+		# Make the entries of the hierarchy unique
+		taxonomic_hierarchy_table = make_hierarchy_table_level_entries_unique(taxonomic_hierarchy_table, first_taxonomic_level())
+		function_hierarchy_table = make_hierarchy_table_level_entries_unique(function_hierarchy_table, first_function_level())
+
+
 
 		# Prepare data and send it to the browser
+	
+		### Prepare the OTU table ###
 		session$sendCustomMessage("upload_status", "taxonomic_abundance_formatting")
-		otu_table = prepare_and_send_otu_table_for_visualization(otu_table, taxonomic_hierarchy_table)
+
+		# Normalize the OTU abundances per sample
+		otu_table = normalize_otu_table(otu_table)
+
+		# Summarize the OTU table OTUS to the user-selected level
+		otu_table = summarize_table_to_selected_level(otu_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
+
+		# Filter out taxa based on their relative abundance
+		otu_table = filter_otu_table_by_relative_abundance(otu_table)
+
+		# Renormalize the filtered table
+		otu_table = normalize_otu_table(otu_table)
+
+		# Convert the OTU table to a javascript-friendly format
+		javascript_otu_table = convert_otu_table_to_javascript_table(otu_table)
+
+		# Set the value of the tracked OTU table so that we can send it in pieces to the browser
+		tracked_tables[["otu_table"]] = javascript_otu_table
+
+		# Tell the browser we're ready to start sending otu table data
+		session$sendCustomMessage("taxonomic_abundance_table_ready", length(javascript_otu_table))
+
+
+
+		### Prepare the contribution table ###
 		session$sendCustomMessage("upload_status", "contribution_formatting")
-		contribution_table = prepare_and_send_contribution_table_for_visualization(contribution_table, otu_table, taxonomic_hierarchy_table, function_hierarchy_table)
+
+		# Normalize the contributions by sample
+		contribution_table = normalize_contribution_table(contribution_table)
+
+		# Summarize the contribution table functions to the user-selected level
+		contribution_table = summarize_table_to_selected_level(contribution_table, function_hierarchy_table, function_summary_level(), function_partial_contribution_table())
+
+		# Summarize the contribution table OTUs to the user-selected level
+		contribution_table = summarize_table_to_selected_level(contribution_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
+
+		# Filter out functions based on their relative abundance
+		contribution_table = filter_contribution_table_by_relative_abundance(contribution_table, otu_table)
+
+		# Convert the contribution table to a javascript-friendly format
+		javascript_contribution_table = convert_contribution_table_to_javascript_table(contribution_table)
+
+		# Set the value of the tracked contribution table so that we can send it in pieces to the browser
+		tracked_tables[["contribution_table"]] = javascript_contribution_table
+
+		# Tell the browser how many samples there are
+		session$sendCustomMessage("number_of_samples_message", length(javascript_contribution_table))
+
+		# Tell the browser we're read to start sending contribution table data
+		session$sendCustomMessage(type="contribution_table_ready", length(javascript_contribution_table))
+
+
+
+		### Prepare the hierarchies ###
 		session$sendCustomMessage("upload_status", "hierarchy_formatting")
-		taxonomic_hierarchy_table = prepare_and_send_taxonomic_hierarchy_table_for_visualization(taxonomic_hierarchy_table, contribution_table)
-		function_hierarchy_table = prepare_and_send_function_hierarchy_table_for_visualization(function_hierarchy_table, contribution_table)
+
+		# Remove columns from the taxonomic hierarchy table taht are below the resolution selected by the user
+		taxonomic_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(taxonomic_hierarchy_table, taxonomic_summary_level())
+
+		# Send a list of the taxonomic level names
+		session$sendCustomMessage(type='taxonomic_hierarchy_labels', colnames(taxonomic_hierarchy_table))
+
+		# Re-filter the table now that we have summarized tables
+		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, taxonomic_summary_level(), unique(contribution_table[[taxonomic_summary_level()]]))
+
+		# Make all entries strings
+		taxonomic_hierarchy_table = taxonomic_hierarchy_table[,lapply(.SD, as.character)]
+
+		# Convert the taxonomic hierarchy table to a javascript-friendly format
+		javascript_taxonomic_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(taxonomic_hierarchy_table, "taxa", taxonomic_summary_level())
+
+		# Send the formatted taxonomic hierarchy to the browser
+		session$sendCustomMessage(type='taxonomic_hierarchy', javascript_taxonomic_hierarchy)
+
+		# Remove columns from the function hierarchy table taht are below the resolution selected by the user
+		function_hierarchy_table = format_and_truncate_hierarchy_table_to_selected_level(function_hierarchy_table, function_summary_level())
+
+		# Send a list of the function level names
+		session$sendCustomMessage(type='function_hierarchy_labels', colnames(function_hierarchy_table))
+
+		# Re-filter the table now that we have summarized tables
+		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, function_summary_level(), unique(contribution_table[[function_summary_level()]]))
+
+		# Make all entries strings
+		function_hierarchy_table = function_hierarchy_table[,lapply(.SD, as.character)]
+
+		# Convert the function hierarchy table to a javascript-friendly format
+		javascript_function_hierarchy = convert_hierarchy_table_to_javascript_hierarchy(function_hierarchy_table, "function", function_summary_level())
+
+		# Send the formatted function hierarchy to the browser
+		session$sendCustomMessage(type='function_hierarchy', javascript_function_hierarchy)
+
+
+
+		### Prepare the average function abundance table ###
 		session$sendCustomMessage("upload_status", "averate_function_abundance_formatting")
-		average_function_abundance_table = prepare_and_send_average_function_abundance_table_for_visualization(contribution_table, function_hierarchy_table)
+
+		# Calculate the average abundances
+		average_function_abundance_table = calculate_average_function_abundances(contribution_table, function_hierarchy_table)
+
+		# Send the table to the browser
+		session$sendCustomMessage("function_averages",paste(paste(colnames(average_function_abundance_table), collapse="\t"), paste(sapply(1:nrow(average_function_abundance_table), function(row){return(paste(average_function_abundance_table[row,], collapse="\t"))}), collapse="\n"), sep="\n"))
+
+
+		### Prepare the metadata table ###
 		session$sendCustomMessage("upload_status", "metadata_formatting")
-		metadata_table = prepare_and_send_metadata_table_for_visualization(metadata_table) 
+
+		# If a metadata factor has been selected, order samples by the indicated metadata factor
+		if (!is.null(metadata_factor())){
+			metadata_table = order_metadata_table_by_metadata_factor(metadata_table)
+		}
+
+		javascript_metadata_table = convert_metadata_table_to_javascript_table(metadata_table)
+
+		# If no metadata table was provided, send a NULL signal
+		if (is.null(javascript_metadata_table)){
+			session$sendCustomMessage("metadata_table", "NULL")
+
+		# Otherwise, send the javascript metadata table
+		} else {
+			session$sendCustomMessage("metadata_table", javascript_metadata_table)
+		}
+
+
+
+		### Prepare the sample orders ###
 		session$sendCustomMessage("upload_status", "done")
 		otu_table_sample_order = prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table, input$sort_samples)
 		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, input$sort_samples)
