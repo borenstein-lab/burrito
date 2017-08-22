@@ -179,7 +179,9 @@ draw_svg = function() {
 				d3.select("#switch_scale").text("Hide scale");
 				showScale = true;
 			}
-			uploader.update_plots();
+			makeBusy();
+			setTimeout( function() { uploader.update_plots();
+									 endBusy();              } , 10);
 		});
 
 		document.getElementById('save_function_abundance_table').addEventListener('click', function() {
@@ -1099,6 +1101,21 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 }
 
 function resizeRedraw() {
+	makeBusy();	
+	if (resize_timeout){
+		clearTimeout(resize_timeout);
+	}
+	resize_timeout = setTimeout(function(){
+		if (curr_window_width != window.innerWidth | curr_window_height != window.innerHeight){
+			uploader.update_plots();
+			curr_window_width = window.innerWidth;
+			curr_window_height = window.innerHeight;
+		}
+		endBusy();
+	}, 100)
+}
+
+function makeBusy() {
 	d3.select("#help_background").attr("fill-opacity", "0.1");
 
 	if (!document.getElementById("resizing_message")) {
@@ -1132,19 +1149,12 @@ function resizeRedraw() {
 			.attr("y", height/2 + 10);
 	}
 
-	if (resize_timeout){
-		clearTimeout(resize_timeout);
-	}
-	resize_timeout = setTimeout(function(){
-		if (curr_window_width != window.innerWidth | curr_window_height != window.innerHeight){
-			uploader.update_plots();
-			curr_window_width = window.innerWidth;
-			curr_window_height = window.innerHeight;
+}
 
-			d3.select("#help_background").attr("fill-opacity", "0");
-			d3.select("#resizing_message").attr("visibility","hidden");
-		}
-	}, 100)
+function endBusy() {
+	d3.select("#help_background").attr("fill-opacity", "0");
+	d3.select("#resizing_message").attr("visibility","hidden");
+
 }
 
 function drawScale() {
