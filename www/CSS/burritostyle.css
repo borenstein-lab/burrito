@@ -214,4 +214,9 @@ h2 {
 .func_column rect {
 	shape-rendering: crispEdges;
 }
+.bar_group_divider {
+	stroke: #444444;
+	stroke-width: 2;
+	stroke-dasharray: 5,5;
+}
 white-space: pre-line;

@@ -365,6 +365,16 @@
   		.attr("text-anchor","middle")
   		.attr("font-size", 17)
   		.text(function(d) { return d.Name; });
+		
+	d3.select("#func_bars").selectAll("line.bar_group_divider")
+		.data(groups.slice(0,groups.length - 1))
+		.enter()
+		.insert("line","g.g")
+			.classed("bar_group_divider",true)
+			.attr("x1", function(d) { return d.Max + x.rangeBand() * 9/8 })
+			.attr("y1", graphdims.height_buffer)
+			.attr("x2", function(d) { return d.Max + x.rangeBand() * 9/8 })
+			.attr("y2", graphdims.height + graphdims.height_buffer);
 	
 	}
   /*svglink.selectAll("text").style("fill",function(m){
