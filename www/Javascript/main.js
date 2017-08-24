@@ -726,7 +726,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		// Remove samples without taxa links to functions
 		for (var i = 0; i < allSamples.length; i++){
 			sample = allSamples[i];
-			if (!(unlinked_taxon_name in data_cube.displayed_contribution_cube[sample])){
+			if (!(unlinked_name in data_cube.displayed_contribution_cube[sample])){
 				fixed_allSamples.push(sample);
 			}
 		}
@@ -781,12 +781,12 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			funcs.map(function(m){
 
 				// Don't iterate over taxa if there are no taxa linked to the functions
-				if (!(unlinked_taxon_name in data_cube.displayed_contribution_cube[n.sample])){
+				if (!(unlinked_name in data_cube.displayed_contribution_cube[n.sample])){
 					taxa.map(function(tt){	
 						contributions.push({func:m, Taxa:tt, Sample:n.sample, contributions:data_cube.get_contribution([n.sample],[tt],[m])});
 					})
 				} else {
-					contributions.push({func:m, Taxa:unlinked_taxon_name, Sample:n.sample, contributions:data_cube.get_contribution([n.sample], [unlinked_taxon_name], [m])});
+					contributions.push({func:m, Taxa:unlinked_name, Sample:n.sample, contributions:data_cube.get_contribution([n.sample], [unlinked_name], [m])});
 				}
 			})
 		var temp = [];

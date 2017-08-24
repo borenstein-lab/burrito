@@ -87,10 +87,10 @@
       // Get the leaf nodes under the give taxon and func
       // Don't look for leaf taxa if the sample functions are not linked to taxa
       var leaf_taxa;
-      if (taxon != unlinked_taxon_name){
+      if (taxon != unlinked_name){
         leaf_taxa = this.get_leaves(taxon, this.taxa_lookup);
       } else {
-        leaf_taxa = [unlinked_taxon_name];
+        leaf_taxa = [unlinked_name];
       }
       var leaf_funcs = this.get_leaves(func, this.func_lookup);
 
@@ -205,7 +205,7 @@
         for (var sample in this.displayed_contribution_cube){
 
           // If the sample is linked to otus, modify it
-          if (!(unlinked_taxon_name in this.displayed_contribution_cube[sample])){
+          if (!(unlinked_name in this.displayed_contribution_cube[sample])){
 
             // Remove the entry in the cube corresponding to the taxon
             delete this.displayed_contribution_cube[sample][taxon];
@@ -267,7 +267,7 @@
         for (var sample in this.displayed_contribution_cube){
 
           // Only do this if the functions are linked to otu contributions
-          if (!(unlinked_taxon_name in this.displayed_contribution_cube[sample])){
+          if (!(unlinked_name in this.displayed_contribution_cube[sample])){
             var contributions = {};
             for (var i = 0; i < taxon_present_children.length; i++){
               var child_taxon_name = taxon_present_children[i];
@@ -598,10 +598,10 @@
         this.displayed_contribution_cube[sample] = {};
 
         // Add top level taxonomic function contributions if the sample function profile is linked to taxa
-        if (sample == average_contrib_sample_name | !(unlinked_taxon_name in this.original_contribution_cube[sample])){
+        if (sample == average_contrib_sample_name | !(unlinked_name in this.original_contribution_cube[sample])){
           for (var j = 0; j < this.taxa_tree.length; j++){
             var taxon = this.taxa_tree[j].key;
-            if (taxon != unlinked_taxon_name){
+            if (taxon != unlinked_name){
               this.displayed_contribution_cube[sample][taxon] = {};
               for (var k = 0; k < this.func_tree.length; k++){
                 var func = this.func_tree[k].key;
@@ -610,10 +610,10 @@
             }
           }  
         } else {
-          this.displayed_contribution_cube[sample][unlinked_taxon_name] = {};
+          this.displayed_contribution_cube[sample][unlinked_name] = {};
           for (var k = 0; k < this.func_tree.length; k++){
             var func = this.func_tree[k].key;
-            this.displayed_contribution_cube[sample][unlinked_taxon_name][func] = this.calculate_new_contribution(sample, unlinked_taxon_name, func);
+            this.displayed_contribution_cube[sample][unlinked_name][func] = this.calculate_new_contribution(sample, unlinked_name, func);
           }
         }
       }
