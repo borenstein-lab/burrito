@@ -1558,11 +1558,10 @@ shinyServer(function(input, output, session) {
 
 		# Filter the contribution table to only contain taxa still in the otu table
 		contribution_table = contribution_table[get(taxonomic_summary_level()) %in% c(otu_table[[taxonomic_summary_level()]], unlinked_name)]
-		session$sendCustomMessage("shiny_test", contribution_table)
 
 		# Renormalize the contribution table
 		contribution_table = normalize_contribution_table(contribution_table)
-		session$sendCustomMessage("shiny_test", contribution_table)
+		
 		# Determine the relative abundance of each funtion in each sample
 		function_abundances = contribution_table[,sum(contribution),by=c(first_metadata_level(), function_summary_level())]
 
@@ -1574,10 +1573,10 @@ shinyServer(function(input, output, session) {
 
 		# Filter the contribution table to only contain functions with a high enough maximum relative abundance
 		contribution_table = contribution_table[get(function_summary_level()) %in% filtered_functions]
-		session$sendCustomMessage("shiny_test", contribution_table)
+		
 		# Renormalize the contribution table
 		contribution_table = normalize_contribution_table(contribution_table)
-		session$sendCustomMessage("shiny_test", contribution_table)
+		
 		return(contribution_table)
 	}
 
