@@ -1168,6 +1168,19 @@ shinyServer(function(input, output, session) {
 		return(table_to_filter)
 	}
 
+	# add_unknowns(hierarchy_table)
+	#
+	# Add "unknown" to names of hierarchy levels with no content
+	add_unknowns = function(hierarchy_table, first_level){
+		hierarchy_names = names(hierarchy_table)[names(hierarchy_table) != first_level]
+		hierarchy_table = data.table(V1=hierarchy_table[,get(first_level)], hierarchy_table[,lapply(.SD, function(x){
+			return(ifelse(grepl("[:alnum:]", gsub("^[a-z]__","",x)), x, paste0(x,"_unknown")))
+		}), .SDcols = hierarchy_names])
+		setnames(hierarchy_table, "V1", first_level)
+		return(hierarchy_table)
+		
+	}
+
 	# make_hierarchy_table_level_entries_unique(hierarchy_table, first_level)
 	#
 	# Makes all of the hierarchy entries except for the first column (because that needs to match with the taxonomic abundance and contribution tables) unique by prepending that entry's hierarchy level name to the entry, allowing for duplicated entry names between different labels
@@ -1180,6 +1193,7 @@ shinyServer(function(input, output, session) {
 				return(paste(row[1:col], collapse = "_"))
 			}))	
 		}))))
+		##Add option here to check if greengenes and to add "unknown" if relevant
 		colnames(hierarchy_table) = hierarchy_names
 
 		return(hierarchy_table)
@@ -1599,10 +1613,12 @@ shinyServer(function(input, output, session) {
 		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, first_taxonomic_level(), unique(c(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]])))
 		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
 
+		#Add in "unknown" to hierarchy entries with no alpha characters
+		taxonomic_hierarchy_table = add_unknowns(taxonomic_hierarchy_table, first_taxonomic_level())
+
 		# Make the entries of the hierarchy unique
 		taxonomic_hierarchy_table = make_hierarchy_table_level_entries_unique(taxonomic_hierarchy_table, first_taxonomic_level())
 		function_hierarchy_table = make_hierarchy_table_level_entries_unique(function_hierarchy_table, first_function_level())
-
 
 
 		# Prepare data and send it to the browser
