@@ -575,6 +575,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.func_lookup[d].level == 1 } else { return data_cube.func_lookup[d].level == 0 }})
 	      	}
 	      	num_levels = layer1.level
+
 			
 	      	color_count = 0	      	
 	      	for(k=0; k < first_level.length; k++){
@@ -606,14 +607,21 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	      		} else {
 	      			level_items = descendents.filter(function(d){ return data_cube.func_lookup[d].level == level })
 	      		}
-	      		parent_color = core_color
+	      		parent_color = core_color.toString() //make copy rather than passing by ref
+	      		parent_color = d3.hcl(parent_color)
 	      		for(m=0; m < level_items.length; m++){
 	      			if(list_type=="taxa"){
 	      				desc_leaves = data_cube.get_leaves(level_items[m], data_cube.taxa_lookup)
 	      			} else {
 	      				desc_leaves = data_cube.get_leaves(level_items[m], data_cube.func_lookup)
 	      			}
-	      			desc_colors = desc_leaves.map(function(d){ return d3.hcl(color_scale(d)) })
+	      			desc_colors = desc_leaves.map(function(d){ 
+	      				leaf_col = d3.hcl(color_scale(d))
+	      				if(leaf_col.h < 0){ //deal with negative values
+	      					leaf_col.h = leaf_col.h + 360
+	      				}
+	      				return leaf_col
+	      				})
 	      		if(m%2 == 0 & level_items.length > 1){
 	      			parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
 	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
@@ -626,7 +634,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 					parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
 	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
 	      			parent_color.l = d3.mean(desc_colors.map(function(d){ return d.l}))
-	      		
  	      		}
 		      	if(color_scale.domain().indexOf(level_items[m])==-1){
 		      		color_scale.range().push(parent_color.toString())
