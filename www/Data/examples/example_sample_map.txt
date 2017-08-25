@@ -1,0 +1,4 @@
+Sample	Grouping_1	Grouping_2
+Sample1_Name	Case	Human
+Sample2_Name	Control	Mouse
+Sample3_Name	Control	Human

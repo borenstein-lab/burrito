@@ -1,0 +1,4 @@
+OTU	Sample1_Name	Sample2_Name	Sample3_Name
+OTU1_ID	10	5	0
+OTU2_ID	0	5	1
+OTU3_ID	2	7	4

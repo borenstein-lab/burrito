@@ -1,0 +1,5 @@
+OTU	Kingdom	Phylum
+OTU1_ID	k__Bacteria	p__Bacteroidetes
+OTU2_ID	k__Bacteria	p__Bacteroidetes
+OTU3_ID	k__Bacteria	p__Firmicutes
+OTU4_ID	k__Archaea	p__Euryarchaeota

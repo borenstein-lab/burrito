@@ -1,0 +1,4 @@
+KO	Sample1_Name	Sample2_Name	Sample3_Name
+K00001	2	5	10
+K00002	10	1	0
+K00100	0	3	2

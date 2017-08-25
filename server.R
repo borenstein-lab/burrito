@@ -32,7 +32,7 @@ default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
 picrust_normalization_table = NULL
 picrust_ko_table = NULL
 
-if (basename(getwd()) %in% c("burrito")){
+if (basename(getwd()) %in% c("burrito", "burrito-cecilia")){
 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
 }
@@ -545,13 +545,13 @@ shinyServer(function(input, output, session) {
 		}
 		
 		# Check that functions in the contribution table are present in the function hierarchy
-		if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "function hierarchy")){
+		if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "functional hierarchy")){
 			return(FALSE)
 		}
 		
 		# If the function abundance table is not empty, check that functions in the function abundance table are in the function hierarchy
 		if (nrow(function_abundance_table) > 0){
-			if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "function hierarchy")){
+			if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "functional hierarchy")){
 				return(FALSE)
 			}
 		}
@@ -565,14 +565,14 @@ shinyServer(function(input, output, session) {
 		
 		# If the metadata table is not empty, check that samples in the OTU table are in the metadata table
 		if (nrow(metadata_table) > 0){
-			if (!validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "metadata table")){
+			if (!validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "sample grouping table")){
 				return(FALSE)
 			}
 		}
 		
 		# If the metadat table is not empty, check that samples in the contribution table are in the metadata table
 		if (nrow(metadata_table) > 0){
-			if (!validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "metadata_table")){
+			if (!validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "sample grouping table")){
 				return(FALSE)
 			}
 		}
@@ -841,7 +841,7 @@ shinyServer(function(input, output, session) {
 
 			# If no file was ever selected, send an abort signal
 			if (is.null(metadata_table_file) & !new_file_flags[["metadata_table"]]){
-				session$sendCustomMessage("abort", "The option to upload metadata was chosen, but no metadata file was selected. Please select one or choose the option to upload no metadta.")
+				session$sendCustomMessage("abort", "The option to upload a sample grouping table was chosen, but no sample grouping file was selected. Please select one or choose the option to upload no sample grouping.")
 				return(NULL)
 			}
 
@@ -851,7 +851,7 @@ shinyServer(function(input, output, session) {
 			# If we were able to read the metadata table, check for duplicate rows
 			if (!is.null(metadata_table)){
 
-				unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "metadata table")
+				unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "sample grouping table")
 
 				# If there are duplicate rows, return NULL
 				if (!unique_metadata_entries_validated){
@@ -876,7 +876,7 @@ shinyServer(function(input, output, session) {
 		colnames(picrust_ko_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
 
 		# File checking
-		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICURSt table")
+		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICRUSt table")
 
 		# If there are otus without genomic content, we return NULL
 		if (!otus_have_genomic_content_validated){
