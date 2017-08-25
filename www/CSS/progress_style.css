@@ -1,3 +1,8 @@
+.loading_text {
+	font-size: 180%;
+	font-family: "Times New Roman", Times, serif;
+}
+
 #upload_stepsG circle {
 	r: 1vw;
 	stroke-width: 0;
@@ -6,6 +11,10 @@
 #upload_stepsG rect {
 	height: 0.5vw;
 	transform: translateY(-0.25vw);
+}
+
+.below_step {
+	transform: translateY(calc(1vw + 0.75em));
 }
 
 .upload_steps .pending {
@@ -17,7 +26,20 @@
 }
 
 .upload_steps .complete {
-	fill: #2aed51;
+	fill: #4287ff;
+}
+
+#loading_barsG rect {
+	height: 2.5vh;
+	transform: translateY(-1.25vh);
+}
+
+.above_bar {
+	transform: translateY(calc(-1.25vh + -0.75em));
+}
+
+.below_bar {
+	transform: translateY(calc(1.25vh + 0.75em));
 }
 
 .loading_bars .background_bar {
@@ -29,5 +51,6 @@
 }
 
 .loading_bars .complete {
-	fill: #2aed51;
+	fill: #4287ff;
+	/*fill: #2aed51;*/
 }
