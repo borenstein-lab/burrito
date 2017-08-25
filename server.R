@@ -32,9 +32,13 @@ default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
 picrust_normalization_table = NULL
 picrust_ko_table = NULL
 
-if (basename(getwd()) %in% c("burrito")){
+if (basename(getwd()) %in% c("burrito", "burrito-cecilia")){
 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
+	# Convert OTU and function names to character type
+	picrust_normalization_table[,(colnames(picrust_normalization_table)[1]) := as.character(get(colnames(picrust_normalization_table)[1]))]
+	picrust_ko_table[,(colnames(picrust_ko_table)[1]) := as.character(get(colnames(picrust_ko_table)[1]))]
+	picrust_ko_table[,(colnames(picrust_ko_table)[2]) := as.character(get(colnames(picrust_ko_table)[2]))]
 }
 
 # Constant to mark entries for comparison in the contribution table
@@ -257,11 +261,11 @@ shinyServer(function(input, output, session) {
     	taxonomic_hierarchy_table = taxonomic_hierarchy_table[!duplicated(taxonomic_hierarchy_table)]
 
 		# Sum the occurrences of each element in the first column
-		output = taxonomic_hierarchy_table[,.N, by = eval(first_taxonomic_level())]
+		taxonomic_hierarchy_table = taxonomic_hierarchy_table[,.N, by = eval(first_taxonomic_level())]
 
 		# Rename normalization column for consistency
-		colnames(output)[2] = "partial_contribution_factor"
-		return(output)
+		colnames(taxonomic_hierarchy_table)[2] = "partial_contribution_factor"
+		return(taxonomic_hierarchy_table)
 	})
 
     function_partial_contribution_table = reactive({ 
@@ -474,6 +478,42 @@ shinyServer(function(input, output, session) {
 		return(input_table)
 	}
 
+	# validate_number_of_columns(input_table, column_number, comparison, table_name)
+	#
+	# Checks that there are the appropriate number of columns in the table based on the column number and comparison provided. If there are an incorrect number of columns, send an abort signal and return FALSE
+	validate_number_of_columns = function(input_table, column_number, comparison, table_name){
+
+		num_cols = ncol(input_table)
+		if (comparison == "eq"){
+			if (num_cols != column_number){
+				session$sendCustomMessage("abort", paste("The ", table_name, " should have ", column_number, " column(s) but instead has ", num_cols, " column(s)", sep=""))
+				return(FALSE)
+			}
+		} else if (comparison == "lt"){
+			if (num_cols >= column_number){
+				session$sendCustomMessage("abort", paste("The ", table_name, " should have fewer than ", column_number, " column(s) but instead has ", num_cols, " column(s)", sep=""))
+				return(FALSE)
+			}
+		} else if (comparison == "le"){
+			if (num_cols > column_number){
+				session$sendCustomMessage("abort", paste("The ", table_name, " should have fewer than or equal to ", column_number, " column(s) but instead has ", num_cols, " column(s)", sep=""))
+				return(FALSE)
+			}
+		} else if (comparison == "gt"){
+			if (num_cols <= column_number){
+				session$sendCustomMessage("abort", paste("The ", table_name, " should have more than ", column_number, " column(s) but instead has ", num_cols, " column(s)", sep=""))
+				return(FALSE)
+			}
+		} else if (comparison == "ge"){
+			if (num_cols <= column_number){
+				session$sendCustomMessage("abort", paste("The ", table_name, " should have more than equal to ", column_number, " column(s) but instead has ", num_cols, " column(s)", sep=""))
+				return(FALSE)
+			}
+		}
+
+		return(TRUE)
+	}
+
 	# validate_unique_rows(input_table, id_column_names, element_name, table_name)
 	#
 	# Checks that no rows correspond to the same entity in the table as identified by the indicated ID columns. If there are any duplicates, send an abort signal and return FALSE
@@ -545,13 +585,13 @@ shinyServer(function(input, output, session) {
 		}
 		
 		# Check that functions in the contribution table are present in the function hierarchy
-		if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "function hierarchy")){
+		if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "functional hierarchy")){
 			return(FALSE)
 		}
 		
 		# If the function abundance table is not empty, check that functions in the function abundance table are in the function hierarchy
 		if (nrow(function_abundance_table) > 0){
-			if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "function hierarchy")){
+			if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "functional hierarchy")){
 				return(FALSE)
 			}
 		}
@@ -565,14 +605,14 @@ shinyServer(function(input, output, session) {
 		
 		# If the metadata table is not empty, check that samples in the OTU table are in the metadata table
 		if (nrow(metadata_table) > 0){
-			if (!validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "metadata table")){
+			if (!validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "sample grouping table")){
 				return(FALSE)
 			}
 		}
 		
 		# If the metadat table is not empty, check that samples in the contribution table are in the metadata table
 		if (nrow(metadata_table) > 0){
-			if (!validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "metadata_table")){
+			if (!validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "sample grouping table")){
 				return(FALSE)
 			}
 		}
@@ -596,8 +636,16 @@ shinyServer(function(input, output, session) {
 		# Read the otu table
 		otu_table = process_input_file("taxonomic_abundance_table")
 		
-		# If we were able to read the otu table, check for duplicate rows or duplicate samples
+		# If we were able to read the otu table, check the number of columns, duplicate rows, and duplicate samples
 		if (!is.null(otu_table)){
+
+			# Check that there is more than 1 column
+			column_num_validated = validate_number_of_columns(otu_table, 1, 'gt', "OTU table")
+
+			# If there were fewer than 2 columns, return NULL
+			if (!column_num_validated){
+				return(NULL)
+			}
 
 			# Rename the OTU label column for consistency
 			colnames(otu_table)[1] = first_taxonomic_level()
@@ -619,6 +667,9 @@ shinyServer(function(input, output, session) {
 
 		# Format the OTU table
 		otu_table = format_otu_table(otu_table)
+
+		# Convert the OTU names to character type
+		otu_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
 		
 		return(otu_table)
 	}
@@ -639,8 +690,16 @@ shinyServer(function(input, output, session) {
 		# Read in the genomic content table
 		genomic_content_table = process_input_file("genomic_content_table")
 
-		# If we were able to read the genomic content table, check for duplicate rows
+		# If we were able to read the genomic content table, check the number of columns and duplicate rows
 		if (!is.null(genomic_content_table)){
+
+			# Check that there are 3 columns
+			column_num_validated = validate_number_of_columns(genomic_content_table, 3, 'eq', "genomic content table")
+
+			# If there are not exactly 3 columns, return NULL
+			if (!column_num_validated){
+				return(NULL)
+			}
 
 			# Rename the ID columns for consistency
 			colnames(genomic_content_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
@@ -652,6 +711,10 @@ shinyServer(function(input, output, session) {
 				return(NULL)
 			}
 		}
+
+		# Convert the otu names and function names to character type
+		genomic_content_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+		genomic_content_table[,(first_function_level()) := as.character(get(first_function_level()))]
 
 		return(genomic_content_table)
 	}
@@ -672,8 +735,16 @@ shinyServer(function(input, output, session) {
 		# Read in the contribution table
 		contribution_table = process_input_file("contribution_table")
 
-		# If we were able to read the contribution table, check for duplicate rows
+		# If we were able to read the contribution table, check the number of columns and duplicate rows
 		if (!is.null(contribution_table)){
+
+			# Check that there are at least 6 columns
+			column_num_validated = validate_number_of_columns(contribution_table, 6, 'ge', "contribution table")
+
+			# If there are fewer than 6 columns, return NULL
+			if (!column_num_validated){
+				return(NULL)
+			}
 
 			# Reorder and drop columns to match internal contribution table format
 			contribution_table = contribution_table[,c(2,3,1,6),with=F]
@@ -688,6 +759,11 @@ shinyServer(function(input, output, session) {
 				return(NULL)
 			}
 		}
+
+		# Convert sample names, otu names, and function names to character type
+		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
+		contribution_table[,(first_taxonomi_level()) := as.character(get(first_taxonomic_level()))]
+		contribution_table[,(first_function_level()) := as.character(get(first_function_level()))]
 
 		return(contribution_table)
 	}
@@ -711,11 +787,19 @@ shinyServer(function(input, output, session) {
 			# Read in the function abundance table
 			function_abundance_table = process_input_file("function_abundance_table")
 
-			# If we were able to read the function abundance table, check for duplicate rows or duplicate samples
+			# If we were able to read the function abundance table, check the number of columns, duplicate rows or duplicate samples
 			if (!is.null(function_abundance_table)){
+
+				# Check that there are at least two columns
+				column_num_validated = validate_number_of_columns(function_abundance_table, 1, 'gt', "function abundance table")
 
 				# Rename columns for consistency
 				colnames(function_abundance_table)[1] = first_function_level()
+
+				# If there is one or fewer columns, return NULL
+				if (!column_num_validated){
+					return(NULL)
+				}
 
 				unique_functions_validated = validate_unique_rows(function_abundance_table, first_function_level(), paste(first_function_level(), "s", sep=""), "function abundance table")
 
@@ -731,6 +815,9 @@ shinyServer(function(input, output, session) {
 					return(NULL)
 				}
 			}
+
+			# Convert the function names to character type
+			function_abundance_table[,(first_function_level()) := as.character(get(first_function_level()))]
 
 			return(function_abundance_table)
 		}
@@ -778,6 +865,9 @@ shinyServer(function(input, output, session) {
 				return(NULL)
 			}
 		}
+
+		# Convert all columns in the hierarchy table to character type
+		custom_taxonomic_hierarchy_table = custom_taxonomic_hierarchy_table[,lapply(.SD, as.character)]
 
 		return(custom_taxonomic_hierarchy_table)
 	}
@@ -827,6 +917,9 @@ shinyServer(function(input, output, session) {
 				}), .SDcols = 2:ncol(custom_function_hierarchy_table)]
 		}
 
+		# Convert all columns in the hierarchy table to character type
+		custom_function_hierarchy_table = custom_function_hierarchy_table[,lapply(.SD, as.character)]
+
 		return(custom_function_hierarchy_table)
 	}
 
@@ -841,17 +934,25 @@ shinyServer(function(input, output, session) {
 
 			# If no file was ever selected, send an abort signal
 			if (is.null(metadata_table_file) & !new_file_flags[["metadata_table"]]){
-				session$sendCustomMessage("abort", "The option to upload metadata was chosen, but no metadata file was selected. Please select one or choose the option to upload no metadta.")
+				session$sendCustomMessage("abort", "The option to upload a sample grouping table was chosen, but no sample grouping file was selected. Please select one or choose the option to upload no sample grouping.")
 				return(NULL)
 			}
 
 			# Read in the metadata table
 			metadata_table = process_input_file("metadata_table")
 
-			# If we were able to read the metadata table, check for duplicate rows
+			# If we were able to read the metadata table, check the number of columns and duplicate rows
 			if (!is.null(metadata_table)){
 
-				unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "metadata table")
+				# Check that there is at least 1 column
+				column_num_validated = validate_number_of_columns(metadata_table, 0, 'gt', "sample grouping table")
+				
+				# If there were no columns, return NULL
+				if (!column_num_validated){
+					return(NULL)
+				}
+
+				unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "sample grouping table")
 
 				# If there are duplicate rows, return NULL
 				if (!unique_metadata_entries_validated){
@@ -876,7 +977,7 @@ shinyServer(function(input, output, session) {
 		colnames(picrust_ko_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
 
 		# File checking
-		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICURSt table")
+		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICRUSt table")
 
 		# If there are otus without genomic content, we return NULL
 		if (!otus_have_genomic_content_validated){
@@ -893,6 +994,11 @@ shinyServer(function(input, output, session) {
 		contribution_table[,contribution := (abundance * copy_number) / norm_factor]
 
 		contribution_table = contribution_table[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F]
+
+		# Convert sample, OTU, and function names to character type
+		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
+		contribution_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+		contribution_table[,(first_function_level()) := as.character(get(first_function_level()))]
 
 		return(contribution_table)
 	}
@@ -925,6 +1031,11 @@ shinyServer(function(input, output, session) {
 
 		# Subset to only the relevant columsn
 		contribution_table = contribution_table[,c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution"),with=F]
+
+		# Convert sample, OTU, and function names to character type
+		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
+		contribution_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+		contribution_table[,(first_function_level()) := as.character(get(first_function_level()))]
 
 		return(contribution_table)
 	}
@@ -975,6 +1086,11 @@ shinyServer(function(input, output, session) {
 			return(NULL)
 		}
 
+		# Convert sample, OTU, and function names to character type
+		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
+		contribution_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+		contribution_table[,(first_function_level()) := as.character(get(first_function_level()))]
+
 		# If all validation checks pass, then we can just return the contribution table
 		return(contribution_table)
 	}
@@ -998,6 +1114,11 @@ shinyServer(function(input, output, session) {
 		} else if (input$contribution_method_choice == "CONTRIBUTION"){
 			contribution_table = generate_contribution_table_using_custom_contributions(otu_table)
 		}
+
+		# Convert sample, OTU, and function names to character type
+		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
+		contribution_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+		contribution_table[,(first_function_level()) := as.character(get(first_function_level()))]
 
 		return(contribution_table)
 	}
@@ -1119,18 +1240,23 @@ shinyServer(function(input, output, session) {
 
 		# Filter the summary map to only include the columns for the levels we ned to map between
 		summary_map = summary_map[,c(first_level_name, summary_level),with=F]
-		
+
+		# Convert merging columns to character type
+		table_to_summarize[,(first_level_name) := as.character(get(first_level_name))]
+		partial_contribution_table[,(first_level_name) := as.character(get(first_level_name))]
+		summary_map = summary_map[,lapply(.SD, as.character)]
+
 		# Merge the table to summarize with the summary map by the first level, duplicating rows as necessary when first level elements have multiple entries
 		summary_map = merge(table_to_summarize, summary_map, by = first_level_name, all.x = T, all.y = F, allow.cartesian = T)
 		
 		# Merge with the partial contribution table
-		summary_map = merge(summary_map, partial_contribution_table, by = first_level_name, all.y = F, allow.cartesian = T)
-		
+		summary_map = merge(summary_map, partial_contribution_table, by = first_level_name, all.x = T, all.y = F, allow.cartesian = T)
+
 		# Set any NA entries to the unlinked name
 		summary_map[,(summary_level) := ifelse(is.na(get(summary_level)), unlinked_name, get(summary_level))]
 		
 		# Create a partial contribution column
-		summary_map[,partial_contribution := get(contribution_name)/partial_contribution_factor]
+		summary_map[,partial_contribution := ifelse(is.na(partial_contribution_factor), get(contribution_name), get(contribution_name)/partial_contribution_factor)]
 		
 		# Sum the parital contributions for rows that match in id columns
 		summary_map = summary_map[,sum(partial_contribution),by=summarized_id_names]
@@ -1168,6 +1294,19 @@ shinyServer(function(input, output, session) {
 		return(table_to_filter)
 	}
 
+	# add_unknowns(hierarchy_table)
+	#
+	# Add "unknown" to names of hierarchy levels with no content
+	add_unknowns = function(hierarchy_table, first_level){
+		hierarchy_names = names(hierarchy_table)[names(hierarchy_table) != first_level]
+		hierarchy_table = data.table(V1=hierarchy_table[,get(first_level)], hierarchy_table[,lapply(.SD, function(x){
+			return(ifelse(grepl("[:alnum:]", gsub("^[a-z]__","",x)), x, paste0(x,"_unknown")))
+		}), .SDcols = hierarchy_names])
+		setnames(hierarchy_table, "V1", first_level)
+		return(hierarchy_table)
+		
+	}
+
 	# make_hierarchy_table_level_entries_unique(hierarchy_table, first_level)
 	#
 	# Makes all of the hierarchy entries except for the first column (because that needs to match with the taxonomic abundance and contribution tables) unique by prepending that entry's hierarchy level name to the entry, allowing for duplicated entry names between different labels
@@ -1180,6 +1319,7 @@ shinyServer(function(input, output, session) {
 				return(paste(row[1:col], collapse = "_"))
 			}))	
 		}))))
+		##Add option here to check if greengenes and to add "unknown" if relevant
 		colnames(hierarchy_table) = hierarchy_names
 
 		return(hierarchy_table)
@@ -1417,11 +1557,11 @@ shinyServer(function(input, output, session) {
 	filter_contribution_table_by_relative_abundance = function(contribution_table, otu_table){
 
 		# Filter the contribution table to only contain taxa still in the otu table
-		contribution_table = contribution_table[get(taxonomic_summary_level()) %in% otu_table[[taxonomic_summary_level()]]]
+		contribution_table = contribution_table[get(taxonomic_summary_level()) %in% c(otu_table[[taxonomic_summary_level()]], unlinked_name)]
 
 		# Renormalize the contribution table
 		contribution_table = normalize_contribution_table(contribution_table)
-
+		
 		# Determine the relative abundance of each funtion in each sample
 		function_abundances = contribution_table[,sum(contribution),by=c(first_metadata_level(), function_summary_level())]
 
@@ -1433,10 +1573,10 @@ shinyServer(function(input, output, session) {
 
 		# Filter the contribution table to only contain functions with a high enough maximum relative abundance
 		contribution_table = contribution_table[get(function_summary_level()) %in% filtered_functions]
-
+		
 		# Renormalize the contribution table
 		contribution_table = normalize_contribution_table(contribution_table)
-
+		
 		return(contribution_table)
 	}
 
@@ -1583,10 +1723,10 @@ shinyServer(function(input, output, session) {
 			if (!validate_tables_match(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table)){
 				return()
 			}
-
+			
 			# Add the comparison samples to the contribution table
 			contribution_table = add_comparison_function_abundances_to_contribution_table(contribution_table, function_abundance_table)
-
+			
 			# If we could not add the function abundances to the contribution table, we exit
 			if (is.null(contribution_table)){
 				return()
@@ -1599,10 +1739,12 @@ shinyServer(function(input, output, session) {
 		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, first_taxonomic_level(), unique(c(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]])))
 		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
 
+		#Add in "unknown" to hierarchy entries with no alpha characters
+		taxonomic_hierarchy_table = add_unknowns(taxonomic_hierarchy_table, first_taxonomic_level())
+
 		# Make the entries of the hierarchy unique
 		taxonomic_hierarchy_table = make_hierarchy_table_level_entries_unique(taxonomic_hierarchy_table, first_taxonomic_level())
 		function_hierarchy_table = make_hierarchy_table_level_entries_unique(function_hierarchy_table, first_function_level())
-
 
 
 		# Prepare data and send it to the browser
@@ -1612,16 +1754,16 @@ shinyServer(function(input, output, session) {
 
 		# Normalize the OTU abundances per sample
 		otu_table = normalize_otu_table(otu_table)
-
+		
 		# Summarize the OTU table OTUS to the user-selected level
 		otu_table = summarize_table_to_selected_level(otu_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
-
+		
 		# Filter out taxa based on their relative abundance
 		otu_table = filter_otu_table_by_relative_abundance(otu_table)
-
+		
 		# Renormalize the filtered table
 		otu_table = normalize_otu_table(otu_table)
-
+		
 		# Convert the OTU table to a javascript-friendly format
 		javascript_otu_table = convert_otu_table_to_javascript_table(otu_table)
 
@@ -1638,19 +1780,19 @@ shinyServer(function(input, output, session) {
 
 		# Normalize the contributions by sample
 		contribution_table = normalize_contribution_table(contribution_table)
-
+		
 		# Summarize the contribution table functions to the user-selected level
 		contribution_table = summarize_table_to_selected_level(contribution_table, function_hierarchy_table, function_summary_level(), function_partial_contribution_table())
-
+		
 		# Summarize the contribution table OTUs to the user-selected level
 		contribution_table = summarize_table_to_selected_level(contribution_table, taxonomic_hierarchy_table, taxonomic_summary_level(), taxonomic_partial_contribution_table())
-
+		
 		# Filter out functions based on their relative abundance
 		contribution_table = filter_contribution_table_by_relative_abundance(contribution_table, otu_table)
-
+		
 		# Convert the contribution table to a javascript-friendly format
 		javascript_contribution_table = convert_contribution_table_to_javascript_table(contribution_table)
-
+		
 		# Set the value of the tracked contribution table so that we can send it in pieces to the browser
 		tracked_tables[["contribution_table"]] = javascript_contribution_table
 

@@ -1,0 +1,4 @@
+Gene	Category	SuperPathway	SubPathway
+K00001	Metabolism	Carbohydrate Metabolism	Glycan metabolism
+K00002	Metabolism	Lipid Metabolism	Fatty acid biosynthesis
+K00100	Metabolism	Amino Acid Metabolism	Tryptophan metabolism

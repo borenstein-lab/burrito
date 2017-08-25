@@ -1,0 +1,8 @@
+Gene	Sample	OTU	GeneCountPerGenome	OTUAbundanceInSample	CountContributedByOTU	ContributionPercentOfSample	ContributionPercentOfAllSamples
+K00001	Sample1_Name	OTU1_ID	1.0	10.0	10.0	0.5	0.0002
+K00001	Sample1_Name	OTU2_ID	2.0	5.0	10.0	0.5	0.0002
+K00002	Sample1_Name	OTU3_ID	1.0	4.0	4.0	0.3	0.001
+K00001	Sample2_Name	OTU1_ID	1.0	10.0	10.0	0.5	0.0002
+K00001	Sample2_Name	OTU2_ID	2.0	5.0	10.0	0.5	0.0002
+K00002	Sample3_Name	OTU3_ID	1.0	4.0	4.0	0.3	0.001
+K00001	Sample3_Name	OTU1_ID	1.0	10.0	10.0	0.5	0.0002
