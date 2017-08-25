@@ -2,6 +2,7 @@
 title: Uploading Data to Burrito for Visualization
 layout: default
 ---
+# Uploading Data to Burrito for Visualization
 
 <h2 id="taxonomy">Taxonomic Data</h2>
 

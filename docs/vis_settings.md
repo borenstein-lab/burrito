@@ -2,6 +2,7 @@
 title: Burrito Visualization Settings
 layout: default
 ---
+# Burrito Visualization Settings
 
 ### Color Scheme
 
