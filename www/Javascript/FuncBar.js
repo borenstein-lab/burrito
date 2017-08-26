@@ -113,7 +113,7 @@
 
    var first_sample_x = x(sample_order[0]);
    var last_sample_x = x(sample_order[sample_order.length - 1]);
-
+   
   //y axis label
   svglink.append("text")
     .attr("class", "y label")
@@ -330,7 +330,7 @@
   .attr("dy", ".71em")
   .style("text-anchor", "end")
   .attr("class", "y_label");
-  
+
   if (grouping != "N/A") {
   	var groupnames = sampledata.map(function(e) { return e[grouping]; });
   	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });

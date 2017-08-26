@@ -682,7 +682,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var stackData = getFuncBarData();
 	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 
-
 	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, otu_sample_order);
 
 	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
