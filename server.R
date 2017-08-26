@@ -87,8 +87,8 @@ shinyServer(function(input, output, session) {
 	# Reactive elements that keep track of the name of the first level of the hierarchies (what show up in the OTU and contribution tables)
 	first_taxonomic_level = reactive({
 
-		# If there is no custom taxonomic hierarchy, use the default
-		if (is.null(input$custom_taxonomic_hierarchy_table)){
+		# If the example is being displayed or there is no custom taxonomic hierarchy, use the default
+		if (input$example_visualization == "TRUE" | is.null(input$custom_taxonomic_hierarchy_table)){
 			return(colnames(default_taxonomic_hierarchy_table)[1])
 
 		# Otherwise, use the custom taxonomic hierarchy
@@ -104,8 +104,8 @@ shinyServer(function(input, output, session) {
 
 	first_function_level = reactive({
 
-		# If there is no custom function hierarchy, use the default
-		if (is.null(input$custom_function_hierarchy_table)){
+		# If the example is being displayed or there is no custom function hierarchy, use the default
+		if (input$example_visualization == "TRUE" | is.null(input$custom_function_hierarchy_table)){
 			return(colnames(default_function_hierarchy_table)[1])
 
 		# Otherwise, use the custom function hierarchy
@@ -121,8 +121,8 @@ shinyServer(function(input, output, session) {
 
 	first_metadata_level = reactive({
 
-		# If there is no uploaded metadata table, use the default
-		if (is.null(input$metadata_table)){
+		# If the example is being displayed or there is no uploaded metadata table, use the default
+		if (input$example_visualization == "TRUE" | is.null(input$metadata_table)){
 			return(colnames(default_metadata_table)[1])
 
 		# Otherwise, use the selected metadata table
@@ -1115,6 +1115,11 @@ shinyServer(function(input, output, session) {
 			contribution_table = generate_contribution_table_using_custom_contributions(otu_table)
 		}
 
+		# If the contribution table is NULL, we return NULL
+		if (is.null(contribution_table)){
+			return(NULL)
+		}
+
 		# Convert sample, OTU, and function names to character type
 		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
 		contribution_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
@@ -1518,14 +1523,21 @@ shinyServer(function(input, output, session) {
 		return(metadata_table)
 	}
 
-	# convert_metadata_table_to_javascript_table(metadata_table)
+	# convert_metadata_table_to_javascript_table(metadata_table, function_abundance_table)
 	#
 	# Converts the R table format metadata table to the javascript table used in the visualization, if a metadata table was provided
-	convert_metadata_table_to_javascript_table = function(metadata_table){
+	convert_metadata_table_to_javascript_table = function(metadata_table, function_abundance_table){
 
 		# If the metadata table is empty, return NULL
 		if (nrow(metadata_table) == 0){
 			return(NULL)
+		}
+		
+		# If comparison function abundances were provided, add metadata labels for those comparison samples
+		if (nrow(function_abundance_table) != 0){
+			duplicate_metadata_table = metadata_table
+			duplicate_metadata_table[[first_metadata_level()]] = paste(duplicate_metadata_table[[first_metadata_level()]], comparison_tag, sep="")
+			metadata_table = rbind(metadata_table, duplicate_metadata_table)
 		}
 
 		# Create a text string table that can be parsed by the d3 parser
@@ -1621,8 +1633,9 @@ shinyServer(function(input, output, session) {
 
 		# Get the set of relevant samples
 		samples = levels(factor(contribution_table[[first_metadata_level()]]))
+		function_table_sample_order = c()
 		
-		# By default, remove the average contribution sample and order the rest so comparison samples are next to the right sample
+		# Sort sample names alphabetically if selected
 		if(alphabetical){
 			orig_samps = samples[!grepl(comparison_tag,samples) & samples != "Average_contrib"]
 			if(any(grepl(comparison_tag, samples))){
@@ -1633,35 +1646,40 @@ shinyServer(function(input, output, session) {
 			} else {
 				function_table_sample_order = rank(samples)
 			}
-		} else if (nrow(metadata_table) > 0){ # If there is metadata to order by, use that order instead
+
+		# If there is metadata to order by, use that order instead
+		} else if (nrow(metadata_table) > 0){ 
 
 			# Order all samples but the "Average_contrib" sample by the metadata table order
-			function_table_sample_order = unlist(sapply(metadata_table[get(first_metadata_level()) %in% samples][[first_metadata_level()]], function(sample_name){
+			for (sample_name in metadata_table[[first_metadata_level()]]){
+
+				function_table_sample_order = c(function_table_sample_order, which(samples == sample_name))
 
 				# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
-				if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT"){
-					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+				if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT" & paste(sample_name, comparison_tag, sep="") %in% samples){
+					function_table_sample_order = c(function_table_sample_order, which(samples == paste(sample_name, comparison_tag, sep="")))
 				}
+			}
 
-				# Otherwise, just return the sample that matches
-				return(which(samples == sample_name))
-			}))
+			# Add any remaining samples that didn't have metadata excluding the "Average_contrib" sample
+			for (sample_name in samples[which((!(samples %in% metadata_table[[first_metadata_level()]])) & !grepl(comparison_tag, samples) & samples != "Average_contrib")]){
 
-			# Add any remaining samples that didn't have metadata (though they should not have gotten to this point if that is the case) excluding the "Average_contrib" sample
-			function_table_sample_order = c(function_table_sample_order, unlist(sapply(samples[which(!(samples %in% metadata_table[[first_metadata_level()]])) & !grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
+				function_table_sample_order = c(function_table_sample_order, which(samples == sample_name))
 
 				# If they provided comparison function abundances, put the normal sample and the comparison sample next to each other
-				if (input$function_abundance_choice == "PRESENT"){
-					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
+				if (input$example_visualization != "TRUE" & input$function_abundance_choice == "PRESENT" & paste(sample_name, comparison_tag, sep="") %in% samples){
+					function_table_sample_order = c(function_table_sample_order, which(samples == paste(sample_name, comparison_tag, sep="")))
 				}
+			}
 
-				# Otherwise, just return the sample that matches
-				return(which(samples == sample_name))
-			})))
+		# By default, remove the average contribution sample and order the rest so comparison samples are next to the right sample
 		} else {
-				function_table_sample_order = unlist(sapply(samples[!grepl(comparison_tag, samples) & samples != "Average_contrib"], function(sample_name){
-					return(c(which(samples == sample_name), which(samples == paste(sample_name, comparison_tag, sep=""))))
-				}))
+			for (sample_name in samples[!grepl(comparison_tag, samples) & samples != "Average_contrib"]){
+				function_table_sample_order = c(function_table_sample_order, which(samples == sample_name))
+				if (paste(sample_name, comparison_tag, sep="") %in% samples){
+					function_table_sample_order = c(function_table_sample_order, which(samples == paste(sample_name, comparison_tag, sep="")))
+				}
+			}
 		}
 
 		# Send the function table sample order to the browser
@@ -1694,6 +1712,7 @@ shinyServer(function(input, output, session) {
 		function_hierarchy_table = default_function_hierarchy_table
 		metadata_table = default_metadata_table
 		contribution_table = format_default_contribution_table(default_contribution_table)
+		function_abundance_table = data.table()
 
 		# If they're not viewing the example, then we try to load data
 		if (input$example_visualization != "TRUE"){
@@ -1863,7 +1882,7 @@ shinyServer(function(input, output, session) {
 			metadata_table = order_metadata_table_by_metadata_factor(metadata_table)
 		}
 
-		javascript_metadata_table = convert_metadata_table_to_javascript_table(metadata_table)
+		javascript_metadata_table = convert_metadata_table_to_javascript_table(metadata_table, function_abundance_table)
 
 		# If no metadata table was provided, send a NULL signal
 		if (is.null(javascript_metadata_table)){

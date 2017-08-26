@@ -101,37 +101,6 @@ draw_loading = function(width, height) {
 
 		add_table_loading_bar(loading_bars[loading_bar_index], loading_bar_text[loading_bar_index], height * (2 + loading_bar_index) / (2 + loading_bars.length), loading_barsg, width, height)
 	}
-
-	Shiny.addCustomMessageHandler("upload_status", function(step){
-		var upload_done = true
-		for (var upload_step_index = 0; upload_step_index < upload_steps.length; upload_step_index++){
-			if (step != upload_steps[upload_step_index]){
-				document.getElementById(upload_steps[upload_step_index]).setAttribute("class", "complete")
-			} else if (step == upload_steps[upload_step_index]){
-				document.getElementById(step).setAttribute("class", "in_progress")
-				document.getElementById("upload_step_message").innerHTML = "Step " + (upload_step_index + 1) + ": " + upload_step_message_text[upload_step_index]
-				upload_done = false
-				break
-			}
-		}
-
-		if (upload_done){
-			document.getElementById("upload_step_message").innerHTML = upload_steps_done_text
-		}
-	})
-
-	Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples){
-		document.getElementById("taxonomic_abundance_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
-		document.getElementById("contribution_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
-	})
-
-	Shiny.addCustomMessageHandler("abort", function(message){
-		d3.select("#mainsvg").remove();
-		d3.select("body").classed("svgBody", false);
-		alert(message);
-	})
-
-
 }
 
 update_progress = function(curr_sample, total_samples, table_name, width){
@@ -149,3 +118,32 @@ update_progress = function(curr_sample, total_samples, table_name, width){
 		}
 	}
 }
+
+Shiny.addCustomMessageHandler("upload_status", function(step){
+	var upload_done = true
+	for (var upload_step_index = 0; upload_step_index < upload_steps.length; upload_step_index++){
+		if (step != upload_steps[upload_step_index]){
+			document.getElementById(upload_steps[upload_step_index]).setAttribute("class", "complete")
+		} else if (step == upload_steps[upload_step_index]){
+			document.getElementById(step).setAttribute("class", "in_progress")
+			document.getElementById("upload_step_message").innerHTML = "Step " + (upload_step_index + 1) + ": " + upload_step_message_text[upload_step_index]
+			upload_done = false
+			break
+		}
+	}
+
+	if (upload_done){
+		document.getElementById("upload_step_message").innerHTML = upload_steps_done_text
+	}
+})
+
+Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples){
+	document.getElementById("taxonomic_abundance_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
+	document.getElementById("contribution_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
+})
+
+Shiny.addCustomMessageHandler("abort", function(message){
+	d3.select("#mainsvg").remove();
+	d3.select("body").classed("svgBody", false);
+	alert(message);
+})
