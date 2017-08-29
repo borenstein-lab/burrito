@@ -11,261 +11,569 @@
 	<link rel="stylesheet" type="text/css" href="CSS/burritostyle.css"/>
 	<link rel="stylesheet" type="text/css" href="CSS/progress_style.css"/>
 	<meta charset="utf-8">
-
 </head>
 
 <body topmargin="0" leftmargin="0" marginwidth="0" marginheight="0" onresize="resizeRedraw()">
 <div id="mainthing" style="overflow-x:auto">
+	<!-- JUST FOR CENTERING - START -->
+	<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">
+		<tr valign="top" align="center">
+			<td>
+				<!-- JUST FOR CENTERING - END -->
 
-<!-- JUST FOR CENTERING - START -->
-<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">
-<tr valign="top" align="center"><td>
-<!-- JUST FOR CENTERING - END -->
+				<!-- PAGE TITLE - START-->
+				<table border="0" width=640 cellspacing="0" cellpadding="0" class="normalTxt">
+					<tr>
+						<td>
+							<img border="0" src="images/pixel.gif" width=1 height=5>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<img border="0" src="images/title_lab_800.jpg">
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<img border="0" src="images/pixel.gif" width=1 height=5>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<img border="0" src="images/pixel.gif" width=1 height=5>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<tr>
+								<td>
+									<span class="titleTxt">
+										<text id="home_page_title_text"></text>
+									</span>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<img style="border-width:0" src="images/pixel.gif" height="15" hspace="0" vspace="0">
+								</td>
+							</tr>
+							<tr>
+								<td colspan=4>
+									<text id="home_page_description_text_1"></text>
+									<a href="http://borenstein-lab.github.io/burrito" class="normalLinkTxt" target="_blank">
+										<text id="home_page_description_text_2"></text>
+									</a>
+									<text id="home_page_description_text_3"></text>
+									<a href="https://github.com/borenstein-lab/burrito" target="_blank">
+										<text id="home_page_description_text_4"></text>
+									</a>
+									<text id="home_page_description_text_5"></text>
+									<a href="https://www.nature.com/articles/ncomms4114" target="_blank">
+										<text id="home_page_description_text_6"></text>
+									</a>
+									<text id="home_page_description_text_7"></text>
+									<button type="button" name="example_button" id="home_page_description_example_button">
+										<text id="home_page_description_text_8"></text>
+									</button>
+									<text id="home_page_description_text_9"></text>
+								</td>
+							</tr>
+							<tr>
+								<td colspan=4 bgcolor="#EBEAE1">
+									<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+								</td>
+							</tr>
 
-<!-- PAGE TITLE - START-->
-	  <table border="0" width=640 cellspacing="0" cellpadding="0" class="normalTxt">
-	  <tr><td><img border="0" src="images/pixel.gif" width=1 height=5></td></tr>
-	  <tr><td><img border="0" src="images/title_lab_800.jpg"></td></tr>
-	  <tr><td><img border="0" src="images/pixel.gif" width=1 height=5></td></tr>
-	  <tr><td><img border="0" src="images/pixel.gif" width=1 height=5></td></tr>
-	  <tr><td>
-      <tr><td><span class="titleTxt">Burrito</span></td></tr>
-      <tr><td><img style="border-width:0" src="images/pixel.gif" height="15" hspace="0" vspace="0"></td></tr>
+							<!-- TAXONOMIC BLOCK -->
+							<tr>
+								<td colspan=4>
+									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
+										<tr>
+											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+												<text id="taxonomic_block_title_text"></text>
+											</td>
+											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
+												<a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/data_input.html#taxonomy" target="_blank">
+													<text id="taxonomic_block_manual_link_text"></text>
+												</a>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td>
+										</tr>
+										<tr>
+											<tr>
+												<td>
+													<text id="taxonomic_abundance_table_input_text"></text>
+													<input type="file" name="taxonomic_abundance_table" id="taxonomic_abundance_table">
+												</td>
+												<td align="right">
+													<span class="tt">
+														<img src="images/help.png" style="vertical-align: middle;">
+														<span class="tooltip">
+															<span class="blank"></span>
+															<span class="content">
+																<text id="taxonomic_abundance_table_help_text"></text>
+															</span>
+														</span>
+													</span>
+													<img src="images/pixel.gif" width="10">
+												</td>
+												<td>
+													<a href="Data/examples/example_otus.txt" target="_blank">
+														<img src="images/example.png" style="vertical-align: middle;">
+													</a>
+												</td>
+											</tr>
+											<tr>
+												<td colspan=3 bgcolor="#EBEAE1">
+													<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+												</td>
+											</tr>
+											<tr>
+												<tr>
+													<td>
+														<div id="taxonomic_hierarchy_choice" class="shiny-input-radiogroup">
+															<text id="taxonomic_hierarchy_choice_text_1"></text>
+															<div class="radio">
+																<input type="radio" name="taxonomic_hierarchy_choice" id="gg_taxonomic_hierarchy" value="DEFAULT" checked="checked">
+																<text id="taxonomic_hierarchy_choice_text_2"/>
+															</div>
+															<div class="radio">
+																<input type="radio" name="taxonomic_hierarchy_choice" id="custom_taxonomic_hierarchy" value="CUSTOM">
+																<text id="taxonomic_hierarchy_choice_text_3"></text>
+																<input type="file" name="custom_taxonomic_hierarchy_table" id="custom_taxonomic_hierarchy_table">
+															</div>
+														</div>
+													</td>
+													<td align="right">
+														<span class="tt">
+															<img src="images/help.png" style="vertical-align: middle;">
+															<span class="tooltip">
+																<span class="blank"></span>
+																<span class="content">
+																	<text id="taxonomic_hierarchy_choice_help_text"></text>
+																</span>
+															</span>
+														</span>
+														<img src="images/pixel.gif" width="10">
+													</td>
+													<td>
+														<br>
+														<br>
+														<a href="Data/examples/example_tax_hierarchy.txt" target="_blank">
+															<img src="images/example.png" style="vertical-align: middle;">
+														</a>
+													</td>
+												</tr>
+												<tr>
+													<td colspan=3 bgcolor="#EBEAE1">
+														<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+													</td>
+												</tr>
+												<tr>
+													<tr>
+														<td>
+															<text id="taxonomic_level_of_detail_selector_text"></text>
+															<select name="taxonomic_level_of_detail_selector" id="taxonomic_level_of_detail_selector"></select>
+														</td>
+														<td align="right">
+															<span class="tt">
+																<img src="images/help.png" style="vertical-align: middle;">
+																<span class="tooltip">
+																	<span class="blank"></span>
+																	<span class="content">
+																		<text id="taxonomic_level_of_detail_selector_help_text"></text>
+																	</span>
+																</span>
+															</span>
+															<img src="images/pixel.gif" width="10">
+														</td>
+													</tr>
+												</tr>
+											</tr>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td colspan=4>
+									<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="10"  hspace="0" vspace="0">
+								</td>
+							</tr>
 
+							<!-- FUNCTIONAL BLOCK -->
+							<tr>
+								<td colspan=4>
+									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
+										<tr>
+											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+												<text id="functional_block_title_text"></text>
+											</td>
+											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
+												<a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/data_input.html#function" target="_blank">
+													<text id="functional_block_manual_link_text"</text>
+												</a>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=3>
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<tr>
+												<td>
+													<div id="function_abundance_choice" class="shiny-input-radiogroup">
+														<text id="functional_abundance_choice_text_1"></text>
+														<div class="radio">
+															<input type="radio" name="function_abundance_choice" id="no_function_abundance" value="ABSENT" checked="checked">
+															<text id="functional_abundance_choice_text_2"></text>
+														</div>
+														<div class="radio">
+															<input type="radio" name="function_abundance_choice" id="function_abundance" value="PRESENT">
+															<text id="functional_abundance_choice_text_3"></text>
+															<input type="file" name="function_abundance_table" id="function_abundance_table">
+														</div>
+													</div>
+												</td>
+												<td align="right">
+													<span class="tt">
+														<img src="images/help.png" style="vertical-align: middle;">
+														<span class="tooltip">
+															<span class="blank"></span>
+															<span class="content">
+																<text id="functional_abundance_choice_help_text"></text>
+															</span>
+														</span>
+													</span>
+													<img src="images/pixel.gif" width="10">
+												</td>
+												<td>
+													<br>
+													<br>
+													<a href="Data/examples/example_metagenome.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a>
+												</td>
+											</tr>
+											<tr>
+												<td colspan=3 bgcolor="#EBEAE1">
+													<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+												</td>
+											</tr>
+											<tr>
+												<tr>
+													<td>
+														<div id="contribution_method_choice" class="shiny-input-radiogroup">
+															<text id="contribution_choice_text_1"></text>
+															<div class="radio">
+																<input type="radio" name="contribution_method_choice" id="picrust" value="PICRUST" checked="checked">
+																<text id="contribution_choice_text_2"></text>
+															</div>
+															<div class="radio">
+																<input type="radio" name="contribution_method_choice" id="genomic_content" value="GENOMIC_CONTENT">
+																<text id="contribution_choice_text_3"></text>
+																<input type="file" name="genomic_content_table" id="genomic_content_table">
+															</div>
+															<div class="radio">
+																<input type="radio" name="contribution_method_choice" id="function_contribution" value="CONTRIBUTION">
+																<text id="contribution_choice_text_4"></text>
+																<input type="file" name="contribution_table" id="contribution_table">
+															</div>
+														</div>
+													</td>
+													<td align="right">
+														<span class="tt">
+															<img src="images/help.png" style="vertical-align: middle;">
+															<span class="tooltip">
+																<span class="blank"></span>
+																<span class="content">
+																	<text id="contribution_choice_help_text"></text>
+																</span>
+															</span>
+														</span>
+														<img src="images/pixel.gif" width="10">
+													</td>
+													<td>
+														<br>
+														<br>
+														<a href="Data/examples/example_genome_content.txt" target="_blank">
+															<img src="images/example.png" style="vertical-align: middle;">
+														</a>
+														<a href="Data/examples/example_contributions.txt" target="_blank">
+															<img src="images/example.png" style="vertical-align: middle;">
+														</a>
+													</td>
+												</tr>
+												<tr>
+													<td colspan=3 bgcolor="#EBEAE1">
+														<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+													</td>
+												</tr>
+												<tr>
+													<tr>
+														<td>
+															<div id="function_hierarchy_choice" class="shiny-input-radiogroup">
+																<text id="functional_hierarchy_choice_text_1"></text>
+																<div class="radio">
+																	<input type="radio" name="function_hierarchy_choice" id="brite_hierarchy" value="DEFAULT" checked="checked">
+																	<text id="functional_hierarchy_choice_text_2"></text>
+																</div>
+																<div class="radio">
+																	<input type="radio" name="function_hierarchy_choice" id="custom_function_hierarchy" value="CUSTOM">
+																	<text id="functional_hierarchy_choice_text_3"></text>
+																	<input type="file" name="custom_function_hierarchy_table" id="custom_function_hierarchy_table">
+																</div>
+															</div>
+														</td>
+														<td align="right">
+															<span class="tt">
+																<img src="images/help.png" style="vertical-align: middle;">
+																<span class="tooltip">
+																	<span class="blank"></span>
+																	<span class="content">
+																		<text id="functional_hierarchy_choice_help_text"></text>
+																	</span>
+																</span>
+															</span>
+															<img src="images/pixel.gif" width="10">
+														</td>
+														<td>
+															<br>
+															<br>
+															<a href="Data/examples/example_func_hierarchy.txt" target="_blank">
+																<img src="images/example.png" style="vertical-align: middle;">
+															</a>
+														</td>
+													</tr>
+													<tr>
+														<td colspan=3 bgcolor="#EBEAE1">
+															<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+														</td>
+													</tr>
+													<tr>
+														<tr>
+															<td>
+																<text id="functional_level_of_detail_selector_text"></text>
+																<select name="function_level_of_detail_selector" id="function_level_of_detail_selector"></select>
+															</td>
+															<td align="right">
+																<span class="tt">
+																	<img src="images/help.png" style="vertical-align: middle;">
+																	<span class="tooltip">
+																		<span class="blank"></span>
+																		<span class="content">
+																			<text id="functional_level_of_detail_selector_help_text"></text>
+																		</span>
+																	</span>
+																</span>
+																<img src="images/pixel.gif" width="10">
+															</td>
+														</tr>
+													</tr>
+												</tr>
+											</tr>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td colspan=4>
+									<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="10"  hspace="0" vspace="0">
+								</td>
+							</tr>
 
+							<!-- GROUPING BLOCK -->
+							<tr>
+								<td colspan=4>
+									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
+										<tr>
+											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+												<text id="grouping_block_title_text"></text>
+											</td>
+											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
+												<a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/data_input.html#samples" target="_blank">
+													<text id="grouping_block_manual_link_text"></text>
+												</a>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=3>
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<tr>
+												<td>
+													<div id="metadata_choice" class="shiny-input-radiogroup">
+														<text id="grouping_choice_text_1"></text>
+														<div class="radio">
+															<input type="radio" name="metadata_choice" id="no_metadata" value="ABSENT" checked="checked">
+															<text id="grouping_choice_text_2"></text>
+															<input type="checkbox" name="metadata_choice" id="sort_samples">
+															<text id="grouping_choice_text_3"></text>
+														</div>
+														<div class="radio">
+															<input type="radio" name="metadata_choice" id="metadata" value="PRESENT">
+															<text id="grouping_choice_text_4"></text>
+															<input type="file" name="metadata_table" id="metadata_table">
+														</div>
+													</div>
+												</td>
+												<td align="right">
+													<span class="tt">
+														<img src="images/help.png" style="vertical-align: middle;">
+														<span class="tooltip">
+															<span class="blank"></span>
+															<span class="content">
+																<text id="grouping_choice_help_text"></text>
+															</span>
+														</span>
+													</span>
+													<img src="images/pixel.gif" width="10">
+												</td>
+												<td>
+													<br>
+													<br>
+													<a href="Data/examples/example_sample_map.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;">
+													</a>
+												</td>
+											</tr>
+											<tr>
+												<td colspan=3 bgcolor="#EBEAE1">
+													<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+												</td>
+											</tr>
+											<tr>
+												<tr>
+													<td>
+														<text id="grouping_factor_selector_text"></text>
+														<select name="metadata_factor_selector" id="metadata_factor_selector"></select>
+													</td>
+													<td align="right">
+														<span class="tt">
+															<img src="images/help.png" style="vertical-align: middle;">
+															<span class="tooltip">
+																<span class="blank"></span>
+																<span class="content">
+																	<text id="grouping_factor_selector_help_text"></text>
+																</span>
+															</span>
+														</span>
+														<img src="images/pixel.gif" width="10">
+													</td>
+												</tr>
+											</tr>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td colspan=4>
+									<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0">
+								</td>
+							</tr>
 
+							<!-- VISUALIZATION BLOCK -->
+							<tr>
+								<td colspan=4>
+									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
+										<tr>
+											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+												<text id="visualization_block_title_text"></text>
+											</td>
+											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
+												<a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/vis_settings.html" target="_blank">
+													<text id="visualization_block_manual_link_text"></text>
+												</a>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=3>
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<tr>
+												<td>
+													<text id="color_choice_text"></text>
+													<select name="color_option_selector" id="color_option_selector">
+														<option value="Categories">Hierarchical color scale</option>
+														<option value="Random">Random color scale</option>
+													</select>
+													<td align="right">
+														<span class="tt">
+															<img src="images/help.png" style="vertical-align: middle;">
+															<span class="tooltip">
+																<span class="blank"></span>
+																<span class="content">
+																	<text id="color_choice_help_text"></text>
+																</span>
+															</span>
+														</span>
+														<img src="images/pixel.gif" width="10">
+													</td>
+													<td>
+														<img src="images/pixel.gif" width="74" height="1">
+													</td>
+												</td>
+											</tr>
+										</tr>
+									</table>
+								</td>
+							</tr>
+							<tr>
+								<td colspan=4>
+									<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0">
+								</td>
+							</tr>
 
-<tr><td colspan=4>
-Burrito is a tool for visualizing the relationship between taxonomy and function in microbiome datasets. A detailed description of the input parameters and options is available in the <a href="http://borenstein-lab.github.io/burrito" class="normalLinkTxt" target="_blank">user manual</a>. Source code is available <a href="https://github.com/borenstein-lab/burrito" target="_blank">here</a><br><br>
-Want to try it out? Check this preview (using an example data set from <a href="https://www.nature.com/articles/ncomms4114" target="_blank">Theriot et al 2014</a>): <button type="button" name="example_button" id="example_button">Preview</button><br><br>
+							<!-- ACTIVATION BLOCK -->
+							<tr>
+								<td colspan=4>
+									<button id="update_button" type="button" class="btn action-button btn-large btn-primary">
+										<text id="update_button_text"></text>
+									</button>
+								</td>
+							</tr>
+							<tr>
+								<td colspan=4>
+									<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0">
+								</td>
+							</tr>
 
-If you use Burrito please cite the following paper:<br>
-<em>In progress</em>
-<!-- Rogan Carr and Elhanan Borenstein (2012) <a class="normalLinkTxt" href="https://bioinformatics.oxfordjournals.org/content/28/5/734.abstract">NetSeed: A network-based reverse-ecology tool for calculating the metabolic interface of an organism with its environment.</a> <em>Bioinformatics</em>, 28(5): 734-735. (<a class="normalLinkTxt" href="https://elbo.gs.washington.edu/pub/netseed_carr_bioinf.pdf">PDF</a>) -->
-</td></tr>
+							<!-- END BLOCKS -->
+							<tr>
+								<td colspan=4 bgcolor="#EBEAE1">
+									<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<text id="return_text_1"></text>
+									<a class="normalLinkTxt" href="http://elbo.gs.washington.edu/">
+										<text id="return_text_2"></text>
+									</a>
+									<br>
+								</td>
+							</tr>
+						</td>
+					</tr>
+				</table>
 
-<tr><td colspan=4 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr>
-
-<!-- TAXONOMIC BLOCK -->
-<tr><td colspan=4>
-<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
-	<tr>
-	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Taxonomic Data</td>
-	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/data_input.html#taxonomy" target="_blank">Manual&gt;Taxonomy</a></td>
-	</tr>
-	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		Taxonomic abundance table: <input type="file" name="taxonomic_abundance_table" id="taxonomic_abundance_table">
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Upload a taxonomic abundance table<br>(can be raw read counts or relative abundances).</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td><a href="Data/examples/example_otus.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a></td>
-	</tr>
-
-	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		<div id="taxonomic_hierarchy_choice" class="shiny-input-radiogroup">
-			Taxonomy:<br>
-			<div class="radio">
-				<input type="radio" name="taxonomic_hierarchy_choice" id="gg_taxonomic_hierarchy" value="DEFAULT" checked="checked"> Greengenes taxonomy (default; compatible with PICRUSt)<br>
-			</div>
-			<div class="radio">
-				<input type="radio" name="taxonomic_hierarchy_choice" id="custom_taxonomic_hierarchy" value="CUSTOM"> Custom taxonomy: <input type="file" name="custom_taxonomic_hierarchy_table" id="custom_taxonomic_hierarchy_table"><br>
-			</div>
-		</div>
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose a taxonomy for hierarchically displaying OTU relationships.</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td><a href="Data/examples/example_tax_hierarchy.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a></td>
-	</tr>
-
-	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		Minimum taxonomic resolution: <select name="taxonomic_level_of_detail_selector" id="taxonomic_level_of_detail_selector"></select>
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the minimum taxonomic resolution to view<br>(lower resolution may improve performance for large datasets).</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td></td>
-	</tr>
-
-</table>
-</tr>
-
-<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="10"  hspace="0" vspace="0"></td></tr>
-
-
-<!-- FUNCTIONAL BLOCK -->
-<tr><td colspan=4>
-<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
-	<tr>
-	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Functional Data</td>
-	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/data_input.html#function" target="_blank">Manual&gt;Function</a></td>
-	</tr>
-	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		<div id="function_abundance_choice" class="shiny-input-radiogroup">
-			Metagenomics-based function abundances:<br>
-			<div class="radio">
-				<input type="radio" name="function_abundance_choice" id="no_function_abundance" value="ABSENT" checked="checked"> No metagenomic function abundances available (default)<br>
-			</div>
-			<div class="radio">
-				<input type="radio" name="function_abundance_choice" id="function_abundance" value="PRESENT"> Metagenomic function abundance table: <input type="file" name="function_abundance_table" id="function_abundance_table"><br>
-			</div>
-		</div>
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose whether you will be providing metagenomics-based functional data<br>to compare to the taxonomy-based function abundances.</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td><a href="Data/examples/example_metagenome.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a></td>
-	</tr>
-
-	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		<div id="contribution_method_choice" class="shiny-input-radiogroup">
-			Taxonomy-function linking method:<br>
-			<div class="radio">
-				<input type="radio" name="contribution_method_choice" id="picrust" value="PICRUST" checked="checked"> Run PICRUSt (default)<br>
-			</div>
-			<div class="radio">
-				<input type="radio" name="contribution_method_choice" id="genomic_content" value="GENOMIC_CONTENT"> Genomic content table: <input type="file" name="genomic_content_table" id="genomic_content_table"><br>
-			</div>
-			<div class="radio">
-				<input type="radio" name="contribution_method_choice" id="function_contribution" value="CONTRIBUTION"> Function contribution table: <input type="file" name="contribution_table" id="contribution_table"><br>
-			</div>
-		</div>
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the method for linking taxonomic abundances to metagenomic content.</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td><a href="Data/examples/example_genome_content.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a><br><a href="Data/examples/example_contributions.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a></td>
-	</tr>
-
-	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		<div id="function_hierarchy_choice" class="shiny-input-radiogroup">
-			Function hierarchy:<br>
-			<div class="radio">
-				<input type="radio" name="function_hierarchy_choice" id="brite_hierarchy" value="DEFAULT" checked="checked"> BRITE function hierarchy (default, compatible with PICRUSt)<br>
-			</div>
-			<div class="radio">
-				<input type="radio" name="function_hierarchy_choice" id="custom_function_hierarchy" value="CUSTOM"> Custom function hierarchy: <input type="file" name="custom_function_hierarchy_table" id="custom_function_hierarchy_table"><br>
-			</div>
-		</div>
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose a functional hierarchy for hierarchically displaying function relationships.</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td><a href="Data/examples/example_func_hierarchy.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a></td>
-	</tr>
-
-	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		Minimum function resolution: <select name="function_level_of_detail_selector" id="function_level_of_detail_selector"></select><br>
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the minimum function resolution to view<br>(lower resolution may improve performance for large datasets).</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td></td>
-	</tr>
-
-</table>
-</tr>
-
-<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="10"  hspace="0" vspace="0"></td></tr>
-
-<!-- GROUPING BLOCK -->
-<tr><td colspan=4>
-<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
-	<tr>
-	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Sample grouping</td>
-	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/data_input.html#samples" target="_blank">Manual&gt;Grouping</a></td>
-	</tr>
-	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		<div id="metadata_choice" class="shiny-input-radiogroup">
-			Sample labels:<br>
-			<div class="radio">
-				<input type="radio" name="metadata_choice" id="no_metadata" value="ABSENT" checked="checked"> No sample labels (default)    <input type="checkbox" name="metadata_choice" id="sort_samples">Sort samples alphabetically <br>
-			</div>
-			<div class="radio">
-				<input type="radio" name="metadata_choice" id="metadata" value="PRESENT"> Sample labels: <input type="file" name="metadata_table" id="metadata_table"><br>
-			</div>
-		</div>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose whether you will be providing sample labels.</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td><a href="Data/examples/example_sample_map.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a></td>
-	</tr>
-
-	<tr><td colspan=3 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		Group by label: <select name="metadata_factor_selector" id="metadata_factor_selector"></select><br>
-	</td>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the label to be used for grouping samples.</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td></td>
-	</tr>
-
-</table>
-</tr>
-
-<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0"></td></tr>
-
-<!-- VISUALIZATION BLOCK -->
-<tr><td colspan=4>
-<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
-	<tr>
-	<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">Visualization</td>
-	<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em"><a class="normalLinkTxt" style="font-size:1em" href="http://borenstein-lab.github.io/burrito/vis_settings.html" target="_blank">Manual&gt;Visualization</a></td>
-	</tr>
-	<tr><td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr><tr>
-
-	<tr>
-	<td>
-		Color scheme:<br>
-		<select name="color_option_selector" id="color_option_selector">
-		<option value="Categories">Hierarchical color scale</option>
-		<option value="Random">Random color scale</option>
-		</select>
-	<td align="right"><span class="tt"><img src="images/help.png" style="vertical-align: middle;"><span class="tooltip"><span class="blank"></span><span class="content">Choose the type of color scale used during display.</span></span></span><img src="images/pixel.gif" width="10"></td>
-	<td><img src="images/pixel.gif" width="74" height="1"></td>
-	</tr>
-
-</table>
-</tr>
-
-<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0"></td></tr>
-
-<!-- ACTIVATION BLOCK -->
-<tr><td colspan=4>
-	<button id="update_button" type="button" class="btn action-button btn-large btn-primary">Assemble the Burrito</button>
-</td></tr>
-
-<tr><td colspan=4><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="5"  hspace="0" vspace="0"></td></tr>
-
-<!-- END BLOCKS -->
-
-<tr><td colspan=4 bgcolor="#EBEAE1"><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td></tr>
-
-<tr><td>Back to <a class="normalLinkTxt" href="http://elbo.gs.washington.edu/">the Borenstein Lab</a><br></td></tr>
-
-</table>
-<!-- PAGE TITLE - END -->
-<!-- JUST FOR CENTERING - START-->
-</td></tr>
-<tr valign="middle" align="center"><td height="30"><img border="0" src="images/pixel.gif" width="1" height="30"  hspace="0" vspace="0"></td></tr>
-</table>
-<!-- JUST FOR CENTERING - END -->
-
+				<!-- PAGE TITLE - END -->
+				<!-- JUST FOR CENTERING - START-->
+			</td>
+		</tr>
+		<tr valign="middle" align="center">
+			<td height="30">
+				<img border="0" src="images/pixel.gif" width="1" height="30"  hspace="0" vspace="0">
+			</td>
+		</tr>
+	</table>
+	<!-- JUST FOR CENTERING - END -->
 </div>
-<div style="float:left" id="button_holder"><br><br><br><br><br><br><br><br></div>
 
 <div id="mainplot">
-
 	<svg id="patternsvg" height="0" width="0" xmlns="http://www.w3.org/2000/svg" version="1.1">
 	  <defs>
 	    <pattern id="crosshatch" patternUnits="userSpaceOnUse" width="4" height="4">
@@ -283,11 +591,12 @@ If you use Burrito please cite the following paper:<br>
 		</pattern>
 	  </defs>
 	</svg>
-
 </div>
 
 <!-- Loading javascript libraries -->
 <script src="Javascript/constants.js"></script>
+<script src="Javascript/text_constants.js"></script>
+<script src="Javascript/set_text.js"></script>
 <script src="Javascript/textures.js"></script>
 <script src="Javascript/d3.v3.min.js"></script>
 <script src="Javascript/data_cube.js"></script>

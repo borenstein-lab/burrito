@@ -30,7 +30,7 @@
 			draw_svg();
 		});
 
-		document.getElementById("example_button").addEventListener("click", function() {
+		document.getElementById("home_page_description_example_button").addEventListener("click", function() {
 			mainui.uploadMode = "example";
 			document.getElementById("update_button").click();
 		});

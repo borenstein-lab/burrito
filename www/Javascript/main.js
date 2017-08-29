@@ -90,18 +90,44 @@ draw_svg = function() {
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width","120px")
-			.html("<button id='switch_scale' type='button'>Show scale</button><br><br><br><br><br><br><br>" +
-				"<p>Output file prefix:</p>" + 
-				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>Image format:</p>" +
-				"<form action=''><label> <input type='radio' name='format' value='PNG' checked='checked'> PNG</label><br><label><input type='radio' name='format' value='SVG'> SVG </label></form>" + 
-			"<br><br><button id='save_screenshot' class='savebutton' type='button'>Save screenshot</button>" +	
-			"<br><br><button id='save_taxa_bar' class='savebutton' type='button'>Save taxonomy plot</button>" +	
-			"<br><br><button id='save_taxonomy_leg' class='savebutton' type='button'>Save taxonomy legend</button>" +	
-			"<br><br><button id='save_func_bar' class='savebutton' type='button'>Save function plot</button>" +
-			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>" +
-			"<br><br><br><br><button id='save_function_abundance_table' class='savebutton' type='button'>Download function relative abundance table</button>" +
-			"<br><br><button id='save_contribution_table' class='savebutton' type='button'>Download contribution table</button>" +
-			"<br><br><br><br><button id='return_to_upload' type='button'>Return to the upload page</button>");
+			.html("<button id='switch_scale' type='button'>" +
+				switch_scale_text +
+				"</button><br><br><br><br><br><br><br>" +
+				"<p>" +
+				output_prefix_text +
+				"</p>" + 
+				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>" +
+				image_format_text +
+				"</p>" +
+				"<form action=''><label> <input type='radio' name='format' value='PNG' checked='checked'>" +
+				png_format_text +
+				"</label><br><label><input type='radio' name='format' value='SVG'>" +
+				svg_format_text +
+				"</label></form>" + 
+				"<br><br><button id='save_screenshot' class='savebutton' type='button'>" +
+				save_screenshot_text +
+				"</button>" +	
+				"<br><br><button id='save_taxa_bar' class='savebutton' type='button'>" +
+				save_taxonomic_barplot_text +
+				"</button>" +
+				"<br><br><button id='save_taxonomy_leg' class='savebutton' type='button'>" +
+				save_taxonomic_legend_text +
+				"</button>" +	
+				"<br><br><button id='save_func_bar' class='savebutton' type='button'>" +
+				save_function_barplot_text +
+				"</button>" +
+				"<br><br><button id='save_function_leg' class='savebutton' type='button'>" +
+				save_function_legend_text +
+				"</button>" +
+				"<br><br><br><br><button id='save_function_abundance_table' class='savebutton' type='button'>" +
+				save_function_abundance_table_text +
+				"</button>" +
+				"<br><br><button id='save_contribution_table' class='savebutton' type='button'>" +
+				save_contribution_table_text +
+				"</button>" +
+				"<br><br><br><br><button id='return_to_upload' type='button'>" +
+				return_to_upload_page_text +
+				"</button>");
 
 	
 	document.getElementById('save_screenshot').addEventListener('click', function() {
@@ -372,7 +398,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, trees.getTaxaTreeData(), trees.getFuncTreeData(), func_averages);
 	//if( not expand to OTU level
-	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
 	////////////////////////// Colors
 	//color_option = "Categories" //Categories or Random
 	var color_option = null;
@@ -992,7 +1017,7 @@ function makeBusy() {
 			.attr("font-size", 25)
 			.attr("fill", "#ffffff")
 			.attr("stroke", "none")
-			.text("Busy...");
+			.text(busy_text);
 
 	} else {
 		d3.select("#resizing_message").attr("visibility","visibile")

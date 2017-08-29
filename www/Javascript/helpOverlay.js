@@ -6,13 +6,13 @@
 
 		helpItems = d3.select("#help_items");
 
-		helpOverlay.makeHelpLabel("Click to reveal image export menu", "help_sidebar", 0.002, 0.053);	
-		helpOverlay.makeHelpLabel("Click nodes to expand and collapse the phylogenetic tree", "help_taxnode", 0.048, 0.285);
-		helpOverlay.makeHelpLabel("Click bars to lock highlighting", "help_bars", 0.347, 0.11);
-		helpOverlay.makeHelpLabel("Click edges to highlight individual taxon-function links", "help_edges", 0.40, 0.30);
-		helpOverlay.makeHelpLabel("Mouse over bar charts for detailed abundance information", "help_taxbar", 0.099, 0.674);
-		helpOverlay.makeHelpLabel("Click nodes to expand and collapse the functional hierarchy", "help_funcnode", 0.72, 0.23);
-		helpOverlay.makeHelpLabel("Highlight taxa to reveal taxa-specific functional contributions", "help_funcbar", 0.63, 0.65);
+		helpOverlay.makeHelpLabel(option_menu_help_text, "help_sidebar", 0.002, 0.053);	
+		helpOverlay.makeHelpLabel(taxonomic_hierarchy_help_text, "help_taxnode", 0.048, 0.285);
+		helpOverlay.makeHelpLabel(bipartite_graph_bar_help_text, "help_bars", 0.347, 0.11);
+		helpOverlay.makeHelpLabel(bipartite_graph_edge_help_text, "help_edges", 0.40, 0.30);
+		helpOverlay.makeHelpLabel(barplot_mouseover_help_text, "help_taxbar", 0.099, 0.674);
+		helpOverlay.makeHelpLabel(function_hierarchy_help_text, "help_funcnode", 0.72, 0.23);
+		helpOverlay.makeHelpLabel(barplot_highlight_help_text, "help_funcbar", 0.63, 0.65);
 	}
 
 	helpOverlay.makeHelpLabel = function( label, newid, xpos, ypos) {

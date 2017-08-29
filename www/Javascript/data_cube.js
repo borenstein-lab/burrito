@@ -639,43 +639,6 @@
 
     }
 
-    /////////////////////////////////////////////////////////////////////// reduce_to_genus //////////////////////////////////////////////////////////////
-    //Reduce OTU abundance data to genus-level abundances (to go with genus-level contribution cube)
-    //Also make relative abundances
-    data_cube.reduce_to_genus = function(otu_abundance_data){
-      new_otu_abundance_data = []
-      
-      taxa_display_leaves = []
-      for(j=0; j < (this.taxa_tree).length; j++){
-        taxa_display_leaves = taxa_display_leaves.concat(this.get_leaves(this.taxa_tree[j].key, this.taxa_lookup)); //taxa_tree_leaves//keep working here 
-      }     
-
-      sample_totals = []
-      otus = d3.keys(otu_abundance_data[0]).filter(function(d){ return d !== "Sample"})
-      for(j=0; j < otu_abundance_data.length; j++){
-        sample_totals[j] = 0
-        for(k=0; k < otus.length; k++){
-          sample_totals[j] += otu_abundance_data[j][otus[k]]
-        }
-      }
-
-      for(j=0; j < otu_abundance_data.length; j++){        
-        new_otu_abundance_data[j] = {}
-        new_otu_abundance_data[j]["Sample"] = otu_abundance_data[j]["Sample"]
-        for(k=0; k < taxa_display_leaves.length; k++){
-          new_otu_abundance_data[j][taxa_display_leaves[k]] = 0
-          sub_otus = this.get_leaves(taxa_display_leaves[k], this.taxa_lookup_full)
-          for(i=0; i < sub_otus.length; i++){
-            if(otu_abundance_data[j].hasOwnProperty(sub_otus[i])){
-              new_otu_abundance_data[j][taxa_display_leaves[k]] += otu_abundance_data[j][sub_otus[i]]
-            }
-          }
-          new_otu_abundance_data[j][taxa_display_leaves[k]] /= sample_totals[j]
-        }
-      }
-      return new_otu_abundance_data;
-    }
-
     /////////////////////////////////////////////////////////////////////// get_contribution /////////////////////////////////////////////////////////////////////////////////////////////
 
     // Returns the contribution of a taxon to a function in a sample
