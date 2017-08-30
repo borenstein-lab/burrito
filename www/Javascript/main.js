@@ -67,6 +67,12 @@ draw_svg = function() {
 			.attr("points","150,0 150,60 180,30")
 			.attr("fill","#D0D0D0");
 
+		d3.select("#sidebar_svg").append("g")
+			.attr("id", "gearg")
+			.attr("transform", "translate(153,19) scale(.13)")
+			.append("path")
+				.attr("d", "m 50,0 0,29.98828 -15.8457,6.56641 -21.08789,-21.33984 -17.80469,18.18359 20.45703,20.83398 -6.72461,16.28907 -29.45117,0.0312 -0.004,26.08789 29.99024,0 6.5664,15.8457 -21.33984,21.08789 18.18164,17.80274 20.83594,-20.45508 16.28711,6.72461 0.0332,29.45117 25.82813,0 0.0312,-29.45117 16.28711,-6.72461 20.83593,20.45508 18.18164,-17.80274 -21.33984,-21.08789 6.56641,-15.8457 29.99023,0 -0.002,-26.08789 -29.45313,-0.0312 -6.72461,-16.28907 20.45703,-20.83398 -17.80468,-18.18359 -21.08594,21.33984 -15.84766,-6.56641 0,-29.98828 -26.01367,0 z m 13.00781,49.45703 a 34.092648,34.092648 0 0 1 34.0918,34.0918 34.092648,34.092648 0 0 1 -34.0918,34.09375 34.092648,34.092648 0 0 1 -34.09375,-34.09375 34.092648,34.092648 0 0 1 34.09375,-34.0918 z");
+
 		document.getElementById("sidebar_hide").addEventListener('click', function() {
 			var sidebarz = d3.select("#sidebar_svg");
 			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
@@ -75,11 +81,13 @@ draw_svg = function() {
 				d3.select("#sidebar_hide")
 					.attr("points","150,0 150,60 180,30")
 					.attr("fill","#D0D0D0");
+				d3.select("#gearg").attr("transform", "translate(153,19) scale(.13)");
 			} else {
 				sidebarz.transition().attr("x",0);
 				d3.select("#sidebar_hide")
 					.attr("points","120,30 150,0 150,60")
 					.attr("fill","#606060");
+				d3.select("#gearg").attr("transform", "translate(131,19) scale(.13)");
 			}
 		});
 
@@ -90,18 +98,20 @@ draw_svg = function() {
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width","120px")
-			.html("<button id='switch_scale' type='button'>Show scale</button><br><br><br><br><br><br><br>" +
-				"<p>Output file prefix:</p>" + 
-				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><br><br><p>Image format:</p>" +
-				"<form action=''><label> <input type='radio' name='format' value='PNG' checked='checked'> PNG</label><br><label><input type='radio' name='format' value='SVG'> SVG </label></form>" + 
-			"<br><br><button id='save_screenshot' class='savebutton' type='button'>Save screenshot</button>" +	
-			"<br><br><button id='save_taxa_bar' class='savebutton' type='button'>Save taxonomy plot</button>" +	
-			"<br><br><button id='save_taxonomy_leg' class='savebutton' type='button'>Save taxonomy legend</button>" +	
-			"<br><br><button id='save_func_bar' class='savebutton' type='button'>Save function plot</button>" +
-			"<br><br><button id='save_function_leg' class='savebutton' type='button'>Save function legend</button>" +
-			"<br><br><br><br><button id='save_function_abundance_table' class='savebutton' type='button'>Download function relative abundance table</button>" +
-			"<br><br><button id='save_contribution_table' class='savebutton' type='button'>Download contribution table</button>" +
-			"<br><br><br><br><button id='return_to_upload' type='button'>Return to the upload page</button>");
+			.html("<div id='figure_ex_buttons'><p>Output file prefix:</p>" + 
+				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><p>Image format:</p>" +
+				"<form action=''><label id='PNGoptionsel'> <input type='radio' name='format' value='PNG' checked='checked'> PNG</label><label><input type='radio' name='format' value='SVG'> SVG </label></form>" + 
+			"<button id='save_screenshot' class='savebutton' type='button'>Export screenshot</button>" +	
+			"<button id='save_taxa_bar' class='savebutton' type='button'>Export taxonomy plot</button>" +	
+			"<button id='save_taxonomy_leg' class='savebutton' type='button'>Export taxonomy legend</button>" +	
+			"<button id='save_func_bar' class='savebutton' type='button'>Export function plot</button>" +
+			"<button id='save_function_leg' class='savebutton' type='button'>Export function legend</button>" +
+			"</div><div id='download_buttons'>" + 
+			"<button id='save_function_abundance_table' class='savebutton' type='button'>Download function relative abundance table</button>" +
+			"<button id='save_contribution_table' class='savebutton' type='button'>Download contribution table</button>" +
+			"</div><div id='legendswitch'>" +
+			"<button id='switch_scale' type='button'>Show scale</button></div>" +
+			"<button id='return_to_upload' type='button'>Return to the upload page</button>");
 
 	
 	document.getElementById('save_screenshot').addEventListener('click', function() {

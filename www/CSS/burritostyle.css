@@ -222,4 +222,31 @@ h2 {
 input {
 	autocomplete: off;
 }
+#gearg path {
+	fill: black;
+	stroke: none;
+	pointer-events: none;
+	opacity: 0.6;
+}
+#sidebar_hide:hover + #gearg path {
+	opacity: 1;
+}
+.help_text {
+	font-size: 15;
+}
+#figure_ex_buttons {
+	padding-bottom: 10vh;
+}
+#download_buttons {
+	padding-bottom: 10vh;
+}
+#legendswitch {
+	padding-bottom: 5vh;
+}
+#PNGoptionsel {
+	padding-right: 20px;
+}
+#SaveInputDiv * {
+	//display:block;
+}
 white-space: pre-line;
