@@ -26,6 +26,10 @@
     return total;
   }
 
+  function generate_otu_barplot_tooltip_text(name_split, sample, y1, y0){
+    return taxonomic_abundance_tooltip_text[0] + name_split + taxonomic_abundance_tooltip_text[1] + sample + taxonomic_abundance_tooltip_text[2] + (Math.round((y1 - y0) * 100) / 100) + taxonomic_abundance_tooltip_text[3]
+  }
+
   otu_bar.make_data = function(otu_abundance_data, data_cube, sample_order){
     var bar_data = [];
     otu_abundance_data.forEach(function(d){
@@ -67,7 +71,7 @@
       .style("border", "0px")    
       .style("border-radius", "4px")  
       .style("padding","2px")
-      .text("");
+      .text(default_taxonomic_abundance_tooltip_text);
 
     var normalized = true;
 
@@ -91,7 +95,7 @@
     .attr("font-size",18)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
-    .text("Relative Abundance (%)");
+    .text(taxonomic_abundance_y_axis_title);
 
   //x-axis label
    /* svglink.append("text")
@@ -143,19 +147,19 @@
   		if(clickedBars.empty()){ //if nothing is clicked
         	highlight_overall(current_rectangle_data.name, "", 1);
         	name_split = (current_rectangle_data.name.split('_')).pop()
-        	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+        	tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
         	return tooltip.style("visibility", "visible");
         }
         if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
     		if(displayed_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
         	name_split = (current_rectangle_data.name.split('_')).pop()
-        	tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+        	tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
           	return tooltip.style("visibility", "visible");
     		}
     	} else if(clickedEdges.empty() == false){ //if an edge is clicked
     		if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){ //if relevant edge is clicked
     		    name_split = (current_rectangle_data.name.split('_')).pop()
-        		tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+        		tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
           		return tooltip.style("visibility", "visible");
     		}
     	}
@@ -201,7 +205,7 @@
         current_rectangle_data = d3.select(this).datum();
         current_id = "Genomes0"+current_rectangle_data.name.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")
         name_split = (current_rectangle_data.name.split('_')).pop()
-        tooltip.html("<strong>Taxon</strong>: " + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+ "<strong>Relative Abundance: </strong>" +Math.round((current_rectangle_data.y1-current_rectangle_data.y0)*100)/100+"%");
+        tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
 		tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 		clickResponse(current_id, current_rectangle_data.name, "taxa", displayed_taxa, displayed_funcs)
 		return tooltip.style("visibility", "visible")
@@ -212,8 +216,7 @@
     .attr("x", 0)
     .attr("y",graphdims.height + graphdims.height_buffer)
     .attr("width", last_sample_x - first_sample_x + graphdims.x_axis_x_buffer + x.rangeBand())
-    .attr("height", dims.height - graphdims.height - graphdims.height_buffer)
-    .style("font-family", "Verdana");
+    .attr("height", dims.height - graphdims.height - graphdims.height_buffer);
 
       d3.select("#otu_bar_xtick_svg").append("g")
       .attr("class", "x_axis")

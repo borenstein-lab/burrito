@@ -22,14 +22,17 @@ body {
 /*	width:100%;
 	height:100%; */
 //	overflow: hidden;
-	font-family: "Verdana", Verdana, sans-serif;
-    font-size:12px;
+	//font-family: "Verdana", Verdana, sans-serif;
+    font-family: arial;
+	font-size:12px;
 }
 
 body.svgBody {
 	overflow: hidden;
 }
-
+svg text {
+	font-family: arial;
+}
 .node circle {
    cursor: pointer;
    fill: #fff;
@@ -89,7 +92,7 @@ path.link {
 	width:100%;
 	height:100%;
 	vertical-align:top;
-	font-family: "Verdana", Verdana, sans-serif;
+	//font-family: "Verdana", Verdana, sans-serif;
 }
 #mainsvg {
 	position:fixed;
@@ -98,7 +101,7 @@ path.link {
 	height:100%;
 	width:100%;
 	background-color:white;
-	font-family: "Verdana", Verdana, sans-serif;
+	//font-family: "Verdana", Verdana, sans-serif;
 }
 #plots_svg {
 	position:fixed;
@@ -107,15 +110,15 @@ path.link {
 	height:100%;
 	width:100%;
 	background-color:white;
-	font-family: "Verdana", Verdana, sans-serif;
+	//font-family: "Verdana", Verdana, sans-serif;
 }
 #taxa_bar {
 	background-color:white;
-	font-family: "Verdana", Verdana, sans-serif;
+	//font-family: "Verdana", Verdana, sans-serif;
 }
 #func_bar {
 	background-color:white;
-	font-family: "Verdana", Verdana, sans-serif;
+	//font-family: "Verdana", Verdana, sans-serif;
 }
 #sidebar {
 	z-index:5;
@@ -164,9 +167,6 @@ div#SaveInputDiv * {
 .hidexp {
 	display:none;
 }
-/*.hidbut {
-	visibility:hidden;
-}*/
 .inputSelectorB {
 	width: 100%;
 	height: 60px;
@@ -246,7 +246,16 @@ input {
 #PNGoptionsel {
 	padding-right: 20px;
 }
-#SaveInputDiv * {
-	//display:block;
+#SaveInputDiv button {
+	width: 110px;
+}
+#figure_ex_buttons button {
+	margin-bottom: 2vh;
+}
+#figure_ex_buttons input {
+	margin-bottom: 2vh;
+}
+#download_buttons button {
+	margin-bottom: 2vh;
 }
 white-space: pre-line;

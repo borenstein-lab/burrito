@@ -95,24 +95,37 @@ draw_svg = function() {
 		d3.select("#sidebar_svg").append("foreignObject")
 			.attr("x", 20)
 			.attr("y", 80)
+			//.attr("requiredExtensions","http://www.w3.org/1999/xhtml")
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width","120px")
-			.html("<div id='figure_ex_buttons'><p>Output file prefix:</p>" + 
-				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><p>Image format:</p>" +
-				"<form action=''><label id='PNGoptionsel'> <input type='radio' name='format' value='PNG' checked='checked'> PNG</label><label><input type='radio' name='format' value='SVG'> SVG </label></form>" + 
-			"<button id='save_screenshot' class='savebutton' type='button'>Export screenshot</button>" +	
-			"<button id='save_taxa_bar' class='savebutton' type='button'>Export taxonomy plot</button>" +	
-			"<button id='save_taxonomy_leg' class='savebutton' type='button'>Export taxonomy legend</button>" +	
-			"<button id='save_func_bar' class='savebutton' type='button'>Export function plot</button>" +
-			"<button id='save_function_leg' class='savebutton' type='button'>Export function legend</button>" +
-			"</div><div id='download_buttons'>" + 
-			"<button id='save_function_abundance_table' class='savebutton' type='button'>Download function relative abundance table</button>" +
-			"<button id='save_contribution_table' class='savebutton' type='button'>Download contribution table</button>" +
-			"</div><div id='legendswitch'>" +
-			"<button id='switch_scale' type='button'>Show scale</button></div>" +
-			"<button id='return_to_upload' type='button'>Return to the upload page</button>");
-
+			.html("<div id='figure_ex_buttons'><p>" +
+				output_prefix_text + "</p>" + 
+				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><p>" + 
+				image_format_text + "</p>" +
+				"<form action=''><label id='PNGoptionsel'> <input type='radio' name='format' value='PNG' checked='checked'>" +
+				png_format_text + "</label><label><input type='radio' name='format' value='SVG'>" +
+				svg_format_text + "</label></form>" + 
+				"<button id='save_screenshot' class='savebutton' type='button'>" + 
+				save_screenshot_text + "</button>" +	
+				"<button id='save_taxa_bar' class='savebutton' type='button'>" +
+				save_taxonomic_barplot_text + "</button>" +	
+				"<button id='save_taxonomy_leg' class='savebutton' type='button'>" + 
+				save_taxonomic_legend_text + "</button>" +	
+				"<button id='save_func_bar' class='savebutton' type='button'>" + 
+				save_function_barplot_text + "</button>" +
+				"<button id='save_function_leg' class='savebutton' type='button'>" + 
+				save_function_legend_text + "</button>" +
+				"</div><div id='download_buttons'>" + 
+				"<button id='save_function_abundance_table' class='savebutton' type='button'>" + 
+				save_function_abundance_table_text + "</button>" +
+				"<button id='save_contribution_table' class='savebutton' type='button'>" +
+				save_contribution_table_text + "</button>" +
+				"</div><div id='legendswitch'>" +
+				"<button id='switch_scale' type='button'>" +
+				switch_scale_text_on + "</button></div>" +
+				"<button id='return_to_upload' type='button'>" + 
+				return_to_upload_page_text + "</button>");
 	
 	document.getElementById('save_screenshot').addEventListener('click', function() {
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
@@ -177,10 +190,10 @@ draw_svg = function() {
 
 		document.getElementById('switch_scale').addEventListener('click', function() {
 			if (showScale) {
-				d3.select("#switch_scale").text("Show scale");
+				d3.select("#switch_scale").text(switch_scale_text_on);
 				showScale = false;
 			} else {
-				d3.select("#switch_scale").text("Hide scale");
+				d3.select("#switch_scale").text(switch_scale_text_off);
 				showScale = true;
 			}
 			makeBusy();
@@ -227,9 +240,47 @@ draw_svg = function() {
 			currently_displayed_functions = [];
 			data_cube = null;
 		})
-
-		// Make the help svg overlay and mouseover trigger
 		
+		d3.select("#sidebar_svg").attr("visibility","hidden");
+
+		draw_loading(width, height);
+	}
+}
+
+draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
+	
+	var grouping = null;
+	if (mainui.uploadMode == "example"){
+		grouping = "Group";
+	} else {
+		grouping = document.getElementById("metadata_factor_selector").value;
+	}
+	
+	// Find the new window size, adjust the aspect ratio
+	aspecrat = window.innerWidth / window.innerHeight;
+	width = aspecrat * 1000;
+	if (showScale) {
+		margin.right = 20 + (width * 0.1);
+	} else {
+		margin.right = 20;
+	}
+	barDimensions = {width: (width - margin.left - margin.right - margin.btwbars) /2, height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+	navDims.treewidth = navDims.width * 2/9;
+	bpdims = {height:navDims.height, width: navDims.width, header:margin.top, treewidth: navDims.treewidth};
+	
+	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
+	plotSVG.attr("viewBox","0 0 " + width + " " + height + "")
+	
+	d3.select("#navbar").remove()
+	d3.select("#taxa_bars").remove()
+	d3.select("#func_bars").remove()
+	d3.select("#scalebar").remove()
+	d3.select("#loadingG").remove()
+	
+	d3.select("#sidebar_svg").attr("visibility","visible");
+
+	if (document.getElementById('help_svg') === null) {					
 		helpSVG = d3.select("#mainsvg").append("svg")
 			.attr("id","help_svg")
 			.attr("x", 0)
@@ -275,45 +326,11 @@ draw_svg = function() {
 				d3.select("#help_background").attr("fill-opacity", "0");
 				d3.select("#help_items").attr("visibility", "hidden");
 			});
-
+	
 		helpOverlay.createItems();
-
-		draw_loading(width, height);
-	}
-}
-
-draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
-	
-	var grouping = null;
-	if (mainui.uploadMode == "example"){
-		grouping = "Group";
 	} else {
-		grouping = document.getElementById("metadata_factor_selector").value;
+		helpOverlay.redraw();
 	}
-	
-	// Find the new window size, adjust the aspect ratio
-	aspecrat = window.innerWidth / window.innerHeight;
-	width = aspecrat * 1000;
-	if (showScale) {
-		margin.right = 20 + (width * 0.1);
-	} else {
-		margin.right = 20;
-	}
-	barDimensions = {width: (width - margin.left - margin.right - margin.btwbars) /2, height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
-	navDims.treewidth = navDims.width * 2/9;
-	bpdims = {height:navDims.height, width: navDims.width, header:margin.top, treewidth: navDims.treewidth};
-	
-	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
-	plotSVG.attr("viewBox","0 0 " + width + " " + height + "")
-	
-	d3.select("#navbar").remove()
-	d3.select("#taxa_bars").remove()
-	d3.select("#func_bars").remove()
-	d3.select("#scalebar").remove()
-	d3.select("#loadingG").remove()
-
-	helpOverlay.redraw();
 
 	var NavSVG = plotSVG.insert("svg", "#sidebar")
     	.attr("x",margin.left)
@@ -382,7 +399,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	data_cube = data_cube_wrapper.make_cube(); //defines the functions needed
 	data_cube.initialize_cube(contribution_table, trees.getTaxaTreeData(), trees.getFuncTreeData(), func_averages);
 	//if( not expand to OTU level
-	/*genus_abundance_data = data_cube.reduce_to_genus(otu_abundance_data)*/
 	////////////////////////// Colors
 	//color_option = "Categories" //Categories or Random
 	var color_option = null;
@@ -1002,7 +1018,7 @@ function makeBusy() {
 			.attr("font-size", 25)
 			.attr("fill", "#ffffff")
 			.attr("stroke", "none")
-			.text("Busy...");
+			.text(busy_text);
 
 	} else {
 		d3.select("#resizing_message").attr("visibility","visibile")

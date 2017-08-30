@@ -11,6 +11,13 @@
   .orient("left")
   .tickFormat(d3.format(".2s"));
 
+  function generate_function_barplot_tooltip_text(name_split, sample, total_abund){
+    return function_abundance_tooltip_text[0] + name_split + function_abundance_tooltip_text[1] + sample + function_abundance_tooltip_text[2] + (Math.round(total_abund * 100 * 100) / 100) + function_abundance_tooltip_text[3];
+  }
+
+  function generate_function_barplot_contribution_tooltip_text(name_split, taxa_split, sample, abund){
+    return function_contribution_tooltip_text[0] + name_split + function_contribution_tooltip_text[1] + taxa_split + function_contribution_tooltip_text[2] + sample + function_contribution_tooltip_text[3] + (Math.round(abund * 100 * 100) / 100) + function_contribution_tooltip_text[4];
+  }
 
   fB.vizData = function(data, sample_order){
 
@@ -124,7 +131,7 @@
     .attr("font-size",18)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")
-    .text("Relative Abundance (%)");
+    .text(function_abundance_y_axis_title);
 
   //x-axis label
    /* svglink.append("text")
@@ -154,7 +161,7 @@
   .style("border-radius", "4px")  
   .style("padding","2px")
 
-  .text("");
+  .text(default_function_abundance_tooltip_text);
 
 
 
@@ -198,7 +205,7 @@
      	total_abund = d3.sum(selected.map(function(e){ return e.contributions; }))
     	name_split = (current_rectangle_data.func.split('_')).pop()
     	//taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split 
-        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" +  "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
+        tooltip.html(generate_function_barplot_tooltip_text(name_split, current_rectangle_data.Sample, total_abund));
           return tooltip.style("visibility", "visible");
     } else if(clickedFuncBars.empty() == false && clickedEdges.empty()==true){ //function bar is clicked
     	if(display_func[clickedFuncBars.datum().key] == (current_rectangle_data.func).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
@@ -208,7 +215,7 @@
 					return e.func == current_rectangle_data.func; })
      	total_abund = d3.sum(selected.map(function(e){ return e.contributions; }))
     	name_split = (current_rectangle_data.func.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split  + "<br>" 
-        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
+        tooltip.html(generate_function_barplot_tooltip_text(name_split, current_rectangle_data.Sample, total_abund));
           return tooltip.style("visibility", "visible");
     }
     } else if(clickedEdges.empty() == false){
@@ -216,7 +223,7 @@
     		name_split = (current_rectangle_data.func.split('_')).pop()
     		taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //
     		abund = current_rectangle_data.contributions
-        	tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Taxon: </strong>" + taxa_split  + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(abund*100*100)/100+ "%");
+        	tooltip.html(generate_function_barplot_contribution_tooltip_text(name_split, taxa_split, current_rectangle_data.Sample, abund));
           	return tooltip.style("visibility", "visible");    		
     	}
 	} else if(clickedBars.empty() == false && clickedFuncBars.empty() == true){ //highlight contributions if taxon selected
@@ -224,7 +231,7 @@
 			name_split = (current_rectangle_data.func.split('_')).pop()
     		taxa_split = (current_rectangle_data.Taxa.split('_')).pop() //
     		abund = current_rectangle_data.contributions
-        	tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Taxon: </strong>" + taxa_split  + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(abund*100*100)/100+ "%");
+        	tooltip.html(generate_function_barplot_contribution_tooltip_text(name_split, taxa_split, current_rectangle_data.Sample, abund));
           	return tooltip.style("visibility", "visible");   
 		}
 	}
@@ -278,7 +285,7 @@
 				return e.func == current_rectangle_data.func; })
      	total_abund = d3.sum(selected.map(function(e){ return e.contributions; }))
     	name_split = (current_rectangle_data.func.split('_')).pop() //+ "<strong>Taxon: </strong>" + taxa_split  + "<br>" 
-        tooltip.html("<strong>Function: </strong>" + name_split + "<br>" + "<strong>Sample: </strong>"+current_rectangle_data.Sample + " <br>"+"<strong>Relative Abundance: </strong>" + Math.round(total_abund*100*100)/100+ "%");
+        tooltip.html(generate_function_barplot_tooltip_text(name_split, current_rectangle_data.Sample, total_abund));
 		tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 		clickResponse(current_id, current_rectangle_data.func, "funcs", displayed_taxa, displayed_funcs)
 		return tooltip.style("visibility", "visible")

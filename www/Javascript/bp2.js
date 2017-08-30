@@ -111,7 +111,7 @@
 		d3.select("#"+id).append("g")
 			.attr("class","part"+p)
 			.attr("id","part"+p)
-			.attr("font-family","Verdana") //for legend to save with correct fonts
+			//.attr("font-family","Verdana") //for legend to save with correct fonts
 			.attr("transform","translate("+ (p==0 ? (-1*(bb+b)) : (bb)) +",0)");
 
 		var padding = 0;
@@ -126,7 +126,7 @@
 			.attr("x", p == 0 ? -(extra_width - b - bb) : 0)
 			.attr("width", p == 0 ? (extra_width - bb) : (extra_width - bb)) //function legend is larger because longer names
 			.attr("height", height)
-			.attr("font-family","Verdana");
+			//.attr("font-family","Verdana");
 
 
 		//d3.select("#"+id).select(".part"+p).append("g").attr("class","subbars");
@@ -220,6 +220,10 @@
 	// 		.data(data.subBars[p]).transition();
 
 	// }
+
+	function generate_bipartite_graph_tooltip(width){
+		return bipartite_graph_tooltip_text[0] + Math.round(width) + bipartite_graph_tooltip_text[1];
+	}
 	
 	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
 		d3.select("#"+id).append("g").attr("class","edges").transition().duration(300).attr("transform","translate(0,0)");
@@ -240,7 +244,7 @@
   			.style("border", "0px")    
   			.style("border-radius", "4px")  
   			.style("padding","2px")
-			.text("a simple tooltip");
+			.text(default_bipartite_graph_tooltip_text);
 
 
 
@@ -253,7 +257,7 @@
 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 					clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
 					if(clickedEdges.empty()||d3.select(this).classed("clicked")==true){
-						tooltip.html("Avg contribution to function:<br>"+ Math.round(d.wid) + "%")
+						tooltip.html(generate_bipartite_graph_tooltip(d.wid))
 						tooltip.style("visibility", "visible")
 					}
 			})
@@ -278,7 +282,7 @@
 			})
 			.on("click", function(d,i){
 				current_data = this._current
-				tooltip.html("Avg contribution to function:<br>"+ Math.round(d.wid) + "%")
+				tooltip.html(generate_bipartite_graph_tooltip(d.wid))
 				tooltip.style("visibility","visible")
 				if(d3.select(this).classed("highlighted")==false){
 				//unselect other edges
