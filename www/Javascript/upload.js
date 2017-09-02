@@ -1,7 +1,7 @@
 (function(){
 	var uploader_wrapper = {};
 
-	uploader_wrapper.make_uploader = function(draw_everything, update_progress){
+	uploader_wrapper.make_uploader = function(draw_everything, update_picrust_loading_progress, update_table_downloading_progress){
 
 		var uploader = {};
 
@@ -33,6 +33,8 @@
 		uploader.svgCreated = false;
 		
 		// Initializing constants to keep track of piece-wise uploading indices
+		uploader.curr_picrust_otus = 0;
+		uploader.total_picrust_otus = 0;
 		uploader.current_contribution_sample_index = 0;
 		uploader.current_taxonomic_abundance_sample_index = 0;
 		uploader.taxonomic_abundance_table_length = 0;
@@ -79,6 +81,30 @@
 			}
 		}
 
+
+		/*
+		number_of_otus handler
+
+		Initializes the progress state of the number of picrust OTUs that we need to load genomic content data for
+		*/
+		Shiny.addCustomMessageHandler("number_of_otus", function(num_otus){
+			uploader.total_picrust_otus = num_otus
+			update_picrust_loading_progress(0, uploader.total_picrust_otus)
+		})
+
+		/*
+		otu_genomic_content_processed handler
+
+		Keeps track of how many OTUs have had their genomic content loaded and updates the progress page
+		*/
+		Shiny.addCustomMessageHandler("otu_genomic_content_processed", function(x){
+			uploader.curr_picrust_otus += 1
+			update_picrust_loading_progress(uploader.curr_picrust_otus, uploader.total_picrust_otus)
+			if (uploader.curr_picrust_otus == uploader.total_picrust_otus){
+				uploader.curr_picrust_otus = 0
+			}
+		})
+
 		/*
 		taxonomic_abundance_table_ready handler
 
@@ -108,7 +134,7 @@
 			++uploader.current_taxonomic_abundance_sample_index;
 
 			// Update the progress bar
-			update_progress(uploader.current_taxonomic_abundance_sample_index, uploader.taxonomic_abundance_table_length, "taxonomic_abundance");
+			update_table_downloading_progress(uploader.current_taxonomic_abundance_sample_index, uploader.taxonomic_abundance_table_length, "taxonomic_abundance");
 
 			// Fixes the disconnect issue by requesting pieces of the data rather than the full table
 			setTimeout(function(){
@@ -156,7 +182,7 @@
 			++uploader.current_contribution_sample_index;
 
 			// Update the progress bar
-			update_progress(uploader.current_contribution_sample_index, uploader.contribution_table_length, "contribution");
+			update_table_downloading_progress(uploader.current_contribution_sample_index, uploader.contribution_table_length, "contribution");
 
 			// Fixes the disconnect issue by requesting pieces of the data rather than the full table
 			setTimeout(function(){

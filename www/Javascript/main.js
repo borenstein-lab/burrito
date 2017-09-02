@@ -243,7 +243,12 @@ draw_svg = function() {
 		
 		d3.select("#sidebar_svg").attr("visibility","hidden");
 
-		draw_loading(width, height);
+		var using_picrust = false;
+		if (document.getElementById("picrust").checked & mainui.uploadMode != "example"){
+			using_picrust = true;
+		}
+
+		draw_loading(width, height, using_picrust);
 	}
 }
 
@@ -1140,7 +1145,7 @@ function redrawScale() {
 	drawScale();
 }
 
-var uploader = uploader_wrapper.make_uploader(draw_everything, update_progress);
+var uploader = uploader_wrapper.make_uploader(draw_everything, update_picrust_loading_progress, update_table_downloading_progress);
 
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 

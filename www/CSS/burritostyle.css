@@ -259,3 +259,8 @@ input {
 	margin-bottom: 2vh;
 }
 white-space: pre-line;
+
+.sample_type_label {
+	text-anchor: middle;
+	font-size: 10;
+}

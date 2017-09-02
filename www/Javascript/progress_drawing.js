@@ -70,7 +70,7 @@ add_table_loading_bar = function(loading_bar_name, loading_bar_text, ypos, loadg
 		.text(default_loading_bar_progress_text)
 }
 
-draw_loading = function(width, height) {
+draw_loading = function(width, height, using_picrust){
 	var loadg = MainSVG.append("g")
 		.attr("id","loadingG");
 	
@@ -78,17 +78,22 @@ draw_loading = function(width, height) {
 		.attr("id", "upload_stepsG")
 		.attr("class", "upload_steps")
 
+	var num_loading_bars = loading_bars.length;
+	if (!using_picrust){
+		num_loading_bars -= 1;
+	}
+
 	for (var upload_step_index = 0; upload_step_index < upload_steps.length; upload_step_index++){
 
 		var last_step = !(upload_step_index < upload_steps.length - 1)
-		add_upload_step(upload_steps[upload_step_index], upload_step_text[upload_step_index], upload_step_index + 1, upload_stepsg, last_step, width, height / (2 + loading_bars.length))
+		add_upload_step(upload_steps[upload_step_index], upload_step_text[upload_step_index], upload_step_index + 1, upload_stepsg, last_step, width, height / (2 + num_loading_bars))
 	}
 
 	loadg.append("text")
 		.attr("id", "upload_step_message")
 		.attr("class", "loading_text below_step")
 		.attr("x", width / 2)
-		.attr("y", (height / (2 + loading_bars.length)))
+		.attr("y", (height / (2 + num_loading_bars)))
 		.attr("text-anchor", "middle")
 		.attr("alignment-baseline", "hanging")
 		.text(default_upload_step_text)
@@ -97,19 +102,49 @@ draw_loading = function(width, height) {
 		.attr("id", "loading_barsG")
 		.attr("class", "loading_bars")
 
-	for (var loading_bar_index = 0; loading_bar_index < loading_bars.length; loading_bar_index++){
+	var starting_loading_bar_index = 0
+	if (!using_picrust){
+		starting_loading_bar_index += 1
+	}
 
-		add_table_loading_bar(loading_bars[loading_bar_index], loading_bar_text[loading_bar_index], height * (2 + loading_bar_index) / (2 + loading_bars.length), loading_barsg, width, height)
+	for (var loading_bar_index = starting_loading_bar_index; loading_bar_index < loading_bars.length; loading_bar_index++){
+
+		var true_loading_bar_index = loading_bar_index;
+		if (!using_picrust){
+			true_loading_bar_index -= 1;
+		}
+
+		add_table_loading_bar(loading_bars[loading_bar_index], loading_bar_text[loading_bar_index], height * (2 + true_loading_bar_index) / (2 + num_loading_bars), loading_barsg, width, height)
 	}
 }
 
-update_progress = function(curr_sample, total_samples, table_name, width){
+get_picrust_loading_progress_text = function(curr_num, total_num){
+	return(picrust_loading_progress_text[0] + curr_num + picrust_loading_progress_text[1] + total_num + picrust_loading_progress_text[2])
+}
+
+get_table_downloading_progress_text = function(curr_num, total_num){
+	return(table_downloading_progress_text[0] + curr_num + table_downloading_progress_text[1] + total_num + table_downloading_progress_text[2])
+}
+
+update_picrust_loading_progress = function(curr_otu, total_otus){
+	if (curr_otu >= 0){
+		document.getElementById("picrust_loading_text").innerHTML = get_picrust_loading_progress_text(curr_otu, total_otus)
+		if (curr_otu <= total_otus){
+			document.getElementById("picrust_loading_bar").setAttribute("width", document.getElementById("picrust_background").getAttribute("width") * (curr_otu / total_otus))
+		}
+		if (curr_otu == total_otus){
+			document.getElementById("picrust_loading_bar").setAttribute("class", "complete")
+		}
+	}
+}
+
+update_table_downloading_progress = function(curr_sample, total_samples, table_name){
 	if (table_name == "contribution"){
 		curr_sample = curr_sample - 1
 		total_samples = total_samples-1
 	}
 	if (curr_sample > 0){
-		document.getElementById(table_name + "_loading_text").innerHTML = curr_sample + "/" + (total_samples) + " samples loaded"
+		document.getElementById(table_name + "_loading_text").innerHTML = get_table_downloading_progress_text(curr_sample, total_samples)
 		if (curr_sample <= total_samples){
 			document.getElementById(table_name + "_loading_bar").setAttribute("width", document.getElementById(table_name + "_background").getAttribute("width") * (curr_sample / total_samples))
 		}
@@ -138,8 +173,8 @@ Shiny.addCustomMessageHandler("upload_status", function(step){
 })
 
 Shiny.addCustomMessageHandler("number_of_samples_message", function(num_samples){
-	document.getElementById("taxonomic_abundance_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
-	document.getElementById("contribution_loading_text").innerHTML = "0/" + (num_samples - 1) + " samples loaded"
+	document.getElementById("taxonomic_abundance_loading_text").innerHTML = get_table_downloading_progress_text(0, num_samples - 1)
+	document.getElementById("contribution_loading_text").innerHTML = get_table_downloading_progress_text(0, num_samples - 1)
 })
 
 Shiny.addCustomMessageHandler("abort", function(message){
