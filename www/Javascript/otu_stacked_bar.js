@@ -57,7 +57,6 @@
 
 	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8}
     x.rangeBands([0, graphdims.width], .2);
-    y.range([graphdims.height, 0]);
     xAxis.scale(x);
     yAxis.scale(y);
     
@@ -85,30 +84,7 @@
     var first_sample_x = x(sample_order[0]);
     var last_sample_x = x(sample_order[sample_order.length - 1]);
 
-      //y-axis label
-    svglink.append("text")
-    .attr("class", "y label")
-    .attr("id", "otu_bar_y_label")
-    .attr("text-anchor", "middle")
-    .attr("y", 0)
-    .attr("x", -(graphdims.height + graphdims.height_buffer) / 2)
-    .attr("font-size",18)
-    .attr("dy", ".75em")
-    .attr("transform", "rotate(-90)")
-    .text(taxonomic_abundance_y_axis_title);
 
-  //x-axis label
-   /* svglink.append("text")
-    .attr("class", "x label")
-    .attr("id", "otu_bar_x_label")
-    .attr("text-anchor", "end")
-    .attr("y", dims.height - 18)
-    .attr("x", (dims.width - graphdims.width + graphdims.width_buffer) + ((graphdims.width  - graphdims.width_buffer)/ 2))
-    .attr("font-size",18)
-    .attr("font-style","bold")
-    .attr("dy", ".75em")
-    .text("Samples");
-	*/ //removed to make room for group labels
 
     var Sample = svglink.selectAll(".Sample")
       .data(bar_data)
@@ -211,51 +187,69 @@
 		return tooltip.style("visibility", "visible")
       });
 
+    // Initializae x-axis
     svglink.append("svg")
-    .attr("id", "otu_bar_xtick_svg")
-    .attr("x", 0)
-    .attr("y",graphdims.height + graphdims.height_buffer)
-    .attr("width", last_sample_x - first_sample_x + graphdims.x_axis_x_buffer + x.rangeBand())
-    .attr("height", dims.height - graphdims.height - graphdims.height_buffer);
+      .attr("id", "otu_bar_xtick_svg")
+      .attr("x", 0)
+      .attr("width", last_sample_x - first_sample_x + graphdims.x_axis_x_buffer + x.rangeBand())
+      .attr("clip-path", "")
 
-      d3.select("#otu_bar_xtick_svg").append("g")
+    d3.select("#otu_bar_xtick_svg").append("g")
       .attr("class", "x_axis")
-	  .attr("clip-path","url(#otu_samp_clip)")
-      .attr("transform", "translate(" + graphdims.x_axis_x_buffer + ",0)")
+      .attr("id", "otu_x_axis")
+  	  .attr("transform", "translate(" + graphdims.x_axis_x_buffer + ",0)")
       .call(xAxis)
       .selectAll("text")
-	  .style("alignment-baseline","middle")
-      .style("text-anchor", "end")
-      .attr("dx", 0)
-      .attr("dy", 0)
-      .attr("transform", function(d) {
-        return "translate(-" + (first_sample_x + (x.rangeBand()/2)) + "," + graphdims.sample_label_buffer + ") rotate(-90)"
-      });
+  	    .style("alignment-baseline","middle")
+        .style("text-anchor", "end")
+        .attr("dx", 0)
+        .attr("dy", 0)
 
-	svglink.select("#otu_bar_xtick_svg")
-		.append("clipPath")
-		.attr("id", "otu_samp_clip")
-		.append("rect")
-			.attr("x",0)
-			.attr("y",0)
-			.attr("width", graphdims.width)
-			.attr("height",dims.height - graphdims.height - graphdims.height_buffer - 20 )
+    // Grab the initial x transform of the ticks
+    var initial_x_axis_tick_transform = dims.width
+    d3.select("#otu_x_axis").selectAll(".tick")
+      .each(function(data){
+        var tick = d3.select(this)
+        var transform = d3.transform(tick.attr("transform")).translate
+        if (transform[0] < initial_x_axis_tick_transform){
+          initial_x_axis_tick_transform = transform[0]
+        }
+      })
 
-    svglink.append("g")
-      .attr("class", "y axis")
-	  .attr("transform","translate("+ (dims.width-graphdims.width + graphdims.width_buffer) +"," + graphdims.height_buffer + ")")
-      .call(yAxis)
-      .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .attr("class", "y_label"); 
-	
+    // Remove the initial x transform from the ticks
+    d3.select("#otu_x_axis").selectAll(".tick")
+      .each(function(data){
+        var tick = d3.select(this)
+        var transform = d3.transform(tick.attr("transform")).translate
+        tick.attr("transform", "translate(" + (transform[0] - initial_x_axis_tick_transform) + ",0)")
+      })
+
+    // Calculate the maximum width of x-axis text (height after roatation) and vertically center the text relative to the bars they correspond to
+    var max_x_axis_text_width = 0;
+    d3.select("#otu_x_axis")
+      .selectAll("text")
+        .each(function(){
+          var text_width = d3.select(this)
+            .node()
+              .getBBox()
+                .width
+          if (text_width > max_x_axis_text_width){
+            max_x_axis_text_width = text_width
+          }
+          var text_height = d3.select(this)
+            .node()
+              .getBBox()
+                .height
+          d3.select(this)
+            .attr("transform", "translate(" + ((x.rangeBand() / 2) - (text_height / 2)) + "," + graphdims.sample_label_buffer + ") rotate(-90)")
+        })
+
+  var max_group_label_height = 0	
 	if (grouping != "N/A") {
 
   	var groupnames = sampledata.map(function(e) { return e[grouping]; });
   	groupnames = groupnames.filter(function(v,i) { return groupnames.indexOf(v) == i; });
+
   	var groups = [];
   	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
   	d3.selectAll("#taxa_bars").selectAll(".g").each( function(d) {
@@ -265,7 +259,7 @@
   		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
   		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
   		if (xpos > groups[gindex].Max) { groups[gindex].Max = xpos; }
-  		});
+  	});
 
 
   	d3.select("#otu_bar_xtick_svg").selectAll("g.x_samp_g_label")
@@ -277,16 +271,14 @@
   			.attr("x", function(d) { return d.Min; } )
   			.attr("y", 0)
   			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
-  			.attr("height", dims.height - graphdims.height - graphdims.height_buffer)
   			.attr("fill", function(d) { return sampleColor(d.Name); });
 
   	d3.select("#otu_bar_xtick_svg").selectAll(".x_samp_g_label")
   		.append("text")
-  		.attr("x", function(d) { return d.Min + (d.Max - d.Min + x.rangeBand())/2 })
-  		.attr("y", dims.height - graphdims.height - graphdims.height_buffer - 4)
-  		.attr("text-anchor","middle")
-  		.attr("font-size", 17)
-  		.text(function(d) { return d.Name; });
+    		.attr("x", function(d) { return d.Min + (d.Max - d.Min + x.rangeBand())/2 })
+    		.attr("text-anchor","middle")
+    		.attr("font-size", 17)
+    		.text(function(d) { return d.Name; });
 
 	d3.select("#taxa_bars").selectAll("line.bar_group_divider")
 		.data(groups.slice(0,groups.length - 1))
@@ -296,80 +288,77 @@
 			.attr("x1", function(d) { return d.Max + x.rangeBand() * 9/8 })
 			.attr("y1", graphdims.height_buffer)
 			.attr("x2", function(d) { return d.Max + x.rangeBand() * 9/8 })
-			.attr("y2", graphdims.height + graphdims.height_buffer);
 
+    // Determine the maximum height of any of the group labels
+    d3.select("#otu_bar_xtick_svg").selectAll(".x_samp_g_label")
+      .selectAll("text")
+        .each(function(){
+          var text_height = d3.select(this)
+            .node()
+              .getBBox()
+                .height
+          if (text_height > max_group_label_height){
+            max_group_label_height = text_height
+          }
+        })
 	
 	}
-    /*svglink.selectAll("text").style("fill",function(m){
-      if(sampledata.map(function(e){ return e.Sample; }).indexOf(m)!==-1 & grouping != ""){
-        return sampleColor(otu_bar.getSampleGroup(m, sampledata, grouping));        
-      } else {
-        return "#000000";
-      }
-    }); */ //Don't color sample names, instead place colored rectangle behind
+
+  // Position and size the x-axis to contain full labels and group labels if necessary
+  var buffer_between_sample_labels_and_bottom = 2
+  var x_axis_height = max_x_axis_text_width + max_group_label_height + graphdims.sample_label_buffer + buffer_between_sample_labels_and_bottom
+  d3.select("#otu_bar_xtick_svg")
+    .attr("y", dims.height - x_axis_height)
+    .attr("height", x_axis_height)
+
+  // Make the colored label backgrounds the correct height
+  d3.select("#otu_bar_xtick_svg").selectAll("rect")
+    .attr("height", x_axis_height)
+
+  // Position the group labels
+  d3.select("#otu_bar_xtick_svg").selectAll(".x_samp_g_label")
+    .selectAll("text")
+      .each(function(){
+        d3.select(this)
+          .attr("y", x_axis_height - buffer_between_sample_labels_and_bottom)
+      })
+
+  // Set the height of the group dividers
+  d3.select("#taxa_bars").selectAll("line.bar_group_divider")
+    .each(function(){
+      d3.select(this)
+        .attr("y2", dims.height - x_axis_height)
+    })
+
+  // Initialize the y-axis
+  svglink.append("g")
+    .attr("class", "y axis")
+    .attr("transform","translate("+ (dims.width-graphdims.width + graphdims.width_buffer) +"," + graphdims.height_buffer + ")")
+    .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .attr("class", "y_label"); 
 
 
+    // Initialize the y-axis label
+    svglink.append("text")
+      .attr("class", "y label")
+      .attr("id", "otu_bar_y_label")
+      .attr("text-anchor", "middle")
+      .attr("y", 0)
+      .attr("x", -(dims.height - x_axis_height) / 2)
+      .attr("font-size",18)
+      .attr("dy", ".75em")
+      .attr("transform", "rotate(-90)")
+      .text(taxonomic_abundance_y_axis_title);
+
+    // Set the y range to be between the top of the barplot svg and the top of the x-axis
+    y.range([dims.height - x_axis_height - graphdims.height_buffer, 0]);
 
 
-    // var normalizebox = svg.append("foreignObject")
-    //   .attr("width", 100)
-    //   .attr("height", 100)
-    //   .attr("x", width + 50)
-    //   .attr("y", height/2)
-    //   .attr("text", "Raw Repo Counts")
-    //   .html("<form><input type=checkbox><span>Raw Counts</span></form>")
-    //   .on("click", function(){
-    //     if (!normalized) {
-    //       y.domain([0, 100]);
-    //       d3.select(".y_label").text("Relative abundance");
-    //       bar_data.forEach(function(d) {
-    //         d.taxa.forEach(function(e){
-    //           e.y0 = Math.round(e.y0/d.total*100*100)/100;
-    //           e.y1 = Math.round(e.y1/d.total*100*100)/100;
-    //         })
-    //       })
-    //     } else {
-    //       y.domain([0, d3.max(bar_data, function(d) { 
-    //         return d.total; 
-    //       })]);
-    //       d3.select(".y_label").text("Count");
-    //       bar_data.forEach(function(d) {
-    //         d.taxa.forEach(function(e){
-    //           e.y0 = e.y0*d.total/100;
-    //           e.y1 = e.y1*d.total/100;
-    //         })
-    //       })
-    //     }
-
-    //     normalized = !normalized;
-    //     var transition = svg.transition().duration(750);
-
-    //     transition.select('.y.axis')
-    //       .call(yAxis);
-
-    //     svg.selectAll(".Sample").data(bar_data);
-
-    //     Sample.selectAll("rect")
-    //       .data(function(d) { 
-    //         return d.taxa; 
-    //       })
-    //       .transition().duration(750)
-    //       .attr("width", x.rangeBand())
-    //       .attr("y", function(d) { 
-    //         return y(d.y1); 
-    //       })
-    //       .attr("height", function(d) { 
-    //         return y(d.y0) - y(d.y1); 
-    //       })
-    //       .style("fill", function(d) { 
-    //         return colors(d.name); 
-    //       });
-    //   });
-
-    // normalizebox.append("div")
-    //   .style("position", "absolute")
-    //   .style("z-index", "10")
-    //   .text("Raw Counts");
   };
 
 otu_bar.select_bars = function(taxon){

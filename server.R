@@ -1,5 +1,4 @@
 # R server code interacting with the main webpage
-
 library(shiny)
 library(data.table)
 
@@ -10,7 +9,9 @@ default_metadata_table_filename = "www/Data/mice_samplemap.txt"
 default_contribution_table_filename = "www/Data/mice_metagenome_contributions_K01516_removed.txt"
 default_otu_table_filename = "www/Data/otu_table_even_2.txt"
 picrust_normalization_table_filename = "www/Data/16S_13_5_precalculated.tab.gz"
-picrust_ko_table_filename = "www/Data/melted_filtered_picrust_ko_table.txt.gz"
+# picrust_ko_table_filename = "www/Data/melted_filtered_picrust_ko_table.txt.gz"
+picrust_ko_table_directory = "www/Data/individual_picrust_otu_tables/"
+picrust_ko_table_suffix = "_genomic_content.tab"
 constants_filename = "www/Javascript/constants.js"
 html_elements = c("taxonomic_abundance_table", "genomic_content_table", "contribution_table", "function_abundance_table", "custom_taxonomic_hierarchy_table", "custom_function_hierarchy_table", "metadata_table")
 
@@ -27,19 +28,16 @@ options(stringsAsFactors = F)
 default_taxonomic_hierarchy_table = fread(default_taxonomic_hierarchy_table_filename, header=T, showProgress=F)
 default_function_hierarchy_table = fread(default_function_hierarchy_table_filename, header=T, showProgress=F)
 default_metadata_table = fread(default_metadata_table_filename, header=T, showProgress=F)
-default_contribution_table = fread(default_contribution_table_filename, header=T, showProgress=F)
-default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
-picrust_normalization_table = NULL
-picrust_ko_table = NULL
-
-if (basename(getwd()) %in% c("burrito")){
-	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
-	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
-	# Convert OTU and function names to character type
-	picrust_normalization_table[,(colnames(picrust_normalization_table)[1]) := as.character(get(colnames(picrust_normalization_table)[1]))]
-	picrust_ko_table[,(colnames(picrust_ko_table)[1]) := as.character(get(colnames(picrust_ko_table)[1]))]
-	picrust_ko_table[,(colnames(picrust_ko_table)[2]) := as.character(get(colnames(picrust_ko_table)[2]))]
-}
+# default_contribution_table = fread(default_contribution_table_filename, header=T, showProgress=F)
+# default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
+# if (basename(getwd()) %in% c("burrito")){
+# 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
+# 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
+# 	# Convert OTU and function names to character type
+# 	picrust_normalization_table[,(colnames(picrust_normalization_table)[1]) := as.character(get(colnames(picrust_normalization_table)[1]))]
+# 	picrust_ko_table[,(colnames(picrust_ko_table)[1]) := as.character(get(colnames(picrust_ko_table)[1]))]
+# 	picrust_ko_table[,(colnames(picrust_ko_table)[2]) := as.character(get(colnames(picrust_ko_table)[2]))]
+# }
 
 # Constant to mark entries for comparison in the contribution table
 comparison_tag = "_comparison"
@@ -967,28 +965,62 @@ shinyServer(function(input, output, session) {
 		return(data.table())
 	}
 
-	# run_picrustgenerate_contribution_table_using_picrust(otu_table)
+	# get_genomic_content_from_picrust_table(otu)
+	#
+	# Returns the column from the picrust tables that corresponds to the genomic content of the indicated OTU
+	get_genomic_content_from_picrust_table = function(otu){
+
+		# Read in the file for this otu's genomic content
+		otu_genomic_content = fread(paste(picrust_ko_table_directory, otu, picrust_ko_table_suffix, sep=""), header=T)		
+		colnames(otu_genomic_content) = c(first_taxonomic_level(), first_function_level(), "copy_number")
+		otu_genomic_content[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+
+		# Send a message to the browser saying that we've finished grabbing the genomic content information for another OTU
+		session$sendCustomMessage("otu_genomic_content_processed", "NULL")
+
+		return(otu_genomic_content)
+	}
+
+	# get_subset_picrust_ko_table(otus)
+	#
+	# Returns the melted picrust ko table corresponding to the given set of OTUs
+	get_subset_picrust_ko_table = function(otus){
+
+		# Tell the browser how many OTUs we need to load genomic content data for
+		session$sendCustomMessage("number_of_otus", length(otus))
+
+		# Get all columns corresponding to the otus and transpose
+		subset_picrust_ko_table = rbindlist(lapply(otus, get_genomic_content_from_picrust_table), use.names=T)
+		
+		return(subset_picrust_ko_table)
+	}
+
+	# generate_contribution_table_using_picrust(otu_table)
 	#
 	# Uses the provided OTU table to generate a contribution table based on the PICRUSt 16S normalization and genomic content tables
 	generate_contribution_table_using_picrust = function(otu_table){
 
-		# Rename columns for consistency
+		# Read the normalization table and standardize column names
+		picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T)
 		colnames(picrust_normalization_table) = c(first_taxonomic_level(), "norm_factor")
-		colnames(picrust_ko_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
+		picrust_normalization_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
 
-		# File checking
-		otus_have_genomic_content_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICRUSt table")
+		# Check that the OTUs have normalization factors
+		otus_have_normalization_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], picrust_normalization_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "PICRUSt 16S normalization table")
 
 		# If there are otus without genomic content, we return NULL
-		if (!otus_have_genomic_content_validated){
+		if (!otus_have_normalization_validated){
 			return(NULL)
 		}
 
+		# Get the subset of the ko table mapping present OTUs to their genomic content
+		subset_picrust_ko_table = get_subset_picrust_ko_table(levels(factor(otu_table[[first_taxonomic_level()]])))
+		
 		# Merge with the table of 16S normalization factors
 		contribution_table = merge(otu_table, picrust_normalization_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
 
 		# Merge with the PICRUSt genomic content table
-		contribution_table = merge(contribution_table, picrust_ko_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
+		contribution_table = merge(contribution_table, subset_picrust_ko_table, by = first_taxonomic_level(), allow.cartesian = TRUE, sort = FALSE)
 
 		# Make a contribution column by dividing the OTU abundances by the normalization factors and multiplying with the KO copy number
 		contribution_table[,contribution := (abundance * copy_number) / norm_factor]
@@ -1132,17 +1164,17 @@ shinyServer(function(input, output, session) {
 	#
 	# Normalizes the total function abundances per sample in the contribution table
 	normalize_contribution_table = function(contribution_table){
-
+		
 		# Calculate total function abundances for each sample
 		table_with_total_function_abundances = contribution_table[,sum(contribution), by = eval(first_metadata_level())]
 		colnames(table_with_total_function_abundances)[ncol(table_with_total_function_abundances)] = "total_abundance"
-
+		
 		# Merge the total function abundances
 		table_with_total_function_abundances = merge(contribution_table, table_with_total_function_abundances, by = first_metadata_level(), allow.cartesian = T)
-
+		
 		# Normalize the contributions
 		table_with_total_function_abundances[,contribution := contribution / total_abundance]
-
+		
 		return(table_with_total_function_abundances[,which(colnames(table_with_total_function_abundances) != "total_abundance"),with=F])
 	}
 
@@ -1231,10 +1263,10 @@ shinyServer(function(input, output, session) {
 	#
 	# Summarizes the provided table to the indicated summary level using the given summary map to map current factors to higher-level factors, and distributes partial contributions as necessary
 	summarize_table_to_selected_level = function(table_to_summarize, summary_map, summary_level, partial_contribution_table){
-
+		
 		contribution_name = colnames(table_to_summarize)[ncol(table_to_summarize)]
 		first_level_name = colnames(summary_map)[1]
-
+		
 		# The list of id column names that should exist in the summarized table, leaves out the contribution column name (not an id column) and the name of the column that is being summarized to a higher level, and includes the new summary level name
 		summarized_id_names = c(colnames(table_to_summarize)[which(!(colnames(table_to_summarize) %in% c(contribution_name, first_level_name)))], summary_level)
 		
@@ -1250,10 +1282,10 @@ shinyServer(function(input, output, session) {
 		table_to_summarize[,(first_level_name) := as.character(get(first_level_name))]
 		partial_contribution_table[,(first_level_name) := as.character(get(first_level_name))]
 		summary_map = summary_map[,lapply(.SD, as.character)]
-
+		
 		# Merge the table to summarize with the summary map by the first level, duplicating rows as necessary when first level elements have multiple entries
 		summary_map = merge(table_to_summarize, summary_map, by = first_level_name, all.x = T, all.y = F, allow.cartesian = T)
-		
+
 		# Merge with the partial contribution table
 		summary_map = merge(summary_map, partial_contribution_table, by = first_level_name, all.x = T, all.y = F, allow.cartesian = T)
 
@@ -1570,19 +1602,19 @@ shinyServer(function(input, output, session) {
 
 		# Filter the contribution table to only contain taxa still in the otu table
 		contribution_table = contribution_table[get(taxonomic_summary_level()) %in% c(otu_table[[taxonomic_summary_level()]], unlinked_name)]
-
+		
 		# Renormalize the contribution table
 		contribution_table = normalize_contribution_table(contribution_table)
 		
 		# Determine the relative abundance of each funtion in each sample
 		function_abundances = contribution_table[,sum(contribution),by=c(first_metadata_level(), function_summary_level())]
-
+		
 		# Determine the maximum relative abundance of each function across all samples
 		maximum_function_abundances = function_abundances[,max(V1),by=eval(function_summary_level())]
-
+		
 		# Get the names of functions with a high enough maximum relative abundance
 		filtered_functions = maximum_function_abundances[V1 >= relative_abundance_cutoff][[function_summary_level()]]
-
+		
 		# Filter the contribution table to only contain functions with a high enough maximum relative abundance
 		contribution_table = contribution_table[get(function_summary_level()) %in% filtered_functions]
 		
@@ -1703,19 +1735,30 @@ shinyServer(function(input, output, session) {
 
 	# The main observer, tied specifically to the update button that indicates the visualization should be generated. Runs the data validation and processing necessary to generate the javascript objects used in the visualization
 	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
-
+		
 		session$sendCustomMessage("upload_status", "file_upload")
 		
-		# Set the default tables
-		otu_table = format_otu_table(default_otu_table)
-		taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
-		function_hierarchy_table = default_function_hierarchy_table
-		metadata_table = default_metadata_table
-		contribution_table = format_default_contribution_table(default_contribution_table)
-		function_abundance_table = data.table()
+		# Initialize important tables
+		otu_table = NULL
+		taxonomic_hierarchy_table = NULL
+		function_hierarchy_table = NULL
+		metadata_table = NULL
+		contribution_table = NULL
+		function_abundance_table = NULL
+		
+		# If they're viewing the example, load the default data
+		if (input$example_visualization == "TRUE"){
 
-		# If they're not viewing the example, then we try to load data
-		if (input$example_visualization != "TRUE"){
+			# Set the default tables
+			otu_table = format_otu_table(fread(default_otu_table_filename, header=T, showProgress=F))
+			taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
+			function_hierarchy_table = default_function_hierarchy_table
+			metadata_table = default_metadata_table
+			contribution_table = format_default_contribution_table(fread(default_contribution_table_filename, header=T, showProgress=F))
+			function_abundance_table = data.table()
+
+		# Otherwise, if they're not viewing the example, then we try to load data
+		} else {
 
 			otu_table = process_otu_table_file()
 			taxonomic_hierarchy_table = process_taxonomic_hierarchy_table_file()
@@ -1793,7 +1836,7 @@ shinyServer(function(input, output, session) {
 		session$sendCustomMessage("taxonomic_abundance_table_ready", length(javascript_otu_table))
 
 
-
+		
 		### Prepare the contribution table ###
 		session$sendCustomMessage("upload_status", "contribution_formatting")
 

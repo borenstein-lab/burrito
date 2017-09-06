@@ -50,18 +50,13 @@ draw_svg = function() {
 			.attr("viewBox","0 0 " + width + " " + height + "")
 			.attr("preserveAspectRatio","none")
 			.style("font-family", "Verdana");
-	
-				
-		//d3.select("#sidebar_svg").attr("visibility","hidden");
+
+		var using_picrust = false;
+		if (document.getElementById("picrust").checked & mainui.uploadMode != "example"){
+			using_picrust = true;
+		}
 
 		draw_loading(width, height);
-
-		/*d3.select("#mainplot").append("div")
-			.attr("id", "sidediv")
-			.style("position", "absolute")
-			.style("top", 0)
-			.style("left", 0)
-			.append("text").text("sidetest");*/
 	}
 }
 
@@ -99,11 +94,9 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	d3.select("#sidebar_svg").attr("visibility","visible");
 
 	if (document.getElementById('sidebar_svg') === null) {
-		hpix = 1000 / window.innerHeight;
 		sidebarSVG = d3.select("#mainplot").append("svg")
 			.attr("id","sidebar_svg")
 			.attr("width",330)
-			//.attr("viewBox", "0 0 " + 180 + " " + height + "")
 			.attr("height",height)
 			.style("position", "absolute")
 			.style("top",0)
@@ -157,7 +150,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		d3.select("#sidebarg").append("foreignObject")
 			.attr("x", 10)
 			.attr("y", 30)
-			//.attr("requiredExtensions","http://www.w3.org/1999/xhtml")
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width", "120px")
@@ -309,7 +301,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		sideBarPadding = 0;
 		resizeSidebar();
 	} else {
-		hpix = 1000 / window.innerHeight;
 		resizeSidebar();
 	}
 
@@ -1030,15 +1021,6 @@ function resizeRedraw() {
 }
 
 function resizeSidebar() {
-	/*d3.select("#sidebar_svg").attr("width",180 * hpix);
-	d3.select("#sidebar_svg").select("rect").attr("width", 150 * hpix + "px");
-	d3.select("#sidebar_hide").attr("points",150 * hpix + ",0 " + 150*hpix + "," + 60*hpix + " " + 180*hpix + "," + 30*hpix);
-	d3.select("#sidebar_svg").select("foreignObject")
-		.attr("x", 20*hpix)
-		.attr("y", 80*hpix);
-	d3.select("#SaveInputDiv").style("width", 180*hpix + "px");
-	d3.select("#gearg").attr("transform", "translate(" + 153*hpix + "," + 19*hpix + ") scale(" + .13*hpix + ")"); */
-
 	var curSideMenuHeight = d3.select("#saveInputDiv")[0][0].getBoundingClientRect().bottom;
 	var heightpix = window.innerHeight;
 
@@ -1198,7 +1180,7 @@ function redrawScale() {
 	drawScale();
 }
 
-var uploader = uploader_wrapper.make_uploader(draw_everything, update_progress);
+var uploader = uploader_wrapper.make_uploader(draw_everything, update_picrust_loading_progress, update_table_downloading_progress);
 
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 

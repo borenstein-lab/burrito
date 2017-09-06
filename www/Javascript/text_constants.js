@@ -58,9 +58,11 @@ var upload_step_text = ['File upload', 'Contribution calculation', 'Data validat
 var upload_step_message_text = ['Uploading files', 'Calculating contributions', 'Validating data', 'Processing hierarchies', 'Formatting taxonomic abundances', 'Formatting contributions', 'Formatting hierarchies', 'Formatting average function abundances', 'Formatting metadata'];
 var default_upload_step_text = 'Data processing not yet started';
 var upload_steps_done_text = 'Loading tables';
-var default_loading_bar_progress_text = 'Samples not ready';
-var loading_bars = ['taxonomic_abundance', 'contribution'];
-var loading_bar_text = ['Taxonomic abundance table loading progress', 'Contribution table loading progress'];
+var default_loading_bar_progress_text = 'Data not ready';
+var loading_bars = ['picrust', 'taxonomic_abundance', 'contribution'];
+var loading_bar_text = ['Default genomic content table loading progress', 'Taxonomic abundance table loading progress', 'Contribution table loading progress'];
+var picrust_loading_progress_text = ['Genomic content loaded for ', '/', ' OTUs']
+var table_downloading_progress_text = ['', '/', ' samples loaded']
 
 //// Text for tooltips
 var default_taxonomic_abundance_tooltip_text = '';
@@ -74,6 +76,8 @@ var bipartite_graph_tooltip_text = ['Average contribution to function:<br>', '%'
 //// Text for plots
 var taxonomic_abundance_y_axis_title = 'Relative Abundance (%)';
 var function_abundance_y_axis_title = 'Relative Abundance (%)';
+var taxa_based_bar_label = "T";
+var metagenome_based_bar_label = "M";
 
 //// Text for help overlay
 var option_menu_help_text = 'Click to access the options menu';
