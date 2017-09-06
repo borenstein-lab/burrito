@@ -11,11 +11,14 @@ add_upload_step = function(upload_step_name, initial_text, step_number, upload_s
 			.attr("x", xpos)
 			.attr("y", ypos)
 			.attr("width", width / (upload_steps.length + 1))
+			.attr("height", width * 0.005)
+			.attr("transform", "translate(0, " + (width * -0.0025) + ")")
 	}
 
 	upload_stepg.append("circle")
 		.attr("cx", xpos)
 		.attr("cy", ypos)
+		.attr("r", width * 0.01)
 
 	// Uncomment to add text underneath the circle for each step
 	// var upload_text = upload_stepsg.append("text")
@@ -41,10 +44,13 @@ add_table_loading_bar = function(loading_bar_name, loading_bar_text, ypos, loadg
 	loadg.append("text")
 		.attr("x", width / 2)
 		.attr("y", ypos)
-		.attr("class", "loading_text above_bar")
+		.attr("class", "loading_text")
 		.attr("text-anchor", "middle")
 		.attr("alignment-baseline", "baseline")
+		.attr("dominant-baseline", "baseline")
+		.attr("dy", "-0.75em")
 		.text(loading_bar_text)
+		.attr("transform", "translate(0, " + (height * -0.0125) + ")")
 
 	loadg.append("rect")
 		.attr("id", loading_bar_name + "_background")
@@ -52,6 +58,8 @@ add_table_loading_bar = function(loading_bar_name, loading_bar_text, ypos, loadg
 		.attr("x", xpos)
 		.attr("y", ypos)
 		.attr("width", bar_width)
+		.attr("height", height * 0.025)
+		.attr("transform", "translate(0, " + (height * -0.0125) + ")")
 
 	loadg.append("rect")
 		.attr("id", loading_bar_name + "_loading_bar")
@@ -59,15 +67,20 @@ add_table_loading_bar = function(loading_bar_name, loading_bar_text, ypos, loadg
 		.attr("x", xpos)
 		.attr("y", ypos)
 		.attr("width", 0)
+		.attr("height", height * 0.025)
+		.attr("transform", "translate(0, " + (height * -0.0125) + ")")
 
 	loadg.append("text")
 		.attr("id", loading_bar_name + "_loading_text")
-		.attr("class", "loading_text below_bar")
+		.attr("class", "loading_text")
 		.attr("x", width / 2)
 		.attr("y", ypos)
 		.attr("text-anchor", "middle")
 		.attr("alignment-baseline", "hanging")
+		.attr("dominant-baseline", "hanging")
+		.attr("dy", "0.75em")
 		.text(default_loading_bar_progress_text)
+		.attr("transform", "translate(0, " + (height * 0.0125) + ")")
 }
 
 draw_loading = function(width, height, using_picrust){
@@ -96,6 +109,7 @@ draw_loading = function(width, height, using_picrust){
 		.attr("y", (height / (2 + num_loading_bars)))
 		.attr("text-anchor", "middle")
 		.attr("alignment-baseline", "hanging")
+		.attr("dominant-baseline", "hanging")
 		.text(default_upload_step_text)
 
 	var loading_barsg = loadg.append("g")
