@@ -20,6 +20,15 @@
 	
 	mainui.createUI = function() {
 
+		// Reset all file inputs to avoid caching file names
+		var inputs = document.getElementsByTagName('input')
+
+		for (var i = 0; i < inputs.length; i++){
+			if (inputs[i].getAttribute('type') == 'file'){
+				inputs[i].value = '';
+			}
+		}
+
 		document.getElementById("update_button").addEventListener("click", function() {
 			uploader.reset_load_flags();
 			if (mainui.uploadMode == "example"){
