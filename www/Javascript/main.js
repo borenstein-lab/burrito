@@ -39,7 +39,9 @@ draw_svg = function() {
 		MainSVG = d3.select("#mainplot").append("svg")
 			.attr("id","mainsvg")
 			.attr("viewBox","0 0 " + width + " " + height + "")
-			.attr("preserveAspectRatio","none");
+			.attr("preserveAspectRatio","none")
+			.attr("display","inline")
+			.style("position","absolute");
 
 		uploader.svgCreated = true;	
 		plotSVG = d3.select("#mainsvg").append("svg")
@@ -48,17 +50,71 @@ draw_svg = function() {
 			.attr("preserveAspectRatio","none")
 			.style("font-family", "Verdana");
 	
-		sidebarSVG = d3.select("#mainsvg").append("svg")
+				
+		//d3.select("#sidebar_svg").attr("visibility","hidden");
+
+		draw_loading(width, height);
+
+		d3.select("#mainplot").append("div")
+			.attr("id", "sidediv")
+			.style("position", "absolute")
+			.style("top", 0)
+			.style("left", 0)
+			.append("text").text("sidetest");
+	}
+}
+
+draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
+	
+	var grouping = null;
+	if (mainui.uploadMode == "example"){
+		grouping = "Group";
+	} else {
+		grouping = document.getElementById("metadata_factor_selector").value;
+	}
+	
+	// Find the new window size, adjust the aspect ratio
+	aspecrat = window.innerWidth / window.innerHeight;
+	width = aspecrat * 1000;
+	if (showScale) {
+		margin.right = 20 + (width * 0.1);
+	} else {
+		margin.right = 20;
+	}
+	barDimensions = {width: (width - margin.left - margin.right - margin.btwbars) /2, height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
+	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
+	navDims.treewidth = navDims.width * 2/9;
+	bpdims = {height:navDims.height, width: navDims.width, header:margin.top, treewidth: navDims.treewidth};
+	
+	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
+	plotSVG.attr("viewBox","0 0 " + width + " " + height + "")
+	
+	d3.select("#navbar").remove()
+	d3.select("#taxa_bars").remove()
+	d3.select("#func_bars").remove()
+	d3.select("#scalebar").remove()
+	d3.select("#loadingG").remove()
+	
+	d3.select("#sidebar_svg").attr("visibility","visible");
+
+	if (document.getElementById('sidebar_svg') === null) {
+		hpix = 1000 / window.innerHeight;
+		sidebarSVG = d3.select("#mainplot").append("svg")
 			.attr("id","sidebar_svg")
-			.attr("x",-150)
+			.attr("x",-150 * hpix)
 			.attr("y",0)
-			.attr("width",180)
-			.attr("height",height);
-		
+			.attr("width",180 * hpix)
+			//.attr("viewBox", "0 0 " + 180 + " " + height + "")
+			.attr("height",height)
+			.style("position", "absolute")
+			.style("top",0)
+			.style("left",0)
+			.attr("display","inline");
+	
 		sidebarSVG.append("rect")
 			.attr("x",0)
 			.attr("y",0)
-			.attr("width",150)
+			.attr("width",150 * hpix)
 			.attr("height",height)
 			.attr("fill","#E6E6E6");
 
@@ -77,7 +133,7 @@ draw_svg = function() {
 			var sidebarz = d3.select("#sidebar_svg");
 			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
 			if (curpos > -10) {
-				sidebarz.transition().attr("x",-150);
+				sidebarz.transition().attr("x",-150 * hpix);
 				d3.select("#sidebar_hide")
 					.attr("points","150,0 150,60 180,30")
 					.attr("fill","#D0D0D0");
@@ -93,15 +149,15 @@ draw_svg = function() {
 
 		
 		d3.select("#sidebar_svg").append("foreignObject")
-			.attr("x", 20)
-			.attr("y", 80)
+			.attr("x", 20 * hpix)
+			.attr("y", 80 * hpix)
 			//.attr("requiredExtensions","http://www.w3.org/1999/xhtml")
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
-			.style("width","120px")
+			.style("width",120 * hpix + "px")
 			.html("<div id='figure_ex_buttons'><p>" +
 				output_prefix_text + "</p>" + 
-				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><p>" + 
+				"<input style='width:" + 110 * hpix + "px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><p>" + 
 				image_format_text + "</p>" +
 				"<form action=''><label id='PNGoptionsel'> <input type='radio' name='format' value='PNG' checked='checked'>" +
 				png_format_text + "</label><label><input type='radio' name='format' value='SVG'>" +
@@ -240,45 +296,10 @@ draw_svg = function() {
 			currently_displayed_functions = [];
 			data_cube = null;
 		})
-		
-		d3.select("#sidebar_svg").attr("visibility","hidden");
-
-		draw_loading(width, height);
-	}
-}
-
-draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
-	
-	var grouping = null;
-	if (mainui.uploadMode == "example"){
-		grouping = "Group";
 	} else {
-		grouping = document.getElementById("metadata_factor_selector").value;
+		hpix = 1000 / window.innerHeight;
+		//resizeSidebar();
 	}
-	
-	// Find the new window size, adjust the aspect ratio
-	aspecrat = window.innerWidth / window.innerHeight;
-	width = aspecrat * 1000;
-	if (showScale) {
-		margin.right = 20 + (width * 0.1);
-	} else {
-		margin.right = 20;
-	}
-	barDimensions = {width: (width - margin.left - margin.right - margin.btwbars) /2, height: (height / 2) - margin.bottom - (margin.btwnavbar/2) };
-	navDims = {width: (width - margin.left - margin.right), height: (height/2) - margin.top - (margin.btwbars/2)};
-	navDims.treewidth = navDims.width * 2/9;
-	bpdims = {height:navDims.height, width: navDims.width, header:margin.top, treewidth: navDims.treewidth};
-	
-	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
-	plotSVG.attr("viewBox","0 0 " + width + " " + height + "")
-	
-	d3.select("#navbar").remove()
-	d3.select("#taxa_bars").remove()
-	d3.select("#func_bars").remove()
-	d3.select("#scalebar").remove()
-	d3.select("#loadingG").remove()
-	
-	d3.select("#sidebar_svg").attr("visibility","visible");
 
 	if (document.getElementById('help_svg') === null) {					
 		helpSVG = d3.select("#mainsvg").append("svg")
@@ -994,6 +1015,17 @@ function resizeRedraw() {
 		}
 		endBusy();
 	}, 100)
+}
+
+function resizeSidebar() {
+	d3.select("#sidebar_svg").attr("width",180 * hpix);
+	d3.select("#sidebar_svg").select("rect").attr("width", 150 * hpix + "px");
+	d3.select("#sidebar_hide").attr("points",150 * hpix + ",0 " + 150*hpix + "," + 60*hpix + " " + 180*hpix + "," + 30*hpix);
+	d3.select("#sidebar_svg").select("foreignObject")
+		.attr("x", 20*hpix)
+		.attr("y", 80*hpix);
+	d3.select("#SaveInputDiv").style("width", 180*hpix + "px");
+	d3.select("#gearg").attr("transform", "translate(" + 153*hpix + "," + 19*hpix + ") scale(" + .13*hpix + ")");
 }
 
 function makeBusy() {
