@@ -1,30 +1,30 @@
 Sample	Group	Treatment	Day
-Cef2dayrec21	1	Antibiotic	2
-Cef2dayrec22	1	Antibiotic	2
-Cef2dayrec23	1	Antibiotic	2
-Cef2dayrec25	1	Antibiotic	2
-Cef2dayrec26	1	Antibiotic	2
-Cef2dayrec28	1	Antibiotic	2
-Cef6wkrec13	2	Antibiotic	42
-Cef6wkrec14	2	Antibiotic	42
-Cef6wkrec15	2	Antibiotic	42
-Cef6wkrec16	2	Antibiotic	42
-Cef6wkrec17	2	Antibiotic	42
-Cef6wkrec18	2	Antibiotic	42
-Cef6wkrec19	2	Antibiotic	42
-Cef6wkrec20	2	Antibiotic	42
-NoAbx29	3	Control	2
-NoAbx31	3	Control	2
-NoAbx32	3	Control	2
-NoAbx33	3	Control	2
-NoAbx34	3	Control	2
-NoAbx35	3	Control	2
-NoAbx36	3	Control	2
-NoAbx6wkrec37	4	Control	42
-NoAbx6wkrec38	4	Control	42
-NoAbx6wkrec39	4	Control	42
-NoAbx6wkrec40	4	Control	42
-NoAbx6wkrec41	4	Control	42
-NoAbx6wkrec42	4	Control	42
-NoAbx6wkrec43	4	Control	42
-NoAbx6wkrec44	4	Control	42
+Cef2dayrec21	ABX Day 2	Antibiotic	2
+Cef2dayrec22	ABX Day 2	Antibiotic	2
+Cef2dayrec23	ABX Day 2	Antibiotic	2
+Cef2dayrec25	ABX Day 2	Antibiotic	2
+Cef2dayrec26	ABX Day 2	Antibiotic	2
+Cef2dayrec28	ABX Day 2	Antibiotic	2
+Cef6wkrec13	ABX Day 42	Antibiotic	42
+Cef6wkrec14	ABX Day 42	Antibiotic	42
+Cef6wkrec15	ABX Day 42	Antibiotic	42
+Cef6wkrec16	ABX Day 42	Antibiotic	42
+Cef6wkrec17	ABX Day 42	Antibiotic	42
+Cef6wkrec18	ABX Day 42	Antibiotic	42
+Cef6wkrec19	ABX Day 42	Antibiotic	42
+Cef6wkrec20	ABX Day 42	Antibiotic	42
+NoAbx29	Control Day 2	Control	2
+NoAbx31	Control Day 2	Control	2
+NoAbx32	Control Day 2	Control	2
+NoAbx33	Control Day 2	Control	2
+NoAbx34	Control Day 2	Control	2
+NoAbx35	Control Day 2	Control	2
+NoAbx36	Control Day 2	Control	2
+NoAbx6wkrec37	Control Day 42	Control	42
+NoAbx6wkrec38	Control Day 42	Control	42
+NoAbx6wkrec39	Control Day 42	Control	42
+NoAbx6wkrec40	Control Day 42	Control	42
+NoAbx6wkrec41	Control Day 42	Control	42
+NoAbx6wkrec42	Control Day 42	Control	42
+NoAbx6wkrec43	Control Day 42	Control	42
+NoAbx6wkrec44	Control Day 42	Control	42
