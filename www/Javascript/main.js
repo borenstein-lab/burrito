@@ -11,6 +11,7 @@ var data_cube;
 var currently_displayed_taxa = [];
 var currently_displayed_functions = [];
 var resize_timeout;
+var sideBarPadding;
 var curr_window_width = window.innerWidth;
 var curr_window_height = window.innerHeight;
 
@@ -55,12 +56,12 @@ draw_svg = function() {
 
 		draw_loading(width, height);
 
-		d3.select("#mainplot").append("div")
+		/*d3.select("#mainplot").append("div")
 			.attr("id", "sidediv")
 			.style("position", "absolute")
 			.style("top", 0)
 			.style("left", 0)
-			.append("text").text("sidetest");
+			.append("text").text("sidetest");*/
 	}
 }
 
@@ -101,45 +102,50 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		hpix = 1000 / window.innerHeight;
 		sidebarSVG = d3.select("#mainplot").append("svg")
 			.attr("id","sidebar_svg")
-			.attr("x",-150 * hpix)
-			.attr("y",0)
-			.attr("width",180 * hpix)
+			.attr("width",330)
 			//.attr("viewBox", "0 0 " + 180 + " " + height + "")
 			.attr("height",height)
 			.style("position", "absolute")
 			.style("top",0)
-			.style("left",0)
+			.style("left","-150px")
 			.attr("display","inline");
 	
-		sidebarSVG.append("rect")
+		sidebarg = sidebarSVG.append("g")
+			.attr("id", "sidebarg")
+			.attr("transform", "translate(0,0)");
+
+		sidebarg.append("rect")
 			.attr("x",0)
 			.attr("y",0)
-			.attr("width",150 * hpix)
+			.attr("width",150)
 			.attr("height",height)
 			.attr("fill","#E6E6E6");
 
-		d3.select("#sidebar_svg").append("polygon")
+		d3.select("#sidebarg").append("polygon")
 			.attr("id","sidebar_hide")
 			.attr("points","150,0 150,60 180,30")
 			.attr("fill","#D0D0D0");
 
-		d3.select("#sidebar_svg").append("g")
+		d3.select("#sidebarg").append("g")
 			.attr("id", "gearg")
 			.attr("transform", "translate(153,19) scale(.13)")
 			.append("path")
 				.attr("d", "m 50,0 0,29.98828 -15.8457,6.56641 -21.08789,-21.33984 -17.80469,18.18359 20.45703,20.83398 -6.72461,16.28907 -29.45117,0.0312 -0.004,26.08789 29.99024,0 6.5664,15.8457 -21.33984,21.08789 18.18164,17.80274 20.83594,-20.45508 16.28711,6.72461 0.0332,29.45117 25.82813,0 0.0312,-29.45117 16.28711,-6.72461 20.83593,20.45508 18.18164,-17.80274 -21.33984,-21.08789 6.56641,-15.8457 29.99023,0 -0.002,-26.08789 -29.45313,-0.0312 -6.72461,-16.28907 20.45703,-20.83398 -17.80468,-18.18359 -21.08594,21.33984 -15.84766,-6.56641 0,-29.98828 -26.01367,0 z m 13.00781,49.45703 a 34.092648,34.092648 0 0 1 34.0918,34.0918 34.092648,34.092648 0 0 1 -34.0918,34.09375 34.092648,34.092648 0 0 1 -34.09375,-34.09375 34.092648,34.092648 0 0 1 34.09375,-34.0918 z");
 
 		document.getElementById("sidebar_hide").addEventListener('click', function() {
-			var sidebarz = d3.select("#sidebar_svg");
-			var curpos = parseFloat(sidebarz[0][0].attributes.x.value);
-			if (curpos > -10) {
-				sidebarz.transition().attr("x",-150 * hpix);
+			var sidebarz = d3.select("#sidebarg");
+			var str = sidebarz[0][0].attributes.transform.value;
+			var mats = [];
+			str.match(/\d+/g).forEach(function(i,j) {mats[j] = parseFloat(i);});
+			var curpos = mats[0];
+			if (curpos > 10) {
+				sidebarz.transition().attr("transform","translate(0,0)");
 				d3.select("#sidebar_hide")
 					.attr("points","150,0 150,60 180,30")
 					.attr("fill","#D0D0D0");
 				d3.select("#gearg").attr("transform", "translate(153,19) scale(.13)");
 			} else {
-				sidebarz.transition().attr("x",0);
+				sidebarz.transition().attr("transform","translate(150,0)");
 				d3.select("#sidebar_hide")
 					.attr("points","120,30 150,0 150,60")
 					.attr("fill","#606060");
@@ -148,20 +154,22 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		});
 
 		
-		d3.select("#sidebar_svg").append("foreignObject")
-			.attr("x", 20 * hpix)
-			.attr("y", 80 * hpix)
+		d3.select("#sidebarg").append("foreignObject")
+			.attr("x", 10)
+			.attr("y", 30)
 			//.attr("requiredExtensions","http://www.w3.org/1999/xhtml")
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
-			.style("width",120 * hpix + "px")
-			.html("<div id='figure_ex_buttons'><p>" +
+			.style("width", "120px")
+			.html("<div id='figure_ex_buttons'>" + 
+				"<div id='prefixdiv'><p>" +
 				output_prefix_text + "</p>" + 
-				"<input style='width:" + 110 * hpix + "px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'><p>" + 
+				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'></div>" + 
+				"<div id='imgformatdiv'><p>" + 
 				image_format_text + "</p>" +
 				"<form action=''><label id='PNGoptionsel'> <input type='radio' name='format' value='PNG' checked='checked'>" +
 				png_format_text + "</label><label><input type='radio' name='format' value='SVG'>" +
-				svg_format_text + "</label></form>" + 
+				svg_format_text + "</label></form></div>" + 
 				"<button id='save_screenshot' class='savebutton' type='button'>" + 
 				save_screenshot_text + "</button>" +	
 				"<button id='save_taxa_bar' class='savebutton' type='button'>" +
@@ -289,6 +297,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 		document.getElementById('return_to_upload').addEventListener('click', function(){
 			d3.select("#mainsvg").remove();
+			d3.select("#sidebar_svg").remove();
 			d3.select("body").classed("svgBody", false);
 			mainui.uploadMode = "";
 			uploader.reset_load_flags();
@@ -296,9 +305,12 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			currently_displayed_functions = [];
 			data_cube = null;
 		})
+
+		sideBarPadding = 0;
+		resizeSidebar();
 	} else {
 		hpix = 1000 / window.innerHeight;
-		//resizeSidebar();
+		resizeSidebar();
 	}
 
 	if (document.getElementById('help_svg') === null) {					
@@ -1018,14 +1030,28 @@ function resizeRedraw() {
 }
 
 function resizeSidebar() {
-	d3.select("#sidebar_svg").attr("width",180 * hpix);
+	/*d3.select("#sidebar_svg").attr("width",180 * hpix);
 	d3.select("#sidebar_svg").select("rect").attr("width", 150 * hpix + "px");
 	d3.select("#sidebar_hide").attr("points",150 * hpix + ",0 " + 150*hpix + "," + 60*hpix + " " + 180*hpix + "," + 30*hpix);
 	d3.select("#sidebar_svg").select("foreignObject")
 		.attr("x", 20*hpix)
 		.attr("y", 80*hpix);
 	d3.select("#SaveInputDiv").style("width", 180*hpix + "px");
-	d3.select("#gearg").attr("transform", "translate(" + 153*hpix + "," + 19*hpix + ") scale(" + .13*hpix + ")");
+	d3.select("#gearg").attr("transform", "translate(" + 153*hpix + "," + 19*hpix + ") scale(" + .13*hpix + ")"); */
+
+	var curSideMenuHeight = d3.select("#saveInputDiv")[0][0].getBoundingClientRect().bottom;
+	var heightpix = window.innerHeight;
+
+	var elemheight = curSideMenuHeight - sideBarPadding;
+	var spacingheight = Math.max(0,heightpix - elemheight) * 0.96;
+
+	d3.select("#figure_ex_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
+	d3.select("#download_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
+	d3.select("#legendswitch").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
+	d3.select("#saveInputDiv").selectAll(".savebutton").style("margin-bottom", spacingheight * (0.4 / 9) + "px");
+	d3.select("#prefixdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
+	d3.select("#imgformatdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
+	sideBarPadding = spacingheight;
 }
 
 function makeBusy() {

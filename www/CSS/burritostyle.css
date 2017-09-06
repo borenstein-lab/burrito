@@ -235,13 +235,12 @@ input {
 	font-size: 15;
 }
 #figure_ex_buttons {
-	padding-bottom: 10vh;
+	//padding-bottom: 10vh;
 }
 #download_buttons {
-	padding-bottom: 10vh;
+	//padding-bottom: 10vh;
 }
 #legendswitch {
-	padding-bottom: 5vh;
 }
 #PNGoptionsel {
 	padding-right: 20px;
@@ -250,12 +249,12 @@ input {
 	width: 110px;
 }
 #figure_ex_buttons button {
-	margin-bottom: 2vh;
+	//margin-bottom: 2vh;
 }
 #figure_ex_buttons input {
-	margin-bottom: 2vh;
+	//margin-bottom: 2vh;
 }
 #download_buttons button {
-	margin-bottom: 2vh;
+	//margin-bottom: 2vh;
 }
 white-space: pre-line;
