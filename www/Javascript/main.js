@@ -57,7 +57,7 @@ draw_svg = function() {
 		}
 		
 		window.scrollTo(0,0);
-		draw_loading(width, height);
+		draw_loading(width, height, using_picrust);
 	}
 }
 
