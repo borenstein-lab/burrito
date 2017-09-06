@@ -55,7 +55,8 @@ draw_svg = function() {
 		if (document.getElementById("picrust").checked & mainui.uploadMode != "example"){
 			using_picrust = true;
 		}
-
+		
+		window.scrollTo(0,0);
 		draw_loading(width, height);
 	}
 }
