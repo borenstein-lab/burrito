@@ -354,7 +354,8 @@
                 .attr("class", "sample_type_label")
                 .attr("x", 0)
                 .attr("y", graphdims.sample_label_buffer)
-                .attr("transform", "translate(" + (sample_x - graphdims.sample_buffer) + "," + graphdims.sample_label_buffer + ")")
+                .attr("text-anchor", "middle")
+                .attr("transform", "translate(" + (sample_x + (x.rangeBand() / 2)- graphdims.sample_buffer) + "," + graphdims.sample_label_buffer + ")")
                 .text(taxa_based_bar_label)
             var comparison_x = sample_x + x.rangeBand()
             d3.select("#func_x_axis")
@@ -362,7 +363,8 @@
                 .attr("class", "sample_type_label")
                 .attr("x", 0)
                 .attr("y", graphdims.sample_label_buffer)
-                .attr("transform", "translate(" + (comparison_x - graphdims.sample_buffer) + "," + graphdims.sample_label_buffer + ")")
+                .attr("text-anchor", "middle")
+                .attr("transform", "translate(" + (comparison_x + (x.rangeBand() / 2) - graphdims.sample_buffer) + "," + graphdims.sample_label_buffer + ")")
                 .text(metagenome_based_bar_label)
           // }
         }
