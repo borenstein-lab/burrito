@@ -655,6 +655,7 @@
 			thisnode = thisnode.parent;
 			thisNparents.push(thisnode);
 		}
+		thisNparents.pop();
 		var node = trees.SVGs[data.type].selectAll("g.node");
 		
 		data.notthisandparents = node.filter(function(d2) {
