@@ -302,17 +302,29 @@ shinyServer(function(input, output, session) {
 			# If a custom taxonomic hierarchy has been uploaded, we refer to it
 			if (!is.null(input$custom_taxonomic_hierarchy_table)){
 
-				# Read in the taxonomic hierarchy table
-				taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
+				isolate({
 
-				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
-				if (ncol(taxonomic_hierarchy_table) > 1){
-					session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", colnames(taxonomic_hierarchy_table)[c(2:ncol(taxonomic_hierarchy_table), 1)])
+					# Read in the taxonomic hierarchy table
+					taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
 
-				# Otherwise with a single column the order of the single label doesn't matter
-				} else {
-					session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", list(colnames(taxonomic_hierarchy_table)))
-				}
+					# If we weren't able to read the taxonomic hierarchy table, report that the file was an invalid table format
+					if (is.null(taxonomic_hierarchy_table)){
+						session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", list("N/A"))
+						session$sendCustomMessage("abort", "The selected taxonomic hierarchy table was in an invalid table format. Please select a file in a valid table format.")
+
+					# Otherwise, get the column names of the hierarchy
+					} else {
+
+						# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
+						if (ncol(taxonomic_hierarchy_table) > 1){
+							session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", colnames(taxonomic_hierarchy_table)[c(2:ncol(taxonomic_hierarchy_table), 1)])
+
+						# Otherwise with a single column the order of the single label doesn't matter
+						} else {
+							session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", list(colnames(taxonomic_hierarchy_table)))
+						}
+					}
+				})
 
 			# Otherwise, we send the N/A string
 			} else {
@@ -333,17 +345,28 @@ shinyServer(function(input, output, session) {
 			# If a custom function hierarchy has been uploaded, we refer to it
 			if (!is.null(input$custom_function_hierarchy_table)){
 
-				# Read in the funciton hierarchy table
-				function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
+				isolate({
 
-				# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
-				if (ncol(function_hierarchy_table) > 1){
-					session$sendCustomMessage("function_hierarchy_dropdown_labels", colnames(function_hierarchy_table)[c(2:ncol(function_hierarchy_table), 1)])
+					# Read in the funciton hierarchy table
+					function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
 
-				# Otherwise with a single column the order of the single label doesn't matter
-				} else {
-					session$sendCustomMessage("function_hierarchy_dropdown_labels", list(colnames(function_hierarchy_table)))
-				}
+					# If we weren't able to read the taxonomic hierarchy table, report that the file was an invalid table format
+					if (is.null(function_hierarchy_table)){
+						session$sendCustomMessage("function_hierarchy_dropdown_labels", list("N/A"))
+						session$sendCustomMessage("abort", "The selected function hierarchy table was in an invalid table format. Please select a file in a valid table format.")
+
+					# Otherwise, get the column names of the hierarchy
+					} else {
+						# If there is more than one column, then resolution order is highest at the first column and then from lowest to second highest from left to right for the rest of the columns, so reorder the labels
+						if (ncol(function_hierarchy_table) > 1){
+							session$sendCustomMessage("function_hierarchy_dropdown_labels", colnames(function_hierarchy_table)[c(2:ncol(function_hierarchy_table), 1)])
+
+						# Otherwise with a single column the order of the single label doesn't matter
+						} else {
+							session$sendCustomMessage("function_hierarchy_dropdown_labels", list(colnames(function_hierarchy_table)))
+						}
+					}
+				})
 
 			# Otherwise, we send the N/A string
 			} else {
@@ -364,16 +387,28 @@ shinyServer(function(input, output, session) {
 			# If the metadata table has been uploaded, we refer to it
 			if (!is.null(input$metadata_table)){
 
-				metadata_table = process_input_file('metadata_table')
+				isolate ({
 
-				# If there is only one column, then we send the N/A string
-				if (ncol(metadata_table) < 2){
-					session$sendCustomMessage("metadata_table_labels", list("N/A"))
+					metadata_table = process_input_file('metadata_table')
 
-				# Otherwise, we can send the non-sample columns, lead by the N/A option as the default
-				} else {
-					session$sendCustomMessage("metadata_table_labels", c("N/A", colnames(metadata_table)[2:ncol(metadata_table)]))
-				}
+					# If we weren't able to read the metadata table, report that the file was an invalid table format
+					if (is.null(metadata_table)){
+						session$sendCustomMessage("metadata_table_labels", list("N/A"))
+						session$sendCustomMessage("abort", "The selected sample grouping table was in an invalid table format. Please select a file in a valid table format.")
+
+					# Otherwise, get the column names of the hierarchy
+					} else {
+
+						# If there is only one column, then we send the N/A string
+						if (ncol(metadata_table) < 2){
+							session$sendCustomMessage("metadata_table_labels", list("N/A"))
+
+						# Otherwise, we can send the non-sample columns, lead by the N/A option as the default
+						} else {
+							session$sendCustomMessage("metadata_table_labels", c("N/A", colnames(metadata_table)[2:ncol(metadata_table)]))
+						}
+					}
+				})
 
 			# Otherwise, we send the N/A string
 			} else {
@@ -467,12 +502,17 @@ shinyServer(function(input, output, session) {
 		# Read the table and return it
 		input_table = NULL
 
-		# If the file is gzipped, we unzip and read it, otherwise just read it normally
-		if (grepl("gz$", input_table_file_name)){
-		  input_table = fread(paste('zcat ', input_table_file_path, sep=""), header=TRUE)
-		} else {
-		  input_table = fread(input_table_file_path, header=TRUE)
-		}
+		tryCatch({
+			# If the file is gzipped, we unzip and read it, otherwise just read it normally
+			if (grepl("gz$", input_table_file_name)){
+			  input_table = fread(paste('zcat ', input_table_file_path, sep=""), header=TRUE)
+			} else {
+			  input_table = fread(input_table_file_path, header=TRUE)
+			}
+		}, error = function(e) {
+			input_table = NULL
+		})
+
 		return(input_table)
 	}
 
@@ -634,33 +674,35 @@ shinyServer(function(input, output, session) {
 		# Read the otu table
 		otu_table = process_input_file("taxonomic_abundance_table")
 		
-		# If we were able to read the otu table, check the number of columns, duplicate rows, and duplicate samples
-		if (!is.null(otu_table)){
+		# If we weren't able to read the otu table, report that the file was an invalid table format
+		if (is.null(otu_table)){
+			session$sendCustomMessage("abort", "The selected taxonomic abundance table was in an invalid table format. Please select a file in a valid table format.")
+			return(NULL)
+		}
+		
+		# Check that there is more than 1 column
+		column_num_validated = validate_number_of_columns(otu_table, 1, 'gt', "OTU table")
 
-			# Check that there is more than 1 column
-			column_num_validated = validate_number_of_columns(otu_table, 1, 'gt', "OTU table")
+		# If there were fewer than 2 columns, return NULL
+		if (!column_num_validated){
+			return(NULL)
+		}
 
-			# If there were fewer than 2 columns, return NULL
-			if (!column_num_validated){
-				return(NULL)
-			}
+		# Rename the OTU label column for consistency
+		colnames(otu_table)[1] = first_taxonomic_level()
 
-			# Rename the OTU label column for consistency
-			colnames(otu_table)[1] = first_taxonomic_level()
+		unique_otus_validated = validate_unique_rows(otu_table, first_taxonomic_level(), "taxa", "OTU table")
 
-			unique_otus_validated = validate_unique_rows(otu_table, first_taxonomic_level(), "taxa", "OTU table")
+		# If there are duplicated OTUs, return NULL
+		if (!unique_otus_validated){
+			return(NULL)
+		}
 
-			# If there are duplicated OTUs, return NULL
-			if (!unique_otus_validated){
-				return(NULL)
-			}
+		unique_samples_validated = validate_unique_columns(otu_table, 2:ncol(otu_table), "samples", "OTU table")
 
-			unique_samples_validated = validate_unique_columns(otu_table, 2:ncol(otu_table), "samples", "OTU table")
-
-			# If there are duplicated samples, return NULL
-			if (!unique_samples_validated){
-				return(NULL)
-			}
+		# If there are duplicated samples, return NULL
+		if (!unique_samples_validated){
+			return(NULL)
 		}
 
 		# Format the OTU table
@@ -668,7 +710,7 @@ shinyServer(function(input, output, session) {
 
 		# Convert the OTU names to character type
 		otu_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
-		
+
 		return(otu_table)
 	}
 
@@ -688,26 +730,28 @@ shinyServer(function(input, output, session) {
 		# Read in the genomic content table
 		genomic_content_table = process_input_file("genomic_content_table")
 
-		# If we were able to read the genomic content table, check the number of columns and duplicate rows
-		if (!is.null(genomic_content_table)){
+		# If we weren't able to read the genomic content table, report that the file was an invalid table format
+		if (is.null(genomic_content_table)){
+			session$sendCustomMessage("abort", "The selected genomic content table was in an invalid table format. Please select a file in a valid table format.")
+			return(NULL)
+		}
 
-			# Check that there are 3 columns
-			column_num_validated = validate_number_of_columns(genomic_content_table, 3, 'eq', "genomic content table")
+		# Check that there are 3 columns
+		column_num_validated = validate_number_of_columns(genomic_content_table, 3, 'eq', "genomic content table")
 
-			# If there are not exactly 3 columns, return NULL
-			if (!column_num_validated){
-				return(NULL)
-			}
+		# If there are not exactly 3 columns, return NULL
+		if (!column_num_validated){
+			return(NULL)
+		}
 
-			# Rename the ID columns for consistency
-			colnames(genomic_content_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
+		# Rename the ID columns for consistency
+		colnames(genomic_content_table) = c(first_taxonomic_level(), first_function_level(), "copy_number")
 
-			unique_genomic_content_validated = validate_unique_rows(genomic_content_table, c(first_taxonomic_level(), first_function_level()), paste(first_taxonomic_level(), "-", first_function_level(), " pairs", sep=""), "genomic content table")
+		unique_genomic_content_validated = validate_unique_rows(genomic_content_table, c(first_taxonomic_level(), first_function_level()), paste(first_taxonomic_level(), "-", first_function_level(), " pairs", sep=""), "genomic content table")
 
-			# If there is duplicated genomic content, return NULL
-			if (!unique_genomic_content_validated){
-				return(NULL)
-			}
+		# If there is duplicated genomic content, return NULL
+		if (!unique_genomic_content_validated){
+			return(NULL)
 		}
 
 		# Convert the otu names and function names to character type
@@ -733,31 +777,33 @@ shinyServer(function(input, output, session) {
 		# Read in the contribution table
 		contribution_table = process_input_file("contribution_table")
 
-		# If we were able to read the contribution table, check the number of columns and duplicate rows
-		if (!is.null(contribution_table)){
-
-			# Check that there are at least 6 columns
-			column_num_validated = validate_number_of_columns(contribution_table, 6, 'ge', "contribution table")
-
-			# If there are fewer than 6 columns, return NULL
-			if (!column_num_validated){
-				return(NULL)
-			}
-
-			# Reorder and drop columns to match internal contribution table format
-			contribution_table = contribution_table[,c(2,3,1,6),with=F]
-
-			# Rename columns for consistency
-			colnames(contribution_table) = c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution")
-
-			unique_contributions_validated = validate_unique_rows(contribution_table, c(first_metadata_level(), first_taxonomic_level(), first_function_level()), paste("contributions (combinations of ", first_metadata_level(), ", ", first_taxonomic_level(), ", and ", first_function_level(), ")", sep=""), "contribution table")
-
-			# If there are duplicate rows, return NULL
-			if (!unique_contributions_validated){
-				return(NULL)
-			}
+		# If we weren't able to read the contribution table, report that the file was an invalid table format
+		if (is.null(contribution_table)){
+			session$sendCustomMessage("abort", "The selected contribution table was in an invalid table format. Please select a file in a valid table format.")
+			return(NULL)
 		}
 
+		# Check that there are at least 6 columns
+		column_num_validated = validate_number_of_columns(contribution_table, 6, 'ge', "contribution table")
+
+		# If there are fewer than 6 columns, return NULL
+		if (!column_num_validated){
+			return(NULL)
+		}
+
+		# Reorder and drop columns to match internal contribution table format
+		contribution_table = contribution_table[,c(2,3,1,6),with=F]
+
+		# Rename columns for consistency
+		colnames(contribution_table) = c(first_metadata_level(), first_taxonomic_level(), first_function_level(), "contribution")
+
+		unique_contributions_validated = validate_unique_rows(contribution_table, c(first_metadata_level(), first_taxonomic_level(), first_function_level()), paste("contributions (combinations of ", first_metadata_level(), ", ", first_taxonomic_level(), ", and ", first_function_level(), ")", sep=""), "contribution table")
+
+		# If there are duplicate rows, return NULL
+		if (!unique_contributions_validated){
+			return(NULL)
+		}
+	
 		# Convert sample names, otu names, and function names to character type
 		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
 		contribution_table[,(first_taxonomi_level()) := as.character(get(first_taxonomic_level()))]
@@ -785,33 +831,35 @@ shinyServer(function(input, output, session) {
 			# Read in the function abundance table
 			function_abundance_table = process_input_file("function_abundance_table")
 
-			# If we were able to read the function abundance table, check the number of columns, duplicate rows or duplicate samples
-			if (!is.null(function_abundance_table)){
+			# If we weren't able to read the function abundance table, report that the file was an invalid table format
+			if (is.null(function_abundance_table)){
+				session$sendCustomMessage("abort", "The selected function abundance table was in an invalid table format. Please select a file in a valid table format.")
+				return(NULL)
+			}
+			
+			# Check that there are at least two columns
+			column_num_validated = validate_number_of_columns(function_abundance_table, 1, 'gt', "function abundance table")
 
-				# Check that there are at least two columns
-				column_num_validated = validate_number_of_columns(function_abundance_table, 1, 'gt', "function abundance table")
+			# Rename columns for consistency
+			colnames(function_abundance_table)[1] = first_function_level()
 
-				# Rename columns for consistency
-				colnames(function_abundance_table)[1] = first_function_level()
+			# If there is one or fewer columns, return NULL
+			if (!column_num_validated){
+				return(NULL)
+			}
 
-				# If there is one or fewer columns, return NULL
-				if (!column_num_validated){
-					return(NULL)
-				}
+			unique_functions_validated = validate_unique_rows(function_abundance_table, first_function_level(), paste(first_function_level(), "s", sep=""), "function abundance table")
 
-				unique_functions_validated = validate_unique_rows(function_abundance_table, first_function_level(), paste(first_function_level(), "s", sep=""), "function abundance table")
+			# If there are duplicate functions, return NULL
+			if (!unique_functions_validated){
+				return(NULL)
+			}
 
-				# If there are duplicate functions, return NULL
-				if (!unique_functions_validated){
-					return(NULL)
-				}
+			unique_samples_validated = validate_unique_columns(function_abundance_table, 2:ncol(function_abundance_table), "samples", "function abundance table")
 
-				unique_samples_validated = validate_unique_columns(function_abundance_table, 2:ncol(function_abundance_table), "samples", "function abundance table")
-
-				# If there are duplicate samples, return NULL
-				if (!unique_samples_validated){
-					return(NULL)
-				}
+			# If there are duplicate samples, return NULL
+			if (!unique_samples_validated){
+				return(NULL)
 			}
 
 			# Convert the function names to character type
@@ -846,27 +894,29 @@ shinyServer(function(input, output, session) {
 		# Read in the custom taxonomic hierarchy table
 		custom_taxonomic_hierarchy_table = process_input_file("custom_taxonomic_hierarchy_table")
 
-		# If we were able to read the custom taxnomic hierarchy table, check for duplicate rows or taxonomic hierarchy levels
-		if (!is.null(custom_taxonomic_hierarchy_table)){
+		# If we weren't able to read the taxonomic hierarchy table, report that the file was an invalid table format
+		if (is.null(custom_taxonomic_hierarchy_table)){
+			session$sendCustomMessage("abort", "The selected taxonomic hierarchy table was in an invalid table format. Please select a file in a valid table format.")
+			return(NULL)
+		}
 
-			unique_custom_taxonomic_hierarchy_entries_validated = validate_unique_rows(custom_taxonomic_hierarchy_table, first_taxonomic_level(), "taxa", "custom taxonomic hierarchy table")
+		unique_custom_taxonomic_hierarchy_entries_validated = validate_unique_rows(custom_taxonomic_hierarchy_table, first_taxonomic_level(), "taxa", "custom taxonomic hierarchy table")
 
-			# If there are duplicate rows, return NULL
-			if (!unique_custom_taxonomic_hierarchy_entries_validated){
-				return(NULL)
-			}
+		# If there are duplicate rows, return NULL
+		if (!unique_custom_taxonomic_hierarchy_entries_validated){
+			return(NULL)
+		}
 
-			unique_custom_taxonomic_hierarchy_levels_validated = validate_unique_columns(custom_taxonomic_hierarchy_table, 1:ncol(custom_taxonomic_hierarchy_table), "taxonomic hierarchy levels", "custom taxonomic hierarchy table")
+		unique_custom_taxonomic_hierarchy_levels_validated = validate_unique_columns(custom_taxonomic_hierarchy_table, 1:ncol(custom_taxonomic_hierarchy_table), "taxonomic hierarchy levels", "custom taxonomic hierarchy table")
 
-			# If there are duplicate taxonomic hierarchy levels, return NULL
-			if (! unique_custom_taxonomic_hierarchy_levels_validated){
-				return(NULL)
-			}
+		# If there are duplicate taxonomic hierarchy levels, return NULL
+		if (! unique_custom_taxonomic_hierarchy_levels_validated){
+			return(NULL)
 		}
 
 		# Convert all columns in the hierarchy table to character type
 		custom_taxonomic_hierarchy_table = custom_taxonomic_hierarchy_table[,lapply(.SD, as.character)]
-
+		
 		return(custom_taxonomic_hierarchy_table)
 	}
 
@@ -892,28 +942,30 @@ shinyServer(function(input, output, session) {
 		# Read in the custom function hierarchy table
 		custom_function_hierarchy_table = process_input_file("custom_function_hierarchy_table")
 
-		# If we were able to read the custom taxnomic hierarchy table, check for duplicate rows or function hierarchy levels
-		if (!is.null(custom_function_hierarchy_table)){
-
-			unique_custom_function_hierarchy_entries_validated = validate_unique_rows(custom_function_hierarchy_table, first_function_level(), "functions", "custom function hierarchy table")
-
-			# If there are duplicate rows, we return NULL
-			if (!unique_custom_function_hierarchy_entries_validated){
-				return(NULL)
-			}
-
-			unique_custom_function_hierarchy_levels_validated = validate_unique_columns(custom_function_hierarchy_table, 1:ncol(custom_function_hierarchy_table), "function hierarchy levels", "custom function hierarchy table")
-
-			# If there are duplicate function hierarchy levels, we return NULL
-			if (!unique_custom_function_hierarchy_levels_validated){
-				return(NULL)
-			}
-
-			# Replace empty function hierarchy level names with "unknown"
-			custom_function_hierarchy_table[,(colnames(custom_function_hierarchy_table)[2:ncol(custom_function_hierarchy_table)]) := lapply(.SD, function(col){
-					return(gsub("^$", "unknown", gsub("^.__", "", gsub(";$", "", col))))
-				}), .SDcols = 2:ncol(custom_function_hierarchy_table)]
+		# If we weren't able to read the function hierarchy table, report that the file was an invalid table format
+		if (is.null(custom_function_hierarchy_table)){
+			session$sendCustomMessage("abort", "The selected taxonomic abundance table was in an invalid table format. Please select a file in a valid table format.")
+			return(NULL)
 		}
+
+		unique_custom_function_hierarchy_entries_validated = validate_unique_rows(custom_function_hierarchy_table, first_function_level(), "functions", "custom function hierarchy table")
+
+		# If there are duplicate rows, we return NULL
+		if (!unique_custom_function_hierarchy_entries_validated){
+			return(NULL)
+		}
+
+		unique_custom_function_hierarchy_levels_validated = validate_unique_columns(custom_function_hierarchy_table, 1:ncol(custom_function_hierarchy_table), "function hierarchy levels", "custom function hierarchy table")
+
+		# If there are duplicate function hierarchy levels, we return NULL
+		if (!unique_custom_function_hierarchy_levels_validated){
+			return(NULL)
+		}
+
+		# Replace empty function hierarchy level names with "unknown"
+		custom_function_hierarchy_table[,(colnames(custom_function_hierarchy_table)[2:ncol(custom_function_hierarchy_table)]) := lapply(.SD, function(col){
+				return(gsub("^$", "unknown", gsub("^.__", "", gsub(";$", "", col))))
+			}), .SDcols = 2:ncol(custom_function_hierarchy_table)]
 
 		# Convert all columns in the hierarchy table to character type
 		custom_function_hierarchy_table = custom_function_hierarchy_table[,lapply(.SD, as.character)]
@@ -939,23 +991,25 @@ shinyServer(function(input, output, session) {
 			# Read in the metadata table
 			metadata_table = process_input_file("metadata_table")
 
-			# If we were able to read the metadata table, check the number of columns and duplicate rows
-			if (!is.null(metadata_table)){
+			# If we weren't able to read the metadata table, report that the file was an invalid table format
+			if (is.null(metadata_table)){
+				session$sendCustomMessage("abort", "The selected sample grouping table was in an invalid table format. Please select a file in a valid table format.")
+				return(NULL)
+			}
 
-				# Check that there is at least 1 column
-				column_num_validated = validate_number_of_columns(metadata_table, 0, 'gt', "sample grouping table")
-				
-				# If there were no columns, return NULL
-				if (!column_num_validated){
-					return(NULL)
-				}
+			# Check that there is at least 1 column
+			column_num_validated = validate_number_of_columns(metadata_table, 0, 'gt', "sample grouping table")
+			
+			# If there were no columns, return NULL
+			if (!column_num_validated){
+				return(NULL)
+			}
 
-				unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "sample grouping table")
+			unique_metadata_entries_validated = validate_unique_rows(metadata_table, first_metadata_level(), "samples", "sample grouping table")
 
-				# If there are duplicate rows, return NULL
-				if (!unique_metadata_entries_validated){
-					return(NULL)
-				}
+			# If there are duplicate rows, return NULL
+			if (!unique_metadata_entries_validated){
+				return(NULL)
 			}
 
 			return(metadata_table)
