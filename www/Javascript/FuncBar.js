@@ -555,10 +555,11 @@
         return d.func == func;
       });
     current_color = selected.style("fill");
-    var trimstr = func.replace(/\W+/g,'') + "_tx";
+    var trimstr = func.replace(/\W+/g,'') + "_tx_func_bar";
     if (d3.select("#" + trimstr)[0][0] == null) {
       var t = textures.lines()
         .thicker()
+        .orientation("diagonal", "6/8")
         .background(colors(func).brighter(0.2))
         .id(trimstr)
         .stroke("white");
@@ -587,8 +588,9 @@
         return d.Taxa == taxon;
       });
     selected.style("fill", function(d){
-      var trimstr = d.func.replace(/\W+/g,'') + "_tx";
+      var trimstr = d.func.replace(/\W+/g,'') + "_tx_contribution";
       if (d3.select("#" + trimstr)[0][0] == null) {
+        console.log(d.func)
         var t = textures.lines()
           .thicker()
           .background(d3.rgb(colors(d.func)).brighter(0.2))
@@ -612,13 +614,15 @@
   }
 
   fB.select_single_contribution = function(taxon, func, colors, changeAlpha){
+    console.log("select_single_contribution")
+    console.log(taxon + " " + func)
     selected = d3.select("#func_bars")
       .selectAll(".g")
       .selectAll("rect")
       .filter(function(d) {
         return d.func == func && d.Taxa == taxon;
       });
-    var trimstr = func.replace(/\W+/g,'') + "_tx";
+    var trimstr = func.replace(/\W+/g,'') + "_tx_contribution";
     if (d3.select("#" + trimstr)[0][0] == null) {
       var t = textures.lines()
         .thicker()

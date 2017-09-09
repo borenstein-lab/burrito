@@ -310,75 +310,72 @@
 					d3.select(this).style("opacity",1)
 // 					tooltip.style("visibility", "visible")
 															//dehighlight other taxa
-				displayed_taxa.map(function(e,j){
-					if(j != current_data.key1){ //if this should not be highlighted
-						if(d3.select("#Genomes").select(".edges").selectAll(".clicked")
-							.filter(function(f){ 
-								return (f["key1"]==j); }).empty()==false){ //if an edge is clicked that includes this taxon
-									dehighlightall(e, displayed_funcs[current_data.key2], 3, bars_only = false)
-								}  else {
-									dehighlightall(e, displayed_funcs[current_data.key2], 3, bars_only = true)
-								} 
-						d3.select("#Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
-							.classed("highlighted",false)
-							.classed("clicked",false);
+					displayed_taxa.map(function(e,j){
+						if(j != current_data.key1){ //if this should not be highlighted
+							if(d3.select("#Genomes").select(".edges").selectAll(".clicked").filter(function(f){return (f["key1"]==j); }).empty()==false){ //if an edge is clicked that includes this taxon
+								dehighlightall(e, displayed_funcs[current_data.key2], 3, bars_only = false)
+							}  else {
+								dehighlightall(e, displayed_funcs[current_data.key2], 3, bars_only = true)
+							} 
+							d3.select("#Genomes0"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+								.classed("highlighted",false)
+								.classed("clicked",false);
+								
+							bP.deSelectSegment(0, j, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
 							
-						bP.deSelectSegment(0, j, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
-						
-						d3.select("#Genomes").select(".edges").selectAll(".edge")
-							.filter(function(f){ 
-								return (f["key1"]==j); })
-							.classed("clicked", false)
-							.style("opacity",0.3);
+							d3.select("#Genomes").select(".edges").selectAll(".edge")
+								.filter(function(f){ 
+									return (f["key1"]==j); })
+								.classed("clicked", false)
+								.style("opacity",0.3);
 
-					} else{
-					} })
+						} else{
+						}
+					})
 
-				displayed_funcs.map(function(e,j){
-					if(j != current_data.key2){
-						if(d3.select("#Genomes").select(".edges").selectAll(".clicked")
-							.filter(function(f){ 
-								return (f["key2"]==j); }).empty()==false){
-									dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = false)
-								} else {
-									dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = true)
-								}
-						d3.select("#Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted",false)
-						d3.select("#Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked",false)
-						bP.deSelectSegment(1, j, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
-						
-						d3.select("#Genomes").select(".edges").selectAll(".edge")
-							.filter(function(f){ 
-								return (f["key2"]==j); })
-							.classed("clicked", false)
-							.style("opacity",0.3);
-						//dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = false)
-						}else{
-					}
-				})
+					displayed_funcs.map(function(e,j){
+						if(j != current_data.key2){
+							if(d3.select("#Genomes").select(".edges").selectAll(".clicked").filter(function(f){return (f["key2"]==j); }).empty()==false){
+								dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = false)
+							} else {
+								dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = true)
+							}
+							d3.select("#Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted",false)
+							d3.select("#Genomes1"+e.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked",false)
+							bP.deSelectSegment(1, j, taxa_colors, func_colors, displayed_taxa, displayed_funcs)
+							
+							d3.select("#Genomes").select(".edges").selectAll(".edge")
+								.filter(function(f){ 
+									return (f["key2"]==j); })
+								.classed("clicked", false)
+								.style("opacity",0.3);
+							//dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = false)
+							}else{
+						}
+					})
 
-				highlightall(displayed_taxa[current_data.key1], displayed_funcs[current_data.key2],3)
+					highlightall(displayed_taxa[current_data.key1], displayed_funcs[current_data.key2],3)
 				
-				if(d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked")==false){ //if function is clicked already but not taxon
-// 					displayed_taxa.map(function(e,j){ //dehighlight all other funcs
-// 						if(j != current_data.key1){
-// 							dehighlightall(e, "", 1)
-// 						}
-// 					})
-					d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", true)
-					bP.selectSegment(0, current_data.key1, taxa_colors, func_colors, displayed_taxa, displayed_funcs, no_edges = true)
-					//make bold etc
-				} else{ //if taxon is clicked but not function
-// 					displayed_funcs.map(function(e,j){ //dehighlight all other funcs
-// 						if(j != current_data.key2){
-// 							dehighlightall("", e, 2)
-// 						}
-// 					})
-					d3.select("#Genomes1"+displayed_funcs[current_data.key2].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", true)
-					bP.selectSegment(1, current_data.key2, taxa_colors, func_colors, displayed_taxa, displayed_funcs, no_edges = true)
-				}
+					if(d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked")==false){ //if function is clicked already but not taxon
+	// 					displayed_taxa.map(function(e,j){ //dehighlight all other funcs
+	// 						if(j != current_data.key1){
+	// 							dehighlightall(e, "", 1)
+	// 						}
+	// 					})
+						d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", true)
+						bP.selectSegment(0, current_data.key1, taxa_colors, func_colors, displayed_taxa, displayed_funcs, no_edges = true)
+						//make bold etc
+					} else{ //if taxon is clicked but not function
+	// 					displayed_funcs.map(function(e,j){ //dehighlight all other funcs
+	// 						if(j != current_data.key2){
+	// 							dehighlightall("", e, 2)
+	// 						}
+	// 					})
+						d3.select("#Genomes1"+displayed_funcs[current_data.key2].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", true)
+						bP.selectSegment(1, current_data.key2, taxa_colors, func_colors, displayed_taxa, displayed_funcs, no_edges = true)
+					}
 
-				d3.select(this).classed("clicked",true)
+					d3.select(this).classed("clicked",true)
 				}
 			})
 			.transition().duration(300)
@@ -565,14 +562,12 @@
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 
 			if(m==1){
-				var trimstr = displayed_funcs[s].replace(/\W+/g,'') + "_tx";
+				var trimstr = displayed_funcs[s].replace(/\W+/g,'') + "_tx_func_bar";
 				current_color = func_colors(displayed_funcs[s]) 
 			} else {
 				var trimstr = displayed_taxa[s].replace(/\W+/g,'') + "_tx";
 				current_color = taxa_colors(displayed_taxa[s]);
 			}
-			
-
 			if (d3.select("#" + trimstr)[0][0] == null) {
 				col_switch = d3.rgb(current_color)
 				if(col_switch["r"] > 230 ||col_switch["g"] > 230 || col_switch["b"] > 230){
@@ -580,12 +575,23 @@
 					} else {
 					col_fill = col_switch.brighter(0.3)
 					}
-				var t = textures.lines()
+				var t
+				if (m==1){
+					t = textures.lines()
+					  	.thicker()
+					  	.orientation("diagonal", "6/8")
+			    		.background(col_fill)
+						.id(trimstr)
+			    		.stroke("white");
+			    	console.log(trimstr)
+			    	console.log(t.id())
+			    } else {
+			    	t = textures.lines()
 			    		.thicker()
 			    		.background(col_fill)
 						.id(trimstr)
 			    		.stroke("white");
-
+			    }
 				d3.select("#patternsvg").call(t);
 			}
 
@@ -696,7 +702,7 @@
 			selectedBar.select(".barlabel").style('font-weight','bold').style("visibility", "visible");
 
 			if(m==1){
-				var trimstr = displayed_funcs[current_data["key"+(m+1)]].replace(/\W+/g,'') + "_tx";
+				var trimstr = displayed_funcs[current_data["key"+(m+1)]].replace(/\W+/g,'') + "_tx_contribution";
 				current_color = d3.rgb(func_colors(displayed_funcs[current_data["key"+(m+1)]])) 
 			} else {
 				var trimstr = displayed_taxa[current_data["key"+(m+1)]].replace(/\W+/g,'') + "_tx";
