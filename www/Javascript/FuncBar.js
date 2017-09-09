@@ -106,14 +106,17 @@
     var last_sample_x = x(sample_order[sample_order.length - 1]);
 
     //init the tooltip as invisible
+	
+	d3.selectAll("#functooltipdiv").remove();
     var tooltip = d3.select("body")
       .append("div")
+	  .attr("id","functooltipdiv")
       .style("position", "absolute")
       .style("z-index", "10")
       .style("visibility", "hidden")
       .style("background", "lightyellow")
       .style("opacity", "1")
-      .style("border", "0px")    
+      .style("border", "1px")    
       .style("border-radius", "4px")  
       .style("padding","2px")
       .text(default_function_abundance_tooltip_text);

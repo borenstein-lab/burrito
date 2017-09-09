@@ -86,11 +86,11 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	MainSVG.attr("viewBox","0 0 " + width + " " + height + "")
 	plotSVG.attr("viewBox","0 0 " + width + " " + height + "")
 	
-	d3.select("#navbar").remove()
-	d3.select("#taxa_bars").remove()
-	d3.select("#func_bars").remove()
-	d3.select("#scalebar").remove()
-	d3.select("#loadingG").remove()
+	d3.select("#navbar").remove();
+	d3.select("#taxa_bars").remove();
+	d3.select("#func_bars").remove();
+	d3.select("#scalebar").remove();
+	d3.select("#loadingG").remove();
 	
 	d3.select("#sidebar_svg").attr("visibility","visible");
 
@@ -151,6 +151,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		d3.select("#sidebarg").append("foreignObject")
 			.attr("x", 10)
 			.attr("y", 30)
+			.attr("width", 130)
+			.attr("height", height)
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width", "120px")

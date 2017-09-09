@@ -234,14 +234,17 @@
 			.attr("points", bP.edgePolygon2)
 			.classed("highlighted", false);
 			
+		d3.selectAll("#bptooltipdiv").remove();
+
 		var tooltip = d3.select("body")
   			.append("div")
+			.attr("id","bptooltipdiv")
   			.style("position", "absolute")
   			.style("z-index", "10")
   			.style("visibility", "hidden")
-  			.style("background", "lightgrey")
+  			.style("background", "lightyellow")
   			.style("opacity", "1")
-  			.style("border", "0px")    
+  			.style("border", "1px")    
   			.style("border-radius", "4px")  
   			.style("padding","2px")
 			.text(default_bipartite_graph_tooltip_text);

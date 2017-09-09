@@ -60,8 +60,10 @@
     xAxis.scale(x);
     yAxis.scale(y);
     
+	d3.selectAll("#otutooltipdiv").remove();
     var tooltip = d3.select("body")
       .append("div")
+	  .attr("id","otutooltipdiv")
       .style("position", "absolute")
       .style("z-index", "10")
       .style("visibility", "hidden")
