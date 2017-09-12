@@ -139,6 +139,7 @@ path.link {
 #sidebar_hide {
 	stroke:none;
 	stroke-width:2;
+	pointer-events: all;
 }
 table.ExampleTable {
 	border: 1px solid black;
@@ -256,6 +257,15 @@ input {
 }
 #download_buttons button {
 	//margin-bottom: 2vh;
+}
+.g {
+	cursor: pointer;
+}
+#sidebar_svg {
+	pointer-events: none;
+}
+#saveInputDiv {
+	pointer-events: all;
 }
 white-space: pre-line;
 
