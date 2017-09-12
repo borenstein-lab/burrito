@@ -105,4 +105,4 @@ var save_contribution_table_text = 'Download contribution table';
 var return_to_upload_page_text = 'Return to the upload page';
 
 //// Text for messages to user
-var busy_text = 'Busy...';
+var busy_text = 'Rescaling...';

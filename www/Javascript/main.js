@@ -98,7 +98,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		sidebarSVG = d3.select("#mainplot").append("svg")
 			.attr("id","sidebar_svg")
 			.attr("width",330)
-			.attr("height",height)
+			.attr("height",window.innerHeight)
 			.style("position", "absolute")
 			.style("top",0)
 			.style("left","-150px")
@@ -112,7 +112,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			.attr("x",0)
 			.attr("y",0)
 			.attr("width",150)
-			.attr("height",height)
+			.attr("height",window.innerHeight)
 			.attr("fill","#E6E6E6");
 
 		d3.select("#sidebarg").append("polygon")
@@ -152,7 +152,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			.attr("x", 10)
 			.attr("y", 30)
 			.attr("width", 130)
-			.attr("height", height)
+			.attr("height", window.innerHeight)
 		.append("xhtml:div")
 			.attr("id","SaveInputDiv")
 			.style("width", "120px")
@@ -1047,9 +1047,9 @@ function makeBusy() {
 			.attr("id", "resizing_message")
 			.attr("visibility", "visibile");
 		rsmsgg.append("rect")
-			.attr("x", width/2 - 60)
+			.attr("x", width/2 - (150/2))
 			.attr("y", height/2 - 30)
-			.attr("width", 120)
+			.attr("width", 150)
 			.attr("height", 60)
 			.attr("fill","#191817")
 			.attr("rx", 15)
@@ -1066,7 +1066,7 @@ function makeBusy() {
 	} else {
 		d3.select("#resizing_message").attr("visibility","visibile")
 			.select("rect")
-			.attr("x", width / 2 - 60)
+			.attr("x", width / 2 - (150/2))
 			.attr("y", height/2 - 30);
 		d3.select("#resizing_message").select("text")
 			.attr("x", width/2)
