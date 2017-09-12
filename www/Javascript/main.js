@@ -182,7 +182,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				save_contribution_table_text + "</button>" +
 				"</div><div id='legendswitch'>" +
 				"<button id='switch_scale' type='button'>" +
-				switch_scale_text_on + "</button></div>" +
+				switch_scale_text_on + "<button id='open_manual' type='button'>" +
+				open_manual_text +"</button></div>" +
 				"<button id='return_to_upload' type='button'>" + 
 				return_to_upload_page_text + "</button>");
 	
@@ -258,6 +259,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			makeBusy();
 			setTimeout( function() { uploader.update_plots();
 									 endBusy();              } , 10);
+		});
+
+	document.getElementById('open_manual').addEventListener('click', function() {
+		window.open("http://borenstein-lab.github.io/burrito/");
 		});
 
 		document.getElementById('save_function_abundance_table').addEventListener('click', function() {

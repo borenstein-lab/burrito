@@ -91,6 +91,7 @@ var barplot_highlight_help_text = 'Highlight taxa to reveal taxa-specific functi
 //// Text for option menu
 var switch_scale_text_on = 'Display legend';
 var switch_scale_text_off = 'Hide legend';
+var open_manual_text = 'View documentation';
 var output_prefix_text = 'Output file prefix:';
 var image_format_text = 'Image format:';
 var png_format_text = 'PNG';
