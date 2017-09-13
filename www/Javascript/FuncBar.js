@@ -590,7 +590,6 @@
     selected.style("fill", function(d){
       var trimstr = d.func.replace(/\W+/g,'') + "_tx_contribution";
       if (d3.select("#" + trimstr)[0][0] == null) {
-        console.log(d.func)
         var t = textures.lines()
           .thicker()
           .background(d3.rgb(colors(d.func)).brighter(0.2))
@@ -599,7 +598,7 @@
         d3.select("#patternsvg").call(t);
       }
 
-      return "url(#" + trimstr;
+      return "url(#" + trimstr + ")";
     });
   }
 
@@ -614,8 +613,6 @@
   }
 
   fB.select_single_contribution = function(taxon, func, colors, changeAlpha){
-    console.log("select_single_contribution")
-    console.log(taxon + " " + func)
     selected = d3.select("#func_bars")
       .selectAll(".g")
       .selectAll("rect")

@@ -61,6 +61,118 @@ draw_svg = function() {
 	}
 }
 
+	setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
+		//color scale already has core colors set up
+		//1st - divide up color space into number of leaves
+		//then assign each subgroup of leaves alternating extremes
+		//then assign each parent extreme or average value of its children
+		for(j=0; j < main_list.length; j++){
+			if(list_type=="taxa"){
+				var leaves = data_cube.get_leaves(main_list[j], data_cube.taxa_lookup)
+			} else {
+				var leaves = data_cube.get_leaves(main_list[j], data_cube.func_lookup)
+			}
+		    color_range = leaves.length //number of colors to expand in each direction depends on # of leaves
+			//generate variations of core color
+		    var core_color = d3.hcl(color_scale(main_list[j]))
+	    	new_colors = []
+	    	flip = -1
+	    	for(k=0; k < color_range; k++){
+	    		var new_color = d3.hcl()
+	    		if(list_type == "taxa"){
+	    			light_range = 14
+	    			} else {
+	    				light_range = 28
+	    			}
+				new_color["l"] = core_color["l"] - light_range*flip*(k + (k%2))/(color_range+1)
+	      		new_color["h"] = core_color["h"] - 7.5*flip*(k+ (k%2))/(color_range+1)
+	      		new_color["c"] = core_color["c"] - 4*flip*(k+ (k%2))/(color_range+1)
+	      		new_colors.push(d3.hcl(new_color))
+	      		flip *= -1
+	      	}
+			new_colors = new_colors.sort(function(a,b){ return a.l - b.l })
+			
+			
+	      	if(list_type=="taxa"){
+	      		layer1 = data_cube.taxa_lookup[main_list[j]]
+	      		descendents = data_cube.get_descendents(main_list[j], data_cube.taxa_lookup)
+	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.taxa_lookup[d].level == 1 } else { return data_cube.taxa_lookup[d].level == 0 }})
+	      	} else {
+	      		layer1 = data_cube.func_lookup[main_list[j]]
+	      		descendents = data_cube.get_descendents(main_list[j], data_cube.func_lookup)
+	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.func_lookup[d].level == 1 } else { return data_cube.func_lookup[d].level == 0 }})
+	      	}
+	      	num_levels = layer1.level
+
+			
+	      	color_count = 0	      	
+	      	for(k=0; k < first_level.length; k++){
+	      		if(list_type=="taxa"){
+	      			desc_leaves = data_cube.get_leaves(first_level[k], data_cube.taxa_lookup)
+	      		} else {
+	      			desc_leaves = data_cube.get_leaves(first_level[k], data_cube.func_lookup)	      			
+	      		}
+	      		color_slice = new_colors.slice(color_count, color_count + desc_leaves.length) 
+	      		color_count += desc_leaves.length
+	      		
+	      		//add leaf colors to scale
+	      		for(m=0; m < desc_leaves.length; m++){
+	      			if(color_scale.domain().indexOf(desc_leaves[m])==-1){
+	      				if(m % 2==0){ //go from front or back of slice
+			    			color_scale.range().push(color_slice[m].toString())
+	      				} else {
+	      					color_scale.range().push(color_slice[desc_leaves.length-m].toString())
+	      				}
+	      				color_scale(desc_leaves[m])
+	      			}
+	      		}
+	      	}
+	      	//now get the rest of the levels, assign mean or most extreme value of descendents
+	      	if(layer1.level != 1){ level = 1 } else { level = 0; }
+	      	while(level < num_levels){
+	      		if(list_type=="taxa"){
+	      			level_items = descendents.filter(function(d){ return data_cube.taxa_lookup[d].level == level })
+	      		} else {
+	      			level_items = descendents.filter(function(d){ return data_cube.func_lookup[d].level == level })
+	      		}
+	      		parent_color = core_color.toString() //make copy rather than passing by ref
+	      		parent_color = d3.hcl(parent_color)
+	      		for(m=0; m < level_items.length; m++){
+	      			if(list_type=="taxa"){
+	      				desc_leaves = data_cube.get_leaves(level_items[m], data_cube.taxa_lookup)
+	      			} else {
+	      				desc_leaves = data_cube.get_leaves(level_items[m], data_cube.func_lookup)
+	      			}
+	      			desc_colors = desc_leaves.map(function(d){ 
+	      				leaf_col = d3.hcl(color_scale(d))
+	      				if(leaf_col.h < 0){ //deal with negative values
+	      					leaf_col.h = leaf_col.h + 360
+	      				}
+	      				return leaf_col
+	      				})
+	      		if(m%2 == 0 & level_items.length > 1){
+	      			parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
+	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
+	      			parent_color.l = d3.min(desc_colors.map(function(d){ return d.l}))
+	      		} else if((level_items.length > 1) & m%2 != 0) {
+	      			parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
+	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
+	      			parent_color.l = d3.max(desc_colors.map(function(d){ return d.l}))
+	      		} else{
+					parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
+	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
+	      			parent_color.l = d3.mean(desc_colors.map(function(d){ return d.l}))
+ 	      		}
+		      	if(color_scale.domain().indexOf(level_items[m])==-1){
+		      		color_scale.range().push(parent_color.toString())
+	      			color_scale(level_items[m])
+	      		}
+	      		}
+	      		level++;
+	      	}
+	      }
+		return color_scale;
+	}
 draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
 	
 	var grouping = null;
@@ -415,7 +527,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	otu_abundance_data = otu_table
 
 	// If the data cube already exists, use it to determine the current tree state before re-initializing so we can open back up to the right state
-	if (data_cube){
+	if(data_cube){
 		currently_displayed_taxa = [];
 		currently_displayed_functions = [];
 		for (var i = 0; i < data_cube.displayed_taxa.length; i++){
@@ -439,119 +551,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	} else {
 		color_option = d3.select("#color_option_selector").property("value");
 	}
+	
 
-	var setUpColorScale = function(main_list, list_type, color_scale){ //list_type is taxa or funcs
-		//color scale already has core colors set up
-		//1st - divide up color space into number of leaves
-		//then assign each subgroup of leaves alternating extremes
-		//then assign each parent extreme or average value of its children
-		for(j=0; j < main_list.length; j++){
-			if(list_type=="taxa"){
-				var leaves = data_cube.get_leaves(main_list[j], data_cube.taxa_lookup)
-			} else {
-				var leaves = data_cube.get_leaves(main_list[j], data_cube.func_lookup)
-			}
-		    color_range = leaves.length //number of colors to expand in each direction depends on # of leaves
-			//generate variations of core color
-		    var core_color = d3.hcl(color_scale(main_list[j]))
-	    	new_colors = []
-	    	flip = -1
-	    	for(k=0; k < color_range; k++){
-	    		var new_color = d3.hcl()
-	    		if(list_type == "taxa"){
-	    			light_range = 14
-	    			} else {
-	    				light_range = 28
-	    			}
-				new_color["l"] = core_color["l"] - light_range*flip*(k + (k%2))/(color_range+1)
-	      		new_color["h"] = core_color["h"] - 7.5*flip*(k+ (k%2))/(color_range+1)
-	      		new_color["c"] = core_color["c"] - 4*flip*(k+ (k%2))/(color_range+1)
-	      		new_colors.push(d3.hcl(new_color))
-	      		flip *= -1
-	      	}
-			new_colors = new_colors.sort(function(a,b){ return a.l - b.l })
-			
-			
-	      	if(list_type=="taxa"){
-	      		layer1 = data_cube.taxa_lookup[main_list[j]]
-	      		descendents = data_cube.get_descendents(main_list[j], data_cube.taxa_lookup)
-	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.taxa_lookup[d].level == 1 } else { return data_cube.taxa_lookup[d].level == 0 }})
-	      	} else {
-	      		layer1 = data_cube.func_lookup[main_list[j]]
-	      		descendents = data_cube.get_descendents(main_list[j], data_cube.func_lookup)
-	      		first_level = descendents.filter(function(d){ if(layer1.level != 1){ return data_cube.func_lookup[d].level == 1 } else { return data_cube.func_lookup[d].level == 0 }})
-	      	}
-	      	num_levels = layer1.level
-
-			
-	      	color_count = 0	      	
-	      	for(k=0; k < first_level.length; k++){
-	      		if(list_type=="taxa"){
-	      			desc_leaves = data_cube.get_leaves(first_level[k], data_cube.taxa_lookup)
-	      		} else {
-	      			desc_leaves = data_cube.get_leaves(first_level[k], data_cube.func_lookup)	      			
-	      		}
-	      		color_slice = new_colors.slice(color_count, color_count + desc_leaves.length) 
-	      		color_count += desc_leaves.length
-	      		
-	      		//add leaf colors to scale
-	      		for(m=0; m < desc_leaves.length; m++){
-	      			if(color_scale.domain().indexOf(desc_leaves[m])==-1){
-	      				if(m % 2==0){ //go from front or back of slice
-			    			color_scale.range().push(color_slice[m].toString())
-	      				} else {
-	      					color_scale.range().push(color_slice[desc_leaves.length-m].toString())
-	      				}
-	      				color_scale(desc_leaves[m])
-	      			}
-	      		}
-	      	}
-	      	//now get the rest of the levels, assign mean or most extreme value of descendents
-	      	if(layer1.level != 1){ level = 1 } else { level = 0; }
-	      	while(level < num_levels){
-	      		if(list_type=="taxa"){
-	      			level_items = descendents.filter(function(d){ return data_cube.taxa_lookup[d].level == level })
-	      		} else {
-	      			level_items = descendents.filter(function(d){ return data_cube.func_lookup[d].level == level })
-	      		}
-	      		parent_color = core_color.toString() //make copy rather than passing by ref
-	      		parent_color = d3.hcl(parent_color)
-	      		for(m=0; m < level_items.length; m++){
-	      			if(list_type=="taxa"){
-	      				desc_leaves = data_cube.get_leaves(level_items[m], data_cube.taxa_lookup)
-	      			} else {
-	      				desc_leaves = data_cube.get_leaves(level_items[m], data_cube.func_lookup)
-	      			}
-	      			desc_colors = desc_leaves.map(function(d){ 
-	      				leaf_col = d3.hcl(color_scale(d))
-	      				if(leaf_col.h < 0){ //deal with negative values
-	      					leaf_col.h = leaf_col.h + 360
-	      				}
-	      				return leaf_col
-	      				})
-	      		if(m%2 == 0 & level_items.length > 1){
-	      			parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
-	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
-	      			parent_color.l = d3.min(desc_colors.map(function(d){ return d.l}))
-	      		} else if((level_items.length > 1) & m%2 != 0) {
-	      			parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
-	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
-	      			parent_color.l = d3.max(desc_colors.map(function(d){ return d.l}))
-	      		} else{
-					parent_color.h = d3.mean(desc_colors.map(function(d){ return d.h}))
-	      			parent_color.c = d3.mean(desc_colors.map(function(d){ return d.c}))
-	      			parent_color.l = d3.mean(desc_colors.map(function(d){ return d.l}))
- 	      		}
-		      	if(color_scale.domain().indexOf(level_items[m])==-1){
-		      		color_scale.range().push(parent_color.toString())
-	      			color_scale(level_items[m])
-	      		}
-	      		}
-	      		level++;
-	      	}
-	      }
-		return color_scale;
-	}
 	if(color_option == "Categories"){
 	
 		//set up colors using data cube
@@ -604,6 +605,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		taxa_colors.range().push(d3.hcl("black").toString())//.brighter())
 		taxa_colors("All Taxa")
 
+
 		//func colors
 		var func_colors = d3.scale.ordinal()
 		func_colors.range(func_palette)
@@ -618,13 +620,62 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		taxa_colors_palette = (d3.scale.category20()).range()
 		taxa_colors = d3.scale.ordinal()
 		taxa_colors.range(taxa_colors_palette)
-		taxa_colors.domain(d3.keys(data_cube.taxa_tree_lookup))
-		
+		taxa_colors.domain(d3.keys(data_cube.taxa_lookup))
 		func_colors_palette = colorbrewer["Set3"]["12"].concat(colorbrewer["Dark2"]["8"])	
 		func_colors = d3.scale.ordinal()
 		func_colors.range(func_colors_palette)
-		func_colors.domain(d3.keys(data_cube.func_tree_lookup))
+		func_colors.domain(d3.keys(data_cube.func_lookup))
 	}
+
+	//also make highlighting textures for every taxon and function
+	all_taxa = taxa_colors.domain()
+	all_funcs = func_colors.domain()
+	for(j=0; j < all_taxa.length; j++){
+		trimstr = all_taxa[j].replace(/\W+/g,'') + "_tx";
+		//remove pre-existing
+		d3.select("#patternsvg").select("#"+trimstr).remove()
+// 		col_switch = d3.rgb(taxa_colors(all_taxa[j]))
+// 		if(col_switch["r"] > 230 ||col_switch["g"] > 230 || col_switch["b"] > 230){
+// 			col_fill = col_switch
+// 		} else {
+// 			col_fill = col_switch.brighter(0.3)
+// 		}
+// 		var t = textures.lines()
+// 			    .thicker()
+// 			    .background(col_fill)
+// 				.id(trimstr)
+// 			    .stroke("white");
+// 
+// 		d3.select("#patternsvg").call(t);
+	}
+	
+	for(j=0; j < all_funcs.length; j++){
+		trimstr = all_funcs[j].replace(/\W+/g,'') + "_tx_func_bar";
+		trimstr2 = all_funcs[j].replace(/\W+/g,'') + "_tx_contribution";
+		d3.select("#patternsvg").select("#"+trimstr).remove()
+		d3.select("#patternsvg").select("#"+trimstr2).remove()
+// 		col_switch = d3.rgb(func_colors(all_funcs[j]))
+// 		if(col_switch["r"] > 230 ||col_switch["g"] > 230 || col_switch["b"] > 230){
+// 			col_fill = col_switch
+// 		} else {
+// 			col_fill = col_switch.brighter(0.3)
+// 		}
+// 		var t = textures.lines()
+// 			    .thicker()
+// 			    .orientation("diagonal", "6/8")
+// 			    .background(col_fill)
+// 				.id(trimstr)
+// 			    .stroke("white");
+// 		d3.select("#patternsvg").call(t);	
+// 			    
+// 		var t2 = textures.lines()
+// 			    .thicker()
+// 			    .background(col_fill)
+// 				.id(trimstr2)
+// 			    .stroke("white");
+// 		d3.select("#patternsvg").call(t2);	
+	}
+	
 
 	//sample colors
 	groupValsAll = samplemap.map(function(d,i){ 

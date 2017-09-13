@@ -583,8 +583,6 @@
 			    		.background(col_fill)
 						.id(trimstr)
 			    		.stroke("white");
-			    	console.log(trimstr)
-			    	console.log(t.id())
 			    } else {
 			    	t = textures.lines()
 			    		.thicker()
