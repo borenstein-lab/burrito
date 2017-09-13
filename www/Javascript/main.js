@@ -1094,9 +1094,10 @@ function resizeSidebar() {
 	d3.select("#figure_ex_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
 	d3.select("#download_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
 	d3.select("#legendswitch").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
-	d3.select("#saveInputDiv").selectAll(".savebutton").style("margin-bottom", spacingheight * (0.4 / 9) + "px");
-	d3.select("#prefixdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
-	d3.select("#imgformatdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
+	d3.select("#saveInputDiv").selectAll(".savebutton").style("margin-bottom", spacingheight * (0.4 / 10) + "px");
+	d3.select("#switch_scale").style("margin-bottom", spacingheight * (0.4 / 10) + "px");
+	d3.select("#prefixdiv").style("padding-bottom", spacingheight * (0.4 / 10) + "px");
+	d3.select("#imgformatdiv").style("padding-bottom", spacingheight * (0.4 / 10) + "px");
 	sideBarPadding = spacingheight;
 }
 
