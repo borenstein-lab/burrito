@@ -528,6 +528,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	// If the data cube already exists, use it to determine the current tree state before re-initializing so we can open back up to the right state
 	if(data_cube){
+		var already_data = true;
 		currently_displayed_taxa = [];
 		currently_displayed_functions = [];
 		for (var i = 0; i < data_cube.displayed_taxa.length; i++){
@@ -536,6 +537,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		for (var i = 0; i < data_cube.displayed_funcs.length; i++){
 			currently_displayed_functions.push(data_cube.displayed_funcs[i])
 		}
+	} else {
+		var already_data = false;
 	}
 
 
@@ -627,7 +630,9 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		func_colors.domain(d3.keys(data_cube.func_lookup))
 	}
 
-	//also make highlighting textures for every taxon and function
+	//also remove existing highlighting textures for every taxon and function
+	//is there a way to do this only for colors that have changed, or only when it's a full re-drawing?
+	if(already_data == false){ //only do this if we are starting from a new data_cube
 	all_taxa = taxa_colors.domain()
 	all_funcs = func_colors.domain()
 	for(j=0; j < all_taxa.length; j++){
@@ -675,7 +680,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 // 			    .stroke("white");
 // 		d3.select("#patternsvg").call(t2);	
 	}
-	
+	}
 
 	//sample colors
 	groupValsAll = samplemap.map(function(d,i){ 
