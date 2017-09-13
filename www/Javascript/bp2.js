@@ -354,7 +354,7 @@
 						}
 					})
 
-					highlightall(displayed_taxa[current_data.key1], displayed_funcs[current_data.key2],3)
+					
 				
 					if(d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked")==false){ //if function is clicked already but not taxon
 	// 					displayed_taxa.map(function(e,j){ //dehighlight all other funcs
@@ -362,6 +362,9 @@
 	// 							dehighlightall(e, "", 1)
 	// 						}
 	// 					})
+						// dehighlight functions then rehighlight since we are switching from relative abundance highlighting to contribution highlighting
+						dehighlightall('', displayed_funcs[current_data.key2], 2)
+
 						d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", true)
 						bP.selectSegment(0, current_data.key1, taxa_colors, func_colors, displayed_taxa, displayed_funcs, no_edges = true)
 						//make bold etc
@@ -374,7 +377,7 @@
 						d3.select("#Genomes1"+displayed_funcs[current_data.key2].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", true)
 						bP.selectSegment(1, current_data.key2, taxa_colors, func_colors, displayed_taxa, displayed_funcs, no_edges = true)
 					}
-
+					highlightall(displayed_taxa[current_data.key1], displayed_funcs[current_data.key2],3)
 					d3.select(this).classed("clicked",true)
 				}
 			})
