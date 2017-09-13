@@ -8,7 +8,7 @@ layout: default
 
 <h3>OTU (taxa abundance) table</h3>
 
-The first upload option (4) only requires a table of abundances of Greengenes (McDonald et al 2012 97% OTUs from a 16S rRNA sequencing study, as produced by QIIME or similar programs. The burrito server then runs PICRUSt (Langille et al, 2013) to generate taxonomy-function links and estimated functional profiles. The file format for this option is:
+The first upload option only requires a table of abundances of Greengenes (McDonald et al 2012 97% OTUs from a 16S rRNA sequencing study, as produced by QIIME or similar programs. The burrito server then runs PICRUSt (Langille et al, 2013) to generate taxonomy-function links and estimated functional profiles. The file format for this option is:
 
 The column of OTU IDs must come as the first column in the table.
 
@@ -27,13 +27,13 @@ However, by choosing a lower-resolution level the visualization will load faster
 
 <h3>PICRUSt-formatted table of functional contributions of each taxon</h3>
 
-The second upload option (5) requires a table of 16S rRNA reads, as in the first option, but to save time the user also supplies the contribution table already generated using the PICRUSt metagenome_contributions.py script. The format for this PICRUSt contribution table should be:
+The second upload option requires a table of 16S rRNA reads, as in the first option, but to save time the user also supplies the contribution table already generated using the PICRUSt metagenome_contributions.py script. The format for this PICRUSt contribution table should be:
 
 The columns must appear in this order. The OTU IDs and sample names must appropriately match those found in the 16S rRNA read table.
 
 <h3>Custom gene annotations for each taxon</h3>
 
-The third upload option (6) allows the user to provide their own genome annotation table for the taxa in their OTU table. The first file is again an OTU table of the same format, except with any OTU IDs (not limited to Greengenes). The genome annotation file lists the gene contents for each OTU in the following format:
+The third upload option allows the user to provide their own genome annotation table for the taxa in their OTU table. The first file is again an OTU table of the same format, except with any OTU IDs (not limited to Greengenes). The genome annotation file lists the gene contents for each OTU in the following format:
 
 The columns must appear in this order. The OTU IDs must appropriately match those found in the associated OTU table. All OTUs must have some information in the genome content file.
 
