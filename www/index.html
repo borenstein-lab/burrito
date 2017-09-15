@@ -14,7 +14,7 @@
 </head>
 
 <body topmargin="0" leftmargin="0" marginwidth="0" marginheight="0" onresize="resizeRedraw()">
-<div id="mainthing" style="overflow-x:auto">
+<div id="mainthing">
 	<!-- JUST FOR CENTERING - START -->
 	<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">
 		<tr valign="top" align="center">
@@ -89,7 +89,7 @@
 								<td colspan=4>
 									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
 										<tr>
-											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+											<td colspan=2 width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
 												<text id="taxonomic_block_title_text"></text>
 											</td>
 											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
@@ -99,99 +99,99 @@
 											</td>
 										</tr>
 										<tr>
-											<td colspan=3><img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td>
+											<td colspan=4>
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0"></td>
 										</tr>
 										<tr>
-											<tr>
-												<td>
-													<text id="taxonomic_abundance_table_input_text"></text>
-													<input type="file" name="taxonomic_abundance_table" id="taxonomic_abundance_table">
-												</td>
-												<td align="right">
-													<span class="tt">
-														<img src="images/help.png" style="vertical-align: middle;">
-														<span class="tooltip">
-															<span class="blank"></span>
-															<span class="content">
-																<text id="taxonomic_abundance_table_help_text"></text>
-															</span>
+											<td width="20%" style="font-weight:bold">
+												<text id="taxonomic_abundance_table_input_text"></text>
+											</td>
+											<td width="5%">
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="taxonomic_abundance_table_help_text"></text>
 														</span>
 													</span>
-													<img src="images/pixel.gif" width="10">
-												</td>
-												<td>
-													<a href="Data/examples/example_otus.txt" target="_blank">
-														<img src="images/example.png" style="vertical-align: middle;">
-													</a>
-												</td>
-											</tr>
-											<tr>
-												<td colspan=3 bgcolor="#EBEAE1">
-													<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
-												</td>
-											</tr>
-											<tr>
-												<tr>
-													<td>
-														<div id="taxonomic_hierarchy_choice" class="shiny-input-radiogroup">
-															<text id="taxonomic_hierarchy_choice_text_1"></text>
-															<div class="radio">
-																<input type="radio" name="taxonomic_hierarchy_choice" id="gg_taxonomic_hierarchy" value="DEFAULT" checked="checked">
-																<text id="taxonomic_hierarchy_choice_text_2"/>
-															</div>
-															<div class="radio">
-																<input type="radio" name="taxonomic_hierarchy_choice" id="custom_taxonomic_hierarchy" value="CUSTOM">
-																<text id="taxonomic_hierarchy_choice_text_3"></text>
-																<input type="file" name="custom_taxonomic_hierarchy_table" id="custom_taxonomic_hierarchy_table">
-															</div>
-														</div>
-													</td>
-													<td align="right">
-														<span class="tt">
-															<img src="images/help.png" style="vertical-align: middle;">
-															<span class="tooltip">
-																<span class="blank"></span>
-																<span class="content">
-																	<text id="taxonomic_hierarchy_choice_help_text"></text>
-																</span>
-															</span>
+												</span>
+											</td>
+											<td>
+												<input type="file" name="taxonomic_abundance_table" id="taxonomic_abundance_table">
+											</td>
+											<td align="right">
+												<a href="Data/examples/example_otus.txt" target="_blank">
+													<img src="images/example.png" style="vertical-align: middle;">
+												</a>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=4 bgcolor="#b7b7b3">
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<td style="font-weight:bold">
+												<text id="taxonomic_hierarchy_choice_text_1"></text>
+											</td>
+											<td>
+												<span class="tt">
+												<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="taxonomic_hierarchy_choice_help_text"></text>
 														</span>
-														<img src="images/pixel.gif" width="10">
-													</td>
-													<td>
-														<br>
-														<br>
-														<a href="Data/examples/example_tax_hierarchy.txt" target="_blank">
-															<img src="images/example.png" style="vertical-align: middle;">
-														</a>
-													</td>
-												</tr>
-												<tr>
-													<td colspan=3 bgcolor="#EBEAE1">
-														<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
-													</td>
-												</tr>
-												<tr>
-													<tr>
+													</span>
+												</span>
+											</td>
+											<td id="taxonomic_hierarchy_choice" class="shiny-input-radiogroup" colspan=2>
+												<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="normalTxt" valign="middle">
+													<tr class="radio">
 														<td>
-															<text id="taxonomic_level_of_detail_selector_text"></text>
-															<select name="taxonomic_level_of_detail_selector" id="taxonomic_level_of_detail_selector"></select>
-														</td>
-														<td align="right">
-															<span class="tt">
-																<img src="images/help.png" style="vertical-align: middle;">
-																<span class="tooltip">
-																	<span class="blank"></span>
-																	<span class="content">
-																		<text id="taxonomic_level_of_detail_selector_help_text"></text>
-																	</span>
-																</span>
-															</span>
-															<img src="images/pixel.gif" width="10">
+															<input type="radio" name="taxonomic_hierarchy_choice" id="gg_taxonomic_hierarchy" value="DEFAULT" checked="checked">
+															<text id="taxonomic_hierarchy_choice_text_2"/>
 														</td>
 													</tr>
-												</tr>
-											</tr>
+													<tr class="radio">
+														<td>
+															<input type="radio" name="taxonomic_hierarchy_choice" id="custom_taxonomic_hierarchy" value="CUSTOM">
+															<text id="taxonomic_hierarchy_choice_text_3"></text>
+															<input type="file" name="custom_taxonomic_hierarchy_table" id="custom_taxonomic_hierarchy_table">
+														</td>
+														<td align="right">
+															<a href="Data/examples/example_tax_hierarchy.txt" target="_blank">
+																<img src="images/example.png" style="vertical-align: middle;">
+															</a>
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=4 bgcolor="#b7b7b3">
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<td style="font-weight:bold">
+												<text id="taxonomic_level_of_detail_selector_text"></text>
+											</td>
+											<td>
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="taxonomic_level_of_detail_selector_help_text"></text>
+														</span>
+													</span>
+												</span>
+											</td>
+											<td>
+												<select name="taxonomic_level_of_detail_selector" id="taxonomic_level_of_detail_selector"></select>
+											</td>
 										</tr>
 									</table>
 								</td>
@@ -207,7 +207,7 @@
 								<td colspan=4>
 									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
 										<tr>
-											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+											<td colspan=2 width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
 												<text id="functional_block_title_text"></text>
 											</td>
 											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
@@ -217,161 +217,167 @@
 											</td>
 										</tr>
 										<tr>
-											<td colspan=3>
+											<td colspan=4>
 												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
 											</td>
 										</tr>
 										<tr>
-											<tr>
-												<td>
-													<div id="function_abundance_choice" class="shiny-input-radiogroup">
-														<text id="functional_abundance_choice_text_1"></text>
-														<div class="radio">
+											<td width="20%" style="font-weight:bold">
+												<text id="functional_abundance_choice_text_1"></text>
+											</td>
+											<td width="5%">
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="functional_abundance_choice_help_text"></text>
+														</span>
+													</span>
+												</span>
+											</td>
+											<td id="function_abundance_choice" class="shiny-input-radiogroup" colspan=2>
+												<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="normalTxt" valign="middle">
+													<tr class="radio">
+														<td>
 															<input type="radio" name="function_abundance_choice" id="no_function_abundance" value="ABSENT" checked="checked">
 															<text id="functional_abundance_choice_text_2"></text>
-														</div>
-														<div class="radio">
+														</td>
+													</tr>
+													<tr class="radio">
+														<td>
 															<input type="radio" name="function_abundance_choice" id="function_abundance" value="PRESENT">
 															<text id="functional_abundance_choice_text_3"></text>
 															<input type="file" name="function_abundance_table" id="function_abundance_table">
-														</div>
-													</div>
-												</td>
-												<td align="right">
-													<span class="tt">
-														<img src="images/help.png" style="vertical-align: middle;">
-														<span class="tooltip">
-															<span class="blank"></span>
-															<span class="content">
-																<text id="functional_abundance_choice_help_text"></text>
-															</span>
-														</span>
-													</span>
-													<img src="images/pixel.gif" width="10">
-												</td>
-												<td>
-													<br>
-													<br>
-													<a href="Data/examples/example_metagenome.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a>
-												</td>
-											</tr>
-											<tr>
-												<td colspan=3 bgcolor="#EBEAE1">
-													<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
-												</td>
-											</tr>
-											<tr>
-												<tr>
-													<td>
-														<div id="contribution_method_choice" class="shiny-input-radiogroup">
-															<text id="contribution_choice_text_1"></text>
-															<div class="radio">
-																<input type="radio" name="contribution_method_choice" id="picrust" value="PICRUST" checked="checked">
-																<text id="contribution_choice_text_2"></text>
-															</div>
-															<div class="radio">
-																<input type="radio" name="contribution_method_choice" id="genomic_content" value="GENOMIC_CONTENT">
-																<text id="contribution_choice_text_3"></text>
-																<input type="file" name="genomic_content_table" id="genomic_content_table">
-															</div>
-															<div class="radio">
-																<input type="radio" name="contribution_method_choice" id="function_contribution" value="CONTRIBUTION">
-																<text id="contribution_choice_text_4"></text>
-																<input type="file" name="contribution_table" id="contribution_table">
-															</div>
-														</div>
-													</td>
-													<td align="right">
-														<span class="tt">
-															<img src="images/help.png" style="vertical-align: middle;">
-															<span class="tooltip">
-																<span class="blank"></span>
-																<span class="content">
-																	<text id="contribution_choice_help_text"></text>
-																</span>
-															</span>
-														</span>
-														<img src="images/pixel.gif" width="10">
-													</td>
-													<td>
-														<br>
-														<br>
-														<a href="Data/examples/example_genome_content.txt" target="_blank">
-															<img src="images/example.png" style="vertical-align: middle;">
-														</a>
-														<a href="Data/examples/example_contributions.txt" target="_blank">
-															<img src="images/example.png" style="vertical-align: middle;">
-														</a>
-													</td>
-												</tr>
-												<tr>
-													<td colspan=3 bgcolor="#EBEAE1">
-														<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
-													</td>
-												</tr>
-												<tr>
-													<tr>
-														<td>
-															<div id="function_hierarchy_choice" class="shiny-input-radiogroup">
-																<text id="functional_hierarchy_choice_text_1"></text>
-																<div class="radio">
-																	<input type="radio" name="function_hierarchy_choice" id="brite_hierarchy" value="DEFAULT" checked="checked">
-																	<text id="functional_hierarchy_choice_text_2"></text>
-																</div>
-																<div class="radio">
-																	<input type="radio" name="function_hierarchy_choice" id="custom_function_hierarchy" value="CUSTOM">
-																	<text id="functional_hierarchy_choice_text_3"></text>
-																	<input type="file" name="custom_function_hierarchy_table" id="custom_function_hierarchy_table">
-																</div>
-															</div>
 														</td>
 														<td align="right">
-															<span class="tt">
-																<img src="images/help.png" style="vertical-align: middle;">
-																<span class="tooltip">
-																	<span class="blank"></span>
-																	<span class="content">
-																		<text id="functional_hierarchy_choice_help_text"></text>
-																	</span>
-																</span>
-															</span>
-															<img src="images/pixel.gif" width="10">
+															<a href="Data/examples/example_metagenome.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a>
 														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=4 bgcolor="#b7b7b3">
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<td style="font-weight:bold">
+												<text id="contribution_choice_text_1"></text>
+											</td>
+											<td>
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="contribution_choice_help_text"></text>
+														</span>
+													</span>
+												</span>
+											</td>
+											<td id="contribution_method_choice" class="shiny-input-radiogroup" colspan=2>
+												<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="normalTxt" valign="middle">
+													<tr class="radio">
 														<td>
-															<br>
-															<br>
+															<input type="radio" name="contribution_method_choice" id="picrust" value="PICRUST" checked="checked">
+															<text id="contribution_choice_text_2"></text>
+														</td>
+													</tr>
+													<tr class="radio">
+														<td>
+															<input type="radio" name="contribution_method_choice" id="genomic_content" value="GENOMIC_CONTENT">
+															<text id="contribution_choice_text_3"></text>
+															<input type="file" name="genomic_content_table" id="genomic_content_table">
+														</td>
+														<td align="right">
+															<a href="Data/examples/example_genome_content.txt" target="_blank">
+															<img src="images/example.png" style="vertical-align: middle;">
+														</a>
+														</td>
+													</tr>
+													<tr class="radio">
+														<td>
+															<input type="radio" name="contribution_method_choice" id="function_contribution" value="CONTRIBUTION">
+															<text id="contribution_choice_text_4"></text>
+															<input type="file" name="contribution_table" id="contribution_table">
+														</td>
+														<td align="right">
+															<a href="Data/examples/example_contributions.txt" target="_blank">
+															<img src="images/example.png" style="vertical-align: middle;">
+														</a>
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=4 bgcolor="#b7b7b3">
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<td style="font-weight:bold">
+												<text id="functional_hierarchy_choice_text_1"></text>
+											</td>
+											<td>
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="functional_hierarchy_choice_help_text"></text>
+														</span>
+													</span>
+												</span>
+											</td>
+											<td id="function_hierarchy_choice" class="shiny-input-radiogroup">
+												<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="normalTxt" valign="middle">
+													<tr class="radio">
+														<td>
+															<input type="radio" name="function_hierarchy_choice" id="brite_hierarchy" value="DEFAULT" checked="checked">
+															<text id="functional_hierarchy_choice_text_2"></text>
+														</td>
+													</tr>
+													<tr class="radio">
+														<td>
+															<input type="radio" name="function_hierarchy_choice" id="custom_function_hierarchy" value="CUSTOM">
+															<text id="functional_hierarchy_choice_text_3"></text>
+															<input type="file" name="custom_function_hierarchy_table" id="custom_function_hierarchy_table">
+														</td>
+														<td align="right">
 															<a href="Data/examples/example_func_hierarchy.txt" target="_blank">
 																<img src="images/example.png" style="vertical-align: middle;">
 															</a>
 														</td>
 													</tr>
-													<tr>
-														<td colspan=3 bgcolor="#EBEAE1">
-															<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
-														</td>
-													</tr>
-													<tr>
-														<tr>
-															<td>
-																<text id="functional_level_of_detail_selector_text"></text>
-																<select name="function_level_of_detail_selector" id="function_level_of_detail_selector"></select>
-															</td>
-															<td align="right">
-																<span class="tt">
-																	<img src="images/help.png" style="vertical-align: middle;">
-																	<span class="tooltip">
-																		<span class="blank"></span>
-																		<span class="content">
-																			<text id="functional_level_of_detail_selector_help_text"></text>
-																		</span>
-																	</span>
-																</span>
-																<img src="images/pixel.gif" width="10">
-															</td>
-														</tr>
-													</tr>
-												</tr>
-											</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=4 bgcolor="#b7b7b3">
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<td style="font-weight:bold">
+												<text id="functional_level_of_detail_selector_text"></text>
+											</td>
+											<td>
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="functional_level_of_detail_selector_help_text"></text>
+														</span>
+													</span>
+												</span>
+											</td>
+											<td>
+												<select name="function_level_of_detail_selector" id="function_level_of_detail_selector"></select>
+											</td>
 										</tr>
 									</table>
 								</td>
@@ -387,7 +393,7 @@
 								<td colspan=4>
 									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
 										<tr>
-											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+											<td colspan=2 width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
 												<text id="grouping_block_title_text"></text>
 											</td>
 											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
@@ -397,72 +403,72 @@
 											</td>
 										</tr>
 										<tr>
-											<td colspan=3>
+											<td colspan=4>
 												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
 											</td>
 										</tr>
 										<tr>
-											<tr>
-												<td>
-													<div id="metadata_choice" class="shiny-input-radiogroup">
-														<text id="grouping_choice_text_1"></text>
-														<div class="radio">
+											<td width="20%" style="font-weight:bold">
+												<text id="grouping_choice_text_1"></text>
+											</td>
+											<td width="5%">
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="grouping_choice_help_text"></text>
+														</span>
+													</span>
+												</span>
+											</td>
+											<td id="metadata_choice" class="shiny-input-radiogroup" colspan=2>
+												<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%" class="normalTxt" valign="middle">
+													<tr class="radio">
+														<td>
 															<input type="radio" name="metadata_choice" id="no_metadata" value="ABSENT" checked="checked">
 															<text id="grouping_choice_text_2"></text>
 															<input type="checkbox" name="metadata_choice" id="sort_samples">
 															<text id="grouping_choice_text_3"></text>
-														</div>
-														<div class="radio">
+														</td>
+													</tr>
+													<tr class="radio">
+														<td>
 															<input type="radio" name="metadata_choice" id="metadata" value="PRESENT">
 															<text id="grouping_choice_text_4"></text>
 															<input type="file" name="metadata_table" id="metadata_table">
-														</div>
-													</div>
-												</td>
-												<td align="right">
-													<span class="tt">
-														<img src="images/help.png" style="vertical-align: middle;">
-														<span class="tooltip">
-															<span class="blank"></span>
-															<span class="content">
-																<text id="grouping_choice_help_text"></text>
-															</span>
+														</td>
+														<td align="right">
+															<a href="Data/examples/example_sample_map.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;">
+															</a>
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<tr>
+											<td colspan=4 bgcolor="#b7b7b3">
+												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
+											</td>
+										</tr>
+										<tr>
+											<td style="font-weight:bold">
+												<text id="grouping_factor_selector_text"></text>
+											</td>
+											<td>
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="grouping_factor_selector_help_text"></text>
 														</span>
 													</span>
-													<img src="images/pixel.gif" width="10">
-												</td>
-												<td>
-													<br>
-													<br>
-													<a href="Data/examples/example_sample_map.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;">
-													</a>
-												</td>
-											</tr>
-											<tr>
-												<td colspan=3 bgcolor="#EBEAE1">
-													<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
-												</td>
-											</tr>
-											<tr>
-												<tr>
-													<td>
-														<text id="grouping_factor_selector_text"></text>
-														<select name="metadata_factor_selector" id="metadata_factor_selector"></select>
-													</td>
-													<td align="right">
-														<span class="tt">
-															<img src="images/help.png" style="vertical-align: middle;">
-															<span class="tooltip">
-																<span class="blank"></span>
-																<span class="content">
-																	<text id="grouping_factor_selector_help_text"></text>
-																</span>
-															</span>
-														</span>
-														<img src="images/pixel.gif" width="10">
-													</td>
-												</tr>
-											</tr>
+												</span>
+											</td>
+											<td>
+												<select name="metadata_factor_selector" id="metadata_factor_selector"></select>
+											</td>
 										</tr>
 									</table>
 								</td>
@@ -478,7 +484,7 @@
 								<td colspan=4>
 									<table style="border-style: solid; border-width: 1px; border-color: #737373; padding: 5px;" cellspacing="0" cellpadding="0" height="100%" width="100%" class="normalTxt" valign="middle">
 										<tr>
-											<td width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
+											<td colspan=2 width="100%" style="vertical-align: middle; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em; font-weight:bold;">
 												<text id="visualization_block_title_text"></text>
 											</td>
 											<td colspan=2 style="vertical-align: middle; text-align:right; padding: 2px 2px 2px 0px; border-style: solid; border-color: #737373; border-width: 0px 0px 1px 0px; font-size:1.2em">
@@ -488,35 +494,32 @@
 											</td>
 										</tr>
 										<tr>
-											<td colspan=3>
+											<td colspan=4>
 												<img class="hrImgNarrow" border="0" src="images/pixel.gif" width="100%" height="1"  hspace="0" vspace="0">
 											</td>
 										</tr>
 										<tr>
-											<tr>
-												<td>
-													<text id="color_choice_text"></text>
-													<select name="color_option_selector" id="color_option_selector">
-														<option value="Categories">Hierarchical color scale</option>
-														<option value="Random">Random color scale</option>
-													</select>
-													<td align="right">
-														<span class="tt">
-															<img src="images/help.png" style="vertical-align: middle;">
-															<span class="tooltip">
-																<span class="blank"></span>
-																<span class="content">
-																	<text id="color_choice_help_text"></text>
-																</span>
-															</span>
+											<td width="20%" style="font-weight:bold">
+												<text id="color_choice_text"></text>
+											</td>
+											<td width="5%">
+												<span class="tt">
+													<img src="images/help.png" style="vertical-align: middle;">
+													<span class="tooltip">
+														<span class="blank"></span>
+														<span class="content">
+															<text id="color_choice_help_text"></text>
 														</span>
-														<img src="images/pixel.gif" width="10">
-													</td>
-													<td>
-														<img src="images/pixel.gif" width="74" height="1">
-													</td>
-												</td>
-											</tr>
+													</span>
+												</span>
+											</td>
+											<td>
+												<select name="color_option_selector" id="color_option_selector">
+													<option value="Categories">Hierarchical color scale</option>
+													<option value="Random">Random color scale</option>
+												</select>
+												
+											</td>
 										</tr>
 									</table>
 								</td>
