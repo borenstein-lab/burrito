@@ -12,7 +12,9 @@
   .tickFormat(d3.format(".2s"));
 
   otu_bar.getSampleGroup = function(samp, sampledata, grouping){
-    group = sampledata.filter(function(e){ return e.Sample==samp;})[0][grouping];
+    samp_column = d3.keys(sampledata[0])[0]
+  	group = sampledata.filter(function(e){ 
+  		return e[samp_column]==samp;})[0][grouping];
     return group;
   }
 
@@ -32,9 +34,10 @@
 
   otu_bar.make_data = function(otu_abundance_data, data_cube, sample_order){
     var bar_data = [];
-    otu_abundance_data.forEach(function(d){
+    otu_abundance_data.forEach(function(d, i){
       var bar = {};
-      bar.Sample = d.Sample;
+      samp_col = d3.keys(d)[0]
+      bar.Sample = sample_order[i];
       var y0 = 0;
       var my_display_taxa = data_cube.displayed_taxa.slice(0);
       my_display_taxa.reverse()
@@ -100,7 +103,8 @@
       .data(function(d) {
       	d["taxa"] = d.taxa.map(function(dat){ 
       		dat_plusSamp = dat
-      		dat_plusSamp["Sample"] = d.Sample
+      		samp_col = d3.keys(dat)[0] 
+      		dat_plusSamp["Sample"] = d[samp_col]
       		return dat_plusSamp; })
         return d.taxa;
       })
@@ -255,7 +259,8 @@
   	var groups = [];
   	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
   	d3.selectAll("#taxa_bars").selectAll(".g").each( function(d) {
-  		var curg = otu_bar.getSampleGroup(d.Sample, sampledata, grouping);
+  		samp_col = d3.keys(d)[0]
+  		var curg = otu_bar.getSampleGroup(d[samp_col], sampledata, grouping);
   		var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
   		var xpos = this.getAttribute("transform");
   		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
