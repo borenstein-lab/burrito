@@ -600,11 +600,28 @@ shinyServer(function(input, output, session) {
 
 		# If there are elements in the first set that are not in the second set, send an abort signal and return FALSE
 		if (any(extra_elements)){
-			session$sendCustomMessage("abort", paste("The following ", element_name, " are in the ", first_table_name, " but are not present in the ", second_table_name, ": ", paste(unique(first_element_set[extra_elements]), collapse = " ", sep="")))
+			session$sendCustomMessage("abort", paste("The following ", element_name, " are in the ", first_table_name, " but are not present in the ", second_table_name, ": ", paste(unique(first_element_set[extra_elements]), collapse = " "), sep=""))
 			return(FALSE)
 		}
 
 		return(TRUE)
+	}
+
+	# filter_elements_from_first_not_found_in_second(first_table, second_table, first_table_column_name, second_table_column_name, element_name, first_table_name, second_table_name)
+	#
+	# Filter elements out of the first table that do not appear in the second table
+	filter_elements_from_first_not_found_in_second = function(first_table, second_table, first_table_column_name, second_table_column_name, element_name, first_table_name, second_table_name){
+
+		first_element_set = first_table[[first_table_column_name]]
+		second_element_set = second_table[[second_table_column_name]]
+		extra_elements = !(first_element_set %in% second_element_set)
+
+		# If there are elements in the first set that are not in the second set, send a warning
+		if (any(extra_elements)){
+			session$sendCustomMessage("warning", paste("The following ", element_name, " are in the ", first_table_name, " but are not present in the ", second_table_name, " and will be automatically removed: ", paste(unique(first_element_set[extra_elements]), collapse = " "), sep=""))
+		}
+
+		return(first_table[!extra_elements])
 	}
 
 	# validate_tables_match(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table)
@@ -612,34 +629,34 @@ shinyServer(function(input, output, session) {
 	# Checks whether the tables match with consistent labels and samples
 	validate_tables_match = function(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table){
 		
-		# Check that OTUs in the OTU table are present in the taxonomic hierarchy
-		if (!validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")){
-			return(FALSE)
-		}
+		# # Check that OTUs in the OTU table are present in the taxonomic hierarchy
+		# if (!validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")){
+		# 	return(FALSE)
+		# }
 		
 		# Check that OTUs in the contribution table are present in the taxonomic hierarchy
-		if (!validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")){
-			return(FALSE)
-		}
+		# if (!validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")){
+		# 	return(FALSE)
+		# }
 		
-		# Check that functions in the contribution table are present in the function hierarchy
-		if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "functional hierarchy")){
-			return(FALSE)
-		}
+		# # Check that functions in the contribution table are present in the function hierarchy
+		# if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "functional hierarchy")){
+		# 	return(FALSE)
+		# }
 		
-		# If the function abundance table is not empty, check that functions in the function abundance table are in the function hierarchy
-		if (nrow(function_abundance_table) > 0){
-			if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "functional hierarchy")){
-				return(FALSE)
-			}
-		}
+		# # If the function abundance table is not empty, check that functions in the function abundance table are in the function hierarchy
+		# if (nrow(function_abundance_table) > 0){
+		# 	if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "functional hierarchy")){
+		# 		return(FALSE)
+		# 	}
+		# }
 		
-		# If the function abundance table is not empty, check that samples in the function abundance table are in the contribution table
-		if (nrow(function_abundance_table) > 0){
-			if (!validate_elements_from_first_found_in_second(colnames(function_abundance_table)[2:ncol(function_abundance_table)], contribution_table[[first_metadata_level()]], "samples", "function abundance table", "contribution table")){
-				return(FALSE)
-			}
-		}
+		# # If the function abundance table is not empty, check that samples in the function abundance table are in the contribution table
+		# if (nrow(function_abundance_table) > 0){
+		# 	if (!validate_elements_from_first_found_in_second(colnames(function_abundance_table)[2:ncol(function_abundance_table)], contribution_table[[first_metadata_level()]], "samples", "function abundance table", "contribution table")){
+		# 		return(FALSE)
+		# 	}
+		# }
 		
 		# If the metadata table is not empty, check that samples in the OTU table are in the metadata table
 		if (nrow(metadata_table) > 0){
@@ -806,7 +823,7 @@ shinyServer(function(input, output, session) {
 	
 		# Convert sample names, otu names, and function names to character type
 		contribution_table[,(first_metadata_level()) := as.character(get(first_metadata_level()))]
-		contribution_table[,(first_taxonomi_level()) := as.character(get(first_taxonomic_level()))]
+		contribution_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
 		contribution_table[,(first_function_level()) := as.character(get(first_function_level()))]
 
 		return(contribution_table)
@@ -1838,6 +1855,17 @@ shinyServer(function(input, output, session) {
 			session$sendCustomMessage("upload_status", "data_validation")
 			if (!validate_tables_match(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table)){
 				return()
+			}
+
+			# Filter unmatched elements from tables
+			otu_table = filter_elements_from_first_not_found_in_second(otu_table, taxonomic_hierarchy_table, first_taxonomic_level(), first_taxonomic_level(), paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")
+
+			contribution_table = filter_elements_from_first_not_found_in_second(contribution_table, taxonomic_hierarchy_table, first_taxonomic_level(), first_taxonomic_level(), paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")
+
+			contribution_table = filter_elements_from_first_not_found_in_second(contribution_table, function_hierarchy_table, first_function_level(), first_function_level(), paste(first_function_level(), "s", sep=""), "contribution table", "functional hierarchy")
+
+			if (nrow(function_abundance_table) > 0){
+				function_abundance_table = filter_elements_from_first_not_found_in_second(function_abundance_table, function_hierarchy_table, first_function_level(), first_function_level(), paste(first_function_level(), "s", sep=""), "function abundance table", "functional hierarchy")
 			}
 			
 			# Add the comparison samples to the contribution table

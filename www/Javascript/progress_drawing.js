@@ -196,3 +196,7 @@ Shiny.addCustomMessageHandler("abort", function(message){
 	d3.select("body").classed("svgBody", false);
 	alert(message);
 })
+
+Shiny.addCustomMessageHandler("warning", function(message){
+	alert(message);
+})

@@ -83,7 +83,7 @@
     d3.select("#func_bar_x_label").remove()
     d3.select("#func_bar_xtick_svg").remove()
 
-    var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8, padding: 0.2}
+    var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:10, padding: 0.2}
     x.rangeBands([0, graphdims.width], graphdims.padding);
     
     xAxis.scale(x);
