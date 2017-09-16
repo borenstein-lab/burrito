@@ -32,12 +32,11 @@
     return taxonomic_abundance_tooltip_text[0] + name_split + taxonomic_abundance_tooltip_text[1] + sample + taxonomic_abundance_tooltip_text[2] + (Math.round((y1 - y0) * 100) / 100) + taxonomic_abundance_tooltip_text[3]
   }
 
-  otu_bar.make_data = function(otu_abundance_data, data_cube, sample_order){
+  otu_bar.make_data = function(otu_abundance_data, data_cube, samp_col, sample_order){
     var bar_data = [];
     otu_abundance_data.forEach(function(d, i){
       var bar = {};
-      samp_col = d3.keys(d)[0]
-      bar.Sample = sample_order[i];
+      bar[samp_col] = d[samp_col]//sample_order[i];
       var y0 = 0;
       var my_display_taxa = data_cube.displayed_taxa.slice(0);
       my_display_taxa.reverse()
@@ -79,16 +78,17 @@
 
     var normalized = true;
 
+	
     bar_data.forEach(function(d) {
       d.taxa.forEach(function(e){
         e.y0 = Math.round(e.y0/d.total*100*100)/100;
         e.y1 = Math.round(e.y1/d.total*100*100)/100;
       })
     })
+    
 
     var first_sample_x = x(sample_order[0]);
     var last_sample_x = x(sample_order[sample_order.length - 1]);
-
 
 
     var Sample = svglink.selectAll(".Sample")
@@ -96,15 +96,16 @@
       .enter().append("g")
       .attr("class", "g")
       .attr("transform", function(d) { 
-        return "translate(" + (graphdims.sample_buffer - first_sample_x + x(d.Sample)) + "," + graphdims.height_buffer +")"; 
+      	samp_col = d3.keys(d)[0]
+        return "translate(" + (graphdims.sample_buffer - first_sample_x + x(d[samp_col])) + "," + graphdims.height_buffer +")"; 
       });
 
     Sample.selectAll("rect")
       .data(function(d) {
       	d["taxa"] = d.taxa.map(function(dat){ 
       		dat_plusSamp = dat
-      		samp_col = d3.keys(dat)[0] 
-      		dat_plusSamp["Sample"] = d[samp_col]
+      		samp_col = d3.keys(d)[0]
+      		dat_plusSamp[samp_col] = d[samp_col]
       		return dat_plusSamp; })
         return d.taxa;
       })
@@ -126,22 +127,23 @@
   		clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
   		clickedTaxaBars = d3.select("#Genomes").select(".part0").selectAll(".mainbars").select(".clicked")
   		clickedEdges = d3.select("#Genomes").selectAll(".edges").select(".clicked")
+        samp_col = d3.keys(current_rectangle_data).pop()
   		if(clickedBars.empty()){ //if nothing is clicked
         	highlight_overall(current_rectangle_data.name, "", 1);
         	name_split = (current_rectangle_data.name.split('_')).pop()
-        	tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
+        	tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data[samp_col], current_rectangle_data.y1, current_rectangle_data.y0));
         	return tooltip.style("visibility", "visible");
         }
         if(clickedTaxaBars.empty() == false){ // if any taxa are highlighted
     		if(displayed_taxa[clickedTaxaBars.datum().key] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){
         	name_split = (current_rectangle_data.name.split('_')).pop()
-        	tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
+        	tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data[samp_col], current_rectangle_data.y1, current_rectangle_data.y0));
           	return tooltip.style("visibility", "visible");
     		}
     	} else if(clickedEdges.empty() == false){ //if an edge is clicked
     		if(displayed_taxa[clickedEdges.datum().key1] == (current_rectangle_data.name).replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")){ //if relevant edge is clicked
     		    name_split = (current_rectangle_data.name.split('_')).pop()
-        		tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
+        		tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data[samp_col], current_rectangle_data.y1, current_rectangle_data.y0));
           		return tooltip.style("visibility", "visible");
     		}
     	}
@@ -185,9 +187,10 @@
       })
       .on("click", function(d){
         current_rectangle_data = d3.select(this).datum();
+        samp_col = d3.keys(current_rectangle_data).pop()
         current_id = "Genomes0"+current_rectangle_data.name.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")
         name_split = (current_rectangle_data.name.split('_')).pop()
-        tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data.Sample, current_rectangle_data.y1, current_rectangle_data.y0));
+        tooltip.html(generate_otu_barplot_tooltip_text(name_split, current_rectangle_data[samp_col], current_rectangle_data.y1, current_rectangle_data.y0));
 		tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
 		clickResponse(current_id, current_rectangle_data.name, "taxa", displayed_taxa, displayed_funcs)
 		return tooltip.style("visibility", "visible")
@@ -249,6 +252,7 @@
           d3.select(this)
             .attr("transform", "translate(" + ((x.rangeBand() / 2) - (text_height / 2)) + "," + graphdims.sample_label_buffer + ") rotate(-90)")
         })
+    
 
   var max_group_label_height = 0	
 	if (grouping != "N/A") {
@@ -258,16 +262,18 @@
 
   	var groups = [];
   	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
+  	
+  	
   	d3.selectAll("#taxa_bars").selectAll(".g").each( function(d) {
   		samp_col = d3.keys(d)[0]
   		var curg = otu_bar.getSampleGroup(d[samp_col], sampledata, grouping);
-  		var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
+  		var gindex = groups.map(function(e) { 
+  			return e.Name; }).indexOf(curg);
   		var xpos = this.getAttribute("transform");
   		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
   		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
   		if (xpos > groups[gindex].Max) { groups[gindex].Max = xpos; }
   	});
-
 
   	d3.select("#otu_bar_xtick_svg").selectAll("g.x_samp_g_label")
   		.data(groups)

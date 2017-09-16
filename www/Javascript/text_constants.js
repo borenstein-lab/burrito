@@ -69,7 +69,7 @@ var default_taxonomic_abundance_tooltip_text = '';
 var taxonomic_abundance_tooltip_text = ['<strong>Taxon</strong>: ', '<br><strong>Sample: </strong>', '<br><strong>Relative Abundance: </strong>', '%']
 var default_function_abundance_tooltip_text = '';
 var function_abundance_tooltip_text = ['<strong>Function: </strong>', '<br><strong>Sample: </strong>', '<br><strong>Relative Abundance: </strong>', '%'];
-var function_contribution_tooltip_text = ['<strong>Function: </strong>', '<br><strong>Taxon: </strong>', '<br><strong>Sample: </strong>', '<br>"+"<strong>Relative Abundance: </strong>', '%'];
+var function_contribution_tooltip_text = ['<strong>Function: </strong>', '<br><strong>Taxon: </strong>', '<br><strong>Sample: </strong>', '<br><strong>Relative Abundance: </strong>', '%'];
 var default_bipartite_graph_tooltip_text = 'a simple tooltip';
 var bipartite_graph_tooltip_text = ['Average contribution to function:<br>', '%'];
 

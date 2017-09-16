@@ -639,19 +639,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		trimstr = all_taxa[j].replace(/\W+/g,'') + "_tx";
 		//remove pre-existing
 		d3.select("#patternsvg").select("#"+trimstr).remove()
-// 		col_switch = d3.rgb(taxa_colors(all_taxa[j]))
-// 		if(col_switch["r"] > 230 ||col_switch["g"] > 230 || col_switch["b"] > 230){
-// 			col_fill = col_switch
-// 		} else {
-// 			col_fill = col_switch.brighter(0.3)
-// 		}
-// 		var t = textures.lines()
-// 			    .thicker()
-// 			    .background(col_fill)
-// 				.id(trimstr)
-// 			    .stroke("white");
-// 
-// 		d3.select("#patternsvg").call(t);
 	}
 	
 	for(j=0; j < all_funcs.length; j++){
@@ -659,26 +646,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		trimstr2 = all_funcs[j].replace(/\W+/g,'') + "_tx_contribution";
 		d3.select("#patternsvg").select("#"+trimstr).remove()
 		d3.select("#patternsvg").select("#"+trimstr2).remove()
-// 		col_switch = d3.rgb(func_colors(all_funcs[j]))
-// 		if(col_switch["r"] > 230 ||col_switch["g"] > 230 || col_switch["b"] > 230){
-// 			col_fill = col_switch
-// 		} else {
-// 			col_fill = col_switch.brighter(0.3)
-// 		}
-// 		var t = textures.lines()
-// 			    .thicker()
-// 			    .orientation("diagonal", "6/8")
-// 			    .background(col_fill)
-// 				.id(trimstr)
-// 			    .stroke("white");
-// 		d3.select("#patternsvg").call(t);	
-// 			    
-// 		var t2 = textures.lines()
-// 			    .thicker()
-// 			    .background(col_fill)
-// 				.id(trimstr2)
-// 			    .stroke("white");
-// 		d3.select("#patternsvg").call(t2);	
 	}
 	}
 
@@ -796,7 +763,11 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	var stackData = getFuncBarData();
 	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 
-	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, otu_sample_order);
+	otu_cols = d3.keys(otu_abundance_data[0]) //[(otu_abundance_data[0].length-1)]
+	sample_col = otu_cols.pop()
+
+		
+	var otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, sample_col, otu_sample_order);
 
 	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 
@@ -806,7 +777,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	function update_otu_bar(){
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
-		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, otu_sample_order);
+		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, samp_col, otu_sample_order);
 		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 	}
 
@@ -1094,10 +1065,9 @@ function resizeSidebar() {
 	d3.select("#figure_ex_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
 	d3.select("#download_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
 	d3.select("#legendswitch").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
-	d3.select("#saveInputDiv").selectAll(".savebutton").style("margin-bottom", spacingheight * (0.4 / 10) + "px");
-	d3.select("#switch_scale").style("margin-bottom", spacingheight * (0.4 / 10) + "px");
-	d3.select("#prefixdiv").style("padding-bottom", spacingheight * (0.4 / 10) + "px");
-	d3.select("#imgformatdiv").style("padding-bottom", spacingheight * (0.4 / 10) + "px");
+	d3.select("#saveInputDiv").selectAll(".savebutton").style("margin-bottom", spacingheight * (0.4 / 9) + "px");
+	d3.select("#prefixdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
+	d3.select("#imgformatdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
 	sideBarPadding = spacingheight;
 }
 

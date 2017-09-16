@@ -435,8 +435,10 @@
       var groups = [];
       groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
             
+    
       d3.selectAll("#func_bars").selectAll(".g").each( function(d) {
-        var curg = fB.getSampleGroup(d.Sample, sampledata, grouping);
+      	samp_col = d3.keys(d).pop()
+        var curg = fB.getSampleGroup(d[samp_col], sampledata, grouping);
         var gindex = groups.map(function(e) { return e.Name; }).indexOf(curg);
         var xpos = this.getAttribute("transform");
         xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
