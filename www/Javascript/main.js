@@ -1058,6 +1058,7 @@ function resizeRedraw() {
 function resizeSidebar() {
 	d3.select("#sidebar_svg").attr("height", window.innerHeight)
 		.select("#sidebarg").select("rect").attr("height", window.innerHeight);
+	d3.select("#sidebarg").select("foreignObject").attr("height", window.innerHeight);
 	var curSideMenuHeight = d3.select("#saveInputDiv")[0][0].getBoundingClientRect().bottom;
 	var heightpix = window.innerHeight;
 
