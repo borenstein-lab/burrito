@@ -88,6 +88,14 @@ var barplot_mouseover_help_text = 'Mouse over bar charts for detailed abundance 
 var function_hierarchy_help_text = 'Click nodes to expand and collapse the functional hierarchy';
 var barplot_highlight_help_text = 'Highlight taxa to reveal taxa-specific function attributions';
 
+/// Text for size legend
+var scale_taxa_label1 = 'Average relative'
+var scale_taxa_label2 = 'abundance of taxon'
+var scale_func_label1 = 'Average relative'
+var scale_func_label2 = 'abundance of function'
+var scale_edge_label1 = 'Average taxon-function'
+var scale_edge_label2 = 'attribution'
+
 //// Text for option menu
 var switch_scale_text_on = 'Display legend';
 var switch_scale_text_off = 'Hide legend';
