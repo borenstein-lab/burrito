@@ -49,7 +49,8 @@ draw_svg = function() {
 			.attr("id","plots_svg")
 			.attr("viewBox","0 0 " + width + " " + height + "")
 			.attr("preserveAspectRatio","none")
-			.style("font-family", "Verdana");
+			.style("font-family", "Verdana")
+			.style("background-color", "white");
 
 		var using_picrust = false;
 		if (document.getElementById("picrust").checked & mainui.uploadMode != "example"){
@@ -1141,12 +1142,20 @@ function drawScale() {
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
-		.text("Taxa average abundance");
+  		.text(scale_taxa_label1);
+
+	TaxaNodes.append("text")
+		.attr("x", sbw / 2)
+		.attr("y", 20)
+		.attr("text-anchor","middle")
+		.attr("dy", "1em")
+  		.text(scale_taxa_label2);
+
 
 	for (scalei = 0; scalei < sampAv.length; scalei++) {
 		TaxaNodes.append("circle")
 			.attr("cx", 40)
-			.attr("cy", 50 + scalei * 50)
+			.attr("cy", 70 + scalei * 70)
 			.attr("fill", "#8c8c8c")
 			.attr("stroke","grey")
 			.attr("stroke-width",1)
@@ -1154,7 +1163,7 @@ function drawScale() {
 
 		TaxaNodes.append("text")
 			.attr("x", 90)
-			.attr("y", 50 + scalei * 50)
+			.attr("y", 70 + scalei * 70)
 			.attr("dominant-baseline","central")
 			.text(sampAvName[scalei] + "%");
 	}
@@ -1169,12 +1178,21 @@ function drawScale() {
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
-		.text("Func average abundance");
+		.html(scale_func_label1);
+		
+	FuncNodes.append("text")
+		.attr("x", sbw / 2)
+		.attr("y", 20)
+		.attr("dy", "1em")
+		.attr("text-anchor","middle")
+		.html(scale_func_label2);
+		
+		
 
 	for (scalei = 0; scalei < sampAv.length; scalei++) {
 		FuncNodes.append("circle")
 			.attr("cx", 40)
-			.attr("cy", 50 + scalei * 50)
+			.attr("cy", 70 + scalei * 70)
 			.attr("fill", "#8c8c8c")
 			.attr("stroke","grey")
 			.attr("stroke-width",1)
@@ -1182,7 +1200,7 @@ function drawScale() {
 
 		FuncNodes.append("text")
 			.attr("x", 90)
-			.attr("y", 50 + scalei * 50)
+			.attr("y", 70 + scalei * 70)
 			.attr("dominant-baseline","central")
 			.text(sampAvName[scalei] + "%");
 	}
@@ -1195,7 +1213,14 @@ function drawScale() {
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
-		.text("Contrib to function");
+		.html(scale_edge_label1);
+
+	EdgeBars.append("text")
+		.attr("x", sbw / 2)
+		.attr("y", 20)
+		.attr("text-anchor","middle")
+		.attr("dy", "1em")
+		.html(scale_edge_label2);
 
 	for (scalei = 0; scalei < sampAv.length; scalei++) {
 		EdgeBars.append("rect")
