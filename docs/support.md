@@ -2,9 +2,11 @@
 title: Contact Us
 layout: default
 ---
-# Contact
+# Support and Contact
 
-If you use Burrito, please cite xxx.
+If you use Burrito, please cite:
 
-For questions about Burrito, please email xxx@uw.edu
+McNally, C., Eng, A., Noecker, C., Gagne-Maynard, W., & Borenstein, E. (2017). Burrito: An interactive tool for visualizing taxa-function relationships in microbiome data. Submitted. 
+
+For questions about Burrito, please email burrito [at] uw.edu .
 
