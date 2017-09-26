@@ -18,7 +18,7 @@ Burrito is located at <a href="https://elbo-spice.gs.washington.edu/shiny/burrit
 
 ### Overview of the visualization
 
-[burrito_example](burrito_sp_example_screenshot.png)
+![burrito_example](burrito_sp_example_screenshot.png?raw=true)
 
 Burrito can visualize compositional microbiome data from amplicon sequencing or whole metagenome profiling studies. To generate a visualization, users select from various options when uploading data to the tool (home page)[elbo-spice.gs.washington.edu/burrito]. 
 In the most basic form, Burrito requires a dataset of taxonomic abundances across samples. If no other data are provided, this dataset must be in the form of 97% Greengenes OTUs. 

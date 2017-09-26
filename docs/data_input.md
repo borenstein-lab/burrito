@@ -39,6 +39,9 @@ The columns must appear in this order. The OTU IDs must appropriately match thos
 
 <h3>Comparison with shotgun metagenome annotations</h3>
 
+Burrito will optionally compare taxa-based estimated functional abundances with a second, paired dataset of measured function abundances (for example, directly annotated and quantified from shotgun metagenomic data). To select this option, the user must upload a data file of function abundances with the first column listing KEGG Orthologs (KO), 
+and subsequent columns detailing the abundances of each KO in each sample. The column names must correspond exactly with the sample names used in other data files.
+
 <h3>Functional hierarchy (Pathway assignments)</h3>
 
 The user can provide a custom tree describing the hierarchical relationships between functions (8) (by default the visualization uses the KEGG BRITE hierarchy (Kanehisa and Goto, 2000).
