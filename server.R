@@ -1420,15 +1420,17 @@ shinyServer(function(input, output, session) {
 	# Makes all of the hierarchy entries except for the first column (because that needs to match with the taxonomic abundance and contribution tables) unique by prepending that entry's hierarchy level name to the entry, allowing for duplicated entry names between different labels
 	make_hierarchy_table_level_entries_unique = function(hierarchy_table, first_level){
 
-		# Concatenate ancestor level names in case similar names are shared at the same level in different branches (for example, if two different branches have an unknown node at the same level)
-		hierarchy_names = colnames(hierarchy_table)
-		hierarchy_table = cbind(hierarchy_table[[first_level]], as.data.table(t(apply(hierarchy_table[,2:ncol(hierarchy_table),with=F], 1, function(row){
-			return(sapply(1:length(row), function(col){
-				return(paste(row[1:col], collapse = "_"))
-			}))	
-		}))))
-		##Add option here to check if greengenes and to add "unknown" if relevant
-		colnames(hierarchy_table) = hierarchy_names
+		if (ncol(hierarchy_table) > 2){
+			# Concatenate ancestor level names in case similar names are shared at the same level in different branches (for example, if two different branches have an unknown node at the same level)
+			hierarchy_names = colnames(hierarchy_table)
+			hierarchy_table = cbind(hierarchy_table[[first_level]], as.data.table(t(apply(hierarchy_table[,2:ncol(hierarchy_table),with=F], 1, function(row){
+				return(sapply(1:length(row), function(col){
+					return(paste(row[1:col], collapse = "_"))
+				}))	
+			}))))
+			##Add option here to check if greengenes and to add "unknown" if relevant
+			colnames(hierarchy_table) = hierarchy_names
+		}
 
 		return(hierarchy_table)
 	}
@@ -1889,7 +1891,6 @@ shinyServer(function(input, output, session) {
 		# Make the entries of the hierarchy unique
 		taxonomic_hierarchy_table = make_hierarchy_table_level_entries_unique(taxonomic_hierarchy_table, first_taxonomic_level())
 		function_hierarchy_table = make_hierarchy_table_level_entries_unique(function_hierarchy_table, first_function_level())
-
 
 		# Prepare data and send it to the browser
 	
