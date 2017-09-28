@@ -17,15 +17,15 @@ The burrito server then runs PICRUSt (Langille et al, 2013) to generate taxonomy
 
 <h3>Taxonomic hierarchy</h3>
 
-The user can provide a custom tree describing the taxonomic relationships between OTUs (7) (by default the visualization uses the Greengenes taxonomy).
+The user can provide a custom tree describing the taxonomic relationships between OTUs (by default the visualization uses the Greengenes taxonomy).
 All OTUs (or lowest-level taxa) in the OTU table must have a unique row in the corresponding hierarchy file.
 
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_tax_hierarchy.txt" target="_blank">Example </a>
 
 <h3>Choosing a summary taxonomic level</h3>
 
-Once all data upload options are complete, the user selects a taxonomic hierarchy level to summarize the data to (11). 
-The highest-resolution level can be chosen (e.g. OTU) and the user will be able to visualize function contributions down to the OTU level. 
+Once all data upload options are complete, the user selects a taxonomic hierarchy level to which the data will be summarized. 
+If the user chooses the highest level of resolution (e.g. OTU), the visualization will display function attributions down to the level of individual OTUs. 
 However, by choosing a lower-resolution level the visualization will load faster, be more responsive, and use less memory.
 
 
@@ -59,13 +59,13 @@ The columns must appear in the order in the example. The OTU IDs and sample name
 
 <h3>Functional hierarchy (Pathway assignments)</h3>
 
-The user can provide a custom tree describing the hierarchical relationships between functions (8) (by default the visualization uses the KEGG BRITE hierarchy (Kanehisa and Goto, 2000). This file must be in the same format as the example.
+The user can provide a custom tree describing the hierarchical relationships between functions (by default the visualization uses the KEGG BRITE hierarchy (Kanehisa and Goto, 2000). This file must be in the same format as the example.
 
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_func_hierarchy.txt" target="_blank">Example </a>
 
 <h3>Choosing a functional summary level</h3>
 
-The user also must select a function hierarchy level to summarize the data to (12). As with the OTU summary, the highest-resolution level can be chosen, but choosing a lower-resolution level may increase performance.
+The user also must select a function hierarchy level to which the data will be summarized. As with the OTU summary, any level can be chosen, but choosing a lower-resolution level may increase performance.
 
 *Warning:* The BRITE hierarchy (used by default) maps single KOs to multiple subpathways. Because Burrito's tree visualization assumes there are no such many-to-one hierarchical mappings, Burrito will not display functional data at the KO level under the default settings.
 If using a custom hierarchy that maps a higher-resolution function level to multiple lower-resolution levels, the user should select a summary level with exclusively unique mappings. For lower levels, for example for KOs that belong to multiple pathways, Burrito will assign 
