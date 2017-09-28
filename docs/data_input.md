@@ -13,14 +13,14 @@ Burrito has several options for uploading and viewing datasets. Each data file m
 The first upload option only requires a table of abundances of Greengenes (McDonald et al 2012 97% OTUs from a 16S rRNA sequencing study, as produced by QIIME or similar programs. 
 The burrito server then runs PICRUSt (Langille et al, 2013) to generate taxonomy-function links and estimated functional profiles. The column of OTU IDs must come as the first column in the table.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_otus.txt" target="_blank"><strong>Example</strong> </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_otus.txt" target="_blank">Example </a>
 
 <h3>Taxonomic hierarchy</h3>
 
 The user can provide a custom tree describing the taxonomic relationships between OTUs (7) (by default the visualization uses the Greengenes taxonomy).
 All OTUs (or lowest-level taxa) in the OTU table must have a unique row in the corresponding hierarchy file.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_tax_hierarchy.txt" target="_blank"><strong>Example</strong> </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_tax_hierarchy.txt" target="_blank">Example </a>
 
 <h3>Choosing a summary taxonomic level</h3>
 
@@ -38,7 +38,7 @@ and subsequent columns detailing the abundances of each KO in each sample.
 
 The column names must correspond exactly with the sample names used in other data files.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_metagenome.txt" target="_blank"><strong>Example</strong> </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_metagenome.txt" target="_blank">Example </a>
 
 <h3>Custom genomic content for each taxon</h3>
 
@@ -46,7 +46,7 @@ The third upload option allows the user to provide their own genome annotation t
 
 The columns must appear in the order in the example. The OTU IDs must match those found in the associated OTU table. All OTUs must have some information in the genome content file.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_genome_content.txt" target="_blank"><strong>Example</strong> </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_genome_content.txt" target="_blank">Example </a>
 
 <h3>Table of functional attributions for each taxon</h3>
 
@@ -54,14 +54,14 @@ The second upload option requires a table of 16S rRNA reads, as in the first opt
 
 The columns must appear in the order in the example. The OTU IDs and sample names must appropriately match those found in the 16S rRNA read table.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_contributions.txt" target="_blank"><strong>Example</strong> </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_contributions.txt" target="_blank">Example </a>
 
 
 <h3>Functional hierarchy (Pathway assignments)</h3>
 
 The user can provide a custom tree describing the hierarchical relationships between functions (8) (by default the visualization uses the KEGG BRITE hierarchy (Kanehisa and Goto, 2000). This file must be in the same format as the example.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_func_hierarchy.txt" target="_blank"><strong>Example</strong> </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_func_hierarchy.txt" target="_blank">Example </a>
 
 <h3>Choosing a functional summary level</h3>
 
@@ -75,7 +75,7 @@ their abundance fractionally to each linked pathway.
 
 The user can provide a sample grouping table linking samples to different groupings or factors (e.g. cases vs. controls) in the format shown in the example. Any column of the table can then be selected as the variable used to group and color samples in the visualization. 
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_sample_map.txt" target="_blank"><strong>Example</strong> </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_sample_map.txt" target="_blank">Example </a>
 
 Alternatively, users can select an option to sort samples alphabetically by sample ID.
 
