@@ -103,23 +103,32 @@
 
     var viz = fB.vizData(stackdata, sample_order);
     var first_sample_x = x(sample_order[0]);
-    var last_sample_x = x(sample_order[sample_order.length - 1]);
+    var last_sample_x = x(sample_order[0]);
+    for (i = 0; i < sample_order.length; i++){
+      curr_x = x(sample_order[i]);
+      if (curr_x < first_sample_x){
+        first_sample_x = curr_x;
+      }
+      if (curr_x > last_sample_x){
+        last_sample_x = curr_x;
+      }
+    }
 
     //init the tooltip as invisible
 	
-	d3.selectAll("#functooltipdiv").remove();
-    var tooltip = d3.select("body")
-      .append("div")
-	  .attr("id","functooltipdiv")
-      .style("position", "absolute")
-      .style("z-index", "10")
-      .style("visibility", "hidden")
-      .style("background", "lightyellow")
-      .style("opacity", "1")
-      .style("border", "1px")    
-      .style("border-radius", "4px")  
-      .style("padding","2px")
-      .text(default_function_abundance_tooltip_text);
+  	d3.selectAll("#functooltipdiv").remove();
+      var tooltip = d3.select("body")
+        .append("div")
+        .attr("id","functooltipdiv")
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .style("background", "lightyellow")
+        .style("opacity", "1")
+        .style("border", "1px")    
+        .style("border-radius", "4px")  
+        .style("padding","2px")
+        .text(default_function_abundance_tooltip_text);
 
     //create a Sample object for each sample
     var Sample = svglink.selectAll(".Sample")
@@ -248,8 +257,7 @@
     svglink.append("svg")
       .attr("id", "func_bar_xtick_svg")
       .attr("x", 0)
-      .attr("width", last_sample_x - first_sample_x + graphdims.x_axis_x_buffer + x.rangeBand())
-      .attr("clip-path", "")
+      .attr("width", last_sample_x - first_sample_x + x.rangeBand() + graphdims.x_axis_x_buffer)
 
     d3.select("#func_bar_xtick_svg").append("g")
       .attr("class", "x_axis")
@@ -261,6 +269,13 @@
         .attr("dx", 0)
         .attr("dy", 0)
         .style("text-anchor", "end")
+
+    // Fix length of axis bar so it doesn't extend too far when exported
+    var curr_x_axis_path_string = document.getElementById("func_x_axis").querySelectorAll("path")[0].getAttribute("d");
+    var x_axis_path_string_prefix = curr_x_axis_path_string.match(/^(.*)H/);
+    var x_axis_path_string_suffix = curr_x_axis_path_string.match(/H[0-9\.]*(V.*)$/);
+    d3.select("#func_x_axis").selectAll("path").attr("d", x_axis_path_string_prefix[1] + "H" + (last_sample_x - first_sample_x + x.rangeBand()) + x_axis_path_string_suffix[1]);
+
 
     // Remove labels for comparison samples
     d3.select("#func_x_axis").selectAll("text")

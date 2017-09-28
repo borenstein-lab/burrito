@@ -1126,11 +1126,11 @@ function drawScale() {
 		.attr("x1",0)
 		.attr("y1",0)
 		.attr("x2",0)
-		.attr("y2",height)
+		.attr("y2",height - margin.top - margin.bottom)
 		.style("stroke-width",3)
 		.style("stroke","#000000");
 
-	TaxaNodes = SB.append("g")
+	var TaxaNodes = SB.append("g")
 		.attr("id", "scale_taxa_nodes")
 		.attr("transform", "translate(" + 0  + "," + 0  + ")");
 	
@@ -1138,7 +1138,7 @@ function drawScale() {
 	sampAv = [0.25, 0.05, 0.01];
 	sampAvName = ["25", "5", "1"];
 	
-	TaxaNodes.append("text")
+	var taxa_node_first_line_text = TaxaNodes.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
@@ -1146,9 +1146,8 @@ function drawScale() {
 
 	TaxaNodes.append("text")
 		.attr("x", sbw / 2)
-		.attr("y", 20)
+		.attr("y", 20 + taxa_node_first_line_text.node().getBBox().height)
 		.attr("text-anchor","middle")
-		.attr("dy", "1em")
   		.text(scale_taxa_label2);
 
 
@@ -1168,13 +1167,13 @@ function drawScale() {
 			.text(sampAvName[scalei] + "%");
 	}
 
-	FuncNodes = SB.append("g")
+	var FuncNodes = SB.append("g")
 		.attr("id", "scale_func_nodes")
 		.attr("transform", "translate(" + 0  + "," + sbh/3  + ")");
 	
 	funcBarH = Math.min( d3.select("#part1").select(".mainrect").attr("height"), 100);
 	
-	FuncNodes.append("text")
+	var func_node_first_line_text = FuncNodes.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
@@ -1182,8 +1181,7 @@ function drawScale() {
 		
 	FuncNodes.append("text")
 		.attr("x", sbw / 2)
-		.attr("y", 20)
-		.attr("dy", "1em")
+		.attr("y", 20 + func_node_first_line_text.node().getBBox().height)
 		.attr("text-anchor","middle")
 		.html(scale_func_label2);
 		
@@ -1205,11 +1203,11 @@ function drawScale() {
 			.text(sampAvName[scalei] + "%");
 	}
 	
-	EdgeBars = SB.append("g")
+	var EdgeBars = SB.append("g")
 		.attr("id", "scale_edge_bars")
 		.attr("transform", "translate(" + 0 + "," + 2/3*sbh + ")");
 
-	EdgeBars.append("text")
+	var edge_bar_first_line_text = EdgeBars.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20)
 		.attr("text-anchor","middle")
@@ -1217,9 +1215,8 @@ function drawScale() {
 
 	EdgeBars.append("text")
 		.attr("x", sbw / 2)
-		.attr("y", 20)
+		.attr("y", 20 + edge_bar_first_line_text.node().getBBox().height)
 		.attr("text-anchor","middle")
-		.attr("dy", "1em")
 		.html(scale_edge_label2);
 
 	for (scalei = 0; scalei < sampAv.length; scalei++) {
