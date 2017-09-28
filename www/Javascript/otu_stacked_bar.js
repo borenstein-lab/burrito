@@ -214,6 +214,13 @@
         .attr("dx", 0)
         .attr("dy", 0)
 
+    // Fix length of axis bar so it doesn't extend too far when exported
+    var curr_x_axis_path_string = document.getElementById("otu_x_axis").querySelectorAll("path")[0].getAttribute("d");
+    var x_axis_path_string_prefix = curr_x_axis_path_string.match(/^(.*)H/);
+    var x_axis_path_string_suffix = curr_x_axis_path_string.match(/H[0-9\.]*(V.*)$/);
+    d3.select("#otu_x_axis").selectAll("path").attr("d", x_axis_path_string_prefix[1] + "H" + (last_sample_x - first_sample_x + x.rangeBand()) + x_axis_path_string_suffix[1]);
+
+
     // Grab the initial x transform of the ticks
     var initial_x_axis_tick_transform = dims.width
     d3.select("#otu_x_axis").selectAll(".tick")
