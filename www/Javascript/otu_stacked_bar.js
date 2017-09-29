@@ -57,7 +57,8 @@
     d3.select("#otu_bar_x_label").remove()
     d3.select("#otu_bar_xtick_svg").remove()
 
-	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8}
+	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:10, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8}
+    graphdims.width = graphdims.width - graphdims.width_buffer;
     x.rangeBands([0, graphdims.width], .2);
     xAxis.scale(x);
     yAxis.scale(y);
@@ -97,7 +98,7 @@
       .attr("class", "g")
       .attr("transform", function(d) { 
       	samp_col = d3.keys(d)[0]
-        return "translate(" + (graphdims.sample_buffer - first_sample_x + x(d[samp_col])) + "," + graphdims.height_buffer +")"; 
+        return "translate(" + (graphdims.sample_buffer + graphdims.width_buffer - first_sample_x + x(d[samp_col])) + "," + graphdims.height_buffer +")"; 
       });
 
     Sample.selectAll("rect")
@@ -199,7 +200,7 @@
     // Initializae x-axis
     svglink.append("svg")
       .attr("id", "otu_bar_xtick_svg")
-      .attr("x", 0)
+      .attr("x", graphdims.width_buffer)
       .attr("width", last_sample_x - first_sample_x + graphdims.x_axis_x_buffer + x.rangeBand())
       .attr("clip-path", "")
 
@@ -210,6 +211,8 @@
       .call(xAxis)
       .selectAll("text")
   	    .style("alignment-baseline","middle")
+        .attr("dominant-baseline", "middle")
+        .style("font-size", sample_label_size)
         .style("text-anchor", "end")
         .attr("dx", 0)
         .attr("dy", 0)
@@ -288,16 +291,16 @@
   		.insert("g","g.x_axis")
 			.classed("x_samp_g_label",true)
 			.append("rect")
-  			.attr("x", function(d) { return d.Min; } )
+  			.attr("x", function(d) { return d.Min - graphdims.width_buffer; } )
   			.attr("y", 0)
   			.attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
   			.attr("fill", function(d) { return sampleColor(d.Name); });
 
   	d3.select("#otu_bar_xtick_svg").selectAll(".x_samp_g_label")
   		.append("text")
-    		.attr("x", function(d) { return d.Min + (d.Max - d.Min + x.rangeBand())/2 })
+    		.attr("x", function(d) { return d.Min - graphdims.width_buffer + (d.Max - d.Min + x.rangeBand())/2 })
     		.attr("text-anchor","middle")
-    		.attr("font-size", 17)
+    		.attr("font-size", group_label_size)
     		.text(function(d) { return d.Name; });
 
 	d3.select("#taxa_bars").selectAll("line.bar_group_divider")
@@ -353,14 +356,10 @@
   // Initialize the y-axis
   svglink.append("g")
     .attr("class", "y axis")
-    .attr("transform","translate("+ (dims.width-graphdims.width + graphdims.width_buffer) +"," + graphdims.height_buffer + ")")
+    .attr("transform","translate("+ (dims.width-graphdims.width) +"," + graphdims.height_buffer + ")")
     .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .attr("class", "y_label"); 
+    .selectAll("text")
+      .style("font-size", y_axis_tick_size)
 
 
     // Initialize the y-axis label
@@ -370,7 +369,7 @@
       .attr("text-anchor", "middle")
       .attr("y", 0)
       .attr("x", -(dims.height - x_axis_height) / 2)
-      .attr("font-size",18)
+      .attr("font-size", y_axis_label_size)
       .attr("dy", ".75em")
       .attr("transform", "rotate(-90)")
       .text(taxonomic_abundance_y_axis_title);

@@ -299,6 +299,7 @@
 				return d.name;
 				})
 			.style("font-weight","bold")
+			.style("font-size", tree_depth_label_size)
 			.attr("text-anchor","middle")
 			.attr("visibility", "hidden");
 			
@@ -529,6 +530,7 @@
 				return d.name;
 				})
 			.style("font-weight","bold")
+			.style("font-size", tree_depth_label_size)
 			.attr("text-anchor","middle")
 			.attr("visibility", "hidden");
 			
@@ -697,6 +699,7 @@
 				}
 				})
 				.attr("text-anchor", "middle")
+				.style("font-size", tree_node_label_size)
 				.attr("dy", function (d5, isz) {
 					return "-" + (1* d3.select(thisobj.parentNode).select("circle").attr("r") +  6) +  "";
 				})

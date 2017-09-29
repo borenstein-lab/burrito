@@ -141,6 +141,7 @@
 		mainbar.append("text").attr("class","barlabel")
 			.attr("x", p == 0 ? c1[p] + (extra_width-b-bb) : c1[p])
 			.attr("y",function(d){ return d.middle;})
+			.style("font-size", bipartite_graph_label_size)
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.attr("alignment-baseline","middle")
 			.text(function(d,i){

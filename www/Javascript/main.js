@@ -49,7 +49,7 @@ draw_svg = function() {
 			.attr("id","plots_svg")
 			.attr("viewBox","0 0 " + width + " " + height + "")
 			.attr("preserveAspectRatio","none")
-			.style("font-family", "Verdana")
+			.style("font-family", "arial")
 			.style("background-color", "white");
 
 		var using_picrust = false;
@@ -303,7 +303,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	document.getElementById('save_screenshot').addEventListener('click', function() {
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.png";
-				saveSvgAsPng(document.getElementById("plots_svg"), fileString, { backgroundColor : "white", scale: 1.5})
+				saveSvgAsPng(document.getElementById("plots_svg"), fileString, { backgroundColor : "white", encoderOptions : 3})
 			} else { // SVG
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.svg";
 				svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { 
@@ -315,7 +315,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	document.getElementById('save_taxa_bar').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.png";
-				saveSvgAsPng(document.getElementById("taxa_bars"), fileString, { backgroundColor : "white", scale: 1.5})
+				saveSvgAsPng(document.getElementById("taxa_bars"), fileString, { backgroundColor : "white", scale: 3})
 			} else { // SVG
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.svg";
 				svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) { 
@@ -327,7 +327,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		document.getElementById('save_taxonomy_leg').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_legend.png";
-				saveSvgAsPng(document.getElementById("saveLegBar0"), fileString, { backgroundColor : "white", scale: 1.5})
+				saveSvgAsPng(document.getElementById("saveLegBar0"), fileString, { backgroundColor : "white", scale: 3})
 			} else { // SVG
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_legend.svg";
 				svgAsDataUri(document.getElementById("saveLegBar0"), {}, function(uri) {
@@ -340,7 +340,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		document.getElementById('save_func_bar').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_bar.png";
-				saveSvgAsPng(document.getElementById("func_bars"), fileString, { backgroundColor : "white", scale: 1.5})
+				saveSvgAsPng(document.getElementById("func_bars"), fileString, { backgroundColor : "white", scale: 3})
 			} else { // SVG
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_bar.svg";
 				svgAsDataUri(document.getElementById("func_bars"), {}, function(uri) { 
@@ -352,7 +352,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		document.getElementById('save_function_leg').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_legend.png";
-				saveSvgAsPng(document.getElementById("saveLegBar1"), fileString, { backgroundColor : "white", scale: 1.5})
+				saveSvgAsPng(document.getElementById("saveLegBar1"), fileString, { backgroundColor : "white", scale: 3})
 			} else { // SVG
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_func_legend.svg";
 				svgAsDataUri(document.getElementById("saveLegBar1"), {}, function(uri) { 
@@ -455,7 +455,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			.attr("stroke","white")
 			.attr("text-anchor","middle")
 			.attr("y", 6)
-			.attr("font-size",16)
+			.attr("font-size", help_overlay_text_size)
 			.classed("noselect","true")
 			.text("?");
 
@@ -483,7 +483,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	.attr("width", width - margin.left - margin.right)
 	.attr("height", (height/2) - margin.top - (margin.btwnavbar / 2))
 	.attr("id","navbar")
-	.style("font-family", "Verdana");
+	.style("font-family", "arial");
 			
 	var bpG = NavSVG.append("g")
 		.attr("transform","translate("+ (navDims.width / 2) +","+ margin.top +")");
@@ -499,7 +499,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		//.attr("height",100)
 		//.attr("viewBox","0 0 100 100")
 		.attr("id", "taxa_bars")
-		.style("font-family", "Verdana");
+		.style("font-family", "arial");
 		//.attr("preserveAspectRatio","none");
 		//.attr("transform","scale(2.0)");
 		
@@ -510,7 +510,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		.attr("height",barDimensions.height)
 		//.attr("viewBox","0 0 100 100")
 		.attr("id", "func_bars")
-		.style("font-family", "Verdana");
+		.style("font-family", "arial");
 		
 	var ScaleSVG = plotSVG.insert("svg", "#sidebar")
 		.attr("x", width * 0.9)
@@ -1094,7 +1094,7 @@ function makeBusy() {
 			.attr("x", width/2)
 			.attr("y", height/2 + 10)
 			.attr("text-anchor", "middle")
-			.attr("font-size", 25)
+			.attr("font-size", busy_text_size)
 			.attr("fill", "#ffffff")
 			.attr("stroke", "none")
 			.text(busy_text);
@@ -1141,12 +1141,14 @@ function drawScale() {
 	var taxa_node_first_line_text = TaxaNodes.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20)
+		.style("font-size", legend_text_size)
 		.attr("text-anchor","middle")
   		.text(scale_taxa_label1);
 
 	TaxaNodes.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20 + taxa_node_first_line_text.node().getBBox().height)
+		.style("font-size", legend_text_size)
 		.attr("text-anchor","middle")
   		.text(scale_taxa_label2);
 
@@ -1176,12 +1178,14 @@ function drawScale() {
 	var func_node_first_line_text = FuncNodes.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20)
+		.style("font-size", legend_text_size)
 		.attr("text-anchor","middle")
 		.html(scale_func_label1);
 		
 	FuncNodes.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20 + func_node_first_line_text.node().getBBox().height)
+		.style("font-size", legend_text_size)
 		.attr("text-anchor","middle")
 		.html(scale_func_label2);
 		
@@ -1210,12 +1214,14 @@ function drawScale() {
 	var edge_bar_first_line_text = EdgeBars.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20)
+		.style("font-size", legend_text_size)
 		.attr("text-anchor","middle")
 		.html(scale_edge_label1);
 
 	EdgeBars.append("text")
 		.attr("x", sbw / 2)
 		.attr("y", 20 + edge_bar_first_line_text.node().getBBox().height)
+		.style("font-size", legend_text_size)
 		.attr("text-anchor","middle")
 		.html(scale_edge_label2);
 

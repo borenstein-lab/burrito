@@ -205,10 +205,12 @@
   out$.saveSvg = function(uri, name) {
   	var link = document.createElement("a");
   	link.download = name;
-	link.href = uri;
+	  link.href = uri;
+    document.body.appendChild(link);
+    link.addEventListener("click", function(e){
+      link.parentNode.removeChild(link);
+    })
     link.click();
-    document.body.removeChild(link);
-  	delete link;
   }  
 
   // if define is defined create as an AMD module

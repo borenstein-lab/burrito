@@ -83,7 +83,8 @@
     d3.select("#func_bar_x_label").remove()
     d3.select("#func_bar_xtick_svg").remove()
 
-    var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:0, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:10, padding: 0.2}
+    var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:10, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:10, padding: 0.2}
+    graphdims.width = graphdims.width - graphdims.width_buffer;
     x.rangeBands([0, graphdims.width], graphdims.padding);
     
     xAxis.scale(x);
@@ -136,7 +137,7 @@
       .enter().append("g")
         .attr("class", "g sample_bar")
         .attr("id", function(d){ return "func_" + d.Sample })
-        .attr("transform", function(d) { return "translate(" + (graphdims.sample_buffer - first_sample_x + x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
+        .attr("transform", function(d) { return "translate(" + (graphdims.sample_buffer + graphdims.width_buffer - first_sample_x + x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
 
     //create rects for each value, transpose based on sample
     Sample.selectAll("rect")
@@ -256,7 +257,7 @@
     // Initialize x-axis
     svglink.append("svg")
       .attr("id", "func_bar_xtick_svg")
-      .attr("x", 0)
+      .attr("x", graphdims.width_buffer)
       .attr("width", last_sample_x - first_sample_x + x.rangeBand() + graphdims.x_axis_x_buffer)
 
     d3.select("#func_bar_xtick_svg").append("g")
@@ -266,6 +267,8 @@
       .call(xAxis)
       .selectAll("text")
         .style("alignment-baseline","middle")
+        .attr("dominant-baseline", "middle")
+        .style("font-size", sample_label_size)
         .attr("dx", 0)
         .attr("dy", 0)
         .style("text-anchor", "end")
@@ -306,7 +309,7 @@
     if (num_comparison_samples > 0){
 
       // Reposition x-coordinates of sample and grouping elements depending on comparison samples
-      var last_bar_end = graphdims.sample_buffer + x.rangeBand();
+      var last_bar_end = graphdims.sample_buffer + x.rangeBand() + graphdims.width_buffer;
       for (var sample_index = 1; sample_index < sample_order.length; sample_index++){
 
         var sample_name = sample_order[sample_index]
@@ -350,7 +353,7 @@
         // If this isn't the tick for a comparison sample, then we fix its x position
         if (sample_name.indexOf("_comparison") < 0 & sample_name != ""){
           var x_position = (d3.transform(d3.select("#func_" + sample_name).attr("transform")).translate)[0]
-          tick.attr("transform", "translate(" + (x_position - graphdims.sample_buffer) + ",0)")
+          tick.attr("transform", "translate(" + (x_position - graphdims.sample_buffer - graphdims.width_buffer) + ",0)")
         }
       })
 
@@ -372,8 +375,9 @@
                 .attr("class", "sample_type_label")
                 .attr("x", 0)
                 .attr("y", graphdims.sample_label_buffer)
+                .style("font-size", func_type_label_size)
                 .attr("text-anchor", "middle")
-                .attr("transform", "translate(" + (sample_x + (x.rangeBand() / 2)- graphdims.sample_buffer) + "," + graphdims.sample_label_buffer + ")")
+                .attr("transform", "translate(" + (sample_x + (x.rangeBand() / 2)- graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
                 .text(taxa_based_bar_label)
             var comparison_x = sample_x + x.rangeBand()
             d3.select("#func_x_axis")
@@ -381,8 +385,9 @@
                 .attr("class", "sample_type_label")
                 .attr("x", 0)
                 .attr("y", graphdims.sample_label_buffer)
+                .style("font-size", func_type_label_size)
                 .attr("text-anchor", "middle")
-                .attr("transform", "translate(" + (comparison_x + (x.rangeBand() / 2) - graphdims.sample_buffer) + "," + graphdims.sample_label_buffer + ")")
+                .attr("transform", "translate(" + (comparison_x + (x.rangeBand() / 2) - graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
                 .text(metagenome_based_bar_label)
           // }
         }
@@ -467,16 +472,16 @@
           .insert("g", "g.x_axis")
           .classed("x_samp_g_label",true)
           .append("rect")
-            .attr("x", function(d) { return d.Min; } )
+            .attr("x", function(d) { return d.Min - graphdims.width_buffer; } )
             .attr("y", 0)
             .attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
             .attr("fill", function(d) { return sampleColor(d.Name); });
 
       d3.select("#func_bar_xtick_svg").selectAll(".x_samp_g_label")
         .append("text")
-          .attr("x", function(d) { return d.Min + (d.Max - d.Min + x.rangeBand())/2 })
+          .attr("x", function(d) { return d.Min - graphdims.width_buffer + (d.Max - d.Min + x.rangeBand())/2 })
           .attr("text-anchor","middle")
-          .attr("font-size", 17)
+          .attr("font-size", group_label_size)
           .text(function(d) { return d.Name; });
 
       for (var group_index = 0; group_index < groups.length - 1; group_index++){
@@ -539,24 +544,20 @@
     // Initialize y-axis
     svglink.append("g")
       .attr("class", "y axis")
-      .attr("transform","translate(" + (dims.width - graphdims.width + graphdims.width_buffer) + "," + graphdims.height_buffer + ")")
+      .attr("transform","translate(" + (dims.width - graphdims.width) + "," + graphdims.height_buffer + ")")
       .call(yAxis)
-      .append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .attr("class", "y_label");
+      .selectAll("text")
+        .style("font-size", y_axis_tick_size)
 
 
     // Initialize the y axis label
     svglink.append("text")
-      .attr("class", "y label")
+      .attr("class", "y_label")
       .attr("id", "func_bar_y_label")
       .attr("text-anchor", "middle")
       .attr("y", 0)
       .attr("x", -(dims.height - x_axis_height) / 2)
-      .attr("font-size",18)
+      .attr("font-size", y_axis_label_size)
       .attr("dy", ".75em")
       .attr("transform", "rotate(-90)")
       .text(function_abundance_y_axis_title);
