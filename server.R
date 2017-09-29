@@ -1598,6 +1598,24 @@ shinyServer(function(input, output, session) {
 		return(javascript_contribution_table)
 	}
 
+	# filter_missing_samples_from_metadata(metadata_table, otu_table, contribution_table)
+	#
+	# Removes samples from the metadata table that do not appear in the OTU or contribution tables
+	filter_missing_samples_from_metadata = function(metadata_table, otu_table, contribution_table){
+
+		# If the metadata table is not empty, filter it
+		if (nrow(metadata_table) > 0){
+
+			# Determine which samples in the metadata table appear in the other tables
+			filtered_metadata_rows = which(metadata_table[[first_metadata_level()]] %in% c(otu_table[[first_metadata_level()]], contribution_table[[first_metadata_level()]]))
+
+			# Keep only the rows that are in the other tables
+			metadata_table = metadata_table[filtered_metadata_rows]
+		}
+
+		return(metadata_table)
+	}
+
 	# order_metadata_table_by_metadata_factor(metadata_table)
 	#
 	# Orders the samples in the metadata table by the selected metadata factor
@@ -2002,6 +2020,9 @@ shinyServer(function(input, output, session) {
 
 		### Prepare the metadata table ###
 		session$sendCustomMessage("upload_status", "metadata_formatting")
+
+		# Filter samples without data from the metadata table
+		metadata_table = filter_missing_samples_from_metadata(metadata_table, otu_table, contribution_table)
 
 		# If a metadata factor has been selected, order samples by the indicated metadata factor
 		if (!is.null(metadata_factor())){
