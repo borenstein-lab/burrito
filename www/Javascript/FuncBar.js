@@ -1,13 +1,13 @@
 !function(){
   var fB = {};
 
-  var x = d3.scale.ordinal();
-  var y = d3.scale.linear()
+  var func_bar_x = d3.scale.ordinal();
+  var func_bar_y = d3.scale.linear()
 
-  var xAxis = d3.svg.axis()
+  var func_bar_x_axis = d3.svg.axis()
   .orient("bottom");
 
-  var yAxis = d3.svg.axis()
+  var func_bar_y_axis = d3.svg.axis()
   .orient("left")
   .tickFormat(d3.format(".2s"));
 
@@ -20,7 +20,6 @@
   }
 
   fB.vizData = function(data, sample_order){
-
     var y0 = 0;
     var y1 = 0;
     var total = 0;
@@ -36,7 +35,7 @@
       d.data.forEach(function(e){
 
         e.y0 = y0*100;
-        e.y1= (y0 += +e.contributions)*100; 
+        e.y1= (y0 += +e.contributions)*100;
       })
 
       total = d.data[length-1].y1;
@@ -61,11 +60,11 @@
       }
     }
     if (comparison_present){
-      x.domain(fixed_sample_order)
+      func_bar_x.domain(fixed_sample_order)
     } else {
-      x.domain(sample_order);
+      func_bar_x.domain(sample_order);
     }
-    y.domain([0, 100]);
+    func_bar_y.domain([0, 100]);
     return data;
   }
 
@@ -85,10 +84,10 @@
 
     var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:10, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:10, padding: 0.2}
     graphdims.width = graphdims.width - graphdims.width_buffer;
-    x.rangeBands([0, graphdims.width], graphdims.padding);
+    func_bar_x.rangeBands([0, graphdims.width], graphdims.padding);
     
-    xAxis.scale(x);
-    yAxis.scale(y);
+    func_bar_x_axis.scale(func_bar_x);
+    func_bar_y_axis.scale(func_bar_y);
 
     display_func = []
     d3.select("#Genomes").select(".part1").select("#saveLegBar1").select(".mainbars")
@@ -103,10 +102,10 @@
       })
 
     var viz = fB.vizData(stackdata, sample_order);
-    var first_sample_x = x(sample_order[0]);
-    var last_sample_x = x(sample_order[0]);
+    var first_sample_x = func_bar_x(sample_order[0]);
+    var last_sample_x = func_bar_x(sample_order[0]);
     for (i = 0; i < sample_order.length; i++){
-      curr_x = x(sample_order[i]);
+      curr_x = func_bar_x(sample_order[i]);
       if (curr_x < first_sample_x){
         first_sample_x = curr_x;
       }
@@ -137,7 +136,7 @@
       .enter().append("g")
         .attr("class", "g sample_bar")
         .attr("id", function(d){ return "func_" + d.Sample })
-        .attr("transform", function(d) { return "translate(" + (graphdims.sample_buffer + graphdims.width_buffer - first_sample_x + x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
+        .attr("transform", function(d) { return "translate(" + (graphdims.sample_buffer + graphdims.width_buffer - first_sample_x + func_bar_x(d.Sample)) + "," + graphdims.height_buffer + ")"; });
 
     //create rects for each value, transpose based on sample
     Sample.selectAll("rect")
@@ -147,9 +146,7 @@
         .enter().append("rect")
           .attr("func", function(d) {return d.func})
           .attr("taxon", function(d) { return d.Taxa})
-          .attr("width", x.rangeBand())
-          .attr("y", function(d) {return y(d.y1); })
-          .attr("height", function(d) {return y(d.y0) - y(d.y1) + 1;} )
+          .attr("width", func_bar_x.rangeBand())
           .style("fill", function(d) { return colors(d.func); })
           .on("mouseover", function(d){
             current_rectangle_data = d3.select(this).datum();
@@ -258,13 +255,13 @@
     svglink.append("svg")
       .attr("id", "func_bar_xtick_svg")
       .attr("x", graphdims.width_buffer)
-      .attr("width", last_sample_x - first_sample_x + x.rangeBand() + graphdims.x_axis_x_buffer)
+      .attr("width", last_sample_x - first_sample_x + func_bar_x.rangeBand() + graphdims.x_axis_x_buffer)
 
     d3.select("#func_bar_xtick_svg").append("g")
       .attr("class", "x_axis")
       .attr("id", "func_x_axis")
       .attr("transform", "translate(" + graphdims.x_axis_x_buffer + ",0)")
-      .call(xAxis)
+      .call(func_bar_x_axis)
       .selectAll("text")
         .style("alignment-baseline","middle")
         .attr("dominant-baseline", "middle")
@@ -277,7 +274,7 @@
     var curr_x_axis_path_string = document.getElementById("func_x_axis").querySelectorAll("path")[0].getAttribute("d");
     var x_axis_path_string_prefix = curr_x_axis_path_string.match(/^(.*)H/);
     var x_axis_path_string_suffix = curr_x_axis_path_string.match(/H[0-9\.]*(V.*)$/);
-    d3.select("#func_x_axis").selectAll("path").attr("d", x_axis_path_string_prefix[1] + "H" + (last_sample_x - first_sample_x + x.rangeBand()) + x_axis_path_string_suffix[1]);
+    d3.select("#func_x_axis").selectAll("path").attr("d", x_axis_path_string_prefix[1] + "H" + (last_sample_x - first_sample_x + func_bar_x.rangeBand()) + x_axis_path_string_suffix[1]);
 
 
     // Remove labels for comparison samples
@@ -290,7 +287,7 @@
       })
 
     // Calculate the new padding between bars after removing space between paired comparison samples
-    var original_padding = x.rangeBand() * graphdims.padding / (1 - graphdims.padding)
+    var original_padding = func_bar_x.rangeBand() * graphdims.padding / (1 - graphdims.padding)
     var total_original_padding = original_padding * (sample_order.length - 1)
 
     var num_comparison_samples = 0
@@ -309,7 +306,7 @@
     if (num_comparison_samples > 0){
 
       // Reposition x-coordinates of sample and grouping elements depending on comparison samples
-      var last_bar_end = graphdims.sample_buffer + x.rangeBand() + graphdims.width_buffer;
+      var last_bar_end = graphdims.sample_buffer + func_bar_x.rangeBand() + graphdims.width_buffer;
       for (var sample_index = 1; sample_index < sample_order.length; sample_index++){
 
         var sample_name = sample_order[sample_index]
@@ -319,7 +316,7 @@
         if (sample_name.indexOf("_comparison") >= 0){
 
           sample_element.attr("transform", "translate(" + last_bar_end + "," + graphdims.height_buffer + ")")
-          last_bar_end = last_bar_end + x.rangeBand()
+          last_bar_end = last_bar_end + func_bar_x.rangeBand()
 
         // Otherwise, place the sample the new padding distance away from the previous sample
         } else {
@@ -329,11 +326,11 @@
 
           // If the sample has no comparison sample, make a blank space the size of a comparison sample as placeholder
           if (!document.getElementById("func_" + sample_name + "_comparison")){
-            last_bar_end = last_bar_end + (x.rangeBand() * 2) + new_padding
+            last_bar_end = last_bar_end + (func_bar_x.rangeBand() * 2) + new_padding
 
           // Otherwise, the next bar will be the comparison bar
           } else {
-            last_bar_end = last_bar_end + x.rangeBand() + new_padding
+            last_bar_end = last_bar_end + func_bar_x.rangeBand() + new_padding
           }
         }
       }
@@ -377,9 +374,9 @@
                 .attr("y", graphdims.sample_label_buffer)
                 .style("font-size", func_type_label_size)
                 .attr("text-anchor", "middle")
-                .attr("transform", "translate(" + (sample_x + (x.rangeBand() / 2)- graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
+                .attr("transform", "translate(" + (sample_x + (func_bar_x.rangeBand() / 2)- graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
                 .text(taxa_based_bar_label)
-            var comparison_x = sample_x + x.rangeBand()
+            var comparison_x = sample_x + func_bar_x.rangeBand()
             d3.select("#func_x_axis")
               .append("text")
                 .attr("class", "sample_type_label")
@@ -387,7 +384,7 @@
                 .attr("y", graphdims.sample_label_buffer)
                 .style("font-size", func_type_label_size)
                 .attr("text-anchor", "middle")
-                .attr("transform", "translate(" + (comparison_x + (x.rangeBand() / 2) - graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
+                .attr("transform", "translate(" + (comparison_x + (func_bar_x.rangeBand() / 2) - graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
                 .text(metagenome_based_bar_label)
           // }
         }
@@ -434,11 +431,11 @@
             // If comparison samples exist, center the label between the two bars
             if (num_comparison_samples > 0){
               d3.select(this)
-                .attr("transform", "translate(" + (x.rangeBand() - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
+                .attr("transform", "translate(" + (func_bar_x.rangeBand() - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
             // Otherwise, center on the bar itself
             } else {
               d3.select(this)
-                .attr("transform", "translate(" + ((x.rangeBand() / 2) - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
+                .attr("transform", "translate(" + ((func_bar_x.rangeBand() / 2) - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
             }
           })
 
@@ -474,12 +471,12 @@
           .append("rect")
             .attr("x", function(d) { return d.Min - graphdims.width_buffer; } )
             .attr("y", 0)
-            .attr("width", function(d) { return d.Max - d.Min + x.rangeBand(); })
+            .attr("width", function(d) { return d.Max - d.Min + func_bar_x.rangeBand(); })
             .attr("fill", function(d) { return sampleColor(d.Name); });
 
       d3.select("#func_bar_xtick_svg").selectAll(".x_samp_g_label")
         .append("text")
-          .attr("x", function(d) { return d.Min - graphdims.width_buffer + (d.Max - d.Min + x.rangeBand())/2 })
+          .attr("x", function(d) { return d.Min - graphdims.width_buffer + (d.Max - d.Min + func_bar_x.rangeBand())/2 })
           .attr("text-anchor","middle")
           .attr("font-size", group_label_size)
           .text(function(d) { return d.Name; });
@@ -488,8 +485,8 @@
         d3.select("#func_bars").append("line")
           .attr("class", "bar_group_divider")
           .attr("y1", graphdims.height_buffer)
-          .attr("x1", groups[group_index].Max + x.rangeBand() + ((groups[group_index + 1].Min - groups[group_index].Max - x.rangeBand()) / 2))
-          .attr("x2", groups[group_index].Max + x.rangeBand() + ((groups[group_index + 1].Min - groups[group_index].Max - x.rangeBand()) / 2))
+          .attr("x1", groups[group_index].Max + func_bar_x.rangeBand() + ((groups[group_index + 1].Min - groups[group_index].Max - func_bar_x.rangeBand()) / 2))
+          .attr("x2", groups[group_index].Max + func_bar_x.rangeBand() + ((groups[group_index + 1].Min - groups[group_index].Max - func_bar_x.rangeBand()) / 2))
       }
       // d3.select("#func_bars").selectAll("line.bar_group_divider")
       //   .data(groups.slice(0,groups.length - 1))
@@ -541,14 +538,16 @@
           .attr("y2", dims.height - x_axis_height)
       })
 
+    // Set the y range to be between the top of the barplot svg and the top of the x-axis
+    func_bar_y.range([dims.height - x_axis_height - graphdims.height_buffer, 0]);
+
     // Initialize y-axis
     svglink.append("g")
       .attr("class", "y axis")
       .attr("transform","translate(" + (dims.width - graphdims.width) + "," + graphdims.height_buffer + ")")
-      .call(yAxis)
+      .call(func_bar_y_axis)
       .selectAll("text")
         .style("font-size", y_axis_tick_size)
-
 
     // Initialize the y axis label
     svglink.append("text")
@@ -562,8 +561,14 @@
       .attr("transform", "rotate(-90)")
       .text(function_abundance_y_axis_title);
 
-    // Set the y range to be between the top of the barplot svg and the top of the x-axis
-    y.range([dims.height - x_axis_height - graphdims.height_buffer, 0]);
+    // Now that we know the y range, position the tops and bottoms of the bar rectangles
+    Sample.selectAll("rect")
+      .attr("y", function(d){
+        return func_bar_y(d.y1);
+      })
+      .attr("height", function(d){
+        return func_bar_y(d.y0) - func_bar_y(d.y1) + 1;
+      })
   }
 
   fB.select_bars = function(func, colors){
