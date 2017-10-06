@@ -740,6 +740,83 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		});
 		return all_func_data;
 	}
+	
+	getTotalFuncData = function(stackData){
+		console.log(stackData)
+		var totalFuncs = {}
+		stackData.map(function(f){ //for every sample
+			samp_totals = {}
+			if(f.Sample.indexOf("_comparison")==-1){
+				data_cube.displayed_funcs.map(function(e){ //for every function
+					foo_sub =  f.data.filter(function(d){ //go over all taxa
+						return d.func == e;
+					}) //return all elements with data on this function
+					total_val = d3.sum(foo_sub.map(function(c){ 
+						return c.contributions; }))
+					samp_totals[e] = {}
+					samp_totals[e]["total"] = total_val;
+					//also get percents
+					perc_vals = {}
+					data_cube.displayed_taxa.map(function(t){
+						frac_func = (data_cube.get_contribution(f.Sample, t, e)*100)/total_val
+						perc_vals[t] = frac_func;
+					})
+					samp_totals[e]["percents"] = perc_vals; 
+
+				})
+			} else {
+				data_cube.displayed_funcs.map(function(e){ //for every function
+					foo_sub =  f.data.filter(function(d){ //go over all taxa
+					return d.func == e;
+					}) //return all elements with data on this function
+					console.log(foo_sub)
+					total_val = foo_sub[0].contributions
+				samp_totals[e] = {}
+				samp_totals[e]["total"] = total_val;
+			})
+			}
+			totalFuncs[f.Sample] = samp_totals;
+		})
+		return totalFuncs;
+	}
+
+// 	getPercFuncData = function(totalFuncs, stackData){
+// 		var percFuncs = {};
+// 		stackData.map(function(f,i){
+// 		if(f.Sample.indexOf("_comparison")==-1){
+// 		samp1 = f.Sample;
+// 		percFuncs[f.Sample] = {}
+// 		data_cube.displayed_funcs.map(function(e,j){
+// 			if(totalFuncs[samp1][e] != 0){ //frac only makes sense for nonzero functions
+// 				percFuncs[f.Sample][e] = {}
+// 				data_cube.displayed_taxa.map(function(t){
+// 					frac_func = (data_cube.get_contribution(samp1, t, e)*100)/totalFuncs[samp1][e]
+// 					percFuncs[samp1][e][t] = frac_func
+// 				}) 
+// 			}
+// 		})
+// 		}
+// 		})
+// 		return percFuncs;
+// 		}
+
+	getAvgPercFuncs = function(totalFuncs){
+		var avgPercFuncs = {};
+		data_cube.displayed_funcs.map(function(f){
+			samp_set = d3.keys(totalFuncs).filter(function(m){
+				return ((d3.keys(totalFuncs[m]).indexOf(f) != -1) & m != "Average_contrib" & m.indexOf("_comparison")==-1)
+			})
+			total_func = {};
+			data_cube.displayed_taxa.map(function(t){
+				total = d3.sum(samp_set.map(function(s){
+					return totalFuncs[s][f]["percents"][t];
+					}))
+				total_func[t] = total/(samp_set.length) //leave out average contrib sample
+			})
+			avgPercFuncs[f] = total_func
+		})
+		return avgPercFuncs;
+	}
 
 	function sort_nest(x, y){
 		if (x.key < y.key){
@@ -750,19 +827,37 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			return 0;
 		}
 	}
+	
 
 	//data_cube.expand_taxon("Bacteria");
 	
 	var bpData = getLinkData();
 	var avg_contrib_data = data_cube.displayed_contribution_cube["Average_contrib"]
 
-	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
 
+
+	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
+	
+	var stackData = getFuncBarData();
 
 	//draw the stacked bar
 
-	var stackData = getFuncBarData();
-	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
+
+	// 	for 
+// 	                selected = d3.select("#func_" + current_rectangle_data.Sample)
+//                   .selectAll("rect").data()
+//                   .filter(function(e){ 
+//                     return e.func == current_rectangle_data.func; 
+//                   })
+//                 total_abund = d3.sum(selected.map(function(e){ return e.contributions; }))
+
+	
+
+	totalFuncs = getTotalFuncData(stackData);
+// 	percFuncs = getPercFuncData(totalFuncs, stackData);
+	avgPercFuncs = getAvgPercFuncs(totalFuncs);
+// 	avg_total_func = totalFuncs[0]
+	fB.Draw(stackData, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse, totalFuncs);
 
 	otu_cols = d3.keys(otu_abundance_data[0]) //[(otu_abundance_data[0].length-1)]
 	sample_col = otu_cols.pop()
@@ -772,8 +867,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 
-
-	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
+	bP.draw(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs,highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse, avgPercFuncs);
+	
 
 	function update_otu_bar(){
 		//remove old graph before redrawing new
@@ -782,17 +877,16 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 	}
 
-	function update_func_bar(){
+	function update_func_bar(func_data, total_funcs){
 		//remove old graph before redrawing new
 			FunctionBar.selectAll("g").remove();
-			var func_data = getFuncBarData();
-			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
+			fB.Draw(func_data, samplemap, func_colors, FunctionBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, func_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse, total_funcs);
 
 	}
 
 	var bpData = getLinkData();
 	var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
+	bpvisdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse, avgPercFuncs);
 
 	if (showScale) {
 		drawScale();
@@ -808,9 +902,16 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				dehighlightOverall(data_cube.displayed_taxa[i], data_cube.displayed_funcs[j], 3)
 			}
 		}
-		trees.updateBPvisdata( updateBPgraph() );
+		var avg_contrib_data = data_cube.displayed_contribution_cube["Average_contrib"]
+		var func_data = getFuncBarData();
+		var total_funcs = getTotalFuncData(func_data)
+// 		var perc_funcs = getPercFuncData(total_funcs, func_data)
+		var avg_perc_funcs = getAvgPercFuncs(total_funcs)
+
+		trees.updateBPvisdata( updateBPgraph(avg_perc_funcs, avg_contrib_data) );
 		update_otu_bar();
-		update_func_bar();
+
+		update_func_bar(func_data, total_funcs);
 	});
 		
 	function highlightOverall(taxonName, functionName, highlightwhat) {
@@ -1030,10 +1131,10 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	}
 	
 	// Update the bipartite graph after changes to data_cube
-	function updateBPgraph() {
+	function updateBPgraph(avg_perc_funcs, avg_contrib_data) {
 		var bpData = getLinkData();
 		var data = {data:bP.partData(bpData, data_cube.displayed_taxa, data_cube.displayed_funcs), id:'Genomes', header:["Taxa","Functions", "Genomes"]};
-		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse);
+		var visdata = bP.updateGraph(data, bpG, bpdims, taxa_colors, func_colors, data_cube.displayed_taxa, data_cube.displayed_funcs, highlightOverall, dehighlightOverall, avg_contrib_data, clickResponse, avg_perc_funcs);
 		if (showScale) {
 			redrawScale();
 		}

@@ -80,7 +80,6 @@
 				return (a.key1 < b.key1 ? -1 : a.key1 > b.key1 ? 
 						1 : a.key2 < b.key2 ? -1 : a.key2 > b.key2 ? 1: 0 )});
 		});
-		
 		vis.edges = vis.subBars[0].map(function(p,i){
 
 			return {
@@ -222,8 +221,8 @@
 
 	// }
 
-	function generate_bipartite_graph_tooltip(width){
-		return bipartite_graph_tooltip_text[0] + Math.round(width) + bipartite_graph_tooltip_text[1];
+	function generate_bipartite_graph_tooltip(width, totalShare){
+		return bipartite_graph_tooltip_text[0] + Math.round(width) + bipartite_graph_tooltip_text[1] + bipartite_graph_tooltip_text[2] + Math.round(totalShare) + bipartite_graph_tooltip_text[3];
 	}
 	
 	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
@@ -261,12 +260,12 @@
 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 					clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
 					if(clickedEdges.empty()||d3.select(this).classed("clicked")==true){
-						tooltip.html(generate_bipartite_graph_tooltip(d.wid))
+						tooltip.html(generate_bipartite_graph_tooltip(d.wid, d.shareOfTotal))
 						tooltip.style("visibility", "visible")
 					}
 			})
 			.on("mousemove", function(d){
-				return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+				return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+15)+"px");
 			})
 			.on("mouseout", function(d,i){ 
 				current_data = this._current
@@ -286,7 +285,7 @@
 			})
 			.on("click", function(d,i){
 				current_data = this._current
-				tooltip.html(generate_bipartite_graph_tooltip(d.wid))
+				tooltip.html(generate_bipartite_graph_tooltip(d.wid, d.shareOfTotal))
 				tooltip.style("visibility","visible")
 				if(d3.select(this).classed("highlighted")==false){
 				//unselect other edges
@@ -422,7 +421,7 @@
 		//
 	}	
 	
-	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse){
+	bP.draw = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse, avg_perc_funcs){
 
 		bb = dims.width * .075;
 		b = dims.width / 50;
@@ -432,13 +431,13 @@
 		
 		height = dims.height - dims.header;
 
-		bP.updateGraph(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse) //bip id has to be the same
+		bP.updateGraph(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse, avg_perc_funcs) //bip id has to be the same
 
 
 	}
 		
 
-	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse){ //bip id has to be the same
+	bP.updateGraph = function(bip, svg, dims, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data, clickResponse, avg_perc_funcs){ //bip id has to be the same
 
 		//svg.select("#"+bip.id).transition();
 		svg.select("#"+bip.id).remove(); //.transition();
@@ -447,12 +446,18 @@
 			
 
 		var visData = visualize(bip.data);
+		
+		//calculate edge widths corresponding with average contribution to function, also include average attribution of ttotal
+// 		console.log(avg_perc_funcs)
 		visData["edges"] = visData.edges.map(function(d){
+// 				console.log(avg_contrib_data[displayed_taxa[d.key1]][displayed_funcs[d.key2]])
 				sub_contrib = avg_contrib_data[displayed_taxa[d.key1]][displayed_funcs[d.key2]]
+				avg_share = avg_perc_funcs[displayed_funcs[d.key2]][displayed_taxa[d.key1]]
 			//divided by all the things with that function
-				all_func = d3.keys(avg_contrib_data).map(function(e){ 
-					return avg_contrib_data[e][displayed_funcs[d.key2]]; })
-			return {h1: d.h1, h2: d.h2, key1: d.key1, key2: d.key2, val: d.val, wid: 100*sub_contrib/d3.sum(all_func), y1: d.y1, y2:d.y2 };
+// 				all_func = d3.keys(avg_contrib_data).map(function(e){ 
+// 					return avg_contrib_data[e][displayed_funcs[d.key2]]; })
+// 				console.log(d3.sum(all_func))
+			return {h1: d.h1, h2: d.h2, key1: d.key1, key2: d.key2, val: d.val, wid: avg_share, y1: d.y1, y2:d.y2, shareOfTotal: 100*sub_contrib };
 			})
 
 		drawPart(visData, bip.id, 0, taxa_colors);
