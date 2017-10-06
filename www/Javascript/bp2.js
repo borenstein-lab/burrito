@@ -222,7 +222,7 @@
 	// }
 
 	function generate_bipartite_graph_tooltip(width, totalShare){
-		return bipartite_graph_tooltip_text[0] + Math.round(width) + bipartite_graph_tooltip_text[1] + bipartite_graph_tooltip_text[2] + Math.round(totalShare) + bipartite_graph_tooltip_text[3];
+		return bipartite_graph_tooltip_text[0] + Math.round(width*100)/100 + bipartite_graph_tooltip_text[1] + bipartite_graph_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_graph_tooltip_text[3];
 	}
 	
 	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
@@ -253,9 +253,10 @@
 
 		edgeBar.style("fill", "white") //function(d){ return taxa_colors(data.keys[0][d.key1]) ;})
 			.style("opacity",0).each(function(d) { this._current = d; })
-			.attr("width", function(d){ 
-				return d.wid;
-				})
+// 			.attr("width", function(d){
+// 					return d.wid;
+// 				})
+//this does not control the width! Edgepolygon2 does!
 			.on("mouseover", function(d,i){ 
 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 					clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
@@ -411,13 +412,13 @@
 	}	
 
 	bP.edgePolygon2 = function(d){
-// 		if(d.wid===1){ //don't change
-// 			return [-bb, d.y1, bb, d.y2, bb, d.y2+d.h2, -bb, d.y1+d.h1].join(" ");
-// 		} else{
+		if(d.wid < 2){ //don't change
+			return [-bb, d.y1-Math.sqrt(2), bb, d.y2-Math.sqrt(2), bb, d.y2+Math.sqrt(2), -bb, d.y1+Math.sqrt(2)].join(" ");
+		} else{
 			return [-bb, d.y1-Math.sqrt(d.wid), bb, d.y2-Math.sqrt(d.wid), bb, d.y2+Math.sqrt(d.wid), -bb, d.y1+Math.sqrt(d.wid)].join(" ");
 			//return [-bb, d.y1-d.wid/5, bb, d.y2-d.wid/5, bb, d.y2+d.wid/5, -bb, d.y1+d.wid/5].join(" ");
 
-//		}
+	}
 		//
 	}	
 	
@@ -636,9 +637,14 @@
 					return taxa_colors(displayed_taxa[f["key1"]]);
 				}
 				} })
-				.attr("width", function(d){ 
-					return d.wid;
-					})
+// 				.attr("width", function(d){ 
+// 					if(d.wid < 2){
+// 						console.log(d.wid)
+// 						return 2;
+// 					} else {
+// 						return d.wid;
+// 					}
+// 					})
 				.attr("visibility", "visible");
 			}
 			//selectedEdges.select("_current").style("stroke-opacity", 1);

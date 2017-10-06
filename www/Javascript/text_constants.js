@@ -13,7 +13,7 @@ text_map['taxonomic_block_title_text'] = ['Taxonomic Data'];
 text_map['taxonomic_block_manual_link_text'] = ['Manual&gt;Taxonomy'];
 text_map['taxonomic_abundance_table_input_text'] = ['Taxonomic abundances:'];
 text_map['taxonomic_abundance_table_help_text'] = ['Upload the taxonomic abundance table that function attributions will be linked to<br>(raw read counts or relative abundances).'];
-text_map['taxonomic_hierarchy_choice_text'] = ['Taxonomy:', 'Greengenes taxonomy (default; compatible with automatic attribution calculation)', 'Custom taxonomy:', 'Automatic single-level taxonomic hierarchy (compatible with custom taxonomic IDs)'];
+text_map['taxonomic_hierarchy_choice_text'] = ['Taxonomy:', 'Greengenes taxonomy (default; compatible with automatic attribution calculation)', 'Custom taxonomy:'];
 text_map['taxonomic_hierarchy_choice_help_text'] = ['Choose the taxonomy that defines the hierarchical relationship between taxa and allows you to explore your data at different taxonomic resolutions.'];
 text_map['taxonomic_level_of_detail_selector_text'] = ['Minimum taxonomic resolution:'];
 text_map['taxonomic_level_of_detail_selector_help_text'] = 	['Choose the minimum taxonomic resolution that will be viewable<br>(lower resolution may improve performance for large datasets).'];
@@ -25,7 +25,7 @@ text_map['functional_abundance_choice_text'] = ['Metagenome-based function abund
 text_map['functional_abundance_choice_help_text'] = ['Choose to upload a table of metagenome-based function abundances for your samples to compare to the taxonomy-based function abundances.'];
 text_map['contribution_choice_text'] = ['Taxonomy-function linking method:', 'Automatically calculate attributions (default; uses the 13_5 versions of the 16S copy number normalization and gene content tables downloaded from the PICRUSt website)', 'Custom genomic content table:', 'Function attribution table:'];
 text_map['contribution_choice_help_text'] = ['Choose the method for linking taxonomic abundances to function abundances.'];
-text_map['functional_hierarchy_choice_text'] = ['Function hierarchy:', 'BRITE function hierarchy (default, compatible with automatic attribution calculation)', 'Custom function hierarchy:', 'Automatic single-level function hierarchy (compatible with custom function annotations)'];
+text_map['functional_hierarchy_choice_text'] = ['Function hierarchy:', 'BRITE function hierarchy (default, compatible with automatic attribution calculation)', 'Custom function hierarchy:'];
 text_map['functional_hierarchy_choice_help_text'] = ['Choose the functional hierarchy that defines the hierarchical relationship between functions and allows you to explore your data at different functional resolutions.'];
 text_map['functional_level_of_detail_selector_text'] = ['Minimum functional resolution:'];
 text_map['functional_level_of_detail_selector_help_text'] = ['Choose the minimum functional resolution that will be viewable<br>(lower resolution may improve performance for large datasets).'];
@@ -71,7 +71,7 @@ var default_function_abundance_tooltip_text = '';
 var function_abundance_tooltip_text = ['<strong>Function: </strong>', '<br><strong>Sample: </strong>', '<br><strong>Relative Abundance: </strong>', '%'];
 var function_contribution_tooltip_text = ['<strong>Function: </strong>', '<br><strong>Taxon: </strong>', '<br><strong>Sample: </strong>', '<br><strong>Attribution of Function: </strong>', '%', '<br><strong>Attribution of Total: </strong>', '%'];
 var default_bipartite_graph_tooltip_text = 'a simple tooltip';
-var bipartite_graph_tooltip_text = ['Average attribution of function:<br>', '%', '<br>Average attribution of total:<br>', '%'];
+var bipartite_graph_tooltip_text = ['Average attribution of function: ', '%', '<br>Average attribution of total: ', '%'];
 
 //// Text for plots
 var taxonomic_abundance_y_axis_title = 'Relative Abundance (%)';
