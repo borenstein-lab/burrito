@@ -66,9 +66,18 @@
 		taxa_colors = taxa_cols;
 		func_colors = func_cols;
 		updateOtherThings = updateFunc;
-
-		levelNames['taxa'] = taxonomic_levels;
-		levelNames['func'] = function_levels;
+		levelNames['taxa'] = null;
+		levelNames['func'] = null;
+		if (Object.prototype.toString.call(taxonomic_levels) == '[object Array]'){
+			levelNames['taxa'] = taxonomic_levels;	
+		} else {
+			levelNames['taxa'] = [taxonomic_levels];
+		}
+		if (Object.prototype.toString.call(function_levels) == '[object Array]'){
+			levelNames['func'] = function_levels;	
+		} else {
+			levelNames['func'] = [function_levels];
+		}
 		curlevelNames['taxa'] = levelNames['taxa'];
 		curlevelNames['func'] = levelNames['func'];
 
@@ -138,8 +147,15 @@
 
 				// Otherwise, look at _values
 				} else if (roots['taxa'].values[i]._values){
-					for (var j = 0; j < roots['taxa'].values[i]._values.length; j++){
-						currently_displayed_taxa.push(roots['taxa'].values[i]._values[j].key);
+					// Check if the _values have keys
+					if (roots['taxa'].values[i]._values[0].key){
+						for (var j = 0; j < roots['taxa'].values[i]._values.length; j++){
+							currently_displayed_taxa.push(roots['taxa'].values[i]._values[j].key);
+						}
+
+					// Otherwise, just use the top level values
+					} else {
+						currently_displayed_taxa.push(roots['taxa'].values[i].key)
 					}
 
 				// Otherwise, just use the top level values

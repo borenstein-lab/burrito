@@ -85,8 +85,8 @@ shinyServer(function(input, output, session) {
 	# Reactive elements that keep track of the name of the first level of the hierarchies (what show up in the OTU and contribution tables)
 	first_taxonomic_level = reactive({
 
-		# If the example is being displayed or there is no custom taxonomic hierarchy, use the default
-		if (input$example_visualization == "TRUE" | is.null(input$custom_taxonomic_hierarchy_table)){
+		# If the example is being displayed, an automatic single level taxonomic hierarchy is being used, or there is no custom taxonomic hierarchy, use the default
+		if (input$example_visualization == "TRUE" | input$taxonomic_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL" | is.null(input$custom_taxonomic_hierarchy_table)){
 			return(colnames(default_taxonomic_hierarchy_table)[1])
 
 		# Otherwise, use the custom taxonomic hierarchy
@@ -102,8 +102,8 @@ shinyServer(function(input, output, session) {
 
 	first_function_level = reactive({
 
-		# If the example is being displayed or there is no custom function hierarchy, use the default
-		if (input$example_visualization == "TRUE" | is.null(input$custom_function_hierarchy_table)){
+		# If the example is being displayed, an automatic single level function hierarchy is being used, or there is no custom function hierarchy, use the default
+		if (input$example_visualization == "TRUE" | input$function_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL" | is.null(input$custom_function_hierarchy_table)){
 			return(colnames(default_function_hierarchy_table)[1])
 
 		# Otherwise, use the custom function hierarchy
@@ -140,9 +140,12 @@ shinyServer(function(input, output, session) {
 		# If the example is not being displayed, look at the taxonomic level of detail selector
 		if (input$example_visualization != "TRUE"){
 
-			# If something hasn't been selected (currently having trouble setting a selected choice when we update the dropdown), load the hierarchy and check for the default taxonomic summary level, otherwise use the first column
-			if (is.null(input$taxonomic_level_of_detail_selector)){
+			# If we're using an automatic single level taxonomic hierarchy, then we just use the default first taxonomic level
+			if (input$taxonomic_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL"){
+				return(first_taxonomic_level())
 
+			# Otherwise, if something hasn't been selected (currently having trouble setting a selected choice when we update the dropdown), load the hierarchy and check for the default taxonomic summary level, otherwise use the first column
+			} else if (is.null(input$taxonomic_level_of_detail_selector)){
 
 				# If a custom taxonomic hierarchy has been selected, we refer to it
 				if (input$taxonomic_hierarchy_choice == "CUSTOM"){
@@ -184,8 +187,12 @@ shinyServer(function(input, output, session) {
 		# If the example is not being displayed, look at the function level of detail selector
 		if (input$example_visualization != "TRUE"){
 
-			# If something hasn't been selected (currently having trouble setting a selected choice when we update the dropdown), load the hierarchy and check for the default function summary level, otherwise use the first column
-			if (is.null(input$function_level_of_detail_selector)){
+			# If we're using an automatic single level function hierarchy, then we just use the default first function level
+			if (input$function_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL"){
+				return(first_function_level())
+			
+			# Otherwise, if something hasn't been selected (currently having trouble setting a selected choice when we update the dropdown), load the hierarchy and check for the default function summary level, otherwise use the first column
+			} else if (is.null(input$function_level_of_detail_selector)){
 
 
 				# If a custom function hierarchy has been selected, we refer to it
@@ -250,9 +257,19 @@ shinyServer(function(input, output, session) {
 	# Reactive element to calculate partial contribution factors for the taxonomic hierarchy and function hierarchy
 	taxonomic_partial_contribution_table = reactive({ 
 
+		# Initialize as the default taxonomic hierarchy table
     	taxonomic_hierarchy_table = default_taxonomic_hierarchy_table
-    	if (input$example_visualization != "TRUE" & !is.null(input$custom_taxonomic_hierarchy_table)){
+
+    	# If the example is not being displayed, the custom taxonomic hierarchy option is selected, and a custom taxonomic hierarchy file has been uploaded, use the custom taxonomic hierarchy table
+    	if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "CUSTOM" & !is.null(input$custom_taxonomic_hierarchy_table)){
     		taxonomic_hierarchy_table = process_input_file('custom_taxonomic_hierarchy_table')
+
+    	# Otherwise, if the example is not being displayed, the automatic single level taxonomic hierarchy option is selected, and a taxonomic abundance table has been uploaded, use the taxon names from the taxonomic abundance table
+    	} else if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL" & !is.null(input$taxonomic_abundance_table)){
+    		
+    		# Read the otu table to generate the taxonomic heirarchy and assign the appropriate column name
+    		taxonomic_hierarchy_table = process_input_file('taxonomic_abundance_table')[,1,with=F]
+    		colnames(taxonomic_hierarchy_table) = first_taxonomic_level()
     	}
 
     	# Make rows of the taxonomic hierarchy table unique
@@ -268,20 +285,51 @@ shinyServer(function(input, output, session) {
 
     function_partial_contribution_table = reactive({ 
 
+    	# Initialize as the default function hierarchy table
     	function_hierarchy_table = default_function_hierarchy_table
-    	if (input$example_visualization != "TRUE" & !is.null(input$custom_function_hierarchy_table)){
+
+    	# If the example is not being displayed, the custom function hierarchy option is selected, and a custom function hierarchy file has been uploaded, use the custom function hierarchy table
+    	if (input$example_visualization != "TRUE" & input$function_hierarchy_choice == "CUSTOM" & !is.null(input$custom_function_hierarchy_table)){
     		function_hierarchy_table = process_input_file('custom_function_hierarchy_table')
+
+    	# Otherwise, if the example is not being displayed and the automatic single level function hierarchy option is selected, check whether a function abundance table is being used and which linking method is being used
+    	} else if (input$example_visualization != "TRUE" & input$function_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL"){
+
+    		# Gather set of functions that need to exist in the hierarchy
+    		present_functions = c()
+
+    		# If a function abundance table is being used, add functions in that table to the list
+    		if (input$function_abundance_choice == "PRESENT" & !is.null(input$function_abundance_table)){
+	    		present_functions = c(present_functions, unlist(process_input_file('function_abundance_table')[,1,with=F]))
+	    	}
+
+    		# If the default PICRUSt methodology is being used to link, add the functions from the default function hierarchy table
+    		if (input$contribution_method_choice == "PICRUST"){
+    			present_functions = c(present_functions, unlist(default_function_hierarchy_table[,1,with=F]))
+
+    		# Otherwise, if custom genomic content is being used to link, add the functions from the custom genomic content table
+    		} else if (input$contribution_method_choice == "GENOMIC_CONTENT" & !is.null(input$genomic_content_table)){
+    			present_functions = c(present_functions, unlist(process_input_file('genomic_content_table')[,2,with=F]))
+
+    		# Otherwise, if a custom contribution table is being used to link, add the functions from the custom contribution table
+    		} else if (input$contribution_method_choice == "CONTRIBUTION" & !is.null(input$contribution_table)){
+    			present_functions = c(present_functions, unlist(process_input_file('contribution_table')[,1,with=F]))
+    		}
+
+    		# Create a single column function hierarchy using the present functions
+    		function_hierarchy_table = data.table(a = present_functions)
+    		colnames(function_hierarchy_table) = first_function_level()
     	}
 
     	# Make rows of the function hierarchy table unique
     	function_hierarchy_table = function_hierarchy_table[!duplicated(function_hierarchy_table)]
 
 		# Sum the occurrences of each element in the first column
-		output = function_hierarchy_table[,.N, by = eval(first_function_level())]
+		function_hierarchy_table = function_hierarchy_table[,.N, by = eval(first_function_level())]
 
 		# Rename normalization column for consistency
-		colnames(output)[2] = "partial_contribution_factor"
-		return(output)
+		colnames(function_hierarchy_table)[2] = "partial_contribution_factor"
+		return(function_hierarchy_table)
 	})
 
 	# Observer that updates the flags indicating that a new file has been seleted for upload (necessary to detect when a new file has been selected but has not finished being uploaded)
@@ -331,6 +379,10 @@ shinyServer(function(input, output, session) {
 				session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", list("N/A"))
 			}
 
+		# Otherwise, if an automatic single level taxonomic hierarchy has been selected, we send the N/A string
+		} else if (input$taxonomic_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL"){
+			session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", list("N/A"))
+
 		# Otherwise, we use the default taxonomic hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
 		} else {
 			session$sendCustomMessage("taxonomic_hierarchy_dropdown_labels", colnames(default_taxonomic_hierarchy_table)[c(2:ncol(default_taxonomic_hierarchy_table), 1)])
@@ -372,6 +424,10 @@ shinyServer(function(input, output, session) {
 			} else {
 				session$sendCustomMessage("function_hierarchy_dropdown_labels", list("N/A"))
 			}
+
+		# Otherwise, if an automatic single level function hierarchy has been selected, we send the N/A string
+		} else if (input$function_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL"){
+			session$sendCustomMessage("function_hierarchy_dropdown_labels", list("N/A"))
 
 		# Otherwise, we use the default function hierarchy, which has to have its column labels reordered for the dropdown to be in resolution order
 		} else {
@@ -899,6 +955,16 @@ shinyServer(function(input, output, session) {
 			return(default_taxonomic_hierarchy_table)
 		}
 
+		# Othwerise, if the option to use an automatical single level taxonomic hierarchy is selected, then use the taxon IDs from the otu table to make the taxonomic hierarchy
+		if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL" & !is.null(input$taxonomic_abundance_table)){
+
+			# Read the otu table to generate the taxonomic heirarchy and assign the appropriate column name
+    		taxonomic_hierarchy_table = process_input_file('taxonomic_abundance_table')[,1,with=F]
+    		colnames(taxonomic_hierarchy_table) = first_taxonomic_level()
+
+    		return(taxonomic_hierarchy_table)
+    	}
+
 		# Othwerise, we read the custom taxonomic hierarchy table
 		custom_taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
 
@@ -946,6 +1012,41 @@ shinyServer(function(input, output, session) {
 		if (input$function_hierarchy_choice == "DEFAULT"){
 			return(default_function_hierarchy_table)
 		}
+
+		# Otherwise, if the option to use an automatical single level function hierarchy is selected, then check whether a function abundance table is being used and which linking method is selected to determine the functions in the hierarchy
+		if (input$example_visualization != "TRUE" & input$function_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL"){
+
+    		# Gather set of functions that need to exist in the hierarchy
+    		present_functions = c()
+
+    		# If a function abundance table is being used, add functions in that table to the list
+    		if (input$function_abundance_choice == "PRESENT" & !is.null(input$function_abundance_table)){
+	    		present_functions = c(present_functions, unlist(process_input_file('function_abundance_table')[,1,with=F]))
+	    	}
+
+    		# If the default PICRUSt methodology is being used to link, add the functions from the default function hierarchy table
+    		if (input$contribution_method_choice == "PICRUST"){
+    			present_functions = c(present_functions, unlist(default_function_hierarchy_table[,1,with=F]))
+    			
+    		# Otherwise, if custom genomic content is being used to link, add the functions from the custom genomic content table
+    		} else if (input$contribution_method_choice == "GENOMIC_CONTENT" & !is.null(input$genomic_content_table)){
+    			present_functions = c(present_functions, unlist(process_input_file('genomic_content_table')[,2,with=F]))
+    			
+    		# Otherwise, if a custom contribution table is being used to link, add the functions from the custom contribution table
+    		} else if (input$contribution_method_choice == "CONTRIBUTION" & !is.null(input$contribution_table)){
+    			present_functions = c(present_functions, unlist(process_input_file('contribution_table')[,1,with=F]))
+    		}
+
+    		# Make the set of present functions unique
+    		present_functions = present_functions[!duplicated(present_functions)]
+
+    		# Create a single column function hierarchy using the present functions
+    		function_hierarchy_table = data.table(a = present_functions)
+    		colnames(function_hierarchy_table) = first_function_level()
+
+    		return(function_hierarchy_table)
+    	}
+
 
 		# Otherwise, we read the custom function hierarchy table
 		custom_function_hierarchy_table_file = input$custom_function_hierarchy_table
@@ -1406,13 +1507,19 @@ shinyServer(function(input, output, session) {
 	#
 	# Add "unknown" to names of hierarchy levels with no content
 	add_unknowns = function(hierarchy_table, first_level){
-		hierarchy_names = names(hierarchy_table)[names(hierarchy_table) != first_level]
-		hierarchy_table = data.table(V1=hierarchy_table[,get(first_level)], hierarchy_table[,lapply(.SD, function(x){
-			return(ifelse(grepl("[:alnum:]", gsub("^[a-z]__","",x)), x, paste0(x,"_unknown")))
-		}), .SDcols = hierarchy_names])
-		setnames(hierarchy_table, "V1", first_level)
+
+		if (ncol(hierarchy_table) > 1){
+			hierarchy_names = names(hierarchy_table)[names(hierarchy_table) != first_level]
+			hierarchy_table = data.table(V1=hierarchy_table[,get(first_level)], hierarchy_table[,lapply(.SD, function(x){
+				return(ifelse(grepl("[[:alnum:]]", gsub("^[a-z]__","",x)), x, paste0(x,"_unknown")))
+			}), .SDcols = hierarchy_names])
+			setnames(hierarchy_table, "V1", first_level)
+		} else {
+			taxon_ids = as.character(unlist(hierarchy_table[[first_taxonomic_level()]]))
+			hierarchy_table[[first_taxonomic_level()]] = ifelse(grepl("[[:alnum:]]", gsub("^[a-z]__","",taxon_ids)), taxon_ids, paste0(taxon_ids, "_unknown"))
+		}
+
 		return(hierarchy_table)
-		
 	}
 
 	# make_hierarchy_table_level_entries_unique(hierarchy_table, first_level)
@@ -1596,6 +1703,24 @@ shinyServer(function(input, output, session) {
 		})
 
 		return(javascript_contribution_table)
+	}
+
+	# filter_missing_samples_from_metadata(metadata_table, otu_table, contribution_table)
+	#
+	# Removes samples from the metadata table that do not appear in the OTU or contribution tables
+	filter_missing_samples_from_metadata = function(metadata_table, otu_table, contribution_table){
+
+		# If the metadata table is not empty, filter it
+		if (nrow(metadata_table) > 0){
+
+			# Determine which samples in the metadata table appear in the other tables
+			filtered_metadata_rows = which(metadata_table[[first_metadata_level()]] %in% c(otu_table[[first_metadata_level()]], contribution_table[[first_metadata_level()]]))
+
+			# Keep only the rows that are in the other tables
+			metadata_table = metadata_table[filtered_metadata_rows]
+		}
+
+		return(metadata_table)
 	}
 
 	# order_metadata_table_by_metadata_factor(metadata_table)
@@ -1885,7 +2010,7 @@ shinyServer(function(input, output, session) {
 		taxonomic_hierarchy_table = filter_hierarchy_table_entries(taxonomic_hierarchy_table, first_taxonomic_level(), unique(c(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]])))
 		function_hierarchy_table = filter_hierarchy_table_entries(function_hierarchy_table, first_function_level(), unique(contribution_table[[first_function_level()]]))
 
-		#Add in "unknown" to hierarchy entries with no alpha characters
+		# Add in "unknown" to hierarchy entries with no alpha characters
 		taxonomic_hierarchy_table = add_unknowns(taxonomic_hierarchy_table, first_taxonomic_level())
 
 		# Make the entries of the hierarchy unique
@@ -2003,6 +2128,9 @@ shinyServer(function(input, output, session) {
 		### Prepare the metadata table ###
 		session$sendCustomMessage("upload_status", "metadata_formatting")
 
+		# Filter samples without data from the metadata table
+		metadata_table = filter_missing_samples_from_metadata(metadata_table, otu_table, contribution_table)
+
 		# If a metadata factor has been selected, order samples by the indicated metadata factor
 		if (!is.null(metadata_factor())){
 			metadata_table = order_metadata_table_by_metadata_factor(metadata_table)
@@ -2018,8 +2146,6 @@ shinyServer(function(input, output, session) {
 		} else {
 			session$sendCustomMessage("metadata_table", javascript_metadata_table)
 		}
-
-
 
 		### Prepare the sample orders ###
 		session$sendCustomMessage("upload_status", "done")
