@@ -742,7 +742,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	}
 	
 	getTotalFuncData = function(stackData){
-		console.log(stackData)
 		var totalFuncs = {}
 		stackData.map(function(f){ //for every sample
 			samp_totals = {}
@@ -769,7 +768,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 					foo_sub =  f.data.filter(function(d){ //go over all taxa
 					return d.func == e;
 					}) //return all elements with data on this function
-					console.log(foo_sub)
 					total_val = foo_sub[0].contributions
 				samp_totals[e] = {}
 				samp_totals[e]["total"] = total_val;
@@ -779,26 +777,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		})
 		return totalFuncs;
 	}
-
-// 	getPercFuncData = function(totalFuncs, stackData){
-// 		var percFuncs = {};
-// 		stackData.map(function(f,i){
-// 		if(f.Sample.indexOf("_comparison")==-1){
-// 		samp1 = f.Sample;
-// 		percFuncs[f.Sample] = {}
-// 		data_cube.displayed_funcs.map(function(e,j){
-// 			if(totalFuncs[samp1][e] != 0){ //frac only makes sense for nonzero functions
-// 				percFuncs[f.Sample][e] = {}
-// 				data_cube.displayed_taxa.map(function(t){
-// 					frac_func = (data_cube.get_contribution(samp1, t, e)*100)/totalFuncs[samp1][e]
-// 					percFuncs[samp1][e][t] = frac_func
-// 				}) 
-// 			}
-// 		})
-// 		}
-// 		})
-// 		return percFuncs;
-// 		}
 
 	getAvgPercFuncs = function(totalFuncs){
 		var avgPercFuncs = {};
