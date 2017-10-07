@@ -621,7 +621,7 @@
 						list_type = "taxa"
 					} else {
 						if(d3.select(this).classed("clicked")==false){
-							matchedNode = d3.select("#node_"+displayed_fun	cs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg	
 							funcTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
 							funcTooltip.style("visibility","visible")
