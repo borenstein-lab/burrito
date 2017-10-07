@@ -113,6 +113,9 @@
 			//.attr("font-family","Verdana") //for legend to save with correct fonts
 			.attr("transform","translate("+ (p==0 ? (-1*(bb+b)) : (bb)) +",0)");
 
+		d3.selectAll("#bpNodetooltip0").remove();
+		d3.selectAll("#bpNodetooltip1").remove();
+
 		var padding = 0;
 		var nbar = data.mainBars[p].length;
 		if ( nbar < 5) { padding = 20;
@@ -195,6 +198,8 @@
 				thisbbox = thistxt[0][0].getBBox();
 			});
 		}
+		
+
 		//mainbar.selectAll(".barlabel").style("visibility","visible");
 		/*
 		d3.select("#"+id).select(".part"+p).select(".subbars")
@@ -223,6 +228,10 @@
 
 	function generate_bipartite_graph_tooltip(width, totalShare){
 		return bipartite_graph_tooltip_text[0] + Math.round(width*100)/100 + bipartite_graph_tooltip_text[1] + bipartite_graph_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_graph_tooltip_text[3];
+	}
+
+	function generate_bipartite_node_tooltip(value){
+		return bipartite_node_tooltip_text[0] + Math.round(value*100)/100 + bipartite_node_tooltip_text[1]; // + bipartite_node_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_node_tooltip_text[3];
 	}
 	
 	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
@@ -464,7 +473,37 @@
 		drawPart(visData, bip.id, 0, taxa_colors);
 		drawPart(visData, bip.id, 1, func_colors); 
 		drawEdges(visData, bip.id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data);
-		
+	
+		//add tooltips
+		var taxaTooltip = d3.select("body")
+  			.append("div")
+			.attr("id","bpnodetooltip0")
+  			.style("position", "absolute")
+  			.style("z-index", "10")
+  			.style("visibility", "hidden")
+  			.style("background", "lightyellow")
+  			.style("opacity", "1")
+  			.style("border", "1px")    
+  			.style("border-radius", "4px")  
+  			.style("padding","2px")
+  			.attr("transform","translate("+(-1*(bb+b)) +",0)")
+  			//.style("x", -(extra_width - b - bb))
+			.text("test");
+
+		var funcTooltip = d3.select("body")
+  			.append("div")
+			.attr("id","bpnodetooltip1")
+  			.style("position", "absolute")
+  			.style("z-index", "10")
+  			.style("visibility", "hidden")
+  			.style("background", "lightyellow")
+  			.style("opacity", "1")
+  			.style("border", "1px")    
+  			.style("border-radius", "4px")  
+  			.style("padding","2px")
+  			.attr("transform","translate("+(bb) +",0)")
+  			.style("x", 0)
+			.text("test");
 			
 		[0,1].forEach(function(p){			
 			d3.select("#"+bip.id)
@@ -482,17 +521,49 @@
 				})
 				.on("mouseover",function(d, i){ 
 					//if(d3.select(this).classed("highlighted") == false){ //if not already highlighted
+
 					clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
 					if(clickedBars.empty()){
 						if (p == 0) {
+							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg
+							taxaTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							taxaTooltip.style("visibility","visible")
 							return highlightall(displayed_taxa[i],"",1);
 						} else {
+							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg
+							funcTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							funcTooltip.style("visibility","visible")
 							return highlightall("", displayed_funcs[i],2);
 						}
-					} //else do nothing
+					} else if(d3.select(this).classed("clicked")==true){ //also show tooltip if clicked
+						if (p == 0) {
+							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg
+							taxaTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							taxaTooltip.style("visibility","visible")
+							return highlightall(displayed_taxa[i],"",1);
+						} else {
+							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg
+							funcTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							funcTooltip.style("visibility","visible")
+							return highlightall("", displayed_funcs[i],2);
+						}						
+					}
+					//else do nothing
 				//} 
 				})						
+				.on("mousemove", function(d){
+					if(p == 0){
+						taxaTooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+15)+"px");
+					} else {
+						funcTooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+15)+"px");
+					}
+				})
 				.on("mouseout",function(d, i){ 
+					p == 0 ? taxaTooltip.style("visibility", "hidden") : funcTooltip.style("visibility", "hidden");
 					clickedBars = d3.select("#Genomes").selectAll(".mainbars").select(".clicked")
 					if(clickedBars.empty()){
 					//only de-highlight if not clicked on, and if none of its edges are clicked
@@ -530,16 +601,31 @@
 										})
 										.style("opacity", 0);
 							}
-						}
+							
+						}	
 					}
 				}
+
 				})
 				.on("click", function(d,i){
 					current_id = d3.select(this).attr("id")
 					if (p == 0){
+						//show tooltip
+						if(d3.select(this).classed("clicked")==false){
+							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg
+							taxaTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							taxaTooltip.style("visibility","visible")
+						}
 						current_name = displayed_taxa[i]
 						list_type = "taxa"
 					} else {
+						if(d3.select(this).classed("clicked")==false){
+							matchedNode = d3.select("#node_"+displayed_fun	cs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg	
+							funcTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							funcTooltip.style("visibility","visible")
+						}	
 						current_name = displayed_funcs[i]
 						list_type = "funcs"
 					}

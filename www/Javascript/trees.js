@@ -66,18 +66,9 @@
 		taxa_colors = taxa_cols;
 		func_colors = func_cols;
 		updateOtherThings = updateFunc;
-		levelNames['taxa'] = null;
-		levelNames['func'] = null;
-		if (Object.prototype.toString.call(taxonomic_levels) == '[object Array]'){
-			levelNames['taxa'] = taxonomic_levels;	
-		} else {
-			levelNames['taxa'] = [taxonomic_levels];
-		}
-		if (Object.prototype.toString.call(function_levels) == '[object Array]'){
-			levelNames['func'] = function_levels;	
-		} else {
-			levelNames['func'] = [function_levels];
-		}
+
+		levelNames['taxa'] = taxonomic_levels;
+		levelNames['func'] = function_levels;
 		curlevelNames['taxa'] = levelNames['taxa'];
 		curlevelNames['func'] = levelNames['func'];
 
@@ -147,15 +138,8 @@
 
 				// Otherwise, look at _values
 				} else if (roots['taxa'].values[i]._values){
-					// Check if the _values have keys
-					if (roots['taxa'].values[i]._values[0].key){
-						for (var j = 0; j < roots['taxa'].values[i]._values.length; j++){
-							currently_displayed_taxa.push(roots['taxa'].values[i]._values[j].key);
-						}
-
-					// Otherwise, just use the top level values
-					} else {
-						currently_displayed_taxa.push(roots['taxa'].values[i].key)
+					for (var j = 0; j < roots['taxa'].values[i]._values.length; j++){
+						currently_displayed_taxa.push(roots['taxa'].values[i]._values[j].key);
 					}
 
 				// Otherwise, just use the top level values
@@ -348,6 +332,9 @@
 		// Enter any new nodes at the parent's previous position.
 		var nodeEnter = node.enter().append("g")
 			.attr("class", "node")
+			.attr("id", function(d){
+				return "node_"+d.key.replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_");
+			})
 			.attr("transform", function (d) {
 				return "translate(" + source.y0 + "," + source.x0 + ")";
 			})
