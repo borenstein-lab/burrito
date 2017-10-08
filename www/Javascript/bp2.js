@@ -226,12 +226,13 @@
 
 	// }
 
-	function generate_bipartite_graph_tooltip(width, totalShare){
-		return bipartite_graph_tooltip_text[0] + Math.round(width*100)/100 + bipartite_graph_tooltip_text[1] + bipartite_graph_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_graph_tooltip_text[3];
+	function generate_bipartite_graph_tooltip(tax, func, width, totalShare){
+		return bipartite_graph_tooltip_text[0] + tax+ bipartite_graph_tooltip_text[1] + func +  bipartite_graph_tooltip_text[2] + Math.round(width*100)/100 + bipartite_graph_tooltip_text[3] + bipartite_graph_tooltip_text[4] + Math.round(totalShare*100)/100 + bipartite_graph_tooltip_text[5];
 	}
 
-	function generate_bipartite_node_tooltip(value){
-		return bipartite_node_tooltip_text[0] + Math.round(value*100)/100 + bipartite_node_tooltip_text[1]; // + bipartite_node_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_node_tooltip_text[3];
+	function generate_bipartite_node_tooltip(p, id, value){
+		p == 0 ? category = bipartite_node_tooltip_text[0] : bipartite_node_tooltip_text[1]
+		return category + id + bipartite_node_tooltip_text[2] + Math.round(value*100)/100 + bipartite_node_tooltip_text[3]; // + bipartite_node_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_node_tooltip_text[3];
 	}
 	
 	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
@@ -270,7 +271,7 @@
 					d3.select(this).attr("points", bP.edgePolygon2).style("opacity",1);
 					clickedEdges = d3.select("#Genomes").select(".edges").selectAll(".clicked")
 					if(clickedEdges.empty()||d3.select(this).classed("clicked")==true){
-						tooltip.html(generate_bipartite_graph_tooltip(d.wid, d.shareOfTotal))
+						tooltip.html(generate_bipartite_graph_tooltip(displayed_taxa[d.key1], displayed_funcs[d.key2], d.wid, d.shareOfTotal))
 						tooltip.style("visibility", "visible")
 					}
 			})
@@ -286,22 +287,22 @@
 							} else if(d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked")==false && d3.select("#Genomes1"+displayed_funcs[current_data.key2].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("clicked") == false){ //if associated taxon is not clicked
 								return 0;
 							} else if(d3.select("#Genomes").select(".edges").selectAll(".clicked").empty() == false){ //if another edge is clicked
-								return 0.3;
+								return 0.2;
 							} else{
-								return 0.8;
+								return 0.65;
 							}
 							});//.style("fill", "grey");
 				tooltip.style("visibility", "hidden")
 			})
 			.on("click", function(d,i){
 				current_data = this._current
-				tooltip.html(generate_bipartite_graph_tooltip(d.wid, d.shareOfTotal))
+				tooltip.html(generate_bipartite_graph_tooltip(displayed_taxa[d.key1], displayed_funcs[d.key2], d.wid, d.shareOfTotal))
 				tooltip.style("visibility","visible")
 				if(d3.select(this).classed("highlighted")==false){
 				//unselect other edges
 				} 
 				if(d3.select(this).classed("clicked")==true){ //edge already clicked
-					d3.select(this).style("opacity", 0.8)
+					d3.select(this).style("opacity", 0.65)
 					d3.select(this).classed("clicked", false)
 					dehighlightall(displayed_taxa[current_data.key1], displayed_funcs[current_data.key2], 3, bars_only = false)
 					//Revert to original highlighting
@@ -337,7 +338,7 @@
 								.filter(function(f){ 
 									return (f["key1"]==j); })
 								.classed("clicked", false)
-								.style("opacity",0.3);
+								.style("opacity",0.2);
 
 						} else{
 						}
@@ -358,7 +359,7 @@
 								.filter(function(f){ 
 									return (f["key2"]==j); })
 								.classed("clicked", false)
-								.style("opacity",0.3);
+								.style("opacity",0.2);
 							//dehighlightall(displayed_taxa[current_data.key1], e, 3, bars_only = false)
 							}else{
 						}
@@ -527,13 +528,13 @@
 						if (p == 0) {
 							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg
-							taxaTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							taxaTooltip.html(generate_bipartite_node_tooltip(p, displayed_taxa[d.key], avg_val*100))
 							taxaTooltip.style("visibility","visible")
 							return highlightall(displayed_taxa[i],"",1);
 						} else {
 							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg
-							funcTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							funcTooltip.html(generate_bipartite_node_tooltip(p, displayed_funcs[d.key], avg_val*100))
 							funcTooltip.style("visibility","visible")
 							return highlightall("", displayed_funcs[i],2);
 						}
@@ -541,13 +542,13 @@
 						if (p == 0) {
 							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg
-							taxaTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							taxaTooltip.html(generate_bipartite_node_tooltip(p, displayed_taxa[d.key], avg_val*100))
 							taxaTooltip.style("visibility","visible")
 							return highlightall(displayed_taxa[i],"",1);
 						} else {
 							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg
-							funcTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							funcTooltip.html(generate_bipartite_node_tooltip(p, displayed_funcs[d.key], avg_val*100))
 							funcTooltip.style("visibility","visible")
 							return highlightall("", displayed_funcs[i],2);
 						}						
@@ -614,7 +615,7 @@
 						if(d3.select(this).classed("clicked")==false){
 							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg
-							taxaTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							taxaTooltip.html(generate_bipartite_node_tooltip(p, displayed_taxa[d.key],avg_val*100))
 							taxaTooltip.style("visibility","visible")
 						}
 						current_name = displayed_taxa[i]
@@ -623,7 +624,7 @@
 						if(d3.select(this).classed("clicked")==false){
 							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg	
-							funcTooltip.html(generate_bipartite_node_tooltip(avg_val*100))
+							funcTooltip.html(generate_bipartite_node_tooltip(p, displayed_funcs[d.key],avg_val*100))
 							funcTooltip.style("visibility","visible")
 						}	
 						current_name = displayed_funcs[i]
@@ -705,7 +706,7 @@
 					if(d3.select(this).classed("clicked")){
 					return 1;
 					} else {
-						return 0.8;
+						return 0.65;
 					}
 				})
 				.style("fill", function(f){ 
@@ -744,9 +745,9 @@
 			.selectAll(".mainbar").filter(function(d,i){ return (i==s);});
 
 		if(selectedBar.classed("clicked")==false){
-			var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
-				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
-				selSubBar.style("opacity", 0.1);
+// 			var selSubBar = d3.select("#Genomes").select(".part"+m).select(".subbars").selectAll(".subbar")
+// 				.filter(function(d,i){ return (d["key"+(m+1)]==s); }); //return sth element of main bar only
+// 				selSubBar.style("opacity", 0.1);
 
 			if(m==1){
 				current_color = func_colors(displayed_funcs[s]) } else {
