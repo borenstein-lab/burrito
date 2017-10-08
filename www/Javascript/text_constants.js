@@ -71,8 +71,8 @@ var default_function_abundance_tooltip_text = '';
 var function_abundance_tooltip_text = ['<strong>Function: </strong>', '<br><strong>Sample: </strong>', '<br><strong>Relative Abundance: </strong>', '%'];
 var function_contribution_tooltip_text = ['<strong>Function: </strong>', '<br><strong>Taxon: </strong>', '<br><strong>Sample: </strong>', '<br><strong>Attribution of Function: </strong>', '%', '<br><strong>Attribution of Total: </strong>', '%'];
 var default_bipartite_graph_tooltip_text = 'a simple tooltip';
-var bipartite_graph_tooltip_text = ['<strong>Taxon</strong>: ', '<br><strong>Function: </strong>','<br>Average attribution of function: ', '%', '<br>Average attribution of total: ', '%'];
-var bipartite_node_tooltip_text = ['<strong>Taxon</strong>: ', '<strong>Function: </strong>','<br>Average relative abundance: ', '%']; 
+var bipartite_graph_tooltip_text = ['<strong>Taxon</strong>: ', '<br><strong>Function: </strong>','<br><strong>Average Attribution of Function:</strong> ', '%', '<br><strong>Average Attribution of Total:</strong> ', '%'];
+var bipartite_node_tooltip_text = ['<strong>Taxon</strong>: ', '<strong>Function: </strong>','<br><strong>Average Relative Abundance:</strong> ', '%']; 
 //// Text for plots
 var taxonomic_abundance_y_axis_title = 'Relative Abundance (%)';
 var function_abundance_y_axis_title = 'Relative Abundance (%)';

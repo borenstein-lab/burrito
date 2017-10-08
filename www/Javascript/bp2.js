@@ -231,7 +231,7 @@
 	}
 
 	function generate_bipartite_node_tooltip(p, id, value){
-		p == 0 ? category = bipartite_node_tooltip_text[0] : bipartite_node_tooltip_text[1]
+		p == 0 ? category = bipartite_node_tooltip_text[0] : category = bipartite_node_tooltip_text[1]
 		return category + id + bipartite_node_tooltip_text[2] + Math.round(value*100)/100 + bipartite_node_tooltip_text[3]; // + bipartite_node_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_node_tooltip_text[3];
 	}
 	
@@ -377,6 +377,7 @@
 						dehighlightall('', displayed_funcs[current_data.key2], 2)
 
 						d3.select("#Genomes0"+displayed_taxa[current_data.key1].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_")).classed("highlighted", true)
+						
 						bP.selectSegment(0, current_data.key1, taxa_colors, func_colors, displayed_taxa, displayed_funcs, no_edges = true)
 						//make bold etc
 					} else{ //if taxon is clicked but not function
@@ -538,21 +539,34 @@
 							funcTooltip.style("visibility","visible")
 							return highlightall("", displayed_funcs[i],2);
 						}
-					} else if(d3.select(this).classed("clicked")==true){ //also show tooltip if clicked
+					} else if(d3.select(this).classed("clicked")==true ){ //also show tooltip if clicked
 						if (p == 0) {
 							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg
 							taxaTooltip.html(generate_bipartite_node_tooltip(p, displayed_taxa[d.key], avg_val*100))
 							taxaTooltip.style("visibility","visible")
-							return highlightall(displayed_taxa[i],"",1);
+							//return highlightall(displayed_taxa[i],"",1);
 						} else {
 							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
 							avg_val = matchedNode.data()[0].sampleAvg
 							funcTooltip.html(generate_bipartite_node_tooltip(p, displayed_funcs[d.key], avg_val*100))
 							funcTooltip.style("visibility","visible")
-							return highlightall("", displayed_funcs[i],2);
+							//return highlightall("", displayed_funcs[i],2);
 						}						
+					} else if(d3.select(this).classed("highlighted")==true){
+						if (p == 0) {
+							matchedNode = d3.select("#node_"+displayed_taxa[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg
+							taxaTooltip.html(generate_bipartite_node_tooltip(p, displayed_taxa[d.key], avg_val*100))
+							taxaTooltip.style("visibility","visible")
+						} else {
+							matchedNode = d3.select("#node_"+displayed_funcs[d.key].replace(/ /g,"_").replace(/(,|\(|\)|\[|\]|\\|\/)/g, "_"))
+							avg_val = matchedNode.data()[0].sampleAvg
+							funcTooltip.html(generate_bipartite_node_tooltip(p, displayed_funcs[d.key], avg_val*100))
+							funcTooltip.style("visibility","visible")						
+						}					
 					}
+					
 					//else do nothing
 				//} 
 				})						
@@ -706,7 +720,12 @@
 					if(d3.select(this).classed("clicked")){
 					return 1;
 					} else {
-						return 0.65;
+						console.log(d3.selectAll(".edges").selectAll(".clicked"))
+						if(d3.selectAll(".edges").selectAll(".clicked").empty()){
+							return 0.65;
+						} else {
+							return 0.2;
+						}//else don't change
 					}
 				})
 				.style("fill", function(f){ 
