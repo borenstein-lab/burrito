@@ -8,33 +8,33 @@ Burrito has several options for uploading and viewing datasets. Each data file m
 
 <h2 id="taxonomy">Taxonomic Data</h2>
 
-<h3>OTU (taxa abundance) table</h3>
+<h3>Taxonomic abundance table</h3>
 
-The first upload option only requires a table of abundances of Greengenes (McDonald et al 2012 97% OTUs from a 16S rRNA sequencing study, as produced by QIIME or similar programs. 
-The burrito server then runs PICRUSt (Langille et al, 2013) to generate taxonomy-function links and estimated functional profiles. The column of OTU IDs must come as the first column in the table.
+The first taxa-function linking method only requires the user to upload a table of taxonomic abundances that uses Greengenes (McDonald et al 2012) 97% OTU IDs as produced by QIIME or similar programs. 
+The burrito server then uses the PICRUSt (Langille et al, 2013) approach to generate taxonomy-function links and estimated functional profiles. The column of taxon IDs must come as the first column in the table.
 
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_otus.txt" target="_blank">Example </a>
 
 <h3>Taxonomic hierarchy</h3>
 
-The user can provide a custom tree describing the taxonomic relationships between OTUs (by default the visualization uses the Greengenes taxonomy).
-All OTUs (or lowest-level taxa) in the OTU table must have a unique row in the corresponding hierarchy file.
+The user can provide a custom tree describing the hierarchical relationships between taxa (by default the visualization uses the Greengenes taxonomy).
+All taxa in the taxonomic abundance table must have a unique row in the corresponding taxonomic hierarchy file.
 
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_tax_hierarchy.txt" target="_blank">Example </a>
 
 <h3>Choosing a summary taxonomic level</h3>
 
-Once all data upload options are complete, the user selects a taxonomic hierarchy level to which the data will be summarized. 
+Once finished with all taxonomic data upload options, the user selects a taxonomic hierarchy level to which the data will be summarized. 
 If the user chooses the highest level of resolution (e.g. OTU), the visualization will display function attributions down to the level of individual OTUs. 
 However, by choosing a lower-resolution level the visualization will load faster, be more responsive, and use less memory.
 
 
 <h2 id="function">Functional Data</h2>
 
-<h3>Comparison with metagenome-based function abundances</h3>
+<h3>Comparison with taxa-independent function abundances</h3>
 
-Burrito will optionally compare taxa-based estimated functional abundances with a second, paired dataset of measured function abundances (for example, directly annotated and quantified from shotgun metagenomic data). To select this option, the user must upload a data file of function abundances with the first column listing KEGG Orthologs (KO), 
-and subsequent columns detailing the abundances of each KO in each sample. 
+Burrito will optionally compare taxa-based estimated functional abundances with a second, paired dataset of measured function abundances (for example, directly annotated and quantified from shotgun metagenomic data). To select this option, the user must upload a data file of function abundances with the first column listing function IDs (KEGG Orthologs (KOs) if using the default functional hierarchy) 
+and subsequent columns detailing the abundances of each function in each sample. 
 
 The column names must correspond exactly with the sample names used in other data files.
 
@@ -42,17 +42,17 @@ The column names must correspond exactly with the sample names used in other dat
 
 <h3>Custom genomic content for each taxon</h3>
 
-The third upload option allows the user to provide their own genome annotation table for the taxa in their OTU table. The first file is again an OTU table of the same format, except with any OTU IDs (not limited to Greengenes). 
+The second taxa-function linking method allows the user to provide their own genome annotation table for the taxa in their taxonomic abundance table. Using this method, the taxonomic abundance table can use any taxon IDs (they not limited to Greengenes 97% OTU IDs). 
 
-The columns must appear in the order in the example. The OTU IDs must match those found in the associated OTU table. All OTUs must have some information in the genome content file.
+The columns must appear in the same order as in the example. The taxon IDs must match those found in the associated taxonomic abundance table. All taxa must have some information in the genome content file.
 
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_genome_content.txt" target="_blank">Example </a>
 
 <h3>Table of functional attributions for each taxon</h3>
 
-The second upload option requires a table of 16S rRNA reads, as in the first option, but the user can also supply a table of taxon-specific function abundances in the format generated using the PICRUSt metagenome_contributions.py script. 
+The third taxa-function linking method allows the user to supply their own table of taxon-specific function abundances in the same format as the output generated by using the PICRUSt metagenome_contributions.py script.
 
-The columns must appear in the order in the example. The OTU IDs and sample names must appropriately match those found in the 16S rRNA read table.
+The columns must appear in the same order as in the example. The taxon IDs and sample names must appropriately match those found in the taxonomic abundance table.
 
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_contributions.txt" target="_blank">Example </a>
 
@@ -65,7 +65,7 @@ The user can provide a custom tree describing the hierarchical relationships bet
 
 <h3>Choosing a functional summary level</h3>
 
-The user also must select a function hierarchy level to which the data will be summarized. As with the OTU summary, any level can be chosen, but choosing a lower-resolution level may increase performance.
+Once finished with all functional data upload options, the user selects a function hierarchy level to which the data will be summarized. As with the taxonomic summary level, any level can be chosen, but choosing a lower-resolution level may increase performance.
 
 *Warning:* The BRITE hierarchy (used by default) maps single KOs to multiple subpathways. Because Burrito's tree visualization assumes there are no such many-to-one hierarchical mappings, Burrito will not display functional data at the KO level under the default settings.
 If using a custom hierarchy that maps a higher-resolution function level to multiple lower-resolution levels, the user should select a summary level with exclusively unique mappings. For lower levels, for example for KOs that belong to multiple pathways, Burrito will assign 
@@ -78,4 +78,3 @@ The user can provide a sample grouping table linking samples to different groupi
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_sample_map.txt" target="_blank">Example </a>
 
 Alternatively, users can select an option to sort samples alphabetically by sample ID.
-
