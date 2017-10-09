@@ -227,12 +227,15 @@
 	// }
 
 	function generate_bipartite_graph_tooltip(tax, func, width, totalShare){
-		return bipartite_graph_tooltip_text[0] + tax+ bipartite_graph_tooltip_text[1] + func +  bipartite_graph_tooltip_text[2] + Math.round(width*100)/100 + bipartite_graph_tooltip_text[3] + bipartite_graph_tooltip_text[4] + Math.round(totalShare*100)/100 + bipartite_graph_tooltip_text[5];
+		tax_split = tax.split('_').pop()
+		func_split = func.split('_').pop()
+		return bipartite_graph_tooltip_text[0] + tax_split + bipartite_graph_tooltip_text[1] + func_split +  bipartite_graph_tooltip_text[2] + Math.round(width*100)/100 + bipartite_graph_tooltip_text[3] + bipartite_graph_tooltip_text[4] + Math.round(totalShare*100)/100 + bipartite_graph_tooltip_text[5];
 	}
 
 	function generate_bipartite_node_tooltip(p, id, value){
+		id_split = id.split('_').pop()
 		p == 0 ? category = bipartite_node_tooltip_text[0] : category = bipartite_node_tooltip_text[1]
-		return category + id + bipartite_node_tooltip_text[2] + Math.round(value*100)/100 + bipartite_node_tooltip_text[3]; // + bipartite_node_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_node_tooltip_text[3];
+		return category + id_split + bipartite_node_tooltip_text[2] + Math.round(value*100)/100 + bipartite_node_tooltip_text[3]; // + bipartite_node_tooltip_text[2] + Math.round(totalShare*100)/100 + bipartite_node_tooltip_text[3];
 	}
 	
 	function drawEdges(data, id, taxa_colors, func_colors, displayed_taxa, displayed_funcs, highlightall, dehighlightall, avg_contrib_data){
