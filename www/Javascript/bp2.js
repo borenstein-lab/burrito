@@ -723,7 +723,6 @@
 					if(d3.select(this).classed("clicked")){
 					return 1;
 					} else {
-						console.log(d3.selectAll(".edges").selectAll(".clicked"))
 						if(d3.selectAll(".edges").selectAll(".clicked").empty()){
 							return 0.65;
 						} else {
