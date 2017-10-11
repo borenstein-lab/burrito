@@ -3,8 +3,8 @@ var text_map = {};
 //// Text for the home page
 
 // Text for top of home page
-text_map['home_page_title_text'] = ['Burrito'];
-text_map['home_page_description_text'] = ['Burrito is a tool for visualizing the relationship between taxonomy and function in microbiome datasets. A detailed description of the input parameters and options is available in the', 'user manual.', 'Source code is available', 'here', '<br><br>Want to try it out? Check this preview (using an example data set from', 'Theriot et al 2014', '):', 'Preview', '<br><br>If you use Burrito please cite the following paper:<br><em>In progress</em>'];
+text_map['home_page_title_text'] = ['BURRITO'];
+text_map['home_page_description_text'] = ['BURRITO is a tool for visualizing the relationship between taxonomy and function in microbiome datasets. A detailed description of the input parameters and options is available in the', 'user manual.', 'Source code is available', 'here', '<br><br>Want to try it out? Check this preview (using an example data set from', 'Theriot et al 2014', '):', 'Preview', '<br><br>If you use BURRITO please cite the following paper:<br><em>McNally, C., Eng, A., Noecker, C., Gagne-Maynard, W., & Borenstein, E. (2017). BURRITO: An interactive tool for visualizing taxa-function relationships in microbiome data. Submitted.</em>'];
 
 // <!-- Rogan Carr and Elhanan Borenstein (2012) <a class="normalLinkTxt" href="https://bioinformatics.oxfordjournals.org/content/28/5/734.abstract">NetSeed: A network-based reverse-ecology tool for calculating the metabolic interface of an organism with its environment.</a> <em>Bioinformatics</em>, 28(5): 734-735. (<a class="normalLinkTxt" href="https://elbo.gs.washington.edu/pub/netseed_carr_bioinf.pdf">PDF</a>) -->
 
@@ -13,7 +13,7 @@ text_map['taxonomic_block_title_text'] = ['Taxonomic Data'];
 text_map['taxonomic_block_manual_link_text'] = ['Manual&gt;Taxonomy'];
 text_map['taxonomic_abundance_table_input_text'] = ['Taxonomic abundances:'];
 text_map['taxonomic_abundance_table_help_text'] = ['Upload the taxonomic abundance table that function attributions will be linked to<br>(raw read counts or relative abundances).'];
-text_map['taxonomic_hierarchy_choice_text'] = ['Taxonomy:', 'Greengenes taxonomy (default; compatible with automatic attribution calculation)', 'Custom taxonomy:'];
+text_map['taxonomic_hierarchy_choice_text'] = ['Taxonomy:', 'Greengenes taxonomy (default; compatible with automatic attribution calculation)', 'Custom taxonomy:', 'Custom taxon IDs with no hierachy'];
 text_map['taxonomic_hierarchy_choice_help_text'] = ['Choose the taxonomy that defines the hierarchical relationship between taxa and allows you to explore your data at different taxonomic resolutions.'];
 text_map['taxonomic_level_of_detail_selector_text'] = ['Minimum taxonomic resolution:'];
 text_map['taxonomic_level_of_detail_selector_help_text'] = 	['Choose the minimum taxonomic resolution that will be viewable<br>(lower resolution may improve performance for large datasets).'];
@@ -23,9 +23,9 @@ text_map['functional_block_title_text'] = ['Functional Data'];
 text_map['functional_block_manual_link_text'] = ['Manual&gt;Function'];
 text_map['functional_abundance_choice_text'] = ['Metagenome-based function abundances:', 'No metagenome-based function abundances available (default)', 'Metagenome-based function abundance table:'];
 text_map['functional_abundance_choice_help_text'] = ['Choose to upload a table of metagenome-based function abundances for your samples to compare to the taxonomy-based function abundances.'];
-text_map['contribution_choice_text'] = ['Taxonomy-function linking method:', 'Automatically calculate attributions (default; uses the 13_5 versions of the 16S copy number normalization and gene content tables downloaded from the PICRUSt website)', 'Custom genomic content table:', 'Function attribution table:'];
-text_map['contribution_choice_help_text'] = ['Choose the method for linking taxonomic abundances to function abundances.'];
-text_map['functional_hierarchy_choice_text'] = ['Function hierarchy:', 'BRITE function hierarchy (default, compatible with automatic attribution calculation)', 'Custom function hierarchy:'];
+text_map['contribution_choice_text'] = ['Taxonomy-function linking method:', 'Automatically calculate attributions (default; compatible with Greengenes OTU IDs)', 'Custom genomic content table:', 'Function attribution table:'];
+text_map['contribution_choice_help_text'] = ['Choose the method for linking taxonomic abundances to function abundances<br>(automatic attribution calculation uses the 13_5 versions of the 16S copy number normalization and gene content tables downloaded from the PICRUSt website)'];
+text_map['functional_hierarchy_choice_text'] = ['Function hierarchy:', 'BRITE function hierarchy (default, compatible with automatic attribution calculation)', 'Custom function hierarchy:', 'Custom function IDs with no hierarchy'];
 text_map['functional_hierarchy_choice_help_text'] = ['Choose the functional hierarchy that defines the hierarchical relationship between functions and allows you to explore your data at different functional resolutions.'];
 text_map['functional_level_of_detail_selector_text'] = ['Minimum functional resolution:'];
 text_map['functional_level_of_detail_selector_help_text'] = ['Choose the minimum functional resolution that will be viewable<br>(lower resolution may improve performance for large datasets).'];
@@ -47,7 +47,7 @@ text_map['random_color_choice_text'] = ['Random color scale'];
 text_map['color_choice_help_text'] = ['Choose the type of color scale used during display.'];
 
 // Text for activation block of upload options
-text_map['update_button_text'] = ['Assemble the Burrito'];
+text_map['update_button_text'] = ['Assemble the BURRITO'];
 
 // Text for end block of home page
 text_map['return_text'] = ['Back to', 'the Borenstein Lab'];
