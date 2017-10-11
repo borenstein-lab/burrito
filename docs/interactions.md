@@ -1,10 +1,10 @@
 ---
-title: Available Interactions in the Burrito Visualization
+title: Available Interactions in the BURRITO Visualization
 layout: default
 ---
-# Interacting with the Burrito Visualization
+# Interacting with the BURRITO Visualization
 
-Burrito enables the user to explore their data using a wide array of interactive features. These features range from visualization-wide highlighting for examing broad trends to taxon-, function-, or attribution-specific tooltips for detailed information about individual aspects of community structure.
+BURRITO enables the user to explore their data using a wide array of interactive features. These features range from visualization-wide highlighting for examing broad trends to taxon-, function-, or attribution-specific tooltips for detailed information about individual aspects of community structure.
 
 ### Highlighting taxa, functions, and attributions
 

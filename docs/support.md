@@ -2,7 +2,7 @@
 title: Contact Us
 layout: default
 ---
-# Support and Contact
+# Citation and Contact
 
 If you use Burrito, please cite:
 
