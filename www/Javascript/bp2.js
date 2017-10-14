@@ -3,6 +3,7 @@
 	var b=20, bb=150, height=0, buffMargin=1, minHeight=14;
 	var c1=[-15, 15]; //, c2=[-50, 100], c3=[-10, 60]; //Column positions of labels.
 	var colors = d3.scale.category20().range();
+	var single_line_height_factor = 1;
 	
 	bP.partData = function(data, displayed_taxa, displayed_funcs){
 		var sData={};
@@ -146,6 +147,7 @@
 			.style("font-size", bipartite_graph_label_size)
 			.attr("text-anchor", p == 0 ? "end" : "start" )
 			.attr("alignment-baseline","middle")
+			.attr("dominant-baseline", "middle")
 			.text(function(d,i){
 				name_split = (data.keys[p][i].split('_')).pop()
 				return name_split;
@@ -180,40 +182,70 @@
 		}
 		mainbar.selectAll(".barlabel").style("font-size", fontSize+"px");
  		
-		if (p == 1) { //only split function labels into multiline if too long
-			mainbar.selectAll("text").each( function(d,i) {
-				var thistxt = d3.select(this);
-				var thisbbox = thistxt[0][0].getBBox();
-				if ((c1[p] + thisbbox.width) > (extra_width - bb - b)) {
-					var txt = thistxt.text();
-					var lastsp = Math.ceil(txt.length/2) + txt.substring(Math.ceil(txt.length/2),txt.length).indexOf(' ');
-					thistxt.text(txt.substring(0,lastsp));
-					thistxt.attr("y", d.middle - ((thisbbox.height + 0.2*(d.height - 25)) / 2.5))
-					thistxt.append("tspan")
-						.attr("x",thistxt.attr("x"))
-						.attr("dy",thisbbox.height + (d.height - 25) * 0.2)
-						.text(txt.substring((lastsp + 1),txt.length));
+		// Split labels into multiline labels and/or shrink font size so they fit
+		mainbar.selectAll("text").each( function(d,i) {
+			var this_text_object = d3.select(this)
+			var this_text = this_text_object.text();
+			var this_bbox = this_text_object[0][0].getBBox();
+			var single_line_height = this_bbox.height * single_line_height_factor;
+			var curr_font_size = this_text_object.style("font-size");
+			var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+
+
+			var check_value = null;
+			if (p == 0){
+
+			}
+			while ((Math.abs(c1[p]) + this_bbox.width) > (extra_width - bb - b) & font_size_value - font_scaling_step_size > minimum_font_size){
+				//console.log(this_bbox.width)
+				// Find the first space in the text to try and line break there
+				var first_space_index = this_text.indexOf(' ');
+
+				// If there is a space, create a line break there
+				if (first_space_index >= 0){
+					this_text = this_text.substring(0, first_space_index) + "\n" + this_text.substring((first_space_index + 1), this_text.length);
+
+				// Otherwise, decrease the font size to try to make it fit
+				} else {
+					curr_font_size = this_text_object.style("font-size");
+					font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+					this_text_object.style("font-size", (font_size_value - font_scaling_step_size) + "px");
 				}
 
-				thisbbox = thistxt[0][0].getBBox();
-			});
-		}
-		
+				// Find all line breaks in the new text
+				var line_break_indices = [];
+				for (var curr_index = 0; curr_index < this_text.length; curr_index++){
+					if (this_text[curr_index] == "\n"){
+						line_break_indices.push(curr_index);
+					}
+				}
+				
+				var curr_line_break_index = 0;
 
-		//mainbar.selectAll(".barlabel").style("visibility","visible");
-		/*
-		d3.select("#"+id).select(".part"+p).select(".subbars")
-			.selectAll(".subbar").data(data.subBars[p]).enter()
-			.append("rect").attr("class","subbar")
-			.attr("x", 0)
-			.attr("y",function(d){ return d.y})
-			.attr("width",b)
-			.attr("height",function(d){ return d.h})
-			.style("fill",function(d){ 
-				return colors(data.keys[p][d["key"+(p+1)]]);})
-			.style("opacity",0.1)
-			.transition().duration(300);
-		*/
+				// Create line breaks in the text object
+				this_text_object.text(this_text.substring(0, line_break_indices[curr_line_break_index]));
+				this_text_object.attr("y", d.middle - (single_line_height * line_break_indices.length / 2))
+				for (; curr_line_break_index < line_break_indices.length; curr_line_break_index++){
+
+					// If we're looking at the last word, add the text up to the end
+					if (curr_line_break_index == line_break_indices.length - 1){
+						this_text_object.append("tspan")
+							.attr("x", this_text_object.attr("x"))
+							.attr("dy", single_line_height)
+							.text(this_text.substring((line_break_indices[curr_line_break_index] + 1), this_text.length))
+
+					// Otherwise, we're looking at a word in the middle, so we add up to the next line break
+					} else {
+						this_text_object.append("tspan")
+							.attr("x", this_text_object.attr("x"))
+							.attr("dy", single_line_height)
+							.text(this_text.substring((line_break_indices[curr_line_break_index] + 1), line_break_indices[curr_line_break_index + 1]))
+					}
+				}
+
+				this_bbox = this_text_object[0][0].getBBox();
+			}
+		});
 	}
 
 

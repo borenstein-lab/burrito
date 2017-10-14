@@ -265,12 +265,11 @@
         .attr("dy", 0)
         .style("text-anchor", "end")
 
-    // Fix length of axis bar so it doesn't extend too far when exported
+    // Fix length of x axis bar so it doesn't extend too far when exported
     var curr_x_axis_path_string = document.getElementById("func_x_axis").querySelectorAll("path")[0].getAttribute("d");
     var x_axis_path_string_prefix = curr_x_axis_path_string.match(/^(.*)H/);
     var x_axis_path_string_suffix = curr_x_axis_path_string.match(/H[0-9\.]*(V.*)$/);
     d3.select("#func_x_axis").selectAll("path").attr("d", x_axis_path_string_prefix[1] + "H" + (last_sample_x - first_sample_x + func_bar_x.rangeBand()) + x_axis_path_string_suffix[1]);
-
 
     // Remove labels for comparison samples
     d3.select("#func_x_axis").selectAll("text")
@@ -281,27 +280,33 @@
         }
       })
 
-    // Calculate the new padding between bars after removing space between paired comparison samples
-    var original_padding = func_bar_x.rangeBand() * graphdims.padding / (1 - graphdims.padding)
-    var total_original_padding = original_padding * (sample_order.length - 1)
-
+    var num_total_samples = 0
     var num_comparison_samples = 0
     svglink.selectAll(".Sample")
       .data(viz.filter(function(d){
         if (d.Sample.indexOf("_comparison") >= 0){
           num_comparison_samples += 1
+        } else if (d.Sample.indexOf(average_contrib_sample_name) < 0){
+          num_total_samples += 1
         }
       }))
+    if (num_comparison_samples > 0){
+      num_total_samples *= 2
+    }
+
+    // Calculate the new padding between bars after removing space between paired comparison samples
+    var original_padding = func_bar_x.rangeBand() * graphdims.padding / (1 - graphdims.padding)
+    var total_original_padding = original_padding * (num_total_samples - 1)
 
     // Subtract placeholder bar space from the total original padding
-
     var new_padding = total_original_padding / (sample_order.length - num_comparison_samples - 1)
     
     // If there are comparison samples, then we need to move bars and sample labels around
     if (num_comparison_samples > 0){
 
-      // Reposition x-coordinates of sample and grouping elements depending on comparison samples
+      // Reposition x-coordinates of sample, sample label, and grouping elements depending on comparison samples
       var last_bar_end = graphdims.sample_buffer + func_bar_x.rangeBand() + graphdims.width_buffer;
+      var last_sample_label_begin = 0;
       for (var sample_index = 1; sample_index < sample_order.length; sample_index++){
 
         var sample_name = sample_order[sample_index]
@@ -331,24 +336,6 @@
       }
     }
 
-    // Place ticks relative to the bars they correspond to
-    var initial_x_axis_tick_transform = dims.width
-    d3.select("#func_x_axis").selectAll(".tick")
-      .each(function(data){
-        var tick = d3.select(this)
-        var sample_name = "";
-        tick.selectAll("text")
-          .each(function(){
-            sample_name = this.textContent
-          })
-
-        // If this isn't the tick for a comparison sample, then we fix its x position
-        if (sample_name.indexOf("_comparison") < 0 & sample_name != ""){
-          var x_position = (d3.transform(d3.select("#func_" + sample_name).attr("transform")).translate)[0]
-          tick.attr("transform", "translate(" + (x_position - graphdims.sample_buffer - graphdims.width_buffer) + ",0)")
-        }
-      })
-
     // If comparison samples exist, place marker text below paired samples to indicate which is which and record the space required for these labels to properly place sample labels and size the x-axis
     var max_sample_type_text_height = 0
     if (num_comparison_samples > 0){
@@ -359,31 +346,64 @@
         // Skip comparison sample names
         if (sample_name.indexOf("_comparison") < 0){
 
-          // // If a comparison sample exists, then we create labels
-          // if (document.getElementById("func_" + comparison_name)){
-            var sample_x = (d3.transform(d3.select("#func_" + sample_name).attr("transform")).translate)[0]
-            d3.select("#func_x_axis")
-              .append("text")
-                .attr("class", "sample_type_label")
-                .attr("x", 0)
-                .attr("y", graphdims.sample_label_buffer)
-                .style("font-size", func_type_label_size)
-                .attr("text-anchor", "middle")
-                .attr("transform", "translate(" + (sample_x + (func_bar_x.rangeBand() / 2)- graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
-                .text(taxa_based_bar_label)
-            var comparison_x = sample_x + func_bar_x.rangeBand()
-            d3.select("#func_x_axis")
-              .append("text")
-                .attr("class", "sample_type_label")
-                .attr("x", 0)
-                .attr("y", graphdims.sample_label_buffer)
-                .style("font-size", func_type_label_size)
-                .attr("text-anchor", "middle")
-                .attr("transform", "translate(" + (comparison_x + (func_bar_x.rangeBand() / 2) - graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
-                .text(metagenome_based_bar_label)
-          // }
+          var sample_x = (d3.transform(d3.select("#func_" + sample_name).attr("transform")).translate)[0]
+          d3.select("#func_x_axis")
+            .append("text")
+              .attr("class", "sample_type_label")
+              .attr("x", 0)
+              .attr("y", 0)
+              .style("font-size", func_type_label_size)
+              .style("alignment-baseline","hanging")
+              .attr("dominant-baseline", "hanging")
+              .attr("text-anchor", "middle")
+              .attr("transform", "translate(" + (sample_x + (func_bar_x.rangeBand() / 2)- graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
+              .text(taxa_based_bar_label)
+          var comparison_x = sample_x + func_bar_x.rangeBand()
+          d3.select("#func_x_axis")
+            .append("text")
+              .attr("class", "sample_type_label")
+              .attr("x", 0)
+              .attr("y", 0)
+              .style("font-size", func_type_label_size)
+              .style("alignment-baseline","hanging")
+              .attr("dominant-baseline", "hanging")
+              .attr("text-anchor", "middle")
+              .attr("transform", "translate(" + (comparison_x + (func_bar_x.rangeBand() / 2) - graphdims.sample_buffer - graphdims.width_buffer) + "," + graphdims.sample_label_buffer + ")")
+              .text(metagenome_based_bar_label)
         }
       }
+
+      // Check if markers fit underneath bars
+      var markers_fit = true
+      d3.select("#func_x_axis")
+        .selectAll(".sample_type_label")
+          .each(function(){
+            var this_text_object= d3.select(this);
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            var text_width = this_text_object[0][0].getBBox().width
+            if (text_width > func_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              markers_fit = false;
+            }
+          })
+
+      // Shrink marker font size untill all labels fit beneath their bars
+      while (!markers_fit){
+        markers_fit = true;
+        d3.select("#func_x_axis")
+          .selectAll(".sample_type_label")
+            .each(function(){
+              var this_text_object= d3.select(this);
+              var curr_font_size = this_text_object.style("font-size");
+              var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+              this_text_object.style("font-size", (font_size_value - font_scaling_step_size) + "px")
+              var text_width = this_text_object[0][0].getBBox().width
+              if (text_width > func_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+                markers_fit = false;
+              }
+            })
+      }
+
       d3.select("#func_x_axis")
         .selectAll(".sample_type_label")
           .each(function(){
@@ -397,8 +417,108 @@
           })
     }
 
+    // Position x axis ticks
+    d3.select("#func_x_axis")
+      .selectAll(".tick")
+        .each(function(d){
+          var tick = d3.select(this);
+          // Skip comparison sample ticks which have no text
+          if (tick.select("text")[0][0]){
+            var sample_name = tick.select("text")[0][0].textContent;
 
-    // Calculate the maximum width of x-axis text (for non-comparison samples) (height after rotation) and vertically center the text relative to the bars they correspond to
+            // If there are comparison samples, then there is only one padding gap every two samples
+            if (num_comparison_samples > 0){
+              // If there are comparison samples, then we make space for comparisons for all samples
+              var fixed_sample_order = []
+              for (var sample_index = 0; sample_index < sample_order.length; sample_index++){
+                if (sample_order[sample_index].indexOf("_comparison") < 0){
+                  fixed_sample_order.push(sample_order[sample_index])
+                  fixed_sample_order.push(sample_order[sample_index] + "_comparison")
+                }
+              }
+
+              var sample_index = fixed_sample_order.indexOf(sample_name);
+
+              tick.attr("transform", "translate(" + ((func_bar_x.rangeBand() * sample_index) + (new_padding * (sample_index / 2))) + ",0)")
+            // Otherwise, there's a padding gap between every pair of samples
+            } else {
+
+              var sample_index = sample_order.indexOf(sample_name);
+
+              tick.attr("transform", "translate(" + ((func_bar_x.rangeBand() * sample_index) + (new_padding * sample_index)) + ",0)")
+            }
+          }
+        })
+
+    // Vertically center text relative to the bars they label
+    d3.select("#func_x_axis")
+      .selectAll(".tick")
+        .selectAll("text")
+          .each(function(){
+            var text_object = d3.select(this)
+            var text_height = text_object.node()
+              .getBBox()
+                .height
+            // Check if comparison bar exists and if so, we center the label between the two bars
+            if (num_comparison_samples > 0){
+              text_object.attr("transform", "translate(" + (func_bar_x.rangeBand() - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
+            // Otherwise, center on the bar itself
+            } else {
+              text_object.attr("transform", "translate(" + ((func_bar_x.rangeBand() / 2) - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
+            }
+          })
+
+
+    // Check if sample labels fit underneath bars (height of text because we rotate it)
+    var sample_labels_fit = true
+    d3.select("#func_x_axis")
+      .selectAll(".tick")
+        .selectAll("text")
+          .each(function(){
+            var this_text_object = d3.select(this);
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            var text_height = this_text_object[0][0].getBBox().height;
+
+            // If there are comparison samples, then labels have two bar widths to fit under
+            if (num_comparison_samples > 0){
+              if (text_height > func_bar_x.rangeBand() * 2 & font_size_value - font_scaling_step_size > minimum_font_size){
+                sample_labels_fit = false;
+              }
+
+            // Otherwise, there's only one bar above the label
+            } else if (text_height > func_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              sample_labels_fit = false;
+            }
+          })
+
+    // Shrink sample label font size untill all labels fit beneath their bars
+    while (!sample_labels_fit){
+      sample_labels_fit = true;
+      d3.select("#func_x_axis")
+      .selectAll(".tick")
+        .selectAll("text")
+          .each(function(){
+            var this_text_object = d3.select(this);
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            this_text_object.style("font-size", (font_size_value - font_scaling_step_size) + "px")
+            var text_height = this_text_object[0][0].getBBox().height;
+
+            // If there are comparison samples, then labels have two bar widths to fit under
+            if (num_comparison_samples > 0){
+              if (text_height > func_bar_x.rangeBand() * 2 & font_size_value - font_scaling_step_size > minimum_font_size){
+                sample_labels_fit = false;
+              }
+
+            // Otherwise, there's only one bar above the label
+            } else if (text_height > func_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              sample_labels_fit = false;
+            }
+          })
+    }
+
+    // Calculate the maximum width of x-axis text (for non-comparison samples) (height after rotation)
     var max_x_axis_text_width = 0;
     d3.select("#func_x_axis")
       .selectAll(".tick")
@@ -410,27 +530,6 @@
                   .width
             if (text_width > max_x_axis_text_width & this.textContent.indexOf("_comparison") < 0){
               max_x_axis_text_width = text_width
-            }
-            var text_height = d3.select(this)
-              .node()
-                .getBBox()
-                  .height
-            // // Check if comparison bar exists and if so, we center the label between the two bars, otherwise just center it on the single bar
-            // if (document.getElementById("func_" + this.textContent + "_comparison")){
-            //   d3.select(this)
-            //   .attr("transform", "translate(" + (x.rangeBand() - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")  
-            // } else {
-            //   d3.select(this)
-            //     .attr("transform", "translate(" + ((x.rangeBand() / 2) - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
-            // }
-            // If comparison samples exist, center the label between the two bars
-            if (num_comparison_samples > 0){
-              d3.select(this)
-                .attr("transform", "translate(" + (func_bar_x.rangeBand() - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
-            // Otherwise, center on the bar itself
-            } else {
-              d3.select(this)
-                .attr("transform", "translate(" + ((func_bar_x.rangeBand() / 2) - (text_height / 2)) + "," + (graphdims.sample_label_buffer + max_sample_type_text_height) + ") rotate(-90)")
             }
           })
 
@@ -476,6 +575,38 @@
           .attr("font-size", group_label_size)
           .text(function(d) { return d.Name; });
 
+      // Check if any group label is too wide to fit underneath its group
+      var group_labels_fit = true;
+      d3.select("#func_bar_xtick_svg")
+        .selectAll(".x_samp_g_label")
+          .each( function(d){
+            var this_text_object = d3.select(this).select("text");
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            var text_width = this_text_object[0][0].getBBox().width
+            if (text_width > d.Max - d.Min + func_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              group_labels_fit = false;
+            }
+          })
+
+      // Scale group label font size to fit underneath group
+      while (!group_labels_fit){
+        group_labels_fit = true;
+        d3.select("#func_bar_xtick_svg")
+        .selectAll(".x_samp_g_label")
+          .each( function(d){
+            var this_text_object = d3.select(this).select("text");
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            this_text_object.style("font-size", (font_size_value - font_scaling_step_size) + "px");
+            var text_width = this_text_object[0][0].getBBox().width;
+            if (text_width > d.Max - d.Min + func_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              group_labels_fit = false;
+            }
+          })
+      }
+
+
       for (var group_index = 0; group_index < groups.length - 1; group_index++){
         d3.select("#func_bars").append("line")
           .attr("class", "bar_group_divider")
@@ -483,14 +614,6 @@
           .attr("x1", groups[group_index].Max + func_bar_x.rangeBand() + ((groups[group_index + 1].Min - groups[group_index].Max - func_bar_x.rangeBand()) / 2))
           .attr("x2", groups[group_index].Max + func_bar_x.rangeBand() + ((groups[group_index + 1].Min - groups[group_index].Max - func_bar_x.rangeBand()) / 2))
       }
-      // d3.select("#func_bars").selectAll("line.bar_group_divider")
-      //   .data(groups.slice(0,groups.length - 1))
-      //   .enter()
-      //   .insert("line","g.g")
-      //   .classed("bar_group_divider",true)
-      //   .attr("x1", function(d) { return d.Max + x.rangeBand() * 9/8 })
-      //   .attr("y1", graphdims.height_buffer)
-      //   .attr("x2", function(d) { return d.Max + x.rangeBand() * 9/8 })
 
       // Determine the maximum height of any of the group labels
       d3.select("#func_bar_xtick_svg").selectAll(".x_samp_g_label")
@@ -505,7 +628,6 @@
             }
           })
     }
-
 
     // Position and size the x-axis to contain full labels and group labels if necessary
     var buffer_between_sample_labels_and_bottom = 2

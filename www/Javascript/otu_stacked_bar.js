@@ -57,9 +57,9 @@
     d3.select("#otu_bar_x_label").remove()
     d3.select("#otu_bar_xtick_svg").remove()
 
-  	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:10, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8}
+  	var graphdims = {width: dims.width - 45, height: dims.height * 8/10, height_buffer:10, width_buffer:10, sample_buffer:45, x_axis_x_buffer:45, sample_label_buffer:8, padding:0.2}
     graphdims.width = graphdims.width - graphdims.width_buffer;
-    otu_bar_x.rangeBands([0, graphdims.width], .2);
+    otu_bar_x.rangeBands([0, graphdims.width], graphdims.padding);
     otu_bar_x_axis.scale(otu_bar_x);
     otu_bar_y_axis.scale(otu_bar_y);
     
@@ -262,30 +262,62 @@
       .selectAll("path")
         .attr("d", x_axis_path_string_prefix[1] + "H" + (last_sample_x - first_sample_x + otu_bar_x.rangeBand()) + x_axis_path_string_suffix[1]);
 
-
-    // Grab the initial x transform of the ticks
-    var initial_x_axis_tick_transform = dims.width
+    // Position x axis ticks
     d3.select("#otu_x_axis")
       .selectAll(".tick")
-        .each(function(data){
-          var tick = d3.select(this)
-          var transform = d3.transform(tick.attr("transform"))
-            .translate
-          if (transform[0] < initial_x_axis_tick_transform){
-            initial_x_axis_tick_transform = transform[0]
-          }
+        .each(function(d){
+          var tick = d3.select(this);
+          var sample_name = tick.select("text")[0][0].textContent;
+          var sample_index = sample_order.indexOf(sample_name);
+          tick.attr("transform", "translate(" + ((otu_bar_x.rangeBand() * sample_index) + ((otu_bar_x.rangeBand() * graphdims.padding / (1 - graphdims.padding)) * sample_index)) + ",0)")
         })
 
-    // Remove the initial x transform from the ticks
-    d3.select("#otu_x_axis").selectAll(".tick")
-      .each(function(data){
-        var tick = d3.select(this)
-        var transform = d3.transform(tick.attr("transform"))
-          .translate
-        tick.attr("transform", "translate(" + (transform[0] - initial_x_axis_tick_transform) + ",0)")
-      })
+    // Vertically center text relative to the bars they label
+    d3.select("#otu_x_axis")
+      .selectAll(".tick")
+        .selectAll("text")
+          .each(function(){
+            var text_object = d3.select(this)
+            var text_height = text_object.node()
+              .getBBox()
+                .height
+            text_object.attr("transform", "translate(" + ((otu_bar_x.rangeBand() / 2) - (text_height / 2)) + "," + graphdims.sample_label_buffer + ") rotate(-90)")
+          })
 
-    // Calculate the maximum width of x-axis text (height after roatation) and vertically center the text relative to the bars they correspond to
+    // Check if sample labels fit underneath bars (height of text because we rotate it)
+    var sample_labels_fit = true
+    d3.select("#otu_x_axis")
+      .selectAll(".tick")
+        .selectAll("text")
+          .each(function(){
+            var this_text_object = d3.select(this);
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            var text_height = this_text_object[0][0].getBBox().height;
+            if (text_height > otu_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              sample_labels_fit = false;
+            }
+          })
+
+    // Shrink sample label font size untill all labels fit beneath their bars
+    while (!sample_labels_fit){
+      sample_labels_fit = true;
+      d3.select("#otu_x_axis")
+      .selectAll(".tick")
+        .selectAll("text")
+          .each(function(){
+            var this_text_object = d3.select(this);
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            this_text_object.style("font-size", (font_size_value - font_scaling_step_size) + "px")
+            var text_height = this_text_object[0][0].getBBox().height;
+            if (text_height > otu_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              sample_labels_fit = false;
+            }
+          })
+    }
+
+    // Calculate the maximum width of x-axis text (height after roatation)
     var max_x_axis_text_width = 0;
     d3.select("#otu_x_axis")
       .selectAll("text")
@@ -297,12 +329,6 @@
           if (text_width > max_x_axis_text_width){
             max_x_axis_text_width = text_width
           }
-          var text_height = d3.select(this)
-            .node()
-              .getBBox()
-                .height
-          d3.select(this)
-            .attr("transform", "translate(" + ((otu_bar_x.rangeBand() / 2) - (text_height / 2)) + "," + graphdims.sample_label_buffer + ") rotate(-90)")
         })
     
 
@@ -345,6 +371,37 @@
       		.attr("text-anchor","middle")
       		.attr("font-size", group_label_size)
       		.text(function(d) { return d.Name; });
+
+      // Check if any group label is too wide to fit underneath its group
+      var group_labels_fit = true;
+      d3.select("#otu_bar_xtick_svg")
+        .selectAll(".x_samp_g_label")
+          .each( function(d){
+            var this_text_object = d3.select(this).select("text");
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            var text_width = this_text_object[0][0].getBBox().width
+            if (text_width > d.Max - d.Min + otu_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              group_labels_fit = false;
+            }
+          })
+
+      // Scale group label font size to fit underneath group
+      while (!group_labels_fit){
+        group_labels_fit = true;
+        d3.select("#otu_bar_xtick_svg")
+        .selectAll(".x_samp_g_label")
+          .each( function(d){
+            var this_text_object = d3.select(this).select("text");
+            var curr_font_size = this_text_object.style("font-size");
+            var font_size_value = curr_font_size.substring(0, curr_font_size.length - 2);
+            this_text_object.style("font-size", (font_size_value - font_scaling_step_size) + "px");
+            var text_width = this_text_object[0][0].getBBox().width;
+            if (text_width > d.Max - d.Min + otu_bar_x.rangeBand() & font_size_value - font_scaling_step_size > minimum_font_size){
+              group_labels_fit = false;
+            }
+          })
+      }
 
     	d3.select("#taxa_bars").selectAll("line.bar_group_divider")
     		.data(groups.slice(0,groups.length - 1))

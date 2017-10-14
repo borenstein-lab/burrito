@@ -15,3 +15,5 @@ var bipartite_graph_label_size = 25
 var legend_text_size = 14
 var help_overlay_text_size = 14
 var busy_text_size = 20
+var font_scaling_step_size = 1
+var minimum_font_size = 8
