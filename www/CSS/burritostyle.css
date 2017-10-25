@@ -195,6 +195,15 @@ h2 {
 	margin-right: auto;
 	background-color: #ff6666;
 }
+.btn-preview{
+	width: 110px;
+	height: 25px;
+/* 	display: block; */
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #FFD700;
+}
+
 #tooLongTableDiv {
 	position:relative;
 	width: 500px;
