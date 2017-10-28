@@ -685,35 +685,6 @@ shinyServer(function(input, output, session) {
 	# Checks whether the tables match with consistent labels and samples
 	validate_tables_match = function(otu_table, contribution_table, function_abundance_table, taxonomic_hierarchy_table, function_hierarchy_table, metadata_table){
 		
-		# # Check that OTUs in the OTU table are present in the taxonomic hierarchy
-		# if (!validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "taxonomic hierarchy")){
-		# 	return(FALSE)
-		# }
-		
-		# Check that OTUs in the contribution table are present in the taxonomic hierarchy
-		# if (!validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], taxonomic_hierarchy_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "taxonomic hierarchy")){
-		# 	return(FALSE)
-		# }
-		
-		# # Check that functions in the contribution table are present in the function hierarchy
-		# if (!validate_elements_from_first_found_in_second(contribution_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "contribution table", "functional hierarchy")){
-		# 	return(FALSE)
-		# }
-		
-		# # If the function abundance table is not empty, check that functions in the function abundance table are in the function hierarchy
-		# if (nrow(function_abundance_table) > 0){
-		# 	if (!validate_elements_from_first_found_in_second(function_abundance_table[[first_function_level()]], function_hierarchy_table[[first_function_level()]], paste(first_function_level(), "s", sep=""), "function abundance table", "functional hierarchy")){
-		# 		return(FALSE)
-		# 	}
-		# }
-		
-		# # If the function abundance table is not empty, check that samples in the function abundance table are in the contribution table
-		# if (nrow(function_abundance_table) > 0){
-		# 	if (!validate_elements_from_first_found_in_second(colnames(function_abundance_table)[2:ncol(function_abundance_table)], contribution_table[[first_metadata_level()]], "samples", "function abundance table", "contribution table")){
-		# 		return(FALSE)
-		# 	}
-		# }
-		
 		# If the metadata table is not empty, check that samples in the OTU table are in the metadata table
 		if (nrow(metadata_table) > 0){
 			if (!validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "OTU table", "sample grouping table")){
@@ -721,7 +692,7 @@ shinyServer(function(input, output, session) {
 			}
 		}
 		
-		# If the metadat table is not empty, check that samples in the contribution table are in the metadata table
+		# If the metadata table is not empty, check that samples in the contribution table are in the metadata table
 		if (nrow(metadata_table) > 0){
 			if (!validate_elements_from_first_found_in_second(contribution_table[[first_metadata_level()]], metadata_table[[first_metadata_level()]], "samples", "contribution table", "sample grouping table")){
 				return(FALSE)
@@ -738,10 +709,19 @@ shinyServer(function(input, output, session) {
 
 		otu_table_file = input$taxonomic_abundance_table
 
-		# If no file was ever selected, send an abort signal
-		if (is.null(otu_table_file) & !new_file_flags[["taxonomic_abundance_table"]]){
-			session$sendCustomMessage("abort", "No file was selected for the taxonomic abundance table. Please select one.")
-			return(NULL)
+		# If the file is unavailable, check whether a file was actually selected
+		if (is.null(otu_table_file)){
+			
+			# If no file was ever selected, send an abort signal
+			if (!new_file_flags[["taxonomic_abundance_table"]]){
+				session$sendCustomMessage("abort", "No file was selected for the taxonomic abundance table. Please select one.")
+				return(NULL)
+
+			# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+			} else {
+				session$sendCustomMessage("retry_upload", "retry")
+				return(NULL)
+			}
 		}
 
 		# Read the otu table
@@ -794,10 +774,19 @@ shinyServer(function(input, output, session) {
 
 		genomic_content_table_file = input$genomic_content_table
 
-		# If no file was ever selected, send an abort signal
-		if (is.null(genomic_content_table_file) & !new_file_flags[["genomic_content_table"]]){
-			session$sendCustomMessage("abort", "The custom genomic content option was chosen, but no custom genomic content file was selected. Please select one or choose a different option.")
-			return(NULL)
+		# If the file is unavailable, check whether a file was actually selected
+		if (is.null(genomic_content_table_file)){
+
+			# If no file was ever selected, send an abort signal
+			if (!new_file_flags[["genomic_content_table"]]){
+				session$sendCustomMessage("abort", "The custom genomic content option was chosen, but no custom genomic content file was selected. Please select one or choose a different option.")
+				return(NULL)
+
+			# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+			} else {
+				session$sendCustomMessage("retry_upload", "retry")
+				return(NULL)
+			}
 		}
 
 		# Read in the genomic content table
@@ -841,10 +830,19 @@ shinyServer(function(input, output, session) {
 
 		contribution_table_file = input$contribution_table
 
-		# If no file was ever selected, send an abort signal
-		if (is.null(contribution_table_file) & !new_file_flags[["contribution_table"]]){
-			session$sendCustomMessage("abort", "The custom contribution option was chosen, but no custom contribution file was selected. Please select one or choose a different option.")
-			return(NULL)
+		# If the file is unavailable, check whether a file was actually selected
+		if (is.null(contribution_table_file)){
+
+			# If no file was ever selected, send an abort signal
+			if (!new_file_flags[["contribution_table"]]){
+				session$sendCustomMessage("abort", "The custom contribution option was chosen, but no custom contribution file was selected. Please select one or choose a different option.")
+				return(NULL)
+
+			# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+			} else {
+				session$sendCustomMessage("retry_upload", "retry")
+				return(NULL)
+			}
 		}
 
 		# Read in the contribution table
@@ -895,10 +893,19 @@ shinyServer(function(input, output, session) {
 
 			function_abundance_table_file = input$function_abundance_table
 
-			# If no file was ever selected, send an abort signal
-			if (is.null(function_abundance_table_file) & !new_file_flags[["function_abundance_table"]]){
-				session$sendCustomMessage("abort", "The option to upload function abundances for comparison was chosen, but no function abundance file was selected. Please select one or choose the option to upload no function abundances.")
-				return(NULL)
+			# If the file is unavailable, check whether a file was actually selected
+			if (is.null(function_abundance_table_file)){
+
+				# If no file was ever selected, send an abort signal
+				if (!new_file_flags[["function_abundance_table"]]){
+					session$sendCustomMessage("abort", "The option to upload function abundances for comparison was chosen, but no function abundance file was selected. Please select one or choose the option to upload no function abundances.")
+					return(NULL)
+
+				# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+				} else {
+					session$sendCustomMessage("retry_upload", "retry")
+					return(NULL)
+				}
 			}
 
 			# Read in the function abundance table
@@ -956,7 +963,22 @@ shinyServer(function(input, output, session) {
 		}
 
 		# Othwerise, if the option to use an automatical single level taxonomic hierarchy is selected, then use the taxon IDs from the otu table to make the taxonomic hierarchy
-		if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL" & !is.null(input$taxonomic_abundance_table)){
+		if (input$example_visualization != "TRUE" & input$taxonomic_hierarchy_choice == "AUTOMATIC_SINGLE_LEVEL"){
+
+			# If the file is unavailable, check whether a file was actually selected
+			if (is.null(input$taxonomic_abundance_table)){
+
+				# If no file was ever selected, send an abort signal
+				if (!new_file_flags[["taxonomic_abundance_table"]]){
+					session$sendCustomMessage("abort", "The option to generate a single level taxonomic hierarchy was chosen, but no taxonomic abundance file was selected. Please select one or choose a different taxonomy option.")
+					return(NULL)
+
+				# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+				} else {
+					session$sendCustomMessage("retry_upload", "retry")
+					return(NULL)
+				}
+			}
 
 			# Read the otu table to generate the taxonomic heirarchy and assign the appropriate column name
     		taxonomic_hierarchy_table = process_input_file('taxonomic_abundance_table')[,1,with=F]
@@ -968,10 +990,19 @@ shinyServer(function(input, output, session) {
 		# Othwerise, we read the custom taxonomic hierarchy table
 		custom_taxonomic_hierarchy_table_file = input$custom_taxonomic_hierarchy_table
 
-		# If no file was ever selected, send an abort signal
-		if (is.null(custom_taxonomic_hierarchy_table_file) & !new_file_flags[["custom_taxonomic_hierarchy_table"]]){
-			session$sendCustomMessage("abort", "The option to upload a custom taxonomic hierarchy was chosen, but no custom taxonomic hierarchy file was selected. Please select one or choose the option to use the default taxonomic hierarchy.")
-			return(NULL)
+		# If the file is unavailable, check whether a file was actually selected
+		if (is.null(input$custom_taxonomic_hierarchy_table)){
+
+			# If no file was ever selected, send an abort signal
+			if (!new_file_flags[["custom_taxonomic_hierarchy_table"]]){
+				session$sendCustomMessage("abort", "The option to upload a custom taxonomic hierarchy was chosen, but no custom taxonomic hierarchy file was selected. Please select one or choose the option to use the default taxonomic hierarchy.")
+				return(NULL)
+
+			# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+			} else {
+				session$sendCustomMessage("retry_upload", "retry")
+				return(NULL)
+			}
 		}
 
 		# Read in the custom taxonomic hierarchy table
@@ -1019,8 +1050,25 @@ shinyServer(function(input, output, session) {
     		# Gather set of functions that need to exist in the hierarchy
     		present_functions = c()
 
-    		# If a function abundance table is being used, add functions in that table to the list
-    		if (input$function_abundance_choice == "PRESENT" & !is.null(input$function_abundance_table)){
+    		# If a function abundance table is being used, check whether it is available
+    		if (input$function_abundance_choice == "PRESENT"){
+
+    			# If the file is unavailable, check whether a file was actually selected
+				if (is.null(input$function_abundance_table)){
+
+					# If no file was ever selected, send an abort signal
+					if (!new_file_flags[["function_abundance_table"]]){
+						session$sendCustomMessage("abort", "The option to generate a single level function hierarchy was chosen and the option to upload a function abundance table was chosen, but no function abundance file was selected. Please select one or choose to not use a function abundance table.")
+						return(NULL)
+
+					# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+					} else {
+						session$sendCustomMessage("retry_upload", "retry")
+						return(NULL)
+					}
+				}
+
+				# Otherwise, add the functions from the function abundance table
 	    		present_functions = c(present_functions, unlist(process_input_file('function_abundance_table')[,1,with=F]))
 	    	}
 
@@ -1028,12 +1076,46 @@ shinyServer(function(input, output, session) {
     		if (input$contribution_method_choice == "PICRUST"){
     			present_functions = c(present_functions, unlist(default_function_hierarchy_table[,1,with=F]))
     			
-    		# Otherwise, if custom genomic content is being used to link, add the functions from the custom genomic content table
-    		} else if (input$contribution_method_choice == "GENOMIC_CONTENT" & !is.null(input$genomic_content_table)){
+    		# Otherwise, if custom genomic content is being used to link, check whether it is available
+    		} else if (input$contribution_method_choice == "GENOMIC_CONTENT"){
+
+    			# If the file is unavailable, check whether a file was actually selected
+				if (is.null(input$genomic_content_table)){
+
+					# If no file was ever selected, send an abort signal
+					if (!new_file_flags[["genomic_content_table"]]){
+						session$sendCustomMessage("abort", "The option to generate a single level function hierarchy was chosen and the option to upload a genomic content table was chosen, but no genomic content file was selected. Please select one or choose a different linking method.")
+						return(NULL)
+
+					# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+					} else {
+						session$sendCustomMessage("retry_upload", "retry")
+						return(NULL)
+					}
+				}
+
+				# Otherwise, add the functions from the custom genomic content table
     			present_functions = c(present_functions, unlist(process_input_file('genomic_content_table')[,2,with=F]))
     			
-    		# Otherwise, if a custom contribution table is being used to link, add the functions from the custom contribution table
-    		} else if (input$contribution_method_choice == "CONTRIBUTION" & !is.null(input$contribution_table)){
+    		# Otherwise, if a custom contribution table is being used to link, check whether it is available
+    		} else if (input$contribution_method_choice == "CONTRIBUTION"){
+
+    			# If the file is unavailable, check whether a file was actually selected
+				if (is.null(input$contribution_table)){
+
+					# If no file was ever selected, send an abort signal
+					if (!new_file_flags[["contribution_table"]]){
+						session$sendCustomMessage("abort", "The option to generate a single level function hierarchy was chosen and the option to upload a contribution table was chosen, but no contribution file was selected. Please select one or choose a different linking method.")
+						return(NULL)
+
+					# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+					} else {
+						session$sendCustomMessage("retry_upload", "retry")
+						return(NULL)
+					}
+				}
+
+				# Otherwise, add the functions from the custom contribution table
     			present_functions = c(present_functions, unlist(process_input_file('contribution_table')[,1,with=F]))
     		}
 
@@ -1047,14 +1129,22 @@ shinyServer(function(input, output, session) {
     		return(function_hierarchy_table)
     	}
 
-
 		# Otherwise, we read the custom function hierarchy table
 		custom_function_hierarchy_table_file = input$custom_function_hierarchy_table
 
-		# If no file was ever selected, send an abort signal
-		if (is.null(custom_function_hierarchy_table_file) & !new_file_flags[["custom_function_hierarchy_table"]]){
-			session$sendCustomMessage("abort", "The option to upload a custom function hierarchy was chosen, but no custom function hierarchy file was selected. Please select one or choose the option to use the default function hierarchy.")
-			return(NULL)
+		# If the file is unavailable, check whether a file was actually selected
+		if (is.null(input$custom_function_hierarchy_table)){
+
+			# If no file was ever selected, send an abort signal
+			if (!new_file_flags[["custom_function_hierarchy_table"]]){
+				session$sendCustomMessage("abort", "The option to upload a custom function hierarchy was chosen, but no custom function hierarchy file was selected. Please select one or choose the option to use the default function hierarchy.")
+				return(NULL)
+
+			# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+			} else {
+				session$sendCustomMessage("retry_upload", "retry")
+				return(NULL)
+			}
 		}
 
 		# Read in the custom function hierarchy table
@@ -1100,10 +1190,19 @@ shinyServer(function(input, output, session) {
 		if (input$metadata_choice == "PRESENT"){
 			metadata_table_file = input$metadata_table
 
-			# If no file was ever selected, send an abort signal
-			if (is.null(metadata_table_file) & !new_file_flags[["metadata_table"]]){
-				session$sendCustomMessage("abort", "The option to upload a sample grouping table was chosen, but no sample grouping file was selected. Please select one or choose the option to upload no sample grouping.")
-				return(NULL)
+			# If the file is unavailable, check whether a file was actually selected
+			if (is.null(input$metadata_table)){
+
+				# If no file was ever selected, send an abort signal
+				if (!new_file_flags[["metadata_table"]]){
+					session$sendCustomMessage("abort", "The option to upload a sample grouping table was chosen, but no sample grouping file was selected. Please select one or choose the option to upload no sample grouping.")
+					return(NULL)
+
+				# Otherwise, if a file was selected but hasn't fully uploaded yet, we send the signal to retry
+				} else {
+					session$sendCustomMessage("retry_upload", "retry")
+					return(NULL)
+				}
 			}
 
 			# Read in the metadata table
@@ -1957,12 +2056,31 @@ shinyServer(function(input, output, session) {
 
 		# Otherwise, if they're not viewing the example, then we try to load data
 		} else {
-
+			session$sendCustomMessage("shiny_test", "Processing OTU table")
 			otu_table = process_otu_table_file()
+			if (is.null(otu_table)){
+				return()
+			}
+			session$sendCustomMessage("shiny_test", "Processing taxonomic hierarchy table")
 			taxonomic_hierarchy_table = process_taxonomic_hierarchy_table_file()
+			if (is.null(taxonomic_hierarchy_table)){
+				return()
+			}
+			session$sendCustomMessage("shiny_test", "Processing function hierarchy table")
 			function_hierarchy_table = process_function_hierarchy_table_file()
+			if (is.null(function_hierarchy_table)){
+				return()
+			}
+			session$sendCustomMessage("shiny_test", "Processing function abundance table")
 			function_abundance_table = process_function_abundance_table_file()
+			if (is.null(function_abundance_table)){
+				return()
+			}
+			session$sendCustomMessage("shiny_test", "Processing metadata table")
 			metadata_table = process_metadata_table_file()
+			if (is.null(metadata_table)){
+				return()
+			}
 
 			# If any tables could not be processed, we exit
 			if (is.null(otu_table) | is.null(taxonomic_hierarchy_table) | is.null(function_hierarchy_table) | is.null(function_abundance_table) | is.null(metadata_table)){
