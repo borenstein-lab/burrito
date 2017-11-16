@@ -282,3 +282,8 @@ white-space: pre-line;
 	text-anchor: middle;
 	font-size: 10;
 }
+
+.sidebardivline {
+	stroke: black;
+	stroke-width: 1;
+}
