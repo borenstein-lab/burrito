@@ -14,6 +14,7 @@ picrust_ko_table_directory = "www/Data/individual_picrust_otu_tables/"
 picrust_ko_table_suffix = "_genomic_content.tab"
 constants_filename = "www/Javascript/constants.js"
 html_elements = c("taxonomic_abundance_table", "genomic_content_table", "contribution_table", "function_abundance_table", "custom_taxonomic_hierarchy_table", "custom_function_hierarchy_table", "metadata_table")
+log_filename = "www/Data/app.log"
 
 # Read the shared constants table
 constants_table = fread(constants_filename, header=F)
@@ -48,7 +49,7 @@ relative_abundance_cutoff = 0.005
 ### Shiny server session code ###
 shinyServer(function(input, output, session) {
 
-	###Session variables tracked on the server ###
+	### Session variables tracked on the server ###
 
 	# Map of previous file paths to uploaded files, used to detect when a new file has been selected but has not finished uploading
 	old_file_paths = reactiveValues()
@@ -2032,7 +2033,10 @@ shinyServer(function(input, output, session) {
 
 	# The main observer, tied specifically to the update button that indicates the visualization should be generated. Runs the data validation and processing necessary to generate the javascript objects used in the visualization
 	observeEvent(input$update_button, { # ObserveEvent, runs whenever the update button is clicked
-		
+
+		### Log visualization views (no user information) for usage metrics
+		write(as.character(Sys.time()), file=log_filename, append=TRUE)
+
 		session$sendCustomMessage("upload_status", "file_upload")
 		
 		# Initialize important tables
