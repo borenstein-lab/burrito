@@ -104,13 +104,17 @@ var output_prefix_text = 'Output file prefix:';
 var image_format_text = 'Image format:';
 var png_format_text = 'PNG';
 var svg_format_text = 'SVG';
-var save_screenshot_text = 'Export screenshot';
-var save_taxonomic_barplot_text = 'Export taxonomic barplot';
-var save_taxonomic_legend_text = 'Export taxonomy legend';
-var save_function_barplot_text = 'Export function barplot';
-var save_function_legend_text = 'Export function legend';
-var save_function_abundance_table_text = 'Download function relative abundance table';
-var save_contribution_table_text = 'Download attribution table';
+var save_label_text = '<b>Export:</b>';
+var save_screenshot_text = 'Screenshot';
+var save_taxonomic_barplot_text = 'Taxonomic barplot';
+var save_taxonomic_legend_text = 'Taxonomy legend';
+var save_function_barplot_text = 'Function barplot';
+var save_function_legend_text = 'Function legend';
+var download_label_text = '<b>Download:</b>';
+var save_function_abundance_table_text = 'Function relative abundance table';
+var save_contribution_table_text = 'Attribution table';
+var save_statistics_text = 'Differential abundances';
+var save_NSTI_text = 'NSTI';
 var return_to_upload_page_text = 'Return to the upload page';
 
 //// Text for messages to user

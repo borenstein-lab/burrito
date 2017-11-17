@@ -297,14 +297,15 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			.attr("id","SaveInputDiv")
 			.style("width", "120px")
 			.html("<div id='figure_ex_buttons'>" + 
-				"<div id='prefixdiv'><p>" +
-				output_prefix_text + "</p>" + 
+				"<div id='prefixdiv'>" +
+				"<p>" + output_prefix_text + "</p>" + 
 				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'></div>" + 
-				"<div id='imgformatdiv'><p>" + 
-				image_format_text + "</p>" +
+				"<div id='imgformatdiv'>" +
+				"<p>" + image_format_text + "</p>" +
 				"<form action=''><label id='PNGoptionsel'> <input type='radio' name='format' value='PNG' checked='checked'>" +
 				png_format_text + "</label><label><input type='radio' name='format' value='SVG'>" +
 				svg_format_text + "</label></form></div>" + 
+				"<p>" + save_label_text + "</p>" +
 				"<button id='save_screenshot' class='savebutton' type='button'>" + 
 				save_screenshot_text + "</button>" +	
 				"<button id='save_taxa_bar' class='savebutton' type='button'>" +
@@ -315,18 +316,53 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				save_function_barplot_text + "</button>" +
 				"<button id='save_function_leg' class='savebutton' type='button'>" + 
 				save_function_legend_text + "</button>" +
-				"</div><div id='download_buttons'>" + 
+				"</div>" +
+				"<div id='download_buttons'>" +
+				"<p>" + download_label_text + "</p>" +
 				"<button id='save_function_abundance_table' class='savebutton' type='button'>" + 
 				save_function_abundance_table_text + "</button>" +
 				"<button id='save_contribution_table' class='savebutton' type='button'>" +
 				save_contribution_table_text + "</button>" +
-				"</div><div id='legendswitch'>" +
-				"<button id='switch_scale' type='button'>" +
-				switch_scale_text_on + "<button id='open_manual' type='button'>" +
-				open_manual_text +"</button></div>" +
-				"<button id='return_to_upload' type='button'>" + 
-				return_to_upload_page_text + "</button>");
+				"<button id='save_statistics_table' class='savebutton' type='button'>" +
+				save_statistics_text + "</button>" +
+				"<button id='save_NSTI_table' class='savebutton' type='button'>" +
+				save_NSTI_text + "</button>" + 
+				"</div>" +
+				"<div id='legendswitch'>" +
+				"<button id='switch_scale' type='button'>" + switch_scale_text_on + "</button>" +
+				"<button id='open_manual' type='button'>" + open_manual_text + "</button>" + 
+				"</div>" +
+				"<button id='return_to_upload' type='button'>" + return_to_upload_page_text + "</button>");
 	
+		d3.select("#save_statistics_table").attr("disabled", true);
+		d3.select("#save_NSTI_table").attr("disabled", true);
+
+		d3.select("#sidebarg").append("line")
+			.attr("id", "sidebardivl1")
+			.classed("sidebardivline", true)
+			.attr("x1", 0)
+			.attr("x2", 150)
+			.attr("y1", document.getElementById("save_function_leg").getBoundingClientRect().bottom)
+			.attr("y2", document.getElementById("save_function_leg").getBoundingClientRect().bottom);
+		
+		d3.select("#sidebarg").append("line")
+			.attr("id", "sidebardivl2")
+			.classed("sidebardivline", true)
+			.attr("x1", 0)
+			.attr("x2", 150)
+			.attr("y1", document.getElementById("save_NSTI_table").getBoundingClientRect().bottom)
+			.attr("y2", document.getElementById("save_NSTI_table").getBoundingClientRect().bottom);
+		
+		d3.select("#sidebarg").append("line")
+			.attr("id", "sidebardivl3")
+			.classed("sidebardivline", true)
+			.attr("x1", 0)
+			.attr("x2", 150)
+			.attr("y1", document.getElementById("open_manual").getBoundingClientRect().bottom)
+			.attr("y2", document.getElementById("open_manual").getBoundingClientRect().bottom);
+
+
+
 	document.getElementById('save_screenshot').addEventListener('click', function() {
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.png";
@@ -1175,9 +1211,29 @@ function resizeSidebar() {
 	d3.select("#figure_ex_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
 	d3.select("#download_buttons").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
 	d3.select("#legendswitch").style("padding-bottom", spacingheight * (0.6 / 3) + "px");
-	d3.select("#saveInputDiv").selectAll(".savebutton").style("margin-bottom", spacingheight * (0.4 / 9) + "px");
-	d3.select("#prefixdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
-	d3.select("#imgformatdiv").style("padding-bottom", spacingheight * (0.4 / 9) + "px");
+	d3.select("#saveInputDiv").selectAll(".savebutton").style("margin-bottom", spacingheight * (0.4 / 12) + "px");
+	d3.select("#prefixdiv").style("padding-bottom", spacingheight * (0.4 / 12) + "px");
+	d3.select("#switch_scale").style("margin-bottom", spacingheight * (0.4 / 12) + "px");
+	d3.select("#imgformatdiv").style("padding-bottom", spacingheight * (0.4 / 12) + "px");
+	
+	d3.select("#sidebardivl1")
+		.attr("y1", (document.getElementById("save_function_leg").getBoundingClientRect().bottom + 
+			document.getElementById("download_buttons").getBoundingClientRect().top) / 2)
+		.attr("y2", (document.getElementById("save_function_leg").getBoundingClientRect().bottom + 
+			document.getElementById("download_buttons").getBoundingClientRect().top) / 2);
+
+	d3.select("#sidebardivl2")
+		.attr("y1", (document.getElementById("save_NSTI_table").getBoundingClientRect().bottom + 
+			document.getElementById("legendswitch").getBoundingClientRect().top) / 2)
+		.attr("y2", (document.getElementById("save_NSTI_table").getBoundingClientRect().bottom + 
+			document.getElementById("legendswitch").getBoundingClientRect().top) / 2)
+
+	d3.select("#sidebardivl3")
+		.attr("y1", (document.getElementById("open_manual").getBoundingClientRect().bottom + 
+			document.getElementById("return_to_upload").getBoundingClientRect().top) / 2)
+		.attr("y2", (document.getElementById("open_manual").getBoundingClientRect().bottom + 
+			document.getElementById("return_to_upload").getBoundingClientRect().top) / 2)
+
 	sideBarPadding = spacingheight;
 }
 
