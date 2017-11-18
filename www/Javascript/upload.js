@@ -16,7 +16,9 @@
 			TAXONOMIC_ABUNDANCE_SAMPLE_ORDER : 6,
 			FUNCTION_ABUNDANCE_SAMPLE_ORDER : 7,
 			TAXONOMIC_LEVELS : 8,
-			FUNCTION_LEVELS : 9
+			FUNCTION_LEVELS : 9,
+			NSTI_TABLE : 10,
+			STATISTICS_TABLE : 11	
 		};
 
 		uploader.load_flags = [];
@@ -77,7 +79,9 @@
 					uploader.data_objects[uploader.attribute_enum.TAXONOMIC_ABUNDANCE_SAMPLE_ORDER],
 					uploader.data_objects[uploader.attribute_enum.FUNCTION_ABUNDANCE_SAMPLE_ORDER],
 					uploader.data_objects[uploader.attribute_enum.TAXONOMIC_LEVELS],
-					uploader.data_objects[uploader.attribute_enum.FUNCTION_LEVELS]);
+					uploader.data_objects[uploader.attribute_enum.FUNCTION_LEVELS],
+					uploader.data_objects[uploader.attribute_enum.NSTI_TABLE],
+					uploader.data_objects[uploader.attribute_enum.STATISTICS_TABLE]);
 			}
 		}
 
@@ -281,9 +285,33 @@
 		});
 
 		/*
+		nsti_table handler
+
+		Reads the NSTI table, updates the appropriate flag, and calls for a plot update.
+		*/
+		Shiny.addCustomMessageHandler("nsti_table", function(nsti_table){
+			uploader.load_flags[uploader.attribute_enum.NSTI_TABLE] = false;
+			uploader.data_objects[uploader.attribute_enum.NSTI_TABLE] = nsti_table;
+			uploader.load_flags[uploader.attribute_enum.NSTI_TABLE] = true;
+			uploader.update_plots();
+		})
+
+		/*
+		statistics_table handler
+
+		Reads the statistics table, updates the appropriate flag, and calls for a plot update.
+		*/
+		Shiny.addCustomMessageHandler("statistics_table", function(statistics_table){
+			uploader.load_flags[uploader.attribute_enum.STATISTICS_TABLE] = false;
+			uploader.data_objects[uploader.attribute_enum.STATISTICS_TABLE] = statistics_table;
+			uploader.load_flags[uploader.attribute_enum.STATISTICS_TABLE] = true;
+			uploader.update_plots();
+		})
+
+		/*
 		taxonomic_hierarchy_labels handler
 
-		Updates the the taxonomic hierarchy labels for the visualization.
+		Updates the taxonomic hierarchy labels for the visualization.
 		*/
 		Shiny.addCustomMessageHandler("taxonomic_hierarchy_labels", function(labels){
 			uploader.load_flags[uploader.attribute_enum.TAXONOMIC_LEVELS] = false;
@@ -407,7 +435,6 @@
 				}
 			}
 		});
-
 
 		/*
 		retry_upload handler

@@ -9,9 +9,9 @@ default_metadata_table_filename = "www/Data/mice_samplemap.txt"
 default_contribution_table_filename = "www/Data/mice_metagenome_contributions_K01516_removed.txt"
 default_otu_table_filename = "www/Data/otu_table_even_2.txt"
 picrust_normalization_table_filename = "www/Data/16S_13_5_precalculated.tab.gz"
-# picrust_ko_table_filename = "www/Data/melted_filtered_picrust_ko_table.txt.gz"
 picrust_ko_table_directory = "www/Data/individual_picrust_otu_tables/"
 picrust_ko_table_suffix = "_genomic_content.tab"
+picrust_nsti_table_filename = "www/Data/otu_nsti_values.tab"
 constants_filename = "www/Javascript/constants.js"
 html_elements = c("taxonomic_abundance_table", "genomic_content_table", "contribution_table", "function_abundance_table", "custom_taxonomic_hierarchy_table", "custom_function_hierarchy_table", "metadata_table")
 log_filename = "www/Data/app.log"
@@ -29,16 +29,6 @@ options(stringsAsFactors = F)
 default_taxonomic_hierarchy_table = fread(default_taxonomic_hierarchy_table_filename, header=T, showProgress=F)
 default_function_hierarchy_table = fread(default_function_hierarchy_table_filename, header=T, showProgress=F)
 default_metadata_table = fread(default_metadata_table_filename, header=T, showProgress=F)
-# default_contribution_table = fread(default_contribution_table_filename, header=T, showProgress=F)
-# default_otu_table = fread(default_otu_table_filename, header=T, showProgress=F)
-# if (basename(getwd()) %in% c("burrito")){
-# 	picrust_normalization_table = fread(paste("zcat ", picrust_normalization_table_filename, sep=""), header=T, showProgress=F)
-# 	picrust_ko_table = fread(paste("zcat ", picrust_ko_table_filename, sep=""), header=T, showProgress=F)
-# 	# Convert OTU and function names to character type
-# 	picrust_normalization_table[,(colnames(picrust_normalization_table)[1]) := as.character(get(colnames(picrust_normalization_table)[1]))]
-# 	picrust_ko_table[,(colnames(picrust_ko_table)[1]) := as.character(get(colnames(picrust_ko_table)[1]))]
-# 	picrust_ko_table[,(colnames(picrust_ko_table)[2]) := as.character(get(colnames(picrust_ko_table)[2]))]
-# }
 
 # Constant to mark entries for comparison in the contribution table
 comparison_tag = "_comparison"
@@ -1237,6 +1227,45 @@ shinyServer(function(input, output, session) {
 		return(data.table())
 	}
 
+	# generate_and_send_nsti_table(otu_table)
+	#
+	# If we are using the default PICRUSt tables, we calculate sample-level NSTI values and send the resulting table to the browser
+	generate_and_send_nsti_table = function(otu_table){
+
+		# If they've chosen the PICRUSt option, then we can calculate sample NSTI values
+		if (input$example_visualization != "TRUE" & input$contribution_method_choice == "PICRUST"){
+
+			# Read in the table of OTU NSTI values
+			reference_nsti_table = fread(picrust_nsti_table_filename, header=T)
+			colnames(reference_nsti_table)[1] = first_taxonomic_level()
+			reference_nsti_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+			
+			# Merge the NSTI table with the otu table
+			otu_table = merge(otu_table, reference_nsti_table, by=first_taxonomic_level(), all.x = TRUE, all.y = FALSE)
+
+			# Weight and average NSTI values by sample
+			otu_table[,weighted_nsti := abundance * get(colnames(reference_nsti_table)[2])]
+			nsti_table = otu_table[,sum(weighted_nsti)/sum(abundance),by=c(first_metadata_level())]
+			colnames(nsti_table) = c("Sample", "NSTI")
+
+			# Send the nsti table to the browser
+			session$sendCustomMessage("nsti_table", nsti_table)
+
+		# Otherwise, send an empty table
+		} else {
+			session$sendCustomMessage("nsti_table", "NULL")
+		}
+	}
+
+	# generate_and_send_statisitics_table()
+	#
+	# DESCRIPTION (MODIFY ARGUMENTS AS NEEDED)
+	generate_and_send_statisitics_table = function(){
+
+		### TODO ###
+		session$sendCustomMessage("statistics_table", "NULL")
+	}
+
 	# get_genomic_content_from_picrust_table(otu)
 	#
 	# Returns the column from the picrust tables that corresponds to the genomic content of the indicated OTU
@@ -2126,6 +2155,9 @@ shinyServer(function(input, output, session) {
 			}
 		}
 
+		# Generate and send a table of sample NSTIs to the browser if possible
+		generate_and_send_nsti_table(otu_table)
+
 		# Format the hierarchy tables so that we can summarize the OTU and contribution tables with them
 		session$sendCustomMessage("upload_status", "hierarchy_processing")
 		# Filter the hierarchy entries
@@ -2274,9 +2306,7 @@ shinyServer(function(input, output, session) {
 		otu_table_sample_order = prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table, input$sort_samples)
 		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, input$sort_samples)
 
-		# Currently not removing temporary files so users can return to the upload page and maintain files on the server
-		# # Remove temp files from the server
-		#session$sendCustomMessage("upload_status", "Deleting temporary files")
-		#remove_temp_files()
+		### Sending the statistics table (move to wherever necessary depending on the inputs you need)
+		generate_and_send_statisitics_table()
 	})
 })

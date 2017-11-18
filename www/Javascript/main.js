@@ -201,7 +201,7 @@ draw_svg = function() {
 	      }
 		return color_scale;
 	}
-draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels){
+draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, func_hierarchy_text, samp_map_text, func_averages, otu_sample_order, func_sample_order, taxonomic_levels, function_levels, nsti_table, statistics_table){
 	
 	var grouping = null;
 	if (mainui.uploadMode == "example"){
@@ -334,8 +334,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 				"</div>" +
 				"<button id='return_to_upload' type='button'>" + return_to_upload_page_text + "</button>");
 	
-		d3.select("#save_statistics_table").attr("disabled", true);
-		d3.select("#save_NSTI_table").attr("disabled", true);
+		document.getElementById("save_statistics_table").disabled = true;
+		document.getElementById("save_NSTI_table").disabled = true;
 
 		d3.select("#sidebarg").append("line")
 			.attr("id", "sidebardivl1")
@@ -362,30 +362,29 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			.attr("y2", document.getElementById("open_manual").getBoundingClientRect().bottom);
 
 
-
-	document.getElementById('save_screenshot').addEventListener('click', function() {
-			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
-				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.png";
-				saveSvgAsPng(document.getElementById("plots_svg"), fileString, { backgroundColor : "white", encoderOptions : 3})
-			} else { // SVG
-				var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.svg";
-				svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { 
-					saveSvg(uri, fileString)
-				});
-			}
-		}); 	
-	
-	document.getElementById('save_taxa_bar').addEventListener('click', function(){
-			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
-				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.png";
-				saveSvgAsPng(document.getElementById("taxa_bars"), fileString, { backgroundColor : "white", scale: 3})
-			} else { // SVG
-				var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.svg";
-				svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) { 
-					saveSvg(uri, fileString)
-				});
-			}
-		});
+		document.getElementById('save_screenshot').addEventListener('click', function() {
+				if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
+					var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.png";
+					saveSvgAsPng(document.getElementById("plots_svg"), fileString, { backgroundColor : "white", encoderOptions : 3})
+				} else { // SVG
+					var fileString = d3.select("#saveFileNameInput").property("value") + "_screenshot.svg";
+					svgAsDataUri(document.getElementById("plots_svg"), {}, function(uri) { 
+						saveSvg(uri, fileString)
+					});
+				}
+			}); 	
+		
+		document.getElementById('save_taxa_bar').addEventListener('click', function(){
+				if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
+					var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.png";
+					saveSvgAsPng(document.getElementById("taxa_bars"), fileString, { backgroundColor : "white", scale: 3})
+				} else { // SVG
+					var fileString = d3.select("#saveFileNameInput").property("value") + "_taxa_bar.svg";
+					svgAsDataUri(document.getElementById("taxa_bars"), {}, function(uri) { 
+						saveSvg(uri, fileString)
+					});
+				}
+			});
 		
 		document.getElementById('save_taxonomy_leg').addEventListener('click', function(){
 			if (d3.select('input[name="format"]:checked').node().value === 'PNG') {
@@ -437,8 +436,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 									 endBusy();              } , 10);
 		});
 
-	document.getElementById('open_manual').addEventListener('click', function() {
-		window.open("http://borenstein-lab.github.io/burrito/");
+		document.getElementById('open_manual').addEventListener('click', function() {
+			window.open("http://borenstein-lab.github.io/burrito/");
 		});
 
 		document.getElementById('save_function_abundance_table').addEventListener('click', function() {
@@ -470,6 +469,32 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			var blob = new Blob([data_cube.get_contribution_table_text(taxonomy_level_name, function_level_name)], {type: "text/plain;charset=utf-8"});
 			saveAs(blob, fileString);
 		})
+
+		// Enable the NSTI table download button if we have an NSTI table and implement the download
+		if (nsti_table != "NULL"){
+			document.getElementById('save_NSTI_table').addEventListener('click', function() {
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_NSTI.tab";
+				var nsti_table_text = "Sample\tNSTI\n"
+				for (var i = 0; i < nsti_table.Sample.length; i++){
+					nsti_table_text += nsti_table.Sample[i] + "\t" + nsti_table.NSTI[i] + "\n";
+				}
+				var blob = new Blob([nsti_table_text], {type: "text/plain;charset=utf-8"});
+				saveAs(blob, fileString);
+			})
+			document.getElementById("save_NSTI_table").disabled = false;
+		}
+
+		// Enable the statistics table download button if we have a statistics table and implement the download
+		if (statistics_table != "NULL"){
+			document.getElementById('save_statistics_table').addEventListener('click', function() {
+				var fileString = d3.select("#saveFileNameInput").property("value") + "_statistics.tab";
+				var statistics_table_text = "";
+				// TODO: Generate statistics table text
+				var blob = new Blob([statistics_table_text], {type: "text/plain;charset=utf-8"});
+				saveAs(blob, fileString);
+			})
+			document.getElementById("save_statistics_table").disabled = false;
+		}
 
 		document.getElementById('return_to_upload').addEventListener('click', function(){
 			d3.select("#mainsvg").remove();
