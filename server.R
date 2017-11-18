@@ -1239,7 +1239,7 @@ shinyServer(function(input, output, session) {
 			reference_nsti_table = fread(picrust_nsti_table_filename, header=T)
 			colnames(reference_nsti_table)[1] = first_taxonomic_level()
 			reference_nsti_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
-			
+
 			# Merge the NSTI table with the otu table
 			otu_table = merge(otu_table, reference_nsti_table, by=first_taxonomic_level(), all.x = TRUE, all.y = FALSE)
 
@@ -1260,7 +1260,7 @@ shinyServer(function(input, output, session) {
 	# generate_and_send_statisitics_table()
 	#
 	# DESCRIPTION (MODIFY ARGUMENTS AS NEEDED)
-	generate_and_send_statisitics_table = function(){
+	generate_and_send_statistics_table = function(){
 
 		### TODO ###
 		session$sendCustomMessage("statistics_table", "NULL")
@@ -2307,6 +2307,6 @@ shinyServer(function(input, output, session) {
 		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, input$sort_samples)
 
 		### Sending the statistics table (move to wherever necessary depending on the inputs you need)
-		generate_and_send_statisitics_table()
+		generate_and_send_statistics_table()
 	})
 })
