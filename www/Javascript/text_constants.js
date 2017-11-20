@@ -113,8 +113,8 @@ var save_function_legend_text = 'Function legend';
 var download_label_text = '<b>Download:</b>';
 var save_function_abundance_table_text = 'Function relative abundance table';
 var save_contribution_table_text = 'Attribution table';
-var save_statistics_text = 'Differential abundances';
-var save_NSTI_text = 'NSTI';
+var save_statistics_text = 'Differential abundance statistics';
+var save_NSTI_text = 'Sample-level NSTI';
 var return_to_upload_page_text = 'Return to the upload page';
 
 //// Text for messages to user

@@ -225,7 +225,6 @@ shinyServer(function(input, output, session) {
 
 		# If the example is not being displayed, look at the metdata factor selector
 		if (input$example_visualization != "TRUE"){
-
 			# If something hasn't been selected, we don't have a metadata factor
 			if (is.null(input$metadata_factor_selector)){
 				return(NULL)
@@ -1257,13 +1256,43 @@ shinyServer(function(input, output, session) {
 		}
 	}
 
-	# generate_and_send_statisitics_table()
+	# generate_and_send_statistics_table(metadata, otu_table, contribution_table)
 	#
-	# DESCRIPTION (MODIFY ARGUMENTS AS NEEDED)
-	generate_and_send_statistics_table = function(){
-
-		### TODO ###
-		session$sendCustomMessage("statistics_table", "NULL")
+	# If metadata variable is binary, perform Wilcoxon rank-sum tests on all taxa and functions, else return NULL 
+	generate_and_send_statistics_table = function(metadata, otu_table, contribution_table){
+		if(nrow(metadata) > 0 & !is.null(metadata_factor())){
+			#Test for whether metadata_factor() is binary
+			test_levels = unique(metadata[,get(metadata_factor())])
+			if(length(test_levels) == 2){
+				#For all taxa - Do repeated Wilcoxon rank-sum tests, calculate difference in means
+				otu_table_test = merge(otu_table, metadata[,c(first_metadata_level(), metadata_factor()),with=F], by=first_metadata_level(), all.x = F, all.y = F) #Only samples that have metadata assignment 
+				test_results = otu_table_test[,wilcox.test(abundance[get(metadata_factor())==test_levels[1]], abundance[get(metadata_factor())==test_levels[2]])$p.value, by=eval(taxonomic_summary_level())]
+				test_results[,BH_FDR_AdjustP:=p.adjust(V1, method="BH")]
+				test_results[,Bonf_AdjustP:=p.adjust(V1, method="bonferroni")]		
+				diff_means = otu_table_test[,mean(abundance[get(metadata_factor())==test_levels[1]], na.rm=T) - mean(abundance[get(metadata_factor())==test_levels[2]], na.rm=T), by=eval(taxonomic_summary_level())]
+				col_name = paste0("Mean_", test_levels[1], "_", test_levels[2], "_Diff")
+				test_results = merge(test_results, diff_means, by=taxonomic_summary_level(), all = T)
+				setnames(test_results, c(taxonomic_summary_level(), "V1.x", "V1.y"), c("Feature", "WilcoxP", col_name))	
+				#for all functions - aggregate contributions, do same calculations
+				func_table_test = contribution_table[,sum(contribution, na.rm=T), by=c(first_metadata_level(), function_summary_level())]
+				setnames(func_table_test, "V1", "abundance")
+				func_table_test = merge(func_table_test, metadata[,c(first_metadata_level(), metadata_factor()),with=F], by=first_metadata_level(), all.x = F, all.y = F)
+				func_test_results = func_table_test[,wilcox.test(abundance[get(metadata_factor())==test_levels[1]], abundance[get(metadata_factor())==test_levels[2]])$p.value, by=eval(function_summary_level())]
+				func_test_results[,BH_FDR_AdjustP:=p.adjust(V1, method="BH")]
+				func_test_results[,Bonf_AdjustP:=p.adjust(V1, method="bonferroni")]
+				diff_means = func_table_test[,mean(abundance[get(metadata_factor())==test_levels[1]], na.rm=T) - mean(abundance[get(metadata_factor())==test_levels[2]], na.rm=T), by=eval(function_summary_level())]
+				func_test_results = merge(func_test_results, diff_means, by=function_summary_level())
+				setnames(func_test_results, c(function_summary_level(), "V1.x", "V1.y"), c("Feature", "WilcoxP", col_name))					
+				#rbind into big table
+				test_results = rbind(test_results, func_test_results, fill = T)			
+				test_results = test_results[,c("Feature", col_name, "WilcoxP", "BH_FDR_AdjustP", "Bonf_AdjustP"), with=F]
+				session$sendCustomMessage("statistics_table", test_results)
+			} else {
+				session$sendCustomMessage("statistics_table", "NULL")
+			}
+		} else {
+			session$sendCustomMessage("statistics_table", "NULL")
+		}
 	}
 
 	# get_genomic_content_from_picrust_table(otu)
@@ -2270,7 +2299,7 @@ shinyServer(function(input, output, session) {
 
 
 		### Prepare the average function abundance table ###
-		session$sendCustomMessage("upload_status", "averate_function_abundance_formatting")
+		session$sendCustomMessage("upload_status", "average_function_abundance_formatting")
 
 		# Calculate the average abundances
 		average_function_abundance_table = calculate_average_function_abundances(contribution_table, function_hierarchy_table)
@@ -2290,23 +2319,27 @@ shinyServer(function(input, output, session) {
 			metadata_table = order_metadata_table_by_metadata_factor(metadata_table)
 		}
 
+		
 		javascript_metadata_table = convert_metadata_table_to_javascript_table(metadata_table, function_abundance_table)
+
 
 		# If no metadata table was provided, send a NULL signal
 		if (is.null(javascript_metadata_table)){
 			session$sendCustomMessage("metadata_table", "NULL")
-
 		# Otherwise, send the javascript metadata table
 		} else {
 			session$sendCustomMessage("metadata_table", javascript_metadata_table)
 		}
+
+
+		### Generate and send the DA statistics table 
+		generate_and_send_statistics_table(metadata_table, otu_table, contribution_table)
+
 
 		### Prepare the sample orders ###
 		session$sendCustomMessage("upload_status", "done")
 		otu_table_sample_order = prepare_and_send_otu_table_sample_order_for_visualization(otu_table, metadata_table, input$sort_samples)
 		function_table_sample_order = prepare_and_send_function_table_sample_order_for_visualization(contribution_table, metadata_table, input$sort_samples)
 
-		### Sending the statistics table (move to wherever necessary depending on the inputs you need)
-		generate_and_send_statistics_table()
 	})
 })

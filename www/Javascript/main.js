@@ -488,8 +488,11 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		if (statistics_table != "NULL"){
 			document.getElementById('save_statistics_table').addEventListener('click', function() {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_statistics.tab";
-				var statistics_table_text = "";
-				// TODO: Generate statistics table text
+				diff_name = d3.keys(statistics_table)[1]
+				var statistics_table_text = "Feature\t"+diff_name+"\tWilcoxonP\tBH_FDR_AdjustP\tBonf_AdjustP\n";
+				for (var j = 0; j < statistics_table.Feature.length; j++){
+					statistics_table_text += statistics_table.Feature[j] + "\t" + statistics_table[diff_name][j] + "\t" + statistics_table.WilcoxP[j] + "\t" + statistics_table.BH_FDR_AdjustP[j] + "\t" + statistics_table.Bonf_AdjustP[j] + "\n";
+				}
 				var blob = new Blob([statistics_table_text], {type: "text/plain;charset=utf-8"});
 				saveAs(blob, fileString);
 			})
