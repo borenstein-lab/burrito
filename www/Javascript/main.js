@@ -474,7 +474,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		if (nsti_table != "NULL"){
 			document.getElementById('save_NSTI_table').addEventListener('click', function() {
 				var fileString = d3.select("#saveFileNameInput").property("value") + "_NSTI.tab";
-				var nsti_table_text = "Sample\tNSTI\n"
+				var nsti_table_text = "# Prediction index provided by PICRUSt (Langille et al. 2013)\nSample\tNSTI (Nearest Sequenced Taxon Index)\n"
 				for (var i = 0; i < nsti_table.Sample.length; i++){
 					nsti_table_text += nsti_table.Sample[i] + "\t" + nsti_table.NSTI[i] + "\n";
 				}
