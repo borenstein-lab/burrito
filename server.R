@@ -1232,7 +1232,10 @@ shinyServer(function(input, output, session) {
 	generate_and_send_nsti_table = function(otu_table){
 
 		# If they've chosen the PICRUSt option, then we can calculate sample NSTI values
-		if (input$example_visualization != "TRUE" & input$contribution_method_choice == "PICRUST"){
+		if (input$example_visualization == "TRUE" | input$contribution_method_choice == "PICRUST"){
+
+			# Format OTU table to use strings just in case
+			otu_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
 
 			# Read in the table of OTU NSTI values
 			reference_nsti_table = fread(picrust_nsti_table_filename, header=T)
@@ -1988,12 +1991,12 @@ shinyServer(function(input, output, session) {
 		# Get the set of relevant samples
 		samples = levels(factor(otu_table[[first_metadata_level()]]))
 
-		# If specified, we sort alphabetically
-		if(alphabetical){
+		# If specified with no sample grouping, we just sort alphabetically
+		if (input$metadata_choice == "ABSENT" & alphabetical){
 			otu_table_sample_order = rank(samples)
 
 		# Otherwise, if there is metadata to order by, use that order instead
-		} else if (nrow(metadata_table) > 0){ 
+		} else if (input$metadata_choice == "PRESENT" & nrow(metadata_table) > 0){ 
 
 			# Order all samples but the "Average_contrib" sample and the comparison samples by the metadata table order
 			otu_table_sample_order = sapply(metadata_table[get(first_metadata_level()) %in% samples][[first_metadata_level()]], function(sample_name){
@@ -2023,8 +2026,8 @@ shinyServer(function(input, output, session) {
 		samples = levels(factor(contribution_table[[first_metadata_level()]]))
 		function_table_sample_order = c()
 		
-		# Sort sample names alphabetically if selected
-		if(alphabetical){
+		# If specified with no sample grouping, we just sort alphabetically
+		if (input$metadata_choice == "ABSENT" & alphabetical){
 			orig_samps = samples[!grepl(comparison_tag,samples) & samples != "Average_contrib"]
 			if(any(grepl(comparison_tag, samples))){
 				new_samp_order = c(sapply(sort(orig_samps), function(samp){
@@ -2035,8 +2038,8 @@ shinyServer(function(input, output, session) {
 				function_table_sample_order = rank(samples)
 			}
 
-		# If there is metadata to order by, use that order instead
-		} else if (nrow(metadata_table) > 0){ 
+		# Otherwise, if there is metadata to order by, use that order instead
+		} else if (input$metadata_choice == "PRESENT" & nrow(metadata_table) > 0){ 
 
 			# Order all samples but the "Average_contrib" sample by the metadata table order
 			for (sample_name in metadata_table[[first_metadata_level()]]){
