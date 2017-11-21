@@ -1232,10 +1232,7 @@ shinyServer(function(input, output, session) {
 	generate_and_send_nsti_table = function(otu_table){
 
 		# If they've chosen the PICRUSt option, then we can calculate sample NSTI values
-		if (input$example_visualization == "TRUE" | input$contribution_method_choice == "PICRUST"){
-
-			# Format OTU table to use strings just in case
-			otu_table[,(first_taxonomic_level()) := as.character(get(first_taxonomic_level()))]
+		if (input$example_visualization != "TRUE" & input$contribution_method_choice == "PICRUST"){
 
 			# Read in the table of OTU NSTI values
 			reference_nsti_table = fread(picrust_nsti_table_filename, header=T)
@@ -1276,6 +1273,9 @@ shinyServer(function(input, output, session) {
 				col_name = paste0("Mean_", test_levels[1], "_", test_levels[2], "_Diff")
 				test_results = merge(test_results, diff_means, by=taxonomic_summary_level(), all = T)
 				setnames(test_results, c(taxonomic_summary_level(), "V1.x", "V1.y"), c("Feature", "WilcoxP", col_name))	
+				test_results[,FeatureType:="Taxa"]
+				test_results = test_results[order(WilcoxP, decreasing = F)]
+				
 				##### For all functions - aggregate contributions, do same calculations
 				func_table_inferred = contribution_table[!grepl("_comparison", get(first_metadata_level()), fixed = T)] #Remove any paired function samples
 				func_table_mg = contribution_table[grepl("_comparison", get(first_metadata_level()), fixed = T)]
@@ -1290,6 +1290,8 @@ shinyServer(function(input, output, session) {
 				diff_means = func_table_inferred[,mean(abundance[get(metadata_factor())==test_levels[1]], na.rm=T) - mean(abundance[get(metadata_factor())==test_levels[2]], na.rm=T), by=eval(function_summary_level())]
 				func_test_results = merge(func_test_results, diff_means, by=function_summary_level())
 				setnames(func_test_results, c(function_summary_level(), "V1.x", "V1.y"), c("Feature", "WilcoxP", col_name))			
+				func_test_results[,FeatureType:="Taxa-based Functions"]
+				func_test_results = func_test_results[order(WilcoxP, decreasing = F)]
 
 				# Rbind into big table
 				test_results = rbind(test_results, func_test_results, fill = T)			
@@ -1306,11 +1308,17 @@ shinyServer(function(input, output, session) {
 					diff_means = func_table_mg[,mean(abundance[get(metadata_factor())==test_levels[1]], na.rm=T) - mean(abundance[get(metadata_factor())==test_levels[2]], na.rm=T), by=eval(function_summary_level())]
 					func_mg_test_results = merge(func_mg_test_results, diff_means, by=function_summary_level())
 					setnames(func_mg_test_results, c(function_summary_level(), "V1.x", "V1.y"), c("Feature", "WilcoxP", col_name))
-					func_mg_test_results[,Feature:=paste0("Metagenome_", Feature)]
+					func_mg_test_results[,FeatureType:="Metagenome-based Functions"]
+					func_mg_test_results = func_mg_test_results[order(WilcoxP, decreasing = F)]
 					test_results = rbind(test_results, func_mg_test_results, fill = T)			
 				}			
 								
-				test_results = test_results[,c("Feature", col_name, "WilcoxP", "BH_FDR_AdjustP", "Bonf_AdjustP"), with=F]
+				test_results[,eval(col_name):=round(get(col_name), digits = 5)]
+				test_results[,WilcoxP:=round(WilcoxP, digits = 5)]
+				test_results[,BH_FDR_AdjustP:=round(BH_FDR_AdjustP, digits = 5)]
+				test_results[,Bonf_AdjustP:=round(Bonf_AdjustP, digits = 5)]
+
+				test_results = test_results[,c("FeatureType", "Feature", col_name, "WilcoxP", "BH_FDR_AdjustP", "Bonf_AdjustP"), with=F]
 				session$sendCustomMessage("statistics_table", test_results)
 			} else {
 				session$sendCustomMessage("statistics_table", "NULL")
@@ -2013,12 +2021,12 @@ shinyServer(function(input, output, session) {
 		# Get the set of relevant samples
 		samples = levels(factor(otu_table[[first_metadata_level()]]))
 
-		# If specified with no sample grouping, we just sort alphabetically
-		if (input$metadata_choice == "ABSENT" & alphabetical){
+		# If specified, we sort alphabetically
+		if(alphabetical){
 			otu_table_sample_order = rank(samples)
 
 		# Otherwise, if there is metadata to order by, use that order instead
-		} else if (input$metadata_choice == "PRESENT" & nrow(metadata_table) > 0){ 
+		} else if (nrow(metadata_table) > 0){ 
 
 			# Order all samples but the "Average_contrib" sample and the comparison samples by the metadata table order
 			otu_table_sample_order = sapply(metadata_table[get(first_metadata_level()) %in% samples][[first_metadata_level()]], function(sample_name){
@@ -2048,8 +2056,8 @@ shinyServer(function(input, output, session) {
 		samples = levels(factor(contribution_table[[first_metadata_level()]]))
 		function_table_sample_order = c()
 		
-		# If specified with no sample grouping, we just sort alphabetically
-		if (input$metadata_choice == "ABSENT" & alphabetical){
+		# Sort sample names alphabetically if selected
+		if(alphabetical){
 			orig_samps = samples[!grepl(comparison_tag,samples) & samples != "Average_contrib"]
 			if(any(grepl(comparison_tag, samples))){
 				new_samp_order = c(sapply(sort(orig_samps), function(samp){
@@ -2060,8 +2068,8 @@ shinyServer(function(input, output, session) {
 				function_table_sample_order = rank(samples)
 			}
 
-		# Otherwise, if there is metadata to order by, use that order instead
-		} else if (input$metadata_choice == "PRESENT" & nrow(metadata_table) > 0){ 
+		# If there is metadata to order by, use that order instead
+		} else if (nrow(metadata_table) > 0){ 
 
 			# Order all samples but the "Average_contrib" sample by the metadata table order
 			for (sample_name in metadata_table[[first_metadata_level()]]){

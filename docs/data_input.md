@@ -73,7 +73,8 @@ their abundance fractionally to each linked pathway.
 
 <h2 id="samples">Sample Grouping Data</h2>
 
-The user can provide a sample grouping table linking samples to different groupings or factors (e.g. cases vs. controls) in the format shown in the example. Any column of the table can then be selected as the variable used to group and color samples in the visualization. 
+The user can provide a sample grouping table linking samples to different groupings or factors (e.g. cases vs. controls) in the format shown in the example. Any column of the table can then be selected as the variable used to group and color samples in the visualization. If the 
+grouping variable is binary, BURRITO will also perform a basic differential abundance analysis of taxonomic and functional differences between the two groups. See [Exporting Figures and Data from BURRITO](export.html) for more details.
 
 <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_sample_map.txt" target="_blank">Example </a>
 
