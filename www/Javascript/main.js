@@ -298,7 +298,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 			.style("width", "120px")
 			.html("<div id='prefixdiv'>" +
 				"<p>" + output_prefix_text + "</p>" + 
-				"<input style='width:110px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'></div>" + 
+				"<input style='width:120px' id='saveFileNameInput' type='text' name='outfilename' value='burrito'></div>" + 
 				"<div id='figure_ex_buttons'>" + 
 				"<p class='sidetitle'>" + save_label_text + "</p>" +
 				"<div id='imgformatdiv'>" +

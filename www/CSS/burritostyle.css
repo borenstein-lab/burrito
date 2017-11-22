@@ -244,28 +244,11 @@ input {
 .help_text {
 	font-size: 15;
 }
-#figure_ex_buttons {
-	//padding-bottom: 10vh;
-}
-#download_buttons {
-	//padding-bottom: 10vh;
-}
-#legendswitch {
-}
 #PNGoptionsel {
 	padding-right: 20px;
 }
 #SaveInputDiv button {
-	width: 110px;
-}
-#figure_ex_buttons button {
-	//margin-bottom: 2vh;
-}
-#figure_ex_buttons input {
-	//margin-bottom: 2vh;
-}
-#download_buttons button {
-	//margin-bottom: 2vh;
+	width: 120px;
 }
 .g {
 	cursor: pointer;
@@ -290,4 +273,5 @@ white-space: pre-line;
 .sidetitle {
 	text-align: center;
 	font-weight: bold;
+	text-decoration: underline;
 }
