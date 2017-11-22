@@ -26,11 +26,9 @@ via the sidebar menu. See [Uploading Data to BURRITO](data_input.html) for more 
 
 - *Function abundance tables*: 
 Specifically, the estimated function abundances and the taxon-specific function attributions can each be downloaded. These are supplied at the level of resolution selected on the upload page 
-(Genus for taxa and sub-pathway for functions by default). These are formatted the same as output files from PICRUSt (Langille Nature Biotech 2013). 
+(Genus for taxa and sub-pathway for functions by default). These are formatted the same as output files from PICRUSt (Langille et al Nature Biotech 2013). 
 
-- *Quality control of functional predictions*: If the provided data uses the default Greengenes OTUs and PICRUSt functional predictions, BURRITO will calculate and 
-provide for download the weighted Nearest Sequenced Taxon Index (NSTI) for each sample, a score indicating the average branch length separating each OTU from a sequenced reference genome (weighted
-by OTU abundances).
+- *Sample Prediction Indices*: If the provided data uses the default Greengenes OTUs and PICRUSt functional predictions, users can evaluate the quality of those predictions on a per-sample level. BURRITO calculates and provides for download the weighted Nearest Sequenced Taxon Index (NSTI) for each sample, a score indicating the average branch length separating each OTU from a sequenced reference genome (weighted by OTU abundances). See the PICRUSt documentation for more details on these values.
 
 - *Basic differential abundance statistics*: If users provide and select a binary sample grouping (for example Cases and Controls), BURRITO will automatically perform and provide preliminary differential abundance calculations
 for all of the displayed taxa and functions, at the user-specified minimum levels of resolution. This includes the difference in mean abundance between the two sample groups and the p-value from a Wilcoxon rank-sum test between the two groups, 
