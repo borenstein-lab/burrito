@@ -284,6 +284,10 @@ white-space: pre-line;
 }
 
 .sidebardivline {
-	stroke: black;
+	stroke: #666666;
 	stroke-width: 1;
+}
+.sidetitle {
+	text-align: center;
+	font-weight: bold;
 }
