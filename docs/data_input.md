@@ -10,10 +10,11 @@ BURRITO has several options for uploading and viewing datasets. Each data file m
 
 <h3>Taxonomic abundance table</h3>
 
-The first taxa-function linking method only requires the user to upload a table of taxonomic abundances that uses Greengenes (McDonald et al 2012) 97% OTU IDs as produced by QIIME or similar programs. 
+The first taxa-function linking method only requires the user to upload a table of taxonomic abundances that uses Greengenes v13.5 (McDonald et al 2012) 97% OTU IDs as produced by QIIME or similar programs. 
 The burrito server then uses the PICRUSt (Langille et al, 2013) approach to generate taxonomy-function links and estimated functional profiles. The column of taxon IDs must come as the first column in the table.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_otus.txt" target="_blank">Example </a>
+<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_greengenes_otus.txt" target="_blank">Example (With Greengenes OTU IDs) </a>
+<!--- <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_otus.txt" target="_blank">Example </a> -->
 
 <h3>Taxonomic hierarchy</h3>
 
