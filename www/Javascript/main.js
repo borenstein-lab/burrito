@@ -748,8 +748,8 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	groupVals = groupValsAll.filter(function(d,i){ return groupValsAll.indexOf(d)===i; })
 
+	sample_colors = colorbrewer["Paired"][12]
 	if(groupVals.length > sample_colors.length){
-		sample_colors = colorbrewer["Paired"][12]
 		while(groupVals.length > sample_colors.length){
 			sample_colors = sample_colors.concat(colorbrewer["Paired"][12])
 		}
