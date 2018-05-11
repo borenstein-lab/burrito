@@ -748,7 +748,16 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 
 	groupVals = groupValsAll.filter(function(d,i){ return groupValsAll.indexOf(d)===i; })
 
-	var sampleColor = d3.scale.ordinal().domain(groupVals).range(colorbrewer["Paired"][Math.max(4,groupVals.length)].slice(0,groupVals.length));
+	if(groupVals.length > sample_colors.length){
+		sample_colors = colorbrewer["Paired"][12]
+		while(groupVals.length > sample_colors.length){
+			sample_colors = sample_colors.concat(colorbrewer["Paired"][12])
+		}
+	} else {
+		sample_colors = colorbrewer["Paired"][Math.max(4,groupVals.length)]
+	}
+	sample_colors = sample_colors.slice(0,groupVals.length)
+	var sampleColor = d3.scale.ordinal().domain(groupVals).range(sample_colors); // 
 	
 	getLinkData = function(){
 		//get unique linked functions for each taxon
