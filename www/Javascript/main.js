@@ -747,7 +747,6 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 		return d[grouping]; })
 
 	groupVals = groupValsAll.filter(function(d,i){ return groupValsAll.indexOf(d)===i; })
-
 	var sampleColor = d3.scale.ordinal().domain(groupVals).range(colorbrewer["Paired"][Math.max(4,groupVals.length)].slice(0,groupVals.length));
 	
 	getLinkData = function(){
@@ -943,7 +942,7 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	function update_otu_bar(){
 		//remove old graph before redrawing new
 		TaxaBar.selectAll("g").remove();
-		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, samp_col, otu_sample_order);
+		otu_bar_data = otu_bar.make_data(otu_abundance_data, data_cube, sample_col, otu_sample_order);
 		otu_bar.draw(otu_bar_data, samplemap, taxa_colors, TaxaBar, barDimensions, highlightOverall, dehighlightOverall, sampleColor, otu_sample_order, grouping, data_cube.displayed_taxa, data_cube.displayed_funcs, clickResponse);
 	}
 
