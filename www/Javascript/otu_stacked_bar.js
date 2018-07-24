@@ -13,8 +13,9 @@
 
   otu_bar.getSampleGroup = function(samp, sampledata, grouping){
     samp_column = d3.keys(sampledata[0])[0]
-  	group = sampledata.filter(function(e){ 
-  		return e[samp_column]==samp;})[0][grouping];
+  	group = sampledata.filter(function(e){
+  		return e[samp_column]==samp;
+    })[0][grouping];
     return group;
   }
 
@@ -78,7 +79,6 @@
         .text(default_taxonomic_abundance_tooltip_text);
 
     var normalized = true;
-	
     bar_data.forEach(function(d) {
       d.taxa.forEach(function(e){
         e.y0 = Math.round(e.y0/d.total*100*100)/100;
@@ -341,13 +341,12 @@
     	var groups = [];
     	groupnames.forEach( function(gn) { groups.push({ "Name": gn, "Min": width, "Max": 0}); } );
     	
-    	
     	d3.selectAll("#taxa_bars").selectAll(".g").each( function(d) {
       		samp_col = d3.keys(d)[0]
       		var curg = otu_bar.getSampleGroup(d[samp_col], sampledata, grouping);
       		var gindex = groups.map(function(e) { 
-      			return e.Name; })
-            .indexOf(curg);
+      			  return e.Name;
+            }).indexOf(curg);
       		var xpos = this.getAttribute("transform");
       		xpos = parseFloat(xpos.substring(10,xpos.indexOf(",")));
       		if (xpos < groups[gindex].Min) { groups[gindex].Min = xpos; }
