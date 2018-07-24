@@ -12,4 +12,4 @@ BURRITO is a visualization tool developed to facilitate exploration of both taxo
 
 ### If you use BURRITO, please cite:
 
-McNally, C., Eng, A., Noecker, C., Gagne-Maynard, W., & Borenstein, E. (2017). BURRITO: An interactive tool for visualizing taxa-function relationships in microbiome data. Submitted.
+McNally, C.P., Eng, A., Noecker, C., Gagne-Maynard, W.C., and Borenstein, E. (2018). BURRITO: An Interactive Multi-Omic Tool for Visualizing Taxa–Function Relationships in Microbiome Data. Frontiers in Microbiology 9. doi:10.3389/fmicb.2018.00365
