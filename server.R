@@ -1260,6 +1260,23 @@ shinyServer(function(input, output, session) {
 		}
 	}
 
+	# filter_table_for_diff_tests(otu_table, sample_level, test_factor, test_levels, feature_level)
+	#
+	# Prepare feature table for wilcoxon tests (make sure nonzero variance and >1 nonzero samples)
+	filter_table_for_diff_tests = function(otu_table, sample_level, test_factor, test_levels, feature_level){
+		#Count how many non-zero observations there are in each group for each taxon, exclude ones with low numbers
+		session$sendCustomMessage("shiny_test", otu_table)
+		good_taxa = otu_table[, list(length(unique(get(sample_level)[abundance != 0 & !is.na(abundance)])), var(abundance, na.rm=T)), by=c(test_factor, feature_level)]
+		session$sendCustomMessage("shiny_test", good_taxa)
+		good_taxa1 = dcast(good_taxa, paste(feature_level, "~", test_factor), value.var = "V1", fun.aggregate=sum)
+		good_taxa2 = dcast(good_taxa, paste(feature_level, "~", test_factor), value.var = "V2", fun.aggregate=sum)
+		good_taxa_list = intersect(good_taxa1[get(test_levels[1]) >= 2 & get(test_levels[2]) >= 2, get(feature_level)], good_taxa2[get(test_levels[1]) != 0 & get(test_levels[2]) != 0, get(feature_level)])
+		session$sendCustomMessage("shiny_test", good_taxa_list)
+		otu_table_test_good = otu_table[get(feature_level) %in% good_taxa_list]
+		return(otu_table_test_good)
+	}
+
+
 	# generate_and_send_statistics_table(metadata, otu_table, contribution_table)
 	#
 	# If metadata variable is binary, perform Wilcoxon rank-sum tests on all taxa and functions, else return NULL 
@@ -1269,26 +1286,46 @@ shinyServer(function(input, output, session) {
 			test_levels = unique(metadata[,get(metadata_factor())])
 			if(length(test_levels) == 2){
 				# For all taxa - Do repeated Wilcoxon rank-sum tests, calculate difference in means
+				# Wilcoxon test excludes taxa with fewer than 2 nonzero samples in any group, and with zero variance in a sample group
 				otu_table_test = merge(otu_table, metadata[,c(first_metadata_level(), metadata_factor()),with=F], by=first_metadata_level(), all.x = F, all.y = F) #Only samples that have metadata assignment 
-				test_results = otu_table_test[,wilcox.test(abundance[get(metadata_factor())==test_levels[1]], abundance[get(metadata_factor())==test_levels[2]])$p.value, by=eval(taxonomic_summary_level())]
+				session$sendCustomMessage("shiny_test", "Calculating differential abundance statistics")
+				otu_table_test_good = filter_table_for_diff_tests(otu_table_test, first_metadata_level(), metadata_factor(), test_levels, taxonomic_summary_level())
+				#Count how many non-zero observations there are in each group for each taxon, exclude ones with low numbers
+				#good_taxa = otu_table_test[, list(length(unique(get(first_metadata_level())[abundance != 0 & !is.na(abundance)])), var(abundance, na.rm=T)), by=c(metadata_factor(), taxonomic_summary_level())]
+				#good_taxa1 = dcast(good_taxa, paste(taxonomic_summary_level(), "~", metadata_factor()), value.var = "V1", fun.aggregate=sum)
+				#good_taxa2 = dcast(good_taxa, paste(taxonomic_summary_level(), "~", metadata_factor()), value.var = "V2", fun.aggregate=sum)
+				#good_taxa_list = intersect(good_taxa1[get(test_levels[1]) >= 2 & get(test_levels[2]) >= 2, get(taxonomic_summary_level())], good_taxa2[get(test_levels[1]) != 0 & get(test_levels[2]) != 0, get(taxonomic_summary_level())])
+				#otu_table_test_good = otu_table_test[get(taxonomic_summary_level()) %in% good_taxa_list]
+
+				test_results = otu_table_test_good[,wilcox.test(abundance[get(metadata_factor())==test_levels[1]], abundance[get(metadata_factor())==test_levels[2]])$p.value, by=eval(taxonomic_summary_level())]
 				test_results[,BH_FDR_AdjustP:=p.adjust(V1, method="BH")]
 				test_results[,Bonf_AdjustP:=p.adjust(V1, method="bonferroni")]		
+				session$sendCustomMessage("shiny_test", test_results)
 				diff_means = otu_table_test[,mean(abundance[get(metadata_factor())==test_levels[1]], na.rm=T) - mean(abundance[get(metadata_factor())==test_levels[2]], na.rm=T), by=eval(taxonomic_summary_level())]
 				col_name = paste0("Mean_", test_levels[1], "_", test_levels[2], "_Diff")
 				test_results = merge(test_results, diff_means, by=taxonomic_summary_level(), all = T)
 				setnames(test_results, c(taxonomic_summary_level(), "V1.x", "V1.y"), c("Feature", "WilcoxP", col_name))	
 				test_results[,FeatureType:="Taxa"]
 				test_results = test_results[order(WilcoxP, decreasing = F)]
+				session$sendCustomMessage("shiny_test", test_results)
 				
 				##### For all functions - aggregate contributions, do same calculations
+				session$sendCustomMessage("shiny_test", contribution_table)
+				
 				func_table_inferred = contribution_table[!grepl("_comparison", get(first_metadata_level()), fixed = T)] #Remove any paired function samples
 				func_table_mg = contribution_table[grepl("_comparison", get(first_metadata_level()), fixed = T)]
 
 				#First for the inferred functions
+				session$sendCustomMessage("shiny_test", func_table_inferred)
 				func_table_inferred = func_table_inferred[,sum(contribution, na.rm=T), by=c(first_metadata_level(), function_summary_level())]
 				setnames(func_table_inferred, "V1", "abundance")
 				func_table_inferred = merge(func_table_inferred, metadata[,c(first_metadata_level(), metadata_factor()),with=F], by=first_metadata_level(), all.x = F, all.y = F)
-				func_test_results = func_table_inferred[,wilcox.test(abundance[get(metadata_factor())==test_levels[1]], abundance[get(metadata_factor())==test_levels[2]])$p.value, by=eval(function_summary_level())]
+				session$sendCustomMessage("shiny_test", func_table_inferred)
+
+				func_table_inferred_good = filter_table_for_diff_tests(func_table_inferred, first_metadata_level(), metadata_factor(), test_levels, function_summary_level())
+				session$sendCustomMessage("shiny_test", func_table_inferred_good)
+
+				func_test_results = func_table_inferred_good[,wilcox.test(abundance[get(metadata_factor())==test_levels[1]], abundance[get(metadata_factor())==test_levels[2]])$p.value, by=eval(function_summary_level())]
 				func_test_results[,BH_FDR_AdjustP:=p.adjust(V1, method="BH")]
 				func_test_results[,Bonf_AdjustP:=p.adjust(V1, method="bonferroni")]
 				diff_means = func_table_inferred[,mean(abundance[get(metadata_factor())==test_levels[1]], na.rm=T) - mean(abundance[get(metadata_factor())==test_levels[2]], na.rm=T), by=eval(function_summary_level())]
@@ -1306,6 +1343,7 @@ shinyServer(function(input, output, session) {
 					setnames(func_table_mg, "V1", "abundance")
 					func_table_mg[,OrigSample:=gsub("_comparison", "", get(first_metadata_level()))]
 					func_table_mg = merge(func_table_mg, metadata[,c(first_metadata_level(), metadata_factor()),with=F], by.x = "OrigSample", by.y=first_metadata_level(), all.x = F, all.y = F)
+					func_table_mg_good = filter_table_for_diff_tests(func_table_mg, "OrigSample", metadata_factor(), test_levels, function_summary_level())
 					func_mg_test_results = func_table_mg[,wilcox.test(abundance[get(metadata_factor())==test_levels[1]], abundance[get(metadata_factor())==test_levels[2]])$p.value, by=eval(function_summary_level())]
 					func_mg_test_results[,BH_FDR_AdjustP:=p.adjust(V1, method="BH")]
 					func_mg_test_results[,Bonf_AdjustP:=p.adjust(V1, method="bonferroni")]
