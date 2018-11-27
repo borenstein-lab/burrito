@@ -4,7 +4,7 @@ library(data.table)
 
 # Default files, tables for contribution calculations, a file of shared constants, and the html input elements we interact with
 default_taxonomic_hierarchy_table_filename = "www/Data/97_otu_taxonomy_split_with_header.txt"
-default_function_hierarchy_table_filename = "www/Data/classes_parsed2.tsv"
+default_function_hierarchy_table_filename = "www/Data/brite_hierarchy.tab"
 default_metadata_table_filename = "www/Data/mice_samplemap.txt"
 default_contribution_table_filename = "www/Data/mice_metagenome_contributions_K01516_removed.txt"
 default_otu_table_filename = "www/Data/otu_table_even_2.txt"
