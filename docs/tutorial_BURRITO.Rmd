@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Follow these steps to visualize two example vaginal microbiome datasets with BURRITO.
 
-1) Download the example data by clicking and unzipping [**this file**](https://cnoecker.github.io/data/BurritoData.zip). See below for more details on these datasets.
+1) Download the example data by clicking and unzipping [**this file**](https://cnoecker.github.io/TAUMicrobiomeWorkshop2019/data/BurritoData.zip). See below for more details on these datasets.
 
 2) Navigate your browser to http://elbo-spice.gs.washington.edu/shiny/burrito
 
