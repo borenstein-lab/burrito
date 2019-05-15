@@ -312,15 +312,15 @@ $(document).ready(function () {
 </div>
 
 
-<p><strong>URL:</strong> <a href="http://elbo-spice.gs.washington.edu/shiny/burrito" class="uri">http://elbo-spice.gs.washington.edu/shiny/burrito</a></p>
+<p><strong>URL:</strong> <a href="http://elbo-spice.gs.washington.edu/shiny/burrito/" class="uri">http://elbo-spice.gs.washington.edu/shiny/burrito/</a></p>
 <p><strong>Documentation:</strong> <a href="http://borenstein-lab.github.io/burrito" class="uri">http://borenstein-lab.github.io/burrito</a></p>
 <p><strong>Publication:</strong> McNally, C.P., Eng, A., Noecker, C., Gagne-Maynard, W.C., and Borenstein, E. (2018). BURRITO: An Interactive Multi-Omic Tool for Visualizing Taxa–Function Relationships in Microbiome Data. Front. Microbiol. 9, 365.</p>
-<div id="quick-start" class="section level2">
-<h2>Quick Start</h2>
+<div id="quick-start-summary" class="section level2">
+<h2>Quick Start Summary</h2>
 <p>Follow these steps to visualize two example vaginal microbiome datasets with BURRITO.</p>
 <ol style="list-style-type: decimal">
 <li><p>Download the example data by clicking and unzipping <a href="https://cnoecker.github.io/TAUMicrobiomeWorkshop2019/data/BurritoData.zip"><strong>this file</strong></a>. See below for more details on these datasets.</p></li>
-<li><p>Navigate your browser to <a href="http://elbo-spice.gs.washington.edu/shiny/burrito" class="uri">http://elbo-spice.gs.washington.edu/shiny/burrito</a></p></li>
+<li><p>Navigate your browser to <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/" class="uri">https://elbo-spice.gs.washington.edu/shiny/burrito/</a>.</p></li>
 <li><p>Upload the file <strong>cohort1_16S_gg.txt</strong> as the “Taxonomic abundances” file.</p></li>
 <li><p>Leave all the settings in the “Functional Data” box as the defaults.</p></li>
 <li><p>Upload the file <strong>cohort1_16S_metadata.txt</strong> as the “Sample grouping” file, and select one of the variables by which to group samples (recommended: “BV_Nugent_3”).</p></li>
@@ -378,14 +378,14 @@ $(document).ready(function () {
 <ol style="list-style-type: decimal">
 <li><p><strong>Greengenes OTU table (Cohort 1):</strong> A closed-reference Greengenes 97% OTU table. By default, BURRITO uses functional content pre-computed by PICRUSt1 to calculate estimated functional abundances from Greengenes OTUs.</p></li>
 <li><p><strong>Taxonomic abundances plus genomic content (Cohort 2):</strong> Taxonomic abundances in any format plus a custom genomic content table: In this case, BURRITO calculates estimated functional abundances and their attribution to different taxa using the genomic information provided. For this dataset, KEGG annotations associated with each species were downloaded from the Integrated Microbial Genomes database. The output of PICRUSt2 can also be used as input to BURRITO.</p></li>
-<li><p><strong>Function attribution table (not shown here):</strong> BURRITO can also accept what it calls a “functional attribution table”, which is a contribution table in the format produced by PICRUSt v1, describing the abundance of each gene (KEGG ortholog), from each taxon, in each sample. A stratified functional abundance table as produced by the Humann2 software could also be used for this purpose, with some re-formatting.</p></li>
+<li><p><strong>Function attribution table (not shown here):</strong> BURRITO can also accept what it calls a “functional attribution table”, which is a contribution table in the format produced by PICRUSt, describing the abundance of each gene (KEGG ortholog), from each taxon, in each sample. A stratified functional abundance table as produced by the Humann2 software could also be used for this purpose, with some re-formatting.</p></li>
 </ol>
 <p>See the documentation for more examples of each possible input format.</p>
 </div>
 <div id="using-your-own-data" class="section level3">
 <h3>Using your own data</h3>
 <p>If you would like to use your own 16S rRNA dataset, for this tutorial you should process it using qiime2 to obtain a closed-reference Greengenes OTU table.</p>
-<p>To do so, run the following commands in your qiime2 environment (which were also provided in the pre-workshop instructions).</p>
+<p>To do so, run the following commands in your qiime2 environment (which were also provided in the pre-workshop instructions). These assume that you have files named “rep-seqs.qza” and “table.qza” containing sequences and their abundances across samples.</p>
 <pre class="bash"><code># Import Greengenes reference OTU sequences
 qiime tools import \
   --input-path 97_otus.fasta \
@@ -409,6 +409,7 @@ qiime tools export \
 
 biom convert -i greengenes-cr-feature-table/feature-table.biom -o otu_table.txt --to-tsv
 </code></pre>
+<p>The <strong>otu_table.txt</strong> output of this code can be provided as the taxonomic abundances file to BURRITO.</p>
 <div id="advanced-input-options" class="section level4">
 <h4>Advanced input options</h4>
 <p>The input screen for BURRITO includes many additional options to customize your visualization for different types of data. To learn more about these, visit the BURRITO documentation linked at the top of this document.</p>
@@ -416,7 +417,7 @@ biom convert -i greengenes-cr-feature-table/feature-table.biom -o otu_table.txt 
 </div>
 <div id="using-burrito" class="section level3">
 <h3>Using BURRITO</h3>
-<p>Navigate your web browser to the BURRITO website: <a href="http://elbo-spice.gs.washington.edu/shiny/burrito" class="uri">http://elbo-spice.gs.washington.edu/shiny/burrito</a> You should see a panel of data input options.</p>
+<p>Navigate your web browser to the BURRITO website: <a href="http://elbo-spice.gs.washington.edu/shiny/burrito/" class="uri">http://elbo-spice.gs.washington.edu/shiny/burrito/</a> . You should see a panel of data input options.</p>
 <p>For dataset 1, BURRITO will use PICRUSt version one’s pre-computed gene content for Greengenes OTUs. To view dataset 1:</p>
 <ol style="list-style-type: decimal">
 <li>Upload <strong>cohort1_16S_gg.txt</strong> as the “Taxonomic abundances” file.</li>
@@ -435,11 +436,7 @@ biom convert -i greengenes-cr-feature-table/feature-table.biom -o otu_table.txt 
 </ol>
 <div id="interactions" class="section level4">
 <h4>Interactions</h4>
-<p>The two bar plots display the taxonomic and functional abundances in the dataset. Navigate up and down levels of the taxonomic and functional hierarchies by clicking on nodes in the two trees. The size of each node in the tree corresponds with its average abundance, and the width of the connecting edges represents the average contribution of each taxon to each function. You can view the specific abundance values by mousing over and/or clicking any portion of the visualization.</p>
-</div>
-<div id="output" class="section level4">
-<h4>Output</h4>
-<p>Click the settings flag in the upper left corner to display a menu. You can download SVG or PNG versions of the current state of the visualization as a whole or of individual plot components. You can also download the underlying processed data. If you grouped your samples into two groups, BURRITO will also perform some preliminary statistical analyses on differential abundances of the displayed features and make the results available for download.</p>
+<p>The two bar plots display the taxonomic and functional abundances in the dataset. Navigate up and down levels of the taxonomic and functional hierarchies by clicking on nodes in the two trees. The size of each node in the tree corresponds with its average abundance, and the width of the connecting edges represents the average contribution of each taxon to each function. You can view the specific abundance values by mousing over and/or clicking any portion of the visualization. Clicking on any portion of the bar plots highlights all data linked to the selected feature (this also allows you to export a version of the plot with a specific feature highlighted).</p>
 <p>Some questions to explore as you interact with BURRITO:</p>
 <ul>
 <li>Which taxa and functions are most variable across samples?</li>
@@ -448,10 +445,13 @@ biom convert -i greengenes-cr-feature-table/feature-table.biom -o otu_table.txt 
 <li>For example cohort 2, what differences can be seen between the taxa-based functional profile and the metagenomic functional profile?</li>
 </ul>
 </div>
+<div id="output" class="section level4">
+<h4>Output</h4>
+<p>Click the settings flag in the upper left corner to display a menu. You can download SVG or PNG versions of the current state of the visualization as a whole or of individual plot components. You can also download the underlying processed data. If you grouped your samples into two groups, BURRITO will also perform some preliminary statistical analyses on differential abundances of the displayed features and make the results available for download. If you visualized a Greengenes OTU table, BURRITO also provides data on the NSTI metric of the quality of the PICRUSt predictions.</p>
+</div>
 </div>
 <div id="limitations-to-keep-in-mind" class="section level3">
 <h3>Limitations to keep in mind</h3>
-<p>Some limitations to keep in mind:</p>
 <ul>
 <li><p>Displaying and interacting with large datasets can take a long time. Consider summarizing to a higher level of resolution, filtering rare and low-abundance taxa, and/or viewing a subset of samples at a time. If the connection to the server is repeatedly lost, there may be too many people trying to access it at once.</p></li>
 <li><p>The statistical tests performed by BURRITO are exploratory analyses and may or may not be appropriate for your study.</p></li>

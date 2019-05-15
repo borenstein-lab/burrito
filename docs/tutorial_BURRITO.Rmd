@@ -9,19 +9,19 @@ date: May 16, 2019
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-**URL:** http://elbo-spice.gs.washington.edu/shiny/burrito
+**URL:** http://elbo-spice.gs.washington.edu/shiny/burrito/
 
 **Documentation:** http://borenstein-lab.github.io/burrito
 
 **Publication:** McNally, C.P., Eng, A., Noecker, C., Gagne-Maynard, W.C., and Borenstein, E. (2018). BURRITO: An Interactive Multi-Omic Tool for Visualizing Taxa–Function Relationships in Microbiome Data. Front. Microbiol. 9, 365.
 
-## Quick Start
+## Quick Start Summary
 
 Follow these steps to visualize two example vaginal microbiome datasets with BURRITO.
 
 1) Download the example data by clicking and unzipping [**this file**](https://cnoecker.github.io/TAUMicrobiomeWorkshop2019/data/BurritoData.zip). See below for more details on these datasets.
 
-2) Navigate your browser to http://elbo-spice.gs.washington.edu/shiny/burrito
+2) Navigate your browser to https://elbo-spice.gs.washington.edu/shiny/burrito/.
 
 3) Upload the file **cohort1_16S_gg.txt** as the "Taxonomic abundances" file. 
 
@@ -96,7 +96,7 @@ Visualizing these datasets will demonstrate two of the three main input data opt
 
 2) **Taxonomic abundances plus genomic content (Cohort 2):** Taxonomic abundances in any format plus a custom genomic content table: In this case, BURRITO calculates estimated functional abundances and their attribution to different taxa using the genomic information provided. For this dataset, KEGG annotations associated with each species were downloaded from the Integrated Microbial Genomes database. The output of PICRUSt2 can also be used as input to BURRITO. 
 
-3) **Function attribution table (not shown here):** BURRITO can also accept what it calls a "functional attribution table", which is a contribution table in the format produced by PICRUSt v1, describing the abundance of each gene (KEGG ortholog), from each taxon, in each sample. A stratified functional abundance table as produced by the Humann2 software could also be used for this purpose, with some re-formatting. 
+3) **Function attribution table (not shown here):** BURRITO can also accept what it calls a "functional attribution table", which is a contribution table in the format produced by PICRUSt, describing the abundance of each gene (KEGG ortholog), from each taxon, in each sample. A stratified functional abundance table as produced by the Humann2 software could also be used for this purpose, with some re-formatting. 
 
 See the documentation for more examples of each possible input format.
 
@@ -104,7 +104,7 @@ See the documentation for more examples of each possible input format.
 
 If you would like to use your own 16S rRNA dataset, for this tutorial you should process it using qiime2 to obtain a closed-reference Greengenes OTU table. 
 
-To do so, run the following commands in your qiime2 environment (which were also provided in the pre-workshop instructions). 
+To do so, run the following commands in your qiime2 environment (which were also provided in the pre-workshop instructions). These assume that you have files named "rep-seqs.qza" and "table.qza" containing sequences and their abundances across samples. 
 
 ```{bash, eval = F}
 # Import Greengenes reference OTU sequences
@@ -132,12 +132,14 @@ biom convert -i greengenes-cr-feature-table/feature-table.biom -o otu_table.txt 
 
 ```
 
+The **otu_table.txt** output of this code can be provided as the taxonomic abundances file to BURRITO.
+
 #### Advanced input options
 
 The input screen for BURRITO includes many additional options to customize your visualization for different types of data. To learn more about these, visit the BURRITO documentation linked at the top of this document.
 
 ### Using BURRITO
-Navigate your web browser to the BURRITO website: http://elbo-spice.gs.washington.edu/shiny/burrito You should see a panel of data input options. 
+Navigate your web browser to the BURRITO website: http://elbo-spice.gs.washington.edu/shiny/burrito/ . You should see a panel of data input options. 
 
 For dataset 1, BURRITO will use PICRUSt version one's pre-computed gene content for Greengenes OTUs. To view dataset 1: 
 
@@ -151,17 +153,13 @@ For dataset 2, we will provide a file to BURRITO specifying the KO gene content 
 1) Upload **cohort2_qpcr.txt** as the "Taxonomic abundances" file.
 2) Under Taxonomy, select "Custom taxonomy" and upload **cohort2_taxonomy_vaginal_burrito.txt** as the taxonomic hierarchy file.
 3) Optionally, under Functional Data, select "Metagenome-based functional abundance table" and upload **cohort2_metagenomes.txt** as the functional comparison dataset. 
-3) Under "Taxonomy-function linking method", select "Custom genomic content table" and upload **cohort2_qpcr_genomes.txt** as the genomic content file.
-4) Upload **cohort2_metadata.txt** as the "Sample grouping" file and select one of the metadata variables by which to group samples (recommended: "BV").
+4) Under "Taxonomy-function linking method", select "Custom genomic content table" and upload **cohort2_qpcr_genomes.txt** as the genomic content file.
+5) Upload **cohort2_metadata.txt** as the "Sample grouping" file and select one of the metadata variables by which to group samples (recommended: "BV").
 6) Push "Assemble the BURRITO" and wait for the visualization to load. Push OK for any warnings that appear.
 
 #### Interactions
 
-The two bar plots display the taxonomic and functional abundances in the dataset. Navigate up and down levels of the taxonomic and functional hierarchies by clicking on nodes in the two trees. The size of each node in the tree corresponds with its average abundance, and the width of the connecting edges represents the average contribution of each taxon to each function. You can view the specific abundance values by mousing over and/or clicking any portion of the visualization.
-
-#### Output
-
-Click the settings flag in the upper left corner to display a menu. You can download SVG or PNG versions of the current state of the visualization as a whole or of individual plot components. You can also download the underlying processed data. If you grouped your samples into two groups, BURRITO will also perform some preliminary statistical analyses on differential abundances of the displayed features and make the results available for download.
+The two bar plots display the taxonomic and functional abundances in the dataset. Navigate up and down levels of the taxonomic and functional hierarchies by clicking on nodes in the two trees. The size of each node in the tree corresponds with its average abundance, and the width of the connecting edges represents the average contribution of each taxon to each function. You can view the specific abundance values by mousing over and/or clicking any portion of the visualization. Clicking on any portion of the bar plots highlights all data linked to the selected feature (this also allows you to export a version of the plot with a specific feature highlighted).
 
 Some questions to explore as you interact with BURRITO:
 
@@ -170,9 +168,11 @@ Some questions to explore as you interact with BURRITO:
 - At what levels of taxonomic and functions do you see interesting variation in samples?
 - For example cohort 2, what differences can be seen between the taxa-based functional profile and the metagenomic functional profile?
 
-### Limitations to keep in mind
+#### Output
 
-Some limitations to keep in mind: 
+Click the settings flag in the upper left corner to display a menu. You can download SVG or PNG versions of the current state of the visualization as a whole or of individual plot components. You can also download the underlying processed data. If you grouped your samples into two groups, BURRITO will also perform some preliminary statistical analyses on differential abundances of the displayed features and make the results available for download. If you visualized a Greengenes OTU table, BURRITO also provides data on the NSTI metric of the quality of the PICRUSt predictions.
+
+### Limitations to keep in mind
 
 - Displaying and interacting with large datasets can take a long time. Consider summarizing to a higher level of resolution, filtering rare and low-abundance taxa, and/or viewing a subset of samples at a time. If the connection to the server is repeatedly lost, there may be too many people trying to access it at once.
 
