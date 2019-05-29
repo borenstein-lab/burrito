@@ -589,8 +589,8 @@ shinyServer(function(input, output, session) {
 				return(FALSE)
 			}
 		} else if (comparison == "ge"){
-			if (num_cols <= column_number){
-				session$sendCustomMessage("abort", paste("The ", table_name, " should have more than equal to ", column_number, " column(s) but instead has ", num_cols, " column(s)", sep=""))
+			if (num_cols < column_number){
+				session$sendCustomMessage("abort", paste("The ", table_name, " should have more than or equal to ", column_number, " column(s) but instead has ", num_cols, " column(s)", sep=""))
 				return(FALSE)
 			}
 		}
