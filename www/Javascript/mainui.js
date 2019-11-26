@@ -47,7 +47,7 @@
 
 	mainui.fileloading = function(buttonname, filename) {
 		if (document.getElementById(buttonname).files[0].size > max_upload_size){
-				alert("The file '" + document.getElementById(buttonname).files[0].name + "'' is too large to upload at this time. We apologize for the inconvienence.")
+				alert("The file '" + document.getElementById(buttonname).files[0].name + "'' is too large to upload at this time. We apologize for the inconvenience.")
 		}
 	}
 

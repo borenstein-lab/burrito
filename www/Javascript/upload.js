@@ -41,7 +41,10 @@
 		uploader.current_taxonomic_abundance_sample_index = 0;
 		uploader.taxonomic_abundance_table_length = 0;
 		uploader.contribution_table_length = 0;
-		
+
+		// Indicates whether the server has finished returning its processed data
+		uploader.server_finished = true;
+
 		/*
 		reset_load_flags()
 
@@ -159,7 +162,7 @@
 		/*
 		contribution_table_ready handler
 
-		Initializes the contribution table in the uploader class in prepartion for receiving the contribution table from the server.
+		Initializes the contribution table in the uploader class in preparation for receiving the contribution table from the server.
 		*/
 		Shiny.addCustomMessageHandler("contribution_table_ready", function(size){
 
@@ -445,6 +448,29 @@
 			setTimeout(function(){
 				document.getElementById("update_button").click()
 			}, 2000)
+		})
+
+		// Maintain contact with the server until all files have been returned
+		Shiny.addCustomMessageHandler("maintain_connection", function(curr_val){
+
+			// Check what files have been successfully returned
+			var all_loaded = true;
+			for (var i = 0; i < uploader.load_flags.length; i++){
+				if (!uploader.load_flags[i]){
+					all_loaded = false;
+				}
+			}
+
+			// If files still need to finish transferring, delay, then ping the server to maintain the connection
+			if (!all_loaded){
+				setTimeout(function(){
+					if (curr_val > 0){
+						Shiny.onInputChange("contact", curr_val - 1)
+					} else {
+						Shiny.onInputChange("contact", curr_val + 1)
+					}
+				}, 2000)
+			}
 		})
 
 		// Set up the event handlers for loading files when they get chosen for upload

@@ -510,6 +510,11 @@ shinyServer(function(input, output, session) {
 		}
 	})
 
+	observe({
+		session$sendCustomMessage("maintain_connection", input$contact)
+		session$sendCustomMessage("shiny_test", "Sending contact ping")
+	})
+
 	# Helper functions
 
 	# process_input_file(input_element)
@@ -2162,6 +2167,7 @@ shinyServer(function(input, output, session) {
 		write(as.character(Sys.time()), file=log_filename, append=TRUE)
 
 		session$sendCustomMessage("upload_status", "file_upload")
+		session$sendCustomMessage("maintain_connection", "0")
 		
 		# Initialize important tables
 		otu_table = NULL
