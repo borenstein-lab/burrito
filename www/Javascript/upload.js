@@ -42,9 +42,6 @@
 		uploader.taxonomic_abundance_table_length = 0;
 		uploader.contribution_table_length = 0;
 
-		// Indicates whether the server has finished returning its processed data
-		uploader.server_finished = true;
-
 		/*
 		reset_load_flags()
 

@@ -512,7 +512,6 @@ shinyServer(function(input, output, session) {
 
 	observe({
 		session$sendCustomMessage("maintain_connection", input$contact)
-		session$sendCustomMessage("shiny_test", "Sending contact ping")
 	})
 
 	# Helper functions
