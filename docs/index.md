@@ -11,7 +11,7 @@ Microbiome sequencing studies typically focus on two related but separate questi
 BURRITO is a visualization tool developed to facilitate exploration of both taxonomy and function in microbiome datasets. BURRITO can estimate function abundances from 16S rRNA OTU data, 
 and displays species abundances, function abundances, and the share of each function that can be attributed to each species while simultaneously allowing interactive comparisons between different samples.
 
-BURRITO is located at <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/">https://elbo-spice.gs.washington.edu/shiny/burrito/</a>
+BURRITO is located at <a href="http://elbo-spice.cs.tau.ac.il/shiny/burrito/">http://elbo-spice.cs.tau.ac.il/shiny/burrito/</a>
 
 ### Overview
 
