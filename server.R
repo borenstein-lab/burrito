@@ -2166,7 +2166,6 @@ shinyServer(function(input, output, session) {
 		write(as.character(Sys.time()), file=log_filename, append=TRUE)
 
 		session$sendCustomMessage("upload_status", "file_upload")
-		session$sendCustomMessage("maintain_connection", "0")
 		
 		# Initialize important tables
 		otu_table = NULL
