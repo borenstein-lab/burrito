@@ -17,7 +17,7 @@ BURRITO is located at <a href="http://elbo-spice.cs.tau.ac.il/shiny/burrito/">ht
 
 ![burrito_example](burrito_sp_example_screenshot.png?raw=true)
 
-BURRITO can visualize compositional microbiome data from amplicon sequencing or whole metagenome profiling studies. To generate a visualization, users select from various options when uploading data to the tool [home page](http://elbo-spice.gs.washington.edu/shiny/burrito/). 
+BURRITO can visualize compositional microbiome data from amplicon sequencing or whole metagenome profiling studies. To generate a visualization, users select from various options when uploading data to the tool [home page](http://elbo-spice.cs.tau.ac.il/shiny/burrito/). 
 Using the most basic option, BURRITO requires a dataset of taxonomic abundances across samples. If no other data are provided, this dataset must use 97% Greengenes OTUs as taxonomic IDs. 
 Data can be supplied in other formats with supporting information in the form of either gene annotations for each taxon or taxon-specific functional abundances. 
 Sample datasets are provided in the documentation.

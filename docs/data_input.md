@@ -13,15 +13,15 @@ BURRITO has several options for uploading and viewing datasets. Each data file m
 The first taxa-function linking method only requires the user to upload a table of taxonomic abundances that uses Greengenes v13.5 (McDonald et al 2012) 97% OTU IDs as produced by QIIME or similar programs. 
 The burrito server then uses the PICRUSt (Langille et al, 2013) approach to generate taxonomy-function links and estimated functional profiles. The column of taxon IDs must come as the first column in the table.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_greengenes_otus.txt" target="_blank">Example (With Greengenes OTU IDs) </a>
-<!--- <a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_otus.txt" target="_blank">Example </a> -->
+<a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_greengenes_otus.txt" target="_blank">Example (With Greengenes OTU IDs) </a>
+<!--- <a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_otus.txt" target="_blank">Example </a> -->
 
 <h3>Taxonomic hierarchy</h3>
 
 The user can provide a custom tree describing the hierarchical relationships between taxa (by default the visualization uses the Greengenes taxonomy).
 All taxa in the taxonomic abundance table must have a unique row in the corresponding taxonomic hierarchy file.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_tax_hierarchy.txt" target="_blank">Example </a>
+<a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_tax_hierarchy.txt" target="_blank">Example </a>
 
 <h3>Choosing a summary taxonomic level</h3>
 
@@ -39,7 +39,7 @@ and subsequent columns detailing the abundances of each function in each sample.
 
 The column names must correspond exactly with the sample names used in other data files.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_metagenome.txt" target="_blank">Example </a>
+<a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_metagenome.txt" target="_blank">Example </a>
 
 <h3>Custom genomic content for each taxon</h3>
 
@@ -47,7 +47,7 @@ The second taxa-function linking method allows the user to provide their own gen
 
 The columns must appear in the same order as in the example. The taxon IDs must match those found in the associated taxonomic abundance table. All taxa must have some information in the genome content file.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_genome_content.txt" target="_blank">Example </a>
+<a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_genome_content.txt" target="_blank">Example </a>
 
 <h3>Table of functional attributions for each taxon</h3>
 
@@ -55,14 +55,14 @@ The third taxa-function linking method allows the user to supply their own table
 
 The columns must appear in the same order as in the example. The taxon IDs and sample names must appropriately match those found in the taxonomic abundance table.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_contributions.txt" target="_blank">Example </a>
+<a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_contributions.txt" target="_blank">Example </a>
 
 
 <h3>Functional hierarchy (Pathway assignments)</h3>
 
 The user can provide a custom tree describing the hierarchical relationships between functions (by default the visualization uses the KEGG BRITE hierarchy (Kanehisa and Goto, 2000). This file must be in the same format as the example.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_func_hierarchy.txt" target="_blank">Example </a>
+<a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_func_hierarchy.txt" target="_blank">Example </a>
 
 <h3>Choosing a functional summary level</h3>
 
@@ -77,6 +77,6 @@ their abundance fractionally to each linked pathway.
 The user can provide a sample grouping table linking samples to different groupings or factors (e.g. cases vs. controls) in the format shown in the example. Any column of the table can then be selected as the variable used to group and color samples in the visualization. If the 
 grouping variable is binary, BURRITO will also perform a basic differential abundance analysis of taxonomic and functional differences between the two groups. See [Exporting Figures and Data from BURRITO](export.html) for more details.
 
-<a href="https://elbo-spice.gs.washington.edu/shiny/burrito/Data/examples/example_sample_map.txt" target="_blank">Example </a>
+<a href="https://elbo-spice.cs.tau.ac.il/shiny/burrito/Data/examples/example_sample_map.txt" target="_blank">Example </a>
 
 Alternatively, users can select an option to sort samples alphabetically by sample ID.
