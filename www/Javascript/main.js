@@ -1467,4 +1467,4 @@ Shiny.addCustomMessageHandler("maintain_connection", function(curr_val){
 	}, 5000)
 })
 
-Shiny.onInputChange("contact", 0)
+// console.log("test")

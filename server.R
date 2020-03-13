@@ -39,6 +39,9 @@ relative_abundance_cutoff = 0.005
 ### Shiny server session code ###
 shinyServer(function(input, output, session) {
 
+        # Start pings to maintain contact between the browser session and the server
+        session$sendCustomMessage("maintain_connection", 0)
+        
 	### Session variables tracked on the server ###
 
 	# Map of previous file paths to uploaded files, used to detect when a new file has been selected but has not finished uploading
