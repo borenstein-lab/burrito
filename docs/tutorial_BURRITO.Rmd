@@ -1,19 +1,19 @@
 ---
-title: 'BURRITO: An Interactive Multi-Omic Tool for Visualizing Taxa–Function Relationships
+title: 'BURRITO: An Interactive Multi-Omic Tool for Visualizing Taxa-Function Relationships
   in Microbiome Data'
 output: html_document
-date: May 16, 2019
+date: March 13, 2020
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-**URL:** http://elbo-spice.gs.washington.edu/shiny/burrito/
+**URL:** http://elbo-spice.cs.tau.ac.il/shiny/burrito/
 
 **Documentation:** http://borenstein-lab.github.io/burrito
 
-**Publication:** McNally, C.P., Eng, A., Noecker, C., Gagne-Maynard, W.C., and Borenstein, E. (2018). BURRITO: An Interactive Multi-Omic Tool for Visualizing Taxa–Function Relationships in Microbiome Data. Front. Microbiol. 9, 365.
+**Publication:** McNally, C.P., Eng, A., Noecker, C., Gagne-Maynard, W.C., and Borenstein, E. (2018). BURRITO: An Interactive Multi-Omic Tool for Visualizing Taxa-Function Relationships in Microbiome Data. Front. Microbiol. 9, 365.
 
 ## Quick Start Summary
 
@@ -21,7 +21,7 @@ Follow these steps to visualize two example vaginal microbiome datasets with BUR
 
 1) Download the example data by clicking and unzipping [**this file**](https://cnoecker.github.io/TAUMicrobiomeWorkshop2019/data/BurritoData.zip). See below for more details on these datasets.
 
-2) Navigate your browser to https://elbo-spice.gs.washington.edu/shiny/burrito/.
+2) Navigate your browser to http://elbo-spice.cs.tau.ac.il/shiny/burrito/.
 
 3) Upload the file **cohort1_16S_gg.txt** as the "Taxonomic abundances" file. 
 
@@ -139,7 +139,7 @@ The **otu_table.txt** output of this code can be provided as the taxonomic abund
 The input screen for BURRITO includes many additional options to customize your visualization for different types of data. To learn more about these, visit the BURRITO documentation linked at the top of this document.
 
 ### Using BURRITO
-Navigate your web browser to the BURRITO website: http://elbo-spice.gs.washington.edu/shiny/burrito/ . You should see a panel of data input options. 
+Navigate your web browser to the BURRITO website: http://elbo-spice.cs.tau.ac.il/shiny/burrito/ . You should see a panel of data input options. 
 
 For dataset 1, BURRITO will use PICRUSt version one's pre-computed gene content for Greengenes OTUs. To view dataset 1: 
 
