@@ -1452,3 +1452,19 @@ var uploader = uploader_wrapper.make_uploader(draw_everything, update_picrust_lo
 mainui.uploadMode = "Function"; // Should not have to do this, try to eliminate later
 
 Shiny.addCustomMessageHandler("shiny_test", function(message){console.log(message)})
+
+// Maintain contact with the server
+Shiny.addCustomMessageHandler("maintain_connection", function(curr_val){
+
+	// Ping the server to maintain the connection
+	setTimeout(function(){
+		console.log(curr_val)
+		if (curr_val > 0){
+			Shiny.onInputChange("contact", curr_val - 1)
+		} else {
+			Shiny.onInputChange("contact", curr_val + 1)
+		}
+	}, 5000)
+})
+
+// console.log("test")

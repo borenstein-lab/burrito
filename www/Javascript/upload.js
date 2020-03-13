@@ -447,29 +447,6 @@
 			}, 2000)
 		})
 
-		// Maintain contact with the server until all files have been returned
-		Shiny.addCustomMessageHandler("maintain_connection", function(curr_val){
-
-			// Check what files have been successfully returned
-			var all_loaded = true;
-			for (var i = 0; i < uploader.load_flags.length; i++){
-				if (!uploader.load_flags[i]){
-					all_loaded = false;
-				}
-			}
-
-			// If files still need to finish transferring, delay, then ping the server to maintain the connection
-			if (!all_loaded){
-				setTimeout(function(){
-					if (curr_val > 0){
-						Shiny.onInputChange("contact", curr_val - 1)
-					} else {
-						Shiny.onInputChange("contact", curr_val + 1)
-					}
-				}, 2000)
-			}
-		})
-
 		// Set up the event handlers for loading files when they get chosen for upload
 		document.getElementById("taxonomic_abundance_table").addEventListener('change', function(e){
 			Shiny.onInputChange("new_file_trigger", "taxonomic_abundance_table");
