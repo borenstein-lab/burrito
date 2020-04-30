@@ -203,6 +203,16 @@ h2 {
 	margin-right: auto;
 	background-color: #FFD700;
 }
+.btn-file {
+	background-image: linear-gradient(to bottom, #FFFFFF, #F0F0F0);
+	border: 0.5px solid #afafaf;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-right: 8px;
+	padding-left: 8px;
+	color: #000000;
+	margin: 2px;
+}
 
 #tooLongTableDiv {
 	position:relative;

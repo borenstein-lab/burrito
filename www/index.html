@@ -14,7 +14,7 @@
 </head>
 
 <body topmargin="0" leftmargin="0" marginwidth="0" marginheight="0" onresize="resizeRedraw()">
-<div id="mainthing">
+<span id="mainthing">
 	<!-- JUST FOR CENTERING - START -->
 	<table border="0" cellspacing="0" cellpadding="0" height="100%" width="100%">
 		<tr valign="top" align="center">
@@ -133,7 +133,15 @@
 												</span>
 											</td>
 											<td>
-												<input type="file" name="taxonomic_abundance_table" id="taxonomic_abundance_table">
+												<div class="input-group">
+													<label class="input-group-btn">
+														<span class="btn btn-default btn-file btn-preview">
+															Choose file
+															<input type="file" name="taxonomic_abundance_table" id="taxonomic_abundance_table" style="display: none;"/>
+														</span>
+													</label>
+													<input type="text" class="form-control" placeholder="No file selected" readonly="readonly"/>
+												</div>
 											</td>
 											<td align="right">
 												<a href="Data/examples/example_otus.txt" target="_blank">
@@ -173,7 +181,15 @@
 														<td>
 															<input type="radio" name="taxonomic_hierarchy_choice" id="custom_taxonomic_hierarchy" value="CUSTOM">
 															<text id="taxonomic_hierarchy_choice_text_3"></text>
-															<input type="file" name="custom_taxonomic_hierarchy_table" id="custom_taxonomic_hierarchy_table">
+															<div class="input-group">
+																<label class="input-group-btn">
+																	<span class="btn btn-default btn-file btn-preview">
+																		Choose file
+																		<input type="file" name="custom_taxonomic_hierarchy_table" id="custom_taxonomic_hierarchy_table" style="display: none;"/>
+																	</span>
+																</label>
+																<input type="text" class="form-control" placeholder="No file selected" readonly="readonly"/>
+															</div>
 														</td>
 														<td align="right">
 															<a href="Data/examples/example_tax_hierarchy.txt" target="_blank">
@@ -269,7 +285,15 @@
 														<td>
 															<input type="radio" name="function_abundance_choice" id="function_abundance" value="PRESENT">
 															<text id="functional_abundance_choice_text_3"></text>
-															<input type="file" name="function_abundance_table" id="function_abundance_table">
+															<div class="input-group">
+																<label class="input-group-btn">
+																	<span class="btn btn-default btn-file btn-preview">
+																		Choose file
+																		<input type="file" name="function_abundance_table" id="function_abundance_table" style="display: none;"/>
+																	</span>
+																</label>
+																<input type="text" class="form-control" placeholder="No file selected" readonly="readonly"/>
+															</div>
 														</td>
 														<td align="right">
 															<a href="Data/examples/example_metagenome.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;"></a>
@@ -310,7 +334,15 @@
 														<td>
 															<input type="radio" name="contribution_method_choice" id="genomic_content" value="GENOMIC_CONTENT">
 															<text id="contribution_choice_text_3"></text>
-															<input type="file" name="genomic_content_table" id="genomic_content_table">
+															<div class="input-group">
+																<label class="input-group-btn">
+																	<span class="btn btn-default btn-file btn-preview">
+																		Choose file
+																		<input type="file" name="genomic_content_table" id="genomic_content_table" style="display: none;"/>
+																	</span>
+																</label>
+																<input type="text" class="form-control" placeholder="No file selected" readonly="readonly"/>
+															</div>
 														</td>
 														<td align="right">
 															<a href="Data/examples/example_genome_content.txt" target="_blank">
@@ -322,7 +354,15 @@
 														<td>
 															<input type="radio" name="contribution_method_choice" id="function_contribution" value="CONTRIBUTION">
 															<text id="contribution_choice_text_4"></text>
-															<input type="file" name="contribution_table" id="contribution_table">
+															<div class="input-group">
+																<label class="input-group-btn">
+																	<span class="btn btn-default btn-file btn-preview">
+																		Choose file
+																		<input type="file" name="contribution_table" id="contribution_table" style="display: none;"/>
+																	</span>
+																</label>
+																<input type="text" class="form-control" placeholder="No file selected" readonly="readonly"/>
+															</div>
 														</td>
 														<td align="right">
 															<a href="Data/examples/example_contributions.txt" target="_blank">
@@ -365,7 +405,15 @@
 														<td>
 															<input type="radio" name="function_hierarchy_choice" id="custom_function_hierarchy" value="CUSTOM">
 															<text id="functional_hierarchy_choice_text_3"></text>
-															<input type="file" name="custom_function_hierarchy_table" id="custom_function_hierarchy_table">
+															<div class="input-group">
+																<label class="input-group-btn">
+																	<span class="btn btn-default btn-file btn-preview">
+																		Choose file
+																		<input type="file" name="custom_function_hierarchy_table" id="custom_function_hierarchy_table" style="display: none;"/>
+																	</span>
+																</label>
+																<input type="text" class="form-control" placeholder="No file selected" readonly="readonly"/>
+															</div>
 														</td>
 														<td align="right">
 															<a href="Data/examples/example_func_hierarchy.txt" target="_blank">
@@ -463,7 +511,15 @@
 														<td>
 															<input type="radio" name="metadata_choice" id="metadata" value="PRESENT">
 															<text id="grouping_choice_text_4"></text>
-															<input type="file" name="metadata_table" id="metadata_table">
+															<div class="input-group">
+																<label class="input-group-btn">
+																	<span class="btn btn-default btn-file btn-preview">
+																		Choose file
+																		<input type="file" name="metadata_table" id="metadata_table" style="display: none;"/>
+																	</span>
+																</label>
+																<input type="text" class="form-control" placeholder="No file selected" readonly="readonly"/>
+															</div>
 														</td>
 														<td align="right">
 															<a href="Data/examples/example_sample_map.txt" target="_blank"><img src="images/example.png" style="vertical-align: middle;">
