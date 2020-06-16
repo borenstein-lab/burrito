@@ -660,6 +660,19 @@ shinyServer(function(input, output, session) {
 		return(TRUE)
 	}
 
+	# check_elements_from_first_found_in_second(first_element_set, second_element_set, element_name, first_table_name, second_table_name)
+	#
+	# Checks that no elements are present in the first table and not in the second. If there are elements in the first table that are not in the second, report them to the user but continue with data processing
+	check_elements_from_first_found_in_second = function(first_element_set, second_element_set, element_name, first_table_name, second_table_name){
+
+		extra_elements = !(first_element_set %in% second_element_set)
+
+		# If there are elements in the first set that are not in the second set, send an abort signal and return FALSE
+		if (any(extra_elements)){
+			session$sendCustomMessage("warning", paste("The following ", element_name, " are in the ", first_table_name, " but are not present in the ", second_table_name, ": ", paste(unique(first_element_set[extra_elements]), collapse = " "), sep=""))
+		}
+	}
+
 	# filter_elements_from_first_not_found_in_second(first_table, second_table, first_table_column_name, second_table_column_name, element_name, first_table_name, second_table_name)
 	#
 	# Filter elements out of the first table that do not appear in the second table
@@ -1489,13 +1502,8 @@ shinyServer(function(input, output, session) {
 
 		# File checking
 
-		# Check that OTUs have contributions
-		otus_have_contributions_validated = validate_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "contribution table")
-
-		# If there are OTUs without contributions, we return NULL
-		if (!otus_have_contributions_validated){
-			return(NULL)
-		}
+		# Check for OTUs that do not have contributions
+		check_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "contribution table")
 
 		# Check that OTUs with contributions have abundance
 		contribution_otus_exist_validated = validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], otu_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "OTU table")
