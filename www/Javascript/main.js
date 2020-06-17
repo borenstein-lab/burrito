@@ -730,8 +730,11 @@ draw_everything = function(otu_table, contribution_table, tax_hierarchy_text, fu
 	all_funcs = func_colors.domain()
 	for(j=0; j < all_taxa.length; j++){
 		trimstr = all_taxa[j].replace(/\W+/g,'') + "_tx";
-		//remove pre-existing
-		d3.select("#patternsvg").select("#"+trimstr).remove()
+		//try to remove pre-existing, try block catches case where taxon does not contribute to any functions
+		try {
+    		d3.select("#patternsvg").select("#"+trimstr).remove()
+    	} catch (e){
+    	}
 	}
 	
 	for(j=0; j < all_funcs.length; j++){

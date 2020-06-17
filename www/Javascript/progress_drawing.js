@@ -198,5 +198,5 @@ Shiny.addCustomMessageHandler("abort", function(message){
 })
 
 Shiny.addCustomMessageHandler("warning", function(message){
-	alert(message);
+	console.log(message);
 })
