@@ -294,6 +294,9 @@
       num_total_samples *= 2
     }
 
+    console.log("Total samples:" + num_total_samples)
+    console.log("Comparison samples:" + num_comparison_samples)
+
     // Calculate the new padding between bars after removing space between paired comparison samples
     var original_padding = func_bar_x.rangeBand() * graphdims.padding / (1 - graphdims.padding)
     var total_original_padding = original_padding * (num_total_samples - 1)
