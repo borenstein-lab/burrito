@@ -1502,17 +1502,6 @@ shinyServer(function(input, output, session) {
 
 		# File checking
 
-		# Check for OTUs that do not have contributions
-		check_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "contribution table")
-
-		# Check that OTUs with contributions have abundance
-		contribution_otus_exist_validated = validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], otu_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "OTU table")
-
-		# If there are OTUs with contributions but no abundance, we return NULL
-		if (!contribution_otus_exist_validated){
-			return(NULL)
-		}
-
 		# Check that samples in the OTU table have contribution information
 		otu_table_samples_have_contributions_validated = validate_elements_from_first_found_in_second(otu_table[[first_metadata_level()]], contribution_table[[first_metadata_level()]], "samples", "OTU table", "contribution table")
 
@@ -1526,6 +1515,17 @@ shinyServer(function(input, output, session) {
 
 		# If there are samples in the contribution table that don't have OTU abundance information, we return NULL
 		if (!contribution_samples_have_otu_abundances_validated){
+			return(NULL)
+		}
+
+		# Check for OTUs that do not have contributions
+		check_elements_from_first_found_in_second(otu_table[[first_taxonomic_level()]], contribution_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "OTU table", "contribution table")
+
+		# Check that OTUs with contributions have abundance
+		contribution_otus_exist_validated = validate_elements_from_first_found_in_second(contribution_table[[first_taxonomic_level()]], otu_table[[first_taxonomic_level()]], paste(first_taxonomic_level(), "s", sep=""), "contribution table", "OTU table")
+
+		# If there are OTUs with contributions but no abundance, we return NULL
+		if (!contribution_otus_exist_validated){
 			return(NULL)
 		}
 
